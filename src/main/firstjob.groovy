@@ -38,8 +38,15 @@ branches.each {
     job {
         name("${project_folder}/" + "${project}-${branchName}".replaceAll('/','-'))
         scm {
-            git("git://github.com/${project}.git", branchName)
-            gitContext.shallowClone
+            //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
+            //for more info about the git closure
+            git {
+                remote {
+                    url("git://github.com/${project}.git")
+                }
+                branch(branchName)
+                shallowClone(true)
+            }
         }
         steps {
             shell("echo 'Hello world! ${project}/${branchName}'")
