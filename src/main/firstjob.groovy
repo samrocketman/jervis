@@ -39,6 +39,7 @@ branches.each {
         name("${project_folder}/" + "${project}-${branchName}".replaceAll('/','-'))
         scm {
             git("git://github.com/${project}.git", branchName)
+            gitContext.shallowClone
         }
         steps {
             shell("echo 'Hello world! ${project}/${branchName}'")
