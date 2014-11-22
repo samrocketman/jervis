@@ -1,0 +1,52 @@
+buildscript {
+    repositories { mavenCentral() }
+    dependencies {
+        classpath "org.codehaus.groovy:groovy-docgenerator:2.3.0"
+        classpath "org.yaml:snakeyaml:1.14"
+    }
+}
+
+apply plugin: 'maven'
+apply plugin: 'java'
+
+test {
+  // show standard out and standard error of the test JVM(s) on the console
+  testLogging.showStandardStreams = true
+
+  // set heap size for the test JVM(s)
+  minHeapSize = "128m"
+  maxHeapSize = "512m"
+
+  // set JVM arguments for the test JVM(s)
+  jvmArgs '-XX:MaxPermSize=256m'
+
+  // listen to events in the test execution lifecycle
+  beforeTest { descriptor ->
+     logger.lifecycle("Running test: " + descriptor)
+  }
+
+  // listen to standard out and standard error of the test JVM(s)
+  onOutput { descriptor, event ->
+     logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
+  }
+}
+
+sourceSets {
+    main {
+        groovy {
+            srcDir 'src/main'
+        }
+        resources {
+            srcDir 'src/resources'
+        }
+    }
+
+    test {
+        groovy {
+            srcDir 'src/test'
+        }
+        resources {
+            srcDir 'src/testResources'
+        }
+    }
+}
