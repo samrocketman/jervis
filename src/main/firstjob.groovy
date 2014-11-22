@@ -46,6 +46,11 @@ branches.each {
                 }
                 branch(branchName)
                 shallowClone(true)
+                configure { gitHub ->
+                    gitHub / browser(class: "hudson.plugins.git.browser.GithubWeb") {
+                        url("https://github.com/${project}")
+                    }
+                }
             }
         }
         steps {
