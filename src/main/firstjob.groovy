@@ -1,5 +1,9 @@
+import jervis.remotes.GitHub
+
+def remote = new GitHub()
+
 if("${project}".size() > 0 && "${project}".split('/').length == 2) {
-println("Generating jobs for GitHub project ${project}.")
+println("Generating jobs for " + remote.type() + " project ${project}.")
 
 project_folder = "${project}".split('/')[0]
 project_name = "${project}".split('/')[1]
@@ -14,7 +18,7 @@ if(! new File("${JENKINS_HOME}/jobs/${project_folder}/config.xml").exists()) {
 println("Creating project ${project}")
 view(type: ListView) {
     name("${project}")
-    description("GitHub Project https://github.com/${project}")
+    description(remote.type() + "Project " + remote.getWebEndpoint() + "${project}")
     filterBuildQueue()
     filterExecutors()
     jobs {
@@ -31,10 +35,8 @@ view(type: ListView) {
     }
 }
 
-def branchApi = new URL("https://api.github.com/repos/${project}/branches")
-def branches = new groovy.json.JsonSlurper().parse(branchApi.newReader())
-branches.each {
-    def branchName = it.name
+remote.branches("${project}").each {
+    def branchName = it
     job {
         name("${project_folder}/" + "${project}-${branchName}".replaceAll('/','-'))
         scm {
@@ -42,14 +44,17 @@ branches.each {
             //for more info about the git closure
             git {
                 remote {
-                    url("git://github.com/${project}.git")
+                    url(remote.getCloneUrl() + "${project}.git")
                 }
                 branch(branchName)
                 shallowClone(true)
-                configure { gitHub ->
-                    gitHub / browser(class: "hudson.plugins.git.browser.GithubWeb") {
-                        url("https://github.com/${project}")
-                    }
+                switch(remote) {
+                    case GitHub:
+                        configure { gitHub ->
+                            gitHub / browser(class: "hudson.plugins.git.browser.GithubWeb") {
+                                url(remote.getWebEndpoint() + "${project}")
+                            }
+                        }
                 }
             }
         }
