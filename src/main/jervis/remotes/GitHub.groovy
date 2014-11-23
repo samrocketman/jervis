@@ -19,6 +19,10 @@ class GitHub {
     def gh_web = "https://github.com/"
     def gh_api = "https://api.github.com/"
     def gh_token
+
+    /**********************************\
+     * Setters for internal variables *
+    \**********************************/
     //gh_web will always end with a trailing slash
     void setGh_web(gh_web) {
         this.gh_web = (gh_web[-1] == '/')? gh_web : gh_web << '/'
@@ -27,15 +31,21 @@ class GitHub {
     void setGh_api(gh_api) {
         this.gh_api = (gh_api[-1] == '/')? gh_api : gh_api << '/'
     }
-
+    //gh_token should be null if it is a zero length string.
     void setGh_token(gh_token) {
         this.gh_token = (gh_token.toString().length() > 0)? gh_token : null
     }
+
+    /*********************\
+     * private functions *
+    \*********************/
     /*
-       fetch() - reaches out to a URL which returns json content.
-       returns a HashMap from the json object.
+       HashMap fetch(String addr) - fetches a URL.
+       Args:
+           addr - a web address to fetch.  The URL must return json content.
+       returns a HashMap
     */
-    private String fetch(String addr) {
+    private HashMap fetch(String addr) {
         def json = new JsonSlurper()
         if(this.gh_token) {
             return json.parse(addr.toURL().newReader(requestProperties: ["Authorization": "token ${this.gh_token}".toString(), "Accept": "application/json"]))
@@ -44,13 +54,14 @@ class GitHub {
             return json.parse(addr.toURL().newReader())
         }
     }
-    /*
-       decodeBase64() - decodes base64 strings
-       returns a string of the decoded result.
-    */
-    private String decodeBase64(content) {
+    //decode base64 strings into decoded strings
+    private String decodeBase64(String content) {
         return new String(content.toString().decodeBase64())
     }
+
+    /********************\
+     * public functions *
+    \********************/
     /*
        getWebEndpoint() returns the contents of gh_web.
        gh_web is publicly accessible but this method was provided to keep a generic getting method.
@@ -58,16 +69,22 @@ class GitHub {
 
        Always use obj.getWebEndpoint() instead of obj.gh_web.
     */
-    def getWebEndpoint() {
+    public String getWebEndpoint() {
         gh_web
     }
-    def branches(project) {
+    /*
+       List branches(String project) - get a list of branches
+       Args:
+           project - A GitHub project including the org.  e.g. samrocketman/jervis
+    */
+    public List branches(String project) {
         def list = []
         this.fetch("https://api.github.com/repos/${project}/branches").each { list << it.name }
         return list
     }
-    def getFile(project, path, ref) {
-
+    public String getFile(String project, String file_path, String ref) {
+        def response = this.fetch("https://api.github.com/repos/${project}/contents/${file_path}?ref=${ref}")
+        return this.decodeBase64(response['content'])
     }
 }
 
