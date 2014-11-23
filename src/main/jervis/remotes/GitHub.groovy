@@ -87,7 +87,7 @@ class GitHub {
     /*
        List branches(String project) - get a list of branches
        Args:
-           project - A GitHub project including the org.  e.g. samrocketman/jervis
+           project - A GitHub project including the org.
     */
     public List branches(String project) {
         def list = []
@@ -109,7 +109,7 @@ class GitHub {
     /*
        bool fileExists(String project, String file_path, String ref)
        Args:
-           project - A GitHub project including the org.  e.g. samrocketman/jervis
+           project - A GitHub project including the org.
            file_path - A path to a file relative to the root of the GitHub project.
            ref - a git reference.  e.g. master
        returns a bool
@@ -134,6 +134,18 @@ class GitHub {
                 }
                 throw IOException("HTTP response returned was not 200 nor 404.  HTTP response: ${resp.status}")
             }
+        }
+    }
+    /*
+        public String type()
+        returns a human readable string for this type of remote.
+    */
+    public String type() {
+        if(gh_web == "https://github.com/") {
+            return "GitHub"
+        }
+        else {
+            return "GitHub Enterprise"
         }
     }
 }
