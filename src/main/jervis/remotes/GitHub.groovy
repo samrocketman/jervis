@@ -16,9 +16,9 @@ package jervis.remotes
 import groovy.json.JsonSlurper
 
 //following imports are only used by fileExists() function
-import groovyx.net.http.HTTPBuilder
-import static groovyx.net.http.Method.HEAD
-import static groovyx.net.http.ContentType.JSON
+//import groovyx.net.http.HTTPBuilder
+//import static groovyx.net.http.Method.HEAD
+//import static groovyx.net.http.ContentType.JSON
 
 class GitHub {
     def gh_web = "https://github.com/"
@@ -114,6 +114,7 @@ class GitHub {
            ref - a git reference.  e.g. master
        returns a bool
     */
+    /*
     def fileExists(String project, String file_path, String ref) {
         //return true if status 200
         //return false if status 404
@@ -136,6 +137,7 @@ class GitHub {
             }
         }
     }
+    */
     /*
         public String type()
         returns a human readable string for this type of remote.
