@@ -15,6 +15,11 @@ package jervis.remotes
 
 import groovy.json.JsonSlurper
 
+//following imports are only used by fileExists() function
+import groovyx.net.http.HTTPBuilder
+import static groovyx.net.http.Method.HEAD
+import static groovyx.net.http.ContentType.JSON
+
 class GitHub {
     def gh_web = "https://github.com/"
     def gh_api = "https://api.github.com/"
@@ -45,7 +50,7 @@ class GitHub {
            addr - a web address to fetch.  The URL must return json content.
        returns a HashMap
     */
-    private HashMap fetch(String addr) {
+    private fetch(String addr) {
         def json = new JsonSlurper()
         if(this.gh_token) {
             return json.parse(addr.toURL().newReader(requestProperties: ["Authorization": "token ${this.gh_token}".toString(), "Accept": "application/json"]))
@@ -82,9 +87,46 @@ class GitHub {
         this.fetch("https://api.github.com/repos/${project}/branches").each { list << it.name }
         return list
     }
+    /*
+       String getFile(String project, String file_path, String ref)
+       Args:
+           project - A GitHub project including the org.  e.g. samrocketman/jervis
+           file_path - A path to a file relative to the root of the GitHub project.
+           ref - a git reference.  e.g. master
+       returns a String
+    */
     public String getFile(String project, String file_path, String ref) {
         def response = this.fetch("https://api.github.com/repos/${project}/contents/${file_path}?ref=${ref}")
         return this.decodeBase64(response['content'])
     }
-}
+    /*
+       bool fileExists(String project, String file_path, String ref)
+       Args:
+           project - A GitHub project including the org.  e.g. samrocketman/jervis
+           file_path - A path to a file relative to the root of the GitHub project.
+           ref - a git reference.  e.g. master
+       returns a bool
+    */
+    def fileExists(String project, String file_path, String ref) {
+        //return true if status 200
+        //return false if status 404
+        //throw exception for all other HTTP statuses
+        return new HTTPBuilder("https://api.github.com/repos/${project}/contents/${file_path}?ref=${ref}").request(HEAD,JSON) { req ->
+            //github will block request without user agent
+            headers.'User-Agent' = 'samrocketman/jervis'
+            if(this.gh_token) {
+                headers.'Authorization' = "token ${this.gh_token}"
+            }
+            response.success = { resp ->
+                return (resp.status >= 200 && resp.status < 300)
+            }
 
+            response.failure = { resp ->
+                if(resp.status == 404) {
+                    return false
+                }
+                throw IOException("HTTP response returned was not 200 nor 404.  HTTP response: ${resp.status}")
+            }
+        }
+    }
+}
