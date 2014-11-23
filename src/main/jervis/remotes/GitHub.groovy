@@ -23,6 +23,7 @@ import static groovyx.net.http.ContentType.JSON
 class GitHub {
     def gh_web = "https://github.com/"
     def gh_api = "https://api.github.com/"
+    def gh_clone = "git://github.com/"
     def gh_token
 
     /**********************************\
@@ -35,6 +36,10 @@ class GitHub {
     //gh_api will always end with a trailing slash
     void setGh_api(gh_api) {
         this.gh_api = (gh_api[-1] == '/')? gh_api : gh_api << '/'
+    }
+    //gh_clone will always end with a trailing slash
+    void setGh_clone(gh_clone) {
+        this.gh_clone = (gh_clone[-1] == '/')? gh_clone : gh_clone << '/'
     }
     //gh_token should be null if it is a zero length string.
     void setGh_token(gh_token) {
@@ -69,13 +74,15 @@ class GitHub {
     \********************/
     /*
        getWebEndpoint() returns the contents of gh_web.
-       gh_web is publicly accessible but this method was provided to keep a generic getting method.
-       This is future looking for other possible API endpoints (such as GitLab instead of GitHub).
-
-       Always use obj.getWebEndpoint() instead of obj.gh_web.
     */
     public String getWebEndpoint() {
         gh_web
+    }
+    /*
+       getCloneUrl() returns the contents of gh_clone.
+    */
+    public String getCloneUrl() {
+        gh_clone
     }
     /*
        List branches(String project) - get a list of branches
