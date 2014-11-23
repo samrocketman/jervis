@@ -3,6 +3,7 @@ buildscript {
     dependencies {
         classpath "org.codehaus.groovy:groovy-docgenerator:2.3.0"
         classpath "org.yaml:snakeyaml:1.14"
+        classpath "org.codehaus.groovy.modules.http-builder:http-builder:0.7.1"
     }
 }
 
