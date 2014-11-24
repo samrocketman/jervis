@@ -75,7 +75,7 @@ class GitHub {
     /*
        getWebEndpoint() returns the contents of gh_web.
     */
-    public String getWebEndpoint() {
+    public String getWebUrl() {
         gh_web
     }
     /*

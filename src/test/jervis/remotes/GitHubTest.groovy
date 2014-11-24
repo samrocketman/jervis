@@ -66,8 +66,8 @@ class GitHubTest extends GroovyTestCase {
         assert "V2l0aG91dCB0ZXN0cywgeW91J3JlIGdvaW5nIHRvIGhhdmUgYSBiYWQgdGltZSE=" == encoded
         assert mygh.decodeBase64(encoded) == s
     }
-    @Test public void test_GitHub_getWebEndpoint() {
-        assert mygh.getWebEndpoint() == mygh.gh_web
-        assert mygh.getWebEndpoint() == "https://github.com/"
+    @Test public void test_GitHub_getWebUrl() {
+        assert mygh.getWebUrl() == mygh.gh_web
+        assert mygh.getWebUrl() == "https://github.com/"
     }
 }
