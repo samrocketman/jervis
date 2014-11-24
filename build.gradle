@@ -1,14 +1,21 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+
 buildscript {
     repositories { mavenCentral() }
     dependencies {
-        classpath "org.codehaus.groovy:groovy-docgenerator:2.3.0"
         classpath "org.yaml:snakeyaml:1.14"
         classpath "org.codehaus.groovy.modules.http-builder:http-builder:0.7.1"
+        compile 'org.codehaus.groovy:groovy-all:2.3.6'
+        testCompile 'junit:junit:4.11'
+        //compile 'org.codehaus.groovy:groovy-all:1.8.6'
+        compile 'com.google.guava:guava:14.0.1'
+        testCompile 'org.spockframework:spock-core:0.7-groovy-1.8'
+        //testCompile 'junit:junit-dep:4.10'
+        testCompile 'cglib:cglib-nodep:2.2.2' // used by Spock
+        testCompile 'org.objenesis:objenesis:1.2' // used by Spock
     }
 }
-
-apply plugin: 'maven'
-apply plugin: 'java'
 
 test {
   // show standard out and standard error of the test JVM(s) on the console
