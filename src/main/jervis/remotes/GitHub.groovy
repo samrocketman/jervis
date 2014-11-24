@@ -31,15 +31,15 @@ class GitHub {
     \**********************************/
     //gh_web will always end with a trailing slash
     void setGh_web(gh_web) {
-        this.gh_web = (gh_web[-1] == '/')? gh_web : gh_web << '/'
+        this.gh_web = (gh_web[-1] == '/')? gh_web : gh_web + '/'
     }
     //gh_api will always end with a trailing slash
     void setGh_api(gh_api) {
-        this.gh_api = (gh_api[-1] == '/')? gh_api : gh_api << '/'
+        this.gh_api = (gh_api[-1] == '/')? gh_api : gh_api + '/'
     }
     //gh_clone will always end with a trailing slash
     void setGh_clone(gh_clone) {
-        this.gh_clone = (gh_clone[-1] == '/')? gh_clone : gh_clone << '/'
+        this.gh_clone = (gh_clone[-1] == '/')? gh_clone : gh_clone + '/'
     }
     //gh_token should be null if it is a zero length string.
     void setGh_token(gh_token) {
