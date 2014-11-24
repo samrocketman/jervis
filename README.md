@@ -1,5 +1,7 @@
 # Jervis - [![Build Status][status-build]][travis-jervis]
 
+* *Project status:* pre-alpha
+
 Jervis is a combination of some letters in the words Jenkins and Travis: JEnkins
 tRaVIS.  [Jenkins][jenkins] is a [continuous integration][wiki-ci] tool which is
 typically installed on premises.  [Travis][travis] is a hosted, distributed
