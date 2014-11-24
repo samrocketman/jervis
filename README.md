@@ -1,5 +1,4 @@
-Jervis
-======
+# Jervis - ![Build Status][status-build]
 
 Jervis is a combination of some letters in the words Jenkins and Travis: JEnkins
 tRaVIS.  [Jenkins][jenkins] is a [continuous integration][wiki-ci] tool which is
@@ -14,6 +13,7 @@ based on it.
 
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
+[status-build]: https://api.travis-ci.org/samrocketman/jervis.svg
 [travis]: https://travis-ci.org/
 [travis-yaml]: http://docs.travis-ci.com/user/build-configuration/
 [wiki-ci]: https://en.wikipedia.org/wiki/Continuous_integration
