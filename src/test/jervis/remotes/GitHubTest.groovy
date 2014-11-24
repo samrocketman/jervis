@@ -60,14 +60,37 @@ class GitHubTest extends GroovyTestCase {
         mygh.gh_token = ""
         assert mygh.gh_token == null
     }
+    //test GitHub().decodeBase64()
     @Test public void test_GitHub_decodeBase64() {
         def s = "Without tests, you're going to have a bad time!"
         String encoded = s.bytes.encodeBase64().toString()
         assert "V2l0aG91dCB0ZXN0cywgeW91J3JlIGdvaW5nIHRvIGhhdmUgYSBiYWQgdGltZSE=" == encoded
         assert mygh.decodeBase64(encoded) == s
     }
-    @Test public void test_GitHub_getWebUrl() {
+    //test GitHub().getWebUrl()
+    @Test public void test_GitHub_getWebUrl1() {
         assert mygh.getWebUrl() == mygh.gh_web
         assert mygh.getWebUrl() == "https://github.com/"
+    }
+    @Test public void test_GitHub_getWebUrl2() {
+        mygh.gh_web = "http://server/"
+        assert mygh.getWebUrl() == "http://server/"
+    }
+    //test GitHub().getCloneUrl()
+    @Test public void test_GitHub_getCloneUrl1() {
+        assert mygh.getCloneUrl() == mygh.gh_clone
+        assert mygh.getCloneUrl() == "git://github.com/"
+    }
+    @Test public void test_GitHub_getCloneUrl2() {
+        mygh.gh_clone = "http://server/"
+        assert mygh.getCloneUrl() == "http://server/"
+    }
+    //test GitHub().type()
+    @Test public void test_GitHub_type1() {
+        assert mygh.type() == "GitHub"
+    }
+    @Test public void test_GitHub_type2() {
+        mygh.gh_web = "http://server/"
+        assert mygh.type() == "GitHub Enterprise"
     }
 }
