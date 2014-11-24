@@ -24,7 +24,7 @@ class GitHubTest extends GroovyTestCase {
         mygh.gh_web = "http://server/"
         assert mygh.gh_web == "http://server/"
     }
-    @Test public void test_GitHub_readGh_web() {
+    @Test public void test_GitHub_getGh_web() {
         assert mygh.gh_web == "https://github.com/"
     }
     //test GitHub().gh_api
@@ -36,7 +36,7 @@ class GitHubTest extends GroovyTestCase {
         mygh.gh_api = "http://server/"
         assert mygh.gh_api == "http://server/"
     }
-    @Test public void test_GitHub_readGh_api() {
+    @Test public void test_GitHub_getGh_api() {
         assert mygh.gh_api == "https://api.github.com/"
     }
     //test GitHub().gh_clone
@@ -48,7 +48,7 @@ class GitHubTest extends GroovyTestCase {
         mygh.gh_clone = "http://server/"
         assert mygh.gh_clone == "http://server/"
     }
-    @Test public void test_GitHub_readGh_clone() {
+    @Test public void test_GitHub_getGh_clone() {
         assert mygh.gh_clone == "git://github.com/"
     }
     //test GitHub().gh_token
