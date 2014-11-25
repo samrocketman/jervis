@@ -20,24 +20,41 @@ class lifecycleValidator {
         lang in languages
     }
     def throw_key_exception(rootKey) {
-        throw Exception("\nERROR: Lifecycle validation failed.  Missing key: " + rootKey + ["\n\nSee wiki page:", wiki_page,"\n"].join('\n') )
+        try {
+            throw new Exception()
+        }
+        catch(Exception E) {
+            throw new Exception("\nERROR: Lifecycle validation failed.  Missing key: " + rootKey + ["\n\nSee wiki page:", wiki_page,"\n"].join('\n'), E)
+        }
     }
     def throw_value_exception(rootKey, message) {
-        throw Exception("\nERROR: Lifecycle validation failed.  Bad value in key: " + rootKey + message + ["\n\nSee wiki page:", wiki_page,"\n"].join('\n') )
+        try {
+            throw new Exception()
+        }
+        catch(Exception E) {
+            throw new Exception("\nERROR: Lifecycle validation failed.  Bad value in key: " + rootKey + message + ["\n\nSee wiki page:", wiki_page,"\n"].join('\n'), E)
+        }
+    }
+    def validate_asBool() {
+        try {
+            this.validate()
+            return true
+        }
+        catch(Exception E) {
+            return false
+        }
     }
     def validate() {
         lifecycles.keySet().each {
-            println it
-            println "this is a test"
-            println lifecycles[it]["defaultKey"]
             def tools = lifecycles[it].keySet() as String[]
             if(!("defaultKey" in tools)) {
-                this.throw_exception([it,"defaultKey"].join('.'))
+                this.throw_key_exception([it,"defaultKey"].join('.'))
             }
             if(!(lifecycles[it]["defaultKey"] in tools)) {
-                this.throw_exception([it,"defaultKey",lifecycles[it]["defaultKey"]].join('.'))
+                this.throw_key_exception([it,"defaultKey",lifecycles[it]["defaultKey"]].join('.'))
             }
             def current_key = lifecycles[it]["defaultKey"]
+            def count=0
             while(lifecycles[it][current_key] != null) {
                 def cycles = lifecycles[it][current_key].keySet() as String[]
                 if("fileExistsCondition" in cycles) {
@@ -46,28 +63,20 @@ class lifecycleValidator {
                         this.throw_value_exception([it,current_key,"fileExistsCondition","[0]"].join('.'), " first element does not begin with a '/'.")
                     }
                 }
-            }
-        }
-/*
-        lifecycles.findAll{true}.each { language, tools ->
-            tools.findAll{true}.each { tool, cycles ->
-                println language + '.' + tool
-                println cycles
-                println cycles.getClass()
-                if(cycles instanceof java.lang.String) {
-                    if(tool != 'defaultKey') {
-                        throw Exception("ERROR: Lifecycle validation failed.  Unknown key at: " + [language, tool].join('.') )
+                if("fallbackKey" in cycles) {
+                    if(!(lifecycles[it][current_key]["fallbackKey"] in tools)) {
+                        this.throw_key_exception([it,current_key,"fallbackKey",lifecycles[it][current_key]["fallbackKey"]].join('.'))
+                    }
+                    if(!("fileExistsCondition" in cycles)) {
+                        this.throw_key_exception([it,current_key,"fileExistsCondition"].join('.') + " required by " + [it,current_key,"fallbackKey"].join('.'))
                     }
                 }
-                else {
-                    cycles.findAll{true}.each { cycle, command ->
-                        println [language, tool, cycle].join('.')
-                        println command
-                        println command.getClass()
-                    }
+                count++
+                if(count > 1000) {
+                    throw new Exception("\n\nERROR: Lifecycle validation failed.  Infinite loop detected.  Last known key: " + [it,current_key].join('.') + "\n\n")
                 }
+                current_key = lifecycles[it][current_key]["fallbackKey"]
             }
         }
-*/
     }
 }
