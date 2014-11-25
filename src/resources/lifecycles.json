@@ -1,4 +1,53 @@
 {
+    "c": {
+        "defaultKey": "make",
+        "make": {
+            "script": "./configure && make && make test"
+        }
+    },
+    "cpp": {
+        "defaultKey": "make",
+        "make": {
+            "script": "./configure && make && make test"
+        }
+    },
+    "clojure": {
+        "defaultKey": "lein",
+        "lein": {
+            "script": "lein test"
+        }
+    },
+    "erlang": {
+        "defaultKey": "rebar1",
+        "rebar1": {
+            "fileExistsCondition": ["/", "rebar.config"],
+            "fallbackKey": "rebar2",
+            "install": "rebar get-deps",
+            "script": "rebar compile && rebar skip_deps=true eunit"
+        },
+        "rebar2": {
+            "fileExistsCondition": ["/", "Rebar.config"],
+            "fallbackKey": "make",
+            "install": "rebar get-deps",
+            "script": "rebar compile && rebar skip_deps=true eunit"
+        },
+        "make": {
+            "script": "make test"
+        }
+    },
+    "go": {
+        "defaultKey": "make",
+        "make": {
+            "fileExistsCondition": ["/", "Makefile"],
+            "fallbackKey": "go",
+            "install": "go get -d -v ./... && go build -v ./...",
+            "script": "make"
+        },
+        "go": {
+            "install": "go get -d -v ./... && go build -v ./...",
+            "script": "go test -v ./..."
+        }
+    },
     "groovy": {
         "defaultKey": "gradle",
         "gradle": {
@@ -18,6 +67,74 @@
             "script": "ant test",
         }
     },
+    "haskell": {
+        "defaultKey": "cabal",
+        "cabal": {
+            "install": "cabal install --only-dependencies --enable-tests",
+            "script": "cabal configure --enable-tests && cabal build && cabal test"
+        }
+    },
+    "java": {
+        "defaultKey": "gradlew",
+        "gradlew": {
+            "fileExistsCondition": ["/", "gradlew"],
+            "fallbackKey": "gradle",
+            "install": "./gradlew assemble",
+            "script": "./gradlew check"
+        },
+        "gradle": {
+            "fileExistsCondition": ["/", "build.gradle"],
+            "fallbackKey": "maven",
+            "install": "gradle assemble",
+            "script": "gradle check"
+        },
+        "maven": {
+            "fileExistsCondition": ["/", "pom.xml"],
+            "fallbackKey": "ant",
+            "install": "mvn install -DskipTests=true",
+            "script": "mvn test",
+        },
+        "ant": {
+            "fileExistsCondition": ["/", "build.xml"],
+            "script": "ant test",
+        }
+    },
+    "node_js": {
+        "defaultKey": "npm",
+        "npm": {
+            "install": "npm install",
+            "script": "npm test"
+        }
+    },
+    "perl": {
+        "defaultKey": "Module::Build",
+        "Module::Build": {
+            "fileExistsCondition": ["/", "Build.PL"],
+            "fallbackKey": "EUMM",
+            "install": "cpanm --quiet --installdeps --notest .",
+            "script": "perl Build.PL && ./Build test"
+        },
+        "EUMM": {
+            "fileExistsCondition": ["/", "Makefile.PL"],
+            "fallbackKey": "make",
+            "install": "cpanm --quiet --installdeps --notest .",
+            "script": "perl Makefile.PL && make test"
+        },
+        "make": {
+            "install": "cpanm --quiet --installdeps --notest .",
+            "script": "make"
+        }
+    },
+    "php": {
+        "defaultKey": "phpunit",
+        "phpunit": {
+            "script": "phpunit",
+        }
+    },
+    "python": {
+        "defaultKey": "dummy",
+        "dummy": {}
+    },
     "ruby": {
         "defaultKey": "rake1",
         "rake1": {
@@ -31,6 +148,21 @@
             "env": "export BUNDLE_GEMFILE=$PWD/Gemfile",
             "install": "bundle install --jobs=3 --retry=3",
             "script": "bundle exec rake"
+        }
+    },
+    "rust": {
+        "defaultKey": "cargo",
+        "cargo": {
+            "script": [
+                "cargo build --verbose",
+                "cargo test --verbose"
+            ]
+        }
+    },
+    "scala": {
+        "defaultKey": "sbt",
+        "sbt": {
+            "script": "sbt ++$TRAVIS_SCALA_VERSION test"
         }
     }
 }
