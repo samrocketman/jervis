@@ -78,5 +78,6 @@ class lifecycleValidator {
                 current_key = lifecycles[it][current_key]["fallbackKey"]
             }
         }
+        return true
     }
 }
