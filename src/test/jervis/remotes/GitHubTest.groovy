@@ -12,8 +12,8 @@ class GitHubTest extends GroovyTestCase {
     }
     //tear down after every test
     @After protected void tearDown() {
-        super.tearDown()
         mygh = null
+        super.tearDown()
     }
     //test GitHub().gh_web
     @Test public void test_GitHub_set1Gh_web() {
