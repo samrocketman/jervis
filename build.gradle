@@ -32,7 +32,7 @@ sourceSets {
             srcDir 'src/test'
         }
         resources {
-            srcDir 'src/resources'
+            srcDirs = ['src/resources', 'src/testResources']
         }
     }
 }
