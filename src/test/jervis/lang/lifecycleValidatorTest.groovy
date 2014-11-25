@@ -16,12 +16,12 @@ class lifecycleValidatorTest extends GroovyTestCase {
     }
     //test supportedLanguage()
     @Test public void test_lifecycleValidator_supportedLanguage_yes() {
-        URL url = this.getClass().getResource("/good_simple_lifecycles.json");
+        URL url = this.getClass().getResource("/good_lifecycles_simple.json");
         lifecycles.load_JSON(url)
         assert true == lifecycles.supportedLanguage("groovy")
     }
     @Test public void test_lifecycleValidator_supportedLanguage_no() {
-        URL url = this.getClass().getResource("/good_simple_lifecycles.json");
+        URL url = this.getClass().getResource("/good_lifecycles_simple.json");
         lifecycles.load_JSON(url)
         assert false == lifecycles.supportedLanguage("derpy")
     }
@@ -55,6 +55,11 @@ class lifecycleValidatorTest extends GroovyTestCase {
         URL url = this.getClass().getResource("/bad_lifecycles_resolve_infinite_loop.json");
         lifecycles.load_JSON(url)
         assert false == lifecycles.validate_asBool()
+    }
+    @Test public void test_lifecycleValidator_good_lifecycles_simple() {
+        URL url = this.getClass().getResource("/good_lifecycles_simple.json");
+        lifecycles.load_JSON(url)
+        assert true == lifecycles.validate_asBool()
     }
     @Test public void test_lifecycleValidator_main_lifecycles_json() {
         URL url = this.getClass().getResource("/lifecycles.json");
