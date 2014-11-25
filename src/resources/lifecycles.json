@@ -1,0 +1,30 @@
+{
+    "groovy": {
+        "defaultKey": "gradle",
+        "gradle": {
+            "fileExistsCondition": ["/", "build.gradle"],
+            "fallbackKey": "maven",
+            "install": "gradle assemble",
+            "script": "gradle check"
+        },
+        "maven": {
+            "fileExistsCondition": ["/", "pom.xml"],
+            "fallbackKey": "ant",
+            "install": "mvn install -DskipTests=true",
+            "script": "mvn test",
+        },
+        "ant": {
+            "fileExistsCondition": ["/", "build.xml"],
+            "script": "ant test",
+        }
+    },
+    "ruby": {
+        "defaultKey": "rake",
+        "rake": {
+            "fileExistsCondition": ["/", "build.gradle"],
+            "env": "export BUNDLE_GEMFILE=$PWD/Gemfile",
+            "install": "bundle install --jobs=3 --retry=3 --deployment",
+            "script": "bundle exec rake"
+        }
+    }
+}
