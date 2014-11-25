@@ -9,7 +9,7 @@ import groovy.json.JsonSlurper
 //x.validate()
 
 class lifecycleValidator {
-    def wiki_page = "https://github.com/samrocketman/jervis/wiki/Default-commands-for-supported-languages-file"
+    def wiki_page = "https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file"
     def lifecycles
     def languages
     def load_JSON(URL url) {
