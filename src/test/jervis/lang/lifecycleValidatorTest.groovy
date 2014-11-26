@@ -1,6 +1,7 @@
 package jervis.lang
 //the lifecycleValidatorTest() class automatically sees the lifecycleValidatorTest() class because they're in the same package
 import org.junit.*
+import jervis.exceptions.*
 
 class lifecycleValidatorTest extends GroovyTestCase {
     def lifecycles
@@ -49,7 +50,9 @@ class lifecycleValidatorTest extends GroovyTestCase {
     @Test public void test_lifecycleValidator_bad_lifecycles_resolve_fileExistsCondition() {
         URL url = this.getClass().getResource("/bad_lifecycles_resolve_fileExistsCondition.json");
         lifecycles.load_JSON(url)
-        assert false == lifecycles.validate_asBool()
+        shouldFail(BadValueInKeyException) {
+            lifecycles.validate()
+        }
     }
     @Test public void test_lifecycleValidator_bad_lifecycles_resolve_infinite_loop() {
         URL url = this.getClass().getResource("/bad_lifecycles_resolve_infinite_loop.json");
