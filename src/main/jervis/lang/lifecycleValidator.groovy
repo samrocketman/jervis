@@ -1,6 +1,8 @@
 package jervis.lang
 
 import groovy.json.JsonSlurper
+import jervis.exceptions.*
+
 
 //import jervis.lang.lifecycleValidator
 //URL url = new URL('file:///home/sam/git/github/jervis/src/resources/lifecycles.json')
@@ -25,14 +27,6 @@ class lifecycleValidator {
         }
         catch(Exception E) {
             throw new Exception("\nERROR: Lifecycle validation failed.  Missing key: " + rootKey + ["\n\nSee wiki page:", wiki_page,"\n"].join('\n'), E)
-        }
-    }
-    def throw_value_exception(rootKey, message) {
-        try {
-            throw new Exception()
-        }
-        catch(Exception E) {
-            throw new Exception("\nERROR: Lifecycle validation failed.  Bad value in key: " + rootKey + message + ["\n\nSee wiki page:", wiki_page,"\n"].join('\n'), E)
         }
     }
     def validate_asBool() {
@@ -60,7 +54,7 @@ class lifecycleValidator {
                 if("fileExistsCondition" in cycles) {
                     //check for leading slash in the first element of fileExistsCondition
                     if(lifecycles[it][current_key]["fileExistsCondition"][0][0] != '/') {
-                        this.throw_value_exception([it,current_key,"fileExistsCondition","[0]"].join('.'), " first element does not begin with a '/'.")
+                        throw new BadValueInKeyException([it,current_key,"fileExistsCondition","[0]"].join('.') + " first element does not begin with a '/'.")
                     }
                 }
                 if("fallbackKey" in cycles) {

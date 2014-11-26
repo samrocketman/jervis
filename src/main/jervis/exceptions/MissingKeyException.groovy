@@ -1,7 +1,6 @@
 package jervis.exceptions
 
 
-class MissingKeyException extends validationException
+class MissingKeyException extends ValidationException
 {
-
 }

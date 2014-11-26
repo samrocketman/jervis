@@ -1,7 +1,6 @@
 package jervis.exceptions
 
 
-class InfiniteLoopException extends validationException
+class InfiniteLoopException extends ValidationException
 {
-
 }
