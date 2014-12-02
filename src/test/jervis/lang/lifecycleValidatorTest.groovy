@@ -1,5 +1,5 @@
 package jervis.lang
-//the lifecycleValidatorTest() class automatically sees the lifecycleValidatorTest() class because they're in the same package
+//the lifecycleValidatorTest() class automatically sees the lifecycleValidator() class because they're in the same package
 import org.junit.*
 import jervis.exceptions.*
 

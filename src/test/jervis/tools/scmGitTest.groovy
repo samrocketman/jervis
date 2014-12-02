@@ -1,5 +1,5 @@
 package jervis.tools
-//the lifecycleValidatorTest() class automatically sees the lifecycleValidatorTest() class because they're in the same package
+//the scmGitTest() class automatically sees the scmGit() class because they're in the same package
 import org.junit.*
 
 class scmGitTest extends GroovyTestCase {
