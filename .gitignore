@@ -3,3 +3,6 @@ build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
+
+#ignore encryption keys
+id_rsa*
