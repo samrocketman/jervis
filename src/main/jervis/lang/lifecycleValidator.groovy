@@ -67,7 +67,7 @@ class lifecycleValidator {
                 }
                 count++
                 if(count > 1000) {
-                    throw new Exception("\n\nERROR: Lifecycle validation failed.  Infinite loop detected.  Last known key: " + [it,current_key].join('.') + "\n\n")
+                    throw new InfiniteLoopException([it,current_key].join('.'))
                 }
                 current_key = lifecycles[it][current_key]["fallbackKey"]
             }
