@@ -60,13 +60,6 @@ class GitHubTest extends GroovyTestCase {
         mygh.gh_token = ""
         assert mygh.gh_token == null
     }
-    //test GitHub().decodeBase64()
-    @Test public void test_GitHub_decodeBase64() {
-        def s = "Without tests, you're going to have a bad time!"
-        String encoded = s.bytes.encodeBase64().toString()
-        assert "V2l0aG91dCB0ZXN0cywgeW91J3JlIGdvaW5nIHRvIGhhdmUgYSBiYWQgdGltZSE=" == encoded
-        assert mygh.decodeBase64(encoded) == s
-    }
     //test GitHub().getWebUrl()
     @Test public void test_GitHub_getWebUrl1() {
         assert mygh.getWebUrl() == mygh.gh_web

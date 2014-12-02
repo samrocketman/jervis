@@ -14,6 +14,7 @@
 package jervis.remotes
 
 import groovy.json.JsonSlurper
+import jervis.tools.securityIO
 
 //following imports are only used by fileExists() function
 //import groovyx.net.http.HTTPBuilder
@@ -64,10 +65,6 @@ class GitHub {
             return json.parse(addr.toURL().newReader())
         }
     }
-    //decode base64 strings into decoded strings
-    private String decodeBase64(String content) {
-        return new String(content.toString().decodeBase64())
-    }
 
     /********************\
      * public functions *
@@ -104,7 +101,8 @@ class GitHub {
     */
     public String getFile(String project, String file_path, String ref) {
         def response = this.fetch("https://api.github.com/repos/${project}/contents/${file_path}?ref=${ref}")
-        return this.decodeBase64(response['content'])
+        def security = new securityIO()
+        return security.decodeBase64String(response['content'])
     }
     /*
        bool fileExists(String project, String file_path, String ref)
