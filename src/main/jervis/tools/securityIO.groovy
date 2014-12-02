@@ -13,14 +13,14 @@ class securityIO {
         def git = new scmGit()
         set_vars(git.getRoot() + '/id_rsa.pem', git.getRoot() + '/id_rsa.pub.pem', keysize)
     }
-    def securityIO(String priv_key_file_path, String pub_key_file_path, int keysize) {
-        set_vars(priv_key_file_path, pub_key_file_path, keysize)
-    }
     def securityIO(String path) {
         set_vars(checkPath(path) + '/id_rsa.pem', checkPath(path) + '/id_rsa.pub.pem', default_key_size)
     }
     def securityIO(String path, int keysize) {
         set_vars(checkPath(path) + '/id_rsa.pem', checkPath(path) + '/id_rsa.pub.pem', keysize)
+    }
+    def securityIO(String priv_key_file_path, String pub_key_file_path, int keysize) {
+        set_vars(priv_key_file_path, pub_key_file_path, keysize)
     }
     public String checkPath(String path) {
         if(path.length() > 0 && path[-1] == '/') {
