@@ -14,8 +14,27 @@ plugin][jenkins-plugin-job-dsl] and groovy scripts.  It reads the
 [.travis.yml][travis-yaml] file of a project and generates a job in Jenkins
 based on it.
 
+For development planning and other documentation see the [Jervis
+wiki][jervis-wiki].
+
+# Building Jervis
+
+Assemble dependencies.
+
+    gradle assemble
+
+Run unit tests.
+
+    gradle check
+
+Create a `jervis.jar` (only useful if using Jervis as a library class for your
+own development).
+
+    gradle build
+
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
+[jervis-wiki]: https://github.com/samrocketman/jervis/wiki
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=master
 [travis]: https://travis-ci.org/
 [travis-jervis]: https://travis-ci.org/samrocketman/jervis
