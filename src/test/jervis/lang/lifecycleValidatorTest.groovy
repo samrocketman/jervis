@@ -57,7 +57,9 @@ class lifecycleValidatorTest extends GroovyTestCase {
     @Test public void test_lifecycleValidator_bad_lifecycles_resolve_infinite_loop() {
         URL url = this.getClass().getResource("/bad_lifecycles_resolve_infinite_loop.json");
         lifecycles.load_JSON(url)
-        assert false == lifecycles.validate_asBool()
+        shouldFail(InfiniteLoopException) {
+            lifecycles.validate()
+        }
     }
     @Test public void test_lifecycleValidator_good_lifecycles_simple() {
         URL url = this.getClass().getResource("/good_lifecycles_simple.json");
