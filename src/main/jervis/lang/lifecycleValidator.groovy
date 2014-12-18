@@ -4,6 +4,7 @@ import groovy.json.JsonSlurper
 import jervis.exceptions.BadValueInKeyException
 import jervis.exceptions.InfiniteLoopException
 import jervis.exceptions.MissingKeyException
+import jervis.exceptions.ValidationException
 
 
 //import jervis.lang.lifecycleValidator
@@ -28,7 +29,7 @@ class lifecycleValidator {
             this.validate()
             return true
         }
-        catch(Exception E) {
+        catch(ValidationException E) {
             return false
         }
     }
