@@ -33,6 +33,7 @@ class GitHub {
     //gh_web will always end with a trailing slash
     void setGh_web(gh_web) {
         this.gh_web = (gh_web[-1] == '/')? gh_web : gh_web + '/'
+        this.setGh_api(this.gh_web + 'api/v3/')
     }
     //gh_api will always end with a trailing slash
     void setGh_api(gh_api) {
@@ -88,7 +89,7 @@ class GitHub {
     */
     public List branches(String project) {
         def list = []
-        this.fetch("https://api.github.com/repos/${project}/branches").each { list << it.name }
+        this.fetch(this.gh_api + "repos/${project}/branches").each { list << it.name }
         return list
     }
     /*
@@ -100,7 +101,7 @@ class GitHub {
        returns a String
     */
     public String getFile(String project, String file_path, String ref) {
-        def response = this.fetch("https://api.github.com/repos/${project}/contents/${file_path}?ref=${ref}")
+        def response = this.fetch(this.gh_api + "repos/${project}/contents/${file_path}?ref=${ref}")
         def security = new securityIO()
         return security.decodeBase64String(response['content'])
     }

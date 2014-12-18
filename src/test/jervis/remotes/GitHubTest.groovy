@@ -19,10 +19,12 @@ class GitHubTest extends GroovyTestCase {
     @Test public void test_GitHub_set1Gh_web() {
         mygh.gh_web = "http://server"
         assert mygh.gh_web == "http://server/"
+        assert mygh.gh_api == "http://server/api/v3/"
     }
     @Test public void test_GitHub_set2Gh_web() {
         mygh.gh_web = "http://server/"
         assert mygh.gh_web == "http://server/"
+        assert mygh.gh_api == "http://server/api/v3/"
     }
     @Test public void test_GitHub_getGh_web() {
         assert mygh.gh_web == "https://github.com/"
