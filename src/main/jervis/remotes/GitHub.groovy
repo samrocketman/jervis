@@ -16,11 +16,6 @@ package jervis.remotes
 import groovy.json.JsonSlurper
 import jervis.tools.securityIO
 
-//following imports are only used by fileExists() function
-//import groovyx.net.http.HTTPBuilder
-//import static groovyx.net.http.Method.HEAD
-//import static groovyx.net.http.ContentType.JSON
-
 class GitHub {
     def gh_web = "https://github.com/"
     def gh_api = "https://api.github.com/"
@@ -105,38 +100,6 @@ class GitHub {
         def security = new securityIO()
         return security.decodeBase64String(response['content'])
     }
-    /*
-       bool fileExists(String project, String file_path, String ref)
-       Args:
-           project - A GitHub project including the org.
-           file_path - A path to a file relative to the root of the GitHub project.
-           ref - a git reference.  e.g. master
-       returns a bool
-    */
-    /*
-    def fileExists(String project, String file_path, String ref) {
-        //return true if status 200
-        //return false if status 404
-        //throw exception for all other HTTP statuses
-        return new HTTPBuilder("https://api.github.com/repos/${project}/contents/${file_path}?ref=${ref}").request(HEAD,JSON) { req ->
-            //github will block request without user agent
-            headers.'User-Agent' = 'samrocketman/jervis'
-            if(this.gh_token) {
-                headers.'Authorization' = "token ${this.gh_token}"
-            }
-            response.success = { resp ->
-                return (resp.status >= 200 && resp.status < 300)
-            }
-
-            response.failure = { resp ->
-                if(resp.status == 404) {
-                    return false
-                }
-                throw IOException("HTTP response returned was not 200 nor 404.  HTTP response: ${resp.status}")
-            }
-        }
-    }
-    */
     /*
         public String type()
         returns a human readable string for this type of remote.
