@@ -19,6 +19,16 @@ wiki][jervis-wiki].
 
 # Building Jervis
 
+## Dependencies
+
+Groovy and Gradle must be installed.  Here are some of my system components.
+
+* Gradle 1.4
+* Groovy 1.8.6
+* JVM 1.7.0\_65 (Oracle Corporation 24.65-b04)
+
+## Build
+
 Assemble dependencies.
 
     gradle assemble
