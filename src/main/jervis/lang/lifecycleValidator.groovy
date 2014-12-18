@@ -3,6 +3,7 @@ package jervis.lang
 import groovy.json.JsonSlurper
 import jervis.exceptions.BadValueInKeyException
 import jervis.exceptions.InfiniteLoopException
+import jervis.exceptions.MissingKeyException
 
 
 //import jervis.lang.lifecycleValidator
@@ -22,14 +23,6 @@ class lifecycleValidator {
     def supportedLanguage(String lang) {
         lang in languages
     }
-    def throw_key_exception(rootKey) {
-        try {
-            throw new Exception()
-        }
-        catch(Exception E) {
-            throw new Exception("\nERROR: Lifecycle validation failed.  Missing key: " + rootKey + ["\n\nSee wiki page:", wiki_page,"\n"].join('\n'), E)
-        }
-    }
     def validate_asBool() {
         try {
             this.validate()
@@ -43,10 +36,10 @@ class lifecycleValidator {
         lifecycles.keySet().each {
             def tools = lifecycles[it].keySet() as String[]
             if(!("defaultKey" in tools)) {
-                this.throw_key_exception([it,"defaultKey"].join('.'))
+                throw new MissingKeyException([it,"defaultKey"].join('.'))
             }
             if(!(lifecycles[it]["defaultKey"] in tools)) {
-                this.throw_key_exception([it,"defaultKey",lifecycles[it]["defaultKey"]].join('.'))
+                throw new MissingKeyException([it,"defaultKey",lifecycles[it]["defaultKey"]].join('.'))
             }
             def current_key = lifecycles[it]["defaultKey"]
             def count=0
@@ -60,10 +53,10 @@ class lifecycleValidator {
                 }
                 if("fallbackKey" in cycles) {
                     if(!(lifecycles[it][current_key]["fallbackKey"] in tools)) {
-                        this.throw_key_exception([it,current_key,"fallbackKey",lifecycles[it][current_key]["fallbackKey"]].join('.'))
+                        throw new MissingKeyException([it,current_key,"fallbackKey",lifecycles[it][current_key]["fallbackKey"]].join('.'))
                     }
                     if(!("fileExistsCondition" in cycles)) {
-                        this.throw_key_exception([it,current_key,"fileExistsCondition"].join('.') + " required by " + [it,current_key,"fallbackKey"].join('.'))
+                        throw new MissingKeyException([it,current_key,"fileExistsCondition"].join('.') + " required by " + [it,current_key,"fallbackKey"].join('.'))
                     }
                 }
                 count++

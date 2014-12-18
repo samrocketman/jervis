@@ -30,21 +30,33 @@ class lifecycleValidatorTest extends GroovyTestCase {
     @Test public void test_lifecycleValidator_bad_lifecycles_missing_defaultKey() {
         URL url = this.getClass().getResource("/bad_lifecycles_missing_defaultKey.json");
         lifecycles.load_JSON(url)
+        shouldFail(MissingKeyException) {
+            lifecycles.validate()
+        }
         assert false == lifecycles.validate_asBool()
     }
     @Test public void test_lifecycleValidator_bad_lifecycles_missing_fileExistsCondition() {
         URL url = this.getClass().getResource("/bad_lifecycles_missing_fileExistsCondition.json");
         lifecycles.load_JSON(url)
+        shouldFail(MissingKeyException) {
+            lifecycles.validate()
+        }
         assert false == lifecycles.validate_asBool()
     }
     @Test public void test_lifecycleValidator_bad_lifecycles_resolve_defaultKey() {
         URL url = this.getClass().getResource("/bad_lifecycles_resolve_defaultKey.json");
         lifecycles.load_JSON(url)
+        shouldFail(MissingKeyException) {
+            lifecycles.validate()
+        }
         assert false == lifecycles.validate_asBool()
     }
     @Test public void test_lifecycleValidator_bad_lifecycles_resolve_fallbackKey() {
         URL url = this.getClass().getResource("/bad_lifecycles_resolve_fallbackKey.json");
         lifecycles.load_JSON(url)
+        shouldFail(MissingKeyException) {
+            lifecycles.validate()
+        }
         assert false == lifecycles.validate_asBool()
     }
     @Test public void test_lifecycleValidator_bad_lifecycles_resolve_fileExistsCondition() {
@@ -53,6 +65,7 @@ class lifecycleValidatorTest extends GroovyTestCase {
         shouldFail(BadValueInKeyException) {
             lifecycles.validate()
         }
+        assert false == lifecycles.validate_asBool()
     }
     @Test public void test_lifecycleValidator_bad_lifecycles_resolve_infinite_loop() {
         URL url = this.getClass().getResource("/bad_lifecycles_resolve_infinite_loop.json");
@@ -60,10 +73,12 @@ class lifecycleValidatorTest extends GroovyTestCase {
         shouldFail(InfiniteLoopException) {
             lifecycles.validate()
         }
+        assert false == lifecycles.validate_asBool()
     }
     @Test public void test_lifecycleValidator_good_lifecycles_simple() {
         URL url = this.getClass().getResource("/good_lifecycles_simple.json");
         lifecycles.load_JSON(url)
+        assert true == lifecycles.validate()
         assert true == lifecycles.validate_asBool()
     }
     @Test public void test_lifecycleValidator_main_lifecycles_json() {
