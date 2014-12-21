@@ -5,18 +5,20 @@ jar.archiveName = "jervis.jar"
 buildscript {
     repositories { mavenCentral() }
     dependencies {
-        classpath "org.yaml:snakeyaml:1.14"
-        classpath "org.codehaus.groovy.modules.http-builder:http-builder:0.7.1"
-        classpath "org.codehaus.groovy:groovy-all:1.8.9"
         classpath "org.codehaus.groovy:groovy:1.8.9"
+        classpath "org.codehaus.groovy:groovy-all:1.8.9"
+        classpath "org.codehaus.groovy.modules.http-builder:http-builder:0.7.1"
+        classpath "org.yaml:snakeyaml:1.14"
     }
 }
 
 repositories { mavenCentral() }
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:1.8.9'
+    compile 'org.yaml:snakeyaml:1.14'
     testCompile 'junit:junit:4.11'
     testCompile "org.codehaus.groovy:groovy:1.8.9"
+    testCompile 'org.yaml:snakeyaml:1.14'
 }
 
 sourceSets {
