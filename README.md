@@ -19,6 +19,40 @@ wiki][jervis-wiki].  If you wish to stay up to date with the latest Jervis news
 then please feel free to [watch this repository][watch-repo] because I use the
 issue tracking and wiki for planning.
 
+## Why Jervis?
+
+What is Jervis attempting to scale?  Let's talk about some scale bottlenecks
+that have been overcome by Jenkins (formerly Hudson) and its community.
+
+The scaling issue is a main bullet. The solution for the issue is in a
+sub-bullet.
+
+* Developers are challenged with building often and even deploying often.
+  * Jenkins was invented.
+* Jenkins infrastructure is strained when too many slaves are in one master and
+  too many jobs are queued up on a daily basis.  A single master struggles to
+  perform all requested builds in a timely manner.  Jenkins also suffers from
+  single point of failure as a lone master.
+  * Multi-master Jenkins was invented. This provides redundancy for the master.
+    Throughput for daily build capacity is improved.
+* Jenkins jobs suffer from a lot of duplicate code.  It is difficult to fix a
+  bug in one job and have it propagate to other jobs.
+  * Jenkins Job DSL plugin was invented.  Configuration through code is now
+    possible.  Multiple jobs can be generated and regenerated with the same code
+    using templates in a domain specific language.
+* Onboarding new projects in a Jenkins installation can be difficult.  Typically
+  engineers will get together and discuss the needs of the project and then
+  configure a Jenkins job for the needs of the project.  For enterprises with a
+  very large number of projects it is typically hard to scale number of build
+  engineers to match with the large number of projects which require onboarding
+  into the build ecosystem.
+  * Jervis is being invented.  Job generation through convention over
+    configuration.  Scaling the onboarding for a project by creating and abiding
+    by conventions in how jobs are generated.  This is for large scale job
+    generation and project onboarding.  Jervis is taking lessons learned from a
+    seasoned build engineer and attempting to fill this gap in the Jenkins
+    ecosystem.
+
 # Building Jervis
 
 ## Dependencies
