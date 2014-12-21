@@ -21,5 +21,8 @@ class lifecycleGenerator {
         def yaml = new Yaml()
         this.jervis_yaml = yaml.load(raw_yaml)
         this.language = this.jervis_yaml['language']
+        if(!lifecycle_obj.supportedLanguage(this.language)) {
+            throw new Exception("another bad time")
+        }
     }
 }
