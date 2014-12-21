@@ -10,9 +10,10 @@ continuous integration system used by many [open source][wiki-os] projects.
 Both Jenkins and Travis have paid and enterprise offerings.
 
 Jervis uses Travis-like job generation using the [Job DSL
-plugin][jenkins-plugin-job-dsl] and groovy scripts.  It reads the
-[.travis.yml][travis-yaml] file of a project and generates a job in Jenkins
-based on it.
+plugin][jenkins-plugin-job-dsl] and groovy scripts.  It reads the `.jervis.yml`
+file of a project and generates a job in Jenkins based on it.  If `.jervis.yml`
+doesn't exist then it will fall back to using the [`.travis.yml`][travis-yaml]
+file.
 
 For development planning and other documentation see the [Jervis
 wiki][jervis-wiki].  If you wish to stay up to date with the latest Jervis news
