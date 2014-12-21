@@ -14,7 +14,6 @@ import jervis.exceptions.ValidationException
 //x.validate()
 
 class lifecycleValidator {
-    def wiki_page = "https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file"
     def lifecycles
     def languages
     def load_JSON(URL url) {
