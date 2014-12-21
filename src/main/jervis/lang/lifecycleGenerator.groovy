@@ -12,6 +12,9 @@ class lifecycleGenerator {
     def lifecycleGenerator() {
     }
     def loadLifecycles(URL url) {
+        if(!(new File(url.getFile())).exists()) {
+            throw new MissingLifecyclesException("Lifecycles file does not exist: " + url.getFile())
+        }
         this.lifecycle_obj = new lifecycleValidator()
         this.lifecycle_obj.load_JSON(url)
         this.lifecycle_obj.validate()
