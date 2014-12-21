@@ -1,5 +1,6 @@
 package jervis.lang
 
+import jervis.exceptions.UnsupportedLanguageException
 import jervis.lang.lifecycleValidator
 import org.yaml.snakeyaml.Yaml
 
@@ -22,7 +23,7 @@ class lifecycleGenerator {
         this.jervis_yaml = yaml.load(raw_yaml)
         this.language = this.jervis_yaml['language']
         if(!lifecycle_obj.supportedLanguage(this.language)) {
-            throw new Exception("another bad time")
+            throw new UnsupportedLanguageException(this.language)
         }
     }
 }
