@@ -15,7 +15,9 @@ plugin][jenkins-plugin-job-dsl] and groovy scripts.  It reads the
 based on it.
 
 For development planning and other documentation see the [Jervis
-wiki][jervis-wiki].
+wiki][jervis-wiki].  If you wish to stay up to date with the latest Jervis news
+then please feel free to [watch this repository][watch-repo] because I use the
+issue tracking and wiki for planning.
 
 # Building Jervis
 
@@ -49,5 +51,6 @@ own development).
 [travis]: https://travis-ci.org/
 [travis-jervis]: https://travis-ci.org/samrocketman/jervis
 [travis-yaml]: http://docs.travis-ci.com/user/build-configuration/
+[watch-repo]: https://help.github.com/articles/watching-repositories/
 [wiki-ci]: https://en.wikipedia.org/wiki/Continuous_integration
 [wiki-os]: http://en.m.wikipedia.org/wiki/Open_source
