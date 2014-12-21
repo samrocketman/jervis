@@ -1,5 +1,6 @@
 package jervis.lang
 
+import jervis.exceptions.MissingLifecyclesException
 import jervis.exceptions.UnsupportedLanguageException
 import jervis.lang.lifecycleValidator
 import org.yaml.snakeyaml.Yaml
@@ -17,7 +18,7 @@ class lifecycleGenerator {
     }
     def loadYaml(String raw_yaml) {
         if(!lifecycle_obj) {
-            throw new Exception("bad time")
+            throw new MissingLifecyclesException("Call loadLifecycles function before the loadYaml function.")
         }
         def yaml = new Yaml()
         this.jervis_yaml = yaml.load(raw_yaml)
