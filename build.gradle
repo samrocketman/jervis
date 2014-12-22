@@ -65,4 +65,5 @@ test {
 groovydoc {
   // Create GroovyDoc for Groovy
   source = sourceSets.main.groovy
+  windowTitle = "Jervis API Docs"
 }
