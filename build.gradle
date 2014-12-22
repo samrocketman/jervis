@@ -5,7 +5,6 @@ jar.archiveName = "jervis.jar"
 buildscript {
     repositories { mavenCentral() }
     dependencies {
-        classpath "org.codehaus.groovy:groovy:1.8.9"
         classpath "org.codehaus.groovy:groovy-all:1.8.9"
         classpath "org.codehaus.groovy.modules.http-builder:http-builder:0.7.1"
         classpath "org.yaml:snakeyaml:1.14"
@@ -61,4 +60,9 @@ test {
   onOutput { descriptor, event ->
      logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
   }
+}
+
+groovydoc {
+  // Create GroovyDoc for Groovy
+  source = sourceSets.main.groovy
 }
