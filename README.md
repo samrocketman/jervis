@@ -84,6 +84,10 @@ Generate Jervis API documentation.  See the documentation in
 
     gradle groovydoc
 
+Generate a test coverage report.  See the report in `build/reports/cobertura`.
+
+    gradle cobertura
+
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jervis-wiki]: https://github.com/samrocketman/jervis/wiki

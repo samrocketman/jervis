@@ -1,4 +1,5 @@
 apply plugin: 'groovy'
+apply plugin: 'cobertura'
 apply from: 'file:groovydoc.gradle'
 
 jar.archiveName = "jervis.jar"
@@ -9,6 +10,7 @@ version = '0.1.0-SNAPSHOT'
 buildscript {
     repositories { mavenCentral() }
     dependencies {
+        classpath "net.saliman:gradle-cobertura-plugin:1.2.1" //latest cobertura version that works with gradle 1.4
         classpath "org.codehaus.groovy:groovy-all:1.8.9"
         classpath "org.codehaus.groovy.modules.http-builder:http-builder:0.7.1"
         classpath "org.yaml:snakeyaml:1.14"
@@ -66,3 +68,11 @@ test {
   }
 }
 
+//http://jdpgrailsdev.github.io/blog/2014/04/29/gradle_cobertura.html
+cobertura {
+    coverageFormats = ['html', 'xml']
+    coverageIgnoreTrivial = true
+    coverageIgnores = ['org.slf4j.Logger.*']
+    coverageReportDir = new File("$buildDir/reports/cobertura")
+    coverageExcludes = ['.*package-info.*', '.*jervis\\.exceptions\\..*']
+}
