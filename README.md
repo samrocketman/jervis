@@ -79,6 +79,10 @@ own development).
 
     gradle build
 
+Generate Jervis API documentation.
+
+    gradle groovydoc
+
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jervis-wiki]: https://github.com/samrocketman/jervis/wiki
