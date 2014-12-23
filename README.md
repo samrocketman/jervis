@@ -1,6 +1,6 @@
 # Jervis - [![Build Status][status-build]][travis-jervis]
 
-* *Project status:* pre-alpha
+* *Project status:* pre-alpha ([progress to first release][milestone-progress])
 * *Initially Targeted platforms:* Linux
 
 Jervis is a combination of some letters in the words Jenkins and Travis: JEnkins
@@ -91,6 +91,7 @@ Generate a test coverage report.  See the report in `build/reports/cobertura`.
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jervis-wiki]: https://github.com/samrocketman/jervis/wiki
+[milestone-progress]: https://github.com/samrocketman/jervis/milestones
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=master
 [travis]: https://travis-ci.org/
 [travis-jervis]: https://travis-ci.org/samrocketman/jervis
