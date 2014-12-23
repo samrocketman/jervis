@@ -2,9 +2,8 @@ apply plugin: 'groovy'
 apply plugin: 'cobertura'
 apply from: 'file:groovydoc.gradle'
 
-jar.archiveName = "jervis.jar"
-
 group = 'net.gleske'
+jar.baseName = 'jervis'
 version = '0.1.0-SNAPSHOT'
 
 buildscript {
