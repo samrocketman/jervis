@@ -9,9 +9,8 @@ version = '0.1.0-SNAPSHOT'
 buildscript {
     repositories { mavenCentral() }
     dependencies {
-        classpath "net.saliman:gradle-cobertura-plugin:1.2.1" //latest cobertura version that works with gradle 1.4
+        classpath "net.saliman:gradle-cobertura-plugin:2.2.5"
         classpath "org.codehaus.groovy:groovy-all:1.8.9"
-        classpath "org.codehaus.groovy.modules.http-builder:http-builder:0.7.1"
         classpath "org.yaml:snakeyaml:1.14"
     }
 }
@@ -74,4 +73,11 @@ cobertura {
     coverageIgnores = ['org.slf4j.Logger.*']
     coverageReportDir = new File("$buildDir/reports/cobertura")
     coverageExcludes = ['.*package-info.*', '.*jervis\\.exceptions\\..*']
+}
+test.finalizedBy(project.tasks.cobertura)
+
+//http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
+//generate gradlew with: gradle wrapper
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2.1'
 }
