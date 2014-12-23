@@ -79,7 +79,8 @@ own development).
 
     gradle build
 
-Generate Jervis API documentation.
+Generate Jervis API documentation.  See the documentation in
+`build/docs/groovydoc/`.
 
     gradle groovydoc
 
