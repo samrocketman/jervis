@@ -3,6 +3,8 @@ apply from: 'file:groovydoc.gradle'
 
 jar.archiveName = "jervis.jar"
 
+group = 'net.gleske'
+
 buildscript {
     repositories { mavenCentral() }
     dependencies {
