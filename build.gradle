@@ -67,12 +67,23 @@ test {
 }
 
 //http://jdpgrailsdev.github.io/blog/2014/04/29/gradle_cobertura.html
+//https://github.com/stevesaliman/gradle-cobertura-plugin/blob/master/usage.md
 cobertura {
     coverageFormats = ['html', 'xml']
     coverageIgnoreTrivial = true
     coverageIgnores = ['org.slf4j.Logger.*']
     coverageReportDir = new File("$buildDir/reports/cobertura")
     coverageExcludes = ['.*package-info.*', '.*jervis\\.exceptions\\..*']
+
+    //coberturaCheck values 80% (./gradlew coberturaCheck test)
+    //coverageCheckBranchRate = 80
+    //coverageCheckLineRate = 80
+    coverageCheckPackageBranchRate = 80
+    coverageCheckPackageLineRate = 80
+    coverageCheckTotalBranchRate = 80
+    coverageCheckTotalLineRate = 80
+    coverageCheckHaltOnFailure = true
+
 }
 test.finalizedBy(project.tasks.cobertura)
 
