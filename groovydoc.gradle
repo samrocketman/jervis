@@ -1,0 +1,27 @@
+import java.text.SimpleDateFormat
+
+/*
+ * http://gradle.org/docs/current/dsl/org.gradle.api.tasks.javadoc.Groovydoc.html
+ * https://github.com/evgeny-goldin/spock-extensions/blob/master/build.gradle
+ */
+
+def d    = new Date()
+def time = new SimpleDateFormat( "HH:mm '(GMT'Z')'" ).format( d )
+def date = new SimpleDateFormat( 'MMMM dd, yyyy' ).format( d )
+
+groovydoc {
+  use = true
+  groovyClasspath = configurations.compile // http://issues.gradle.org/browse/GRADLE-1391
+  // Create GroovyDoc for Groovy
+  source = sourceSets.main.groovy
+  windowTitle = "Jervis API Docs"
+  header = '<a href="https://github.com/samrocketman/jervis" target="_blank">github.com/samrocketman/jervis</a>'
+  footer = '<a href="https://github.com/samrocketman/jervis" target="_blank">Jervis</a> API documentation was generated at ' + "$time on $date."
+  link 'http://download.oracle.com/javase/6/docs/api/', 'java.'
+  link 'http://groovy.codehaus.org/api/', 'groovy.', 'org.codehaus.groovy.'
+  doLast {
+    copy {
+      from 'assets/stylesheet.css' into 'build/docs/groovydoc'
+    }
+  }
+}

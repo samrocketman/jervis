@@ -1,4 +1,5 @@
 apply plugin: 'groovy'
+apply from: 'file:groovydoc.gradle'
 
 jar.archiveName = "jervis.jar"
 
@@ -62,13 +63,3 @@ test {
   }
 }
 
-groovydoc {
-  // Create GroovyDoc for Groovy
-  source = sourceSets.main.groovy
-  windowTitle = "Jervis API Docs"
-  doLast {
-    copy {
-      from 'assets/stylesheet.css' into 'build/docs/groovydoc'
-    }
-  }
-}
