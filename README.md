@@ -68,25 +68,25 @@ Groovy and Gradle must be installed.  Here are some of my system components.
 
 Assemble dependencies.
 
-    gradle assemble
+    ./gradlew assemble
 
 Run unit tests.
 
-    gradle check
+    ./gradlew check
 
 Create a `jervis.jar` (only useful if using Jervis as a library class for your
 own development).
 
-    gradle build
+    ./gradlew build
 
 Generate Jervis API documentation.  See the documentation in
 `build/docs/groovydoc/`.
 
-    gradle groovydoc
+    ./gradlew groovydoc
 
 Generate a test coverage report.  See the report in `build/reports/cobertura`.
 
-    gradle cobertura
+    ./gradlew cobertura
 
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
