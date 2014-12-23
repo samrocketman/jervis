@@ -23,10 +23,7 @@ class GitHub {
      */
     String gh_web = "https://github.com/"
     /**
-      URL to the GitHub API. For GitHub Enterprise it should be <code>gh_web + "api/v3/"</code>.  Default: <code>https://api.github.com/</code>
-
-      @see https://developer.github.com/v3/
-      @see <a href="http://google.com">http://google.com</a>
+      URL to the <a href="https://developer.github.com/v3/">GitHub API</a>. For GitHub Enterprise it should be <code>gh_web + "api/v3/"</code>.  Default: <code>https://api.github.com/</code>
      */
     String gh_api = "https://api.github.com/"
     /**
@@ -34,9 +31,8 @@ class GitHub {
      */
     String gh_clone = "git://github.com/"
     /**
-      The API token which can be used to communicate with GitHub using authentication.  Default: <code>null</code>
+      The <a href="https://github.com/blog/1509-personal-api-tokens">API token</a>, which can be used to communicate with GitHub using authentication.  Default: <code>null</code>
 
-      @see <a href="https://github.com/blog/1509-personal-api-tokens" target="_blank">API token</a>
      */
     String gh_token
 
@@ -44,7 +40,7 @@ class GitHub {
      * Setters for internal variables
      */
     /**
-      Sets the <code>gh_web</code> and <code>gh_api</code> properties.  This automatically sets <code>gh_api</code> based on <code>gh_web</code>.
+      Sets the <code>{@link #gh_web}</code> and <code>{@link #gh_api}</code> properties.  This automatically sets <code>gh_api</code> based on <code>gh_web</code>.
      */
     //gh_web will always end with a trailing slash
     void setGh_web(gh_web) {
@@ -52,21 +48,21 @@ class GitHub {
         this.setGh_api(this.gh_web + 'api/v3/')
     }
     /**
-      Sets the <code>gh_api</code> property.
+      Sets the <code>{@link #gh_api}</code> property.
      */
     //gh_api will always end with a trailing slash
     void setGh_api(gh_api) {
         this.gh_api = (gh_api[-1] == '/')? gh_api : gh_api + '/'
     }
     /**
-      Sets the <code>gh_clone</code> property.
+      Sets the <code>{@link #gh_clone}</code> property.
      */
     //gh_clone will always end with a trailing slash
     void setGh_clone(gh_clone) {
         this.gh_clone = (gh_clone[-1] == '/')? gh_clone : gh_clone + '/'
     }
     /**
-      Sets the <code>gh_token</code> property.
+      Sets the <code>{@link #gh_token}</code> property.
      */
     //gh_token should be null if it is a zero length string.
     void setGh_token(gh_token) {
@@ -96,7 +92,7 @@ class GitHub {
      * public functions *
      */
     /**
-      Get the contents of <code>gh_web</code>.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are guaranteed to have this function.
+      Get the contents of <code>{@link #gh_web}</code>.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are guaranteed to have this function.
 
       @return The contents of <code>gh_web</code>.
      */
@@ -104,7 +100,7 @@ class GitHub {
         gh_web
     }
     /**
-      Get the contents of <code>gh_clone</code>.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are guaranteed to have this function.
+      Get the contents of <code>{@link #gh_clone}</code>.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are guaranteed to have this function.
 
       @return The contents of <code>gh_clone</code>.
      */
