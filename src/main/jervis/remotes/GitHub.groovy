@@ -8,8 +8,7 @@ def x = new GitHub()
 println "Print each branch."
 x.branches('samrocketman/jervis').each{ println it }
 println "Print the contents of .travis.yml from the master branch."
-println x.getFile('samrocketman/jervis','.travis.yml','master')
-</code></pre>
+println x.getFile('samrocketman/jervis','.travis.yml','master')</code></pre>
  */
 
 package jervis.remotes
