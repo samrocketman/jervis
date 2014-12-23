@@ -22,7 +22,7 @@ class GitHub {
      */
     String gh_web = "https://github.com/"
     /**
-      URL to the <a href="https://developer.github.com/v3/">GitHub API</a>. For GitHub Enterprise it should be <code>gh_web + "api/v3/"</code>.  Default: <code>https://api.github.com/</code>
+      URL to the <a href="https://developer.github.com/v3/" target="_blank">GitHub API</a>. For GitHub Enterprise it should be <code>{@link #gh_web} + "api/v3/"</code>.  Default: <code>https://api.github.com/</code>
      */
     String gh_api = "https://api.github.com/"
     /**
@@ -30,7 +30,7 @@ class GitHub {
      */
     String gh_clone = "git://github.com/"
     /**
-      The <a href="https://github.com/blog/1509-personal-api-tokens">API token</a>, which can be used to communicate with GitHub using authentication.  Default: <code>null</code>
+      The <a href="https://github.com/blog/1509-personal-api-tokens" target="_blank">API token</a>, which can be used to communicate with GitHub using authentication.  Default: <code>null</code>
 
      */
     String gh_token
