@@ -5,7 +5,7 @@ package jervis.exceptions
  */
 class LifecycleException extends Exception {
     /**
-      Throw a <code>LifecycleException</code>
+      Throw a <tt>LifecycleException</tt>
 
       @param message A simple message.
      */
