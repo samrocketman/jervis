@@ -1,5 +1,7 @@
 package jervis.tools
 
+import jervis.exceptions.JervisException
+
 /**
    A class to provide cryptographic features to Jervis such as RSA encryption and base64 encoding.
 
@@ -188,12 +190,12 @@ id_rsa_keysize = keysize</tt></pre>
         def process = ['openssl', 'genrsa', '-out', priv_key_file_path, keysize.toString()].execute()
         process.waitForProcessOutput(stdout, stderr)
         if(process.exitValue()) {
-            throw new Exception(stderr.toString())
+            throw new JervisException(stderr.toString())
         }
         process = ['openssl', 'rsa', '-in', priv_key_file_path, '-pubout', '-outform', 'pem', '-out', pub_key_file_path].execute()
         process.waitForProcessOutput(stdout, stderr)
         if(process.exitValue()) {
-            throw new Exception(stderr.toString())
+            throw new JervisException(stderr.toString())
         }
     }
 
@@ -219,7 +221,7 @@ id_rsa_keysize = keysize</tt></pre>
         proc1 | proc2 | proc3
         proc3.waitForProcessOutput(stdout, stderr)
         if(proc3.exitValue()) {
-            throw new Exception(stderr.toString())
+            throw new JervisException(stderr.toString())
         }
         else {
             return stdout.toString().trim()
@@ -241,7 +243,7 @@ id_rsa_keysize = keysize</tt></pre>
         proc1 | proc2 | proc3
         proc3.waitForProcessOutput(stdout, stderr)
         if(proc3.exitValue()) {
-            throw new Exception(stderr.toString())
+            throw new JervisException(stderr.toString())
         }
         else {
             return stdout.toString().trim()
