@@ -7,11 +7,11 @@ import jervis.exceptions.wikiPages
 
   <h2>Sample usage</h2>
 <pre><tt>import jervis.exceptions.UnsupportedLanguageException
-throw new UnsupportedLanguageException("derpy")</tt></pre>
+throw new UnsupportedLanguageException("derpy")</tt></pre><br>
  */
-
 class UnsupportedLanguageException extends LifecycleException {
     private static String wiki_page = wikiPages.supported_languages
+
     /**
       Throw an exception when an unsupported language lifecycle generation is attempted.
 

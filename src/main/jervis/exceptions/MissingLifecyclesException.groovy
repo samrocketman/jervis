@@ -7,11 +7,11 @@ import jervis.exceptions.wikiPages
 
   <h2>Sample usage</h2>
 <pre><tt>import jervis.exceptions.MissingLifecyclesException
-throw new MissingLifecyclesException("Call loadLifecycles function before the loadYaml function.")</tt></pre>
+throw new MissingLifecyclesException("Call loadLifecycles function before the loadYaml function.")</tt></pre><br>
  */
-
 class MissingLifecyclesException extends LifecycleException {
     private static String wiki_page = wikiPages.lifecycles_spec
+
     /**
       Throw an exception when lifecycles are not loaded from a yaml file.
 

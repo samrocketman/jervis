@@ -1,3 +1,8 @@
+package jervis.remotes
+
+import groovy.json.JsonSlurper
+import jervis.tools.securityIO
+
 /**
    A simple class to interact with the GitHub API for only the parts I need.
 
@@ -8,27 +13,25 @@ def x = new GitHub()
 println "Print each branch."
 x.branches('samrocketman/jervis').each{ println it }
 println "Print the contents of .travis.yml from the master branch."
-println x.getFile('samrocketman/jervis','.travis.yml','master')</tt></pre>
+println x.getFile('samrocketman/jervis','.travis.yml','master')</tt></pre><br>
  */
-
-package jervis.remotes
-
-import groovy.json.JsonSlurper
-import jervis.tools.securityIO
-
 class GitHub {
+
     /**
       URL to the GitHub web interface. Default: <tt>https://github.com/</tt>
      */
     String gh_web = "https://github.com/"
+
     /**
       URL to the <a href="https://developer.github.com/v3/" target="_blank">GitHub API</a>. For GitHub Enterprise it should be <tt>{@link #gh_web} + "api/v3/"</tt>.  Default: <tt>https://api.github.com/</tt>
      */
     String gh_api = "https://api.github.com/"
+
     /**
       The base clone URI in which repositories will be cloned.  Default: <tt>git://github.com/</tt>
      */
     String gh_clone = "git://github.com/"
+
     /**
       The <a href="https://github.com/blog/1509-personal-api-tokens" target="_blank">API token</a>, which can be used to communicate with GitHub using authentication.  Default: <tt>null</tt>
 
@@ -38,6 +41,7 @@ class GitHub {
     /*
      * Setters for internal variables
      */
+
     /**
       Sets the <tt>{@link #gh_web}</tt> and <tt>{@link #gh_api}</tt> properties.  This automatically sets <tt>gh_api</tt> based on <tt>gh_web</tt>.
      */
@@ -46,6 +50,7 @@ class GitHub {
         this.gh_web = (gh_web[-1] == '/')? gh_web : gh_web + '/'
         this.setGh_api(this.gh_web + 'api/v3/')
     }
+
     /**
       Sets the <tt>{@link #gh_api}</tt> property.
      */
@@ -53,6 +58,7 @@ class GitHub {
     void setGh_api(gh_api) {
         this.gh_api = (gh_api[-1] == '/')? gh_api : gh_api + '/'
     }
+
     /**
       Sets the <tt>{@link #gh_clone}</tt> property.
      */
@@ -60,6 +66,7 @@ class GitHub {
     void setGh_clone(gh_clone) {
         this.gh_clone = (gh_clone[-1] == '/')? gh_clone : gh_clone + '/'
     }
+
     /**
       Sets the <tt>{@link #gh_token}</tt> property.
      */
@@ -71,6 +78,7 @@ class GitHub {
     /*
      * private functions
      */
+
     /*
        HashMap fetch(String addr) - fetches a URL.
        Args:
@@ -90,6 +98,7 @@ class GitHub {
     /*
      * public functions *
      */
+
     /**
       Get the contents of <tt>{@link #gh_web}</tt>.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
@@ -98,6 +107,7 @@ class GitHub {
     public String getWebUrl() {
         gh_web
     }
+
     /**
       Get the contents of <tt>{@link #gh_clone}</tt>.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
@@ -106,6 +116,7 @@ class GitHub {
     public String getCloneUrl() {
         gh_clone
     }
+
     /**
       Get a list of branches for a project.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
@@ -117,6 +128,7 @@ class GitHub {
         this.fetch(this.gh_api + "repos/${project}/branches").each { list << it.name }
         return list
     }
+
     /**
       Get the contents of a file from a project.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
@@ -130,6 +142,7 @@ class GitHub {
         def security = new securityIO()
         return security.decodeBase64String(response['content'])
     }
+
     /**
       Get a human readable string for this type of remote.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 

@@ -5,11 +5,10 @@ package jervis.exceptions
 
   <h2>Sample usage</h2>
 <pre><tt>import jervis.exceptions.InfiniteLoopException
-throw new InfiniteLoopException("groovy.maven")</tt></pre>
+throw new InfiniteLoopException("groovy.maven")</tt></pre><br>
  */
+class InfiniteLoopException extends ValidationException {
 
-class InfiniteLoopException extends ValidationException
-{
     /**
       Throw an exception when lifecycle keys reference in an infinite loop.
 

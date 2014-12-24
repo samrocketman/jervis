@@ -5,11 +5,10 @@ package jervis.exceptions
 
   <h2>Sample usage</h2>
 <pre><tt>import jervis.exceptions.BadValueInKeyException
-throw new BadValueInKeyException("ruby.rake1.fileExistsCondition")</tt></pre>
+throw new BadValueInKeyException("ruby.rake1.fileExistsCondition")</tt></pre><br>
  */
+class BadValueInKeyException extends ValidationException {
 
-class BadValueInKeyException extends ValidationException
-{
     /**
       Throw an exception for a bad value in a key.
 

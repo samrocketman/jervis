@@ -8,8 +8,7 @@ package jervis.tools
 <pre><tt>import jervis.tools.scmGit
 def x = new scmGit()
 print "Git root dir: "
-println x.getRoot()
-</tt></pre>
+println x.getRoot()</tt></pre><br>
  */
 
 class scmGit {

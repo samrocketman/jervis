@@ -18,30 +18,34 @@ println s
 println "Decrypted string:"
 println security.rsaDecrypt(s)</tt></pre>
  */
-
 class securityIO {
+
     /**
       Path to the RSA private key.  This will be used by encryptiong and decryption.
       During key generation it is the location where the private key will be written.
       Default: <tt>{@link jervis.tools.scmGit#getRoot()} + "/id_rsa.pem"</tt>
      */
     public String id_rsa_priv
+
     /**
       Path to the RSA public key.  This will be used by encryptiong and decryption.
       During key generation it is the location where the public key will be written.
       Default: <tt>{@link jervis.tools.scmGit#getRoot()} + "/id_rsa.pub.pem"</tt>
      */
     public String id_rsa_pub
+
     /**
       The key size in which RSA keys will be generated.  It is highly recommended this be <tt>1024</tt> bits or higher in powers of two.
       Default: value of <tt>{@link #default_key_size}</tt>.
      */
     public int id_rsa_keysize
+
     /**
       The default key size for <tt>{@link #id_rsa_keysize}</tt>.
       Default: <tt>1024</tt>
      */
     public static int default_key_size = 1024
+
     /**
       Instantiates default values for <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, and <tt>{@link #id_rsa_keysize}</tt>.
      */
@@ -49,6 +53,7 @@ class securityIO {
         def git = new scmGit()
         set_vars(git.getRoot() + '/id_rsa.pem', git.getRoot() + '/id_rsa.pub.pem', default_key_size)
     }
+
     /**
       Instantiates default values for <tt>{@link #id_rsa_priv}</tt> and <tt>{@link #id_rsa_pub}</tt> but
       <tt>{@link #id_rsa_keysize}</tt> is set using <tt>keysize</tt>.
@@ -57,6 +62,7 @@ class securityIO {
         def git = new scmGit()
         set_vars(git.getRoot() + '/id_rsa.pem', git.getRoot() + '/id_rsa.pub.pem', keysize)
     }
+
     /**
       Instantiates the default value for <tt>{@link #id_rsa_keysize}</tt> but sets <tt>{@link #id_rsa_priv}</tt> and <tt>{@link #id_rsa_pub}</tt> based on <tt>path</tt>.
       <tt>path</tt> sets the directory where the public and private key will be generated.
@@ -69,6 +75,7 @@ id_rsa_keysize = {@link #default_key_size}</tt></pre>
     def securityIO(String path) {
         set_vars(checkPath(path) + '/id_rsa.pem', checkPath(path) + '/id_rsa.pub.pem', default_key_size)
     }
+
     /**
       Instantiates setting custom values for <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, and <tt>{@link #id_rsa_keysize}</tt>.
       <tt>path</tt> sets the directory where the public and private key will be generated.
@@ -82,6 +89,7 @@ id_rsa_keysize = keysize</tt></pre>
     def securityIO(String path, int keysize) {
         set_vars(checkPath(path) + '/id_rsa.pem', checkPath(path) + '/id_rsa.pub.pem', keysize)
     }
+
     /**
       Instantiates setting custom values for <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, and <tt>{@link #id_rsa_keysize}</tt>.
       Specifically values are set in the following manner:
@@ -93,6 +101,7 @@ id_rsa_keysize = keysize</tt></pre>
     def securityIO(String priv_key_file_path, String pub_key_file_path, int keysize) {
         set_vars(priv_key_file_path, pub_key_file_path, keysize)
     }
+
     /**
       Returns the right format for <tt>path</tt>.  This is meant for properly setting the private and public key paths.
 
@@ -111,11 +120,20 @@ id_rsa_keysize = keysize</tt></pre>
         }
         return path
     }
-    private def set_vars(String priv_key_file_path, String pub_key_file_path, int keysize) {
+
+    /**
+      A generic setter function that allows contstructor overloading with minimal code duplication.
+
+      @param priv_key_file_path A file path where the private key will be written on the filesystem.
+      @param pub_key_file_path  A file path where the public key will be written on the filesystem.
+      @param keysize            The key size in bits of the key pair.
+     */
+    private void set_vars(String priv_key_file_path, String pub_key_file_path, int keysize) {
         id_rsa_priv = priv_key_file_path
         id_rsa_pub = pub_key_file_path
         id_rsa_keysize = keysize
     }
+
     /**
       Decode a base64 <tt>String</tt>.
 
@@ -125,6 +143,7 @@ id_rsa_keysize = keysize</tt></pre>
     public String decodeBase64String(String content) {
         return new String(content.decodeBase64())
     }
+
     /**
       Decode a base64 <tt>String</tt> into <tt>{@link java.lang.Byte}s</tt>.
 
@@ -134,6 +153,7 @@ id_rsa_keysize = keysize</tt></pre>
     public byte[] decodeBase64Bytes(String content) {
         return content.decodeBase64()
     }
+
     /**
       Encode a <tt>String</tt> into a base64 <tt>String</tt>.
 
@@ -143,6 +163,7 @@ id_rsa_keysize = keysize</tt></pre>
     public String encodeBase64(String content) {
         return content.bytes.encodeBase64().toString()
     }
+
     /**
       Encode raw <tt>{@link java.lang.Byte}s</tt> into a base64 <tt>String</tt>.
 
@@ -152,8 +173,10 @@ id_rsa_keysize = keysize</tt></pre>
     public String encodeBase64(byte[] content) {
         return content.encodeBase64().toString()
     }
+
     /**
-      Generate an RSA key pair (private key and public key).  It does not take values from <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, nor <tt>{@link #id_rsa_keysize}</tt>.
+      Generate an RSA key pair (private key and public key).
+      It does not take values from <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, nor <tt>{@link #id_rsa_keysize}</tt>.
 
       @param priv_key_file_path A file path where the private key will be written on the filesystem.
       @param pub_key_file_path  A file path where the public key will be written on the filesystem.
@@ -173,12 +196,14 @@ id_rsa_keysize = keysize</tt></pre>
             throw new Exception(stderr.toString())
         }
     }
+
     /**
       Generate an RSA key pair (private key and public key) using <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, and <tt>{@link #id_rsa_keysize}</tt>.
      */
     public void generate_rsa_pair() {
         generate_rsa_pair(id_rsa_priv, id_rsa_pub, id_rsa_keysize)
     }
+
     /**
       Uses RSA asymetric encryption to encrypt a plain text <tt>String</tt> and outputs cipher text.
 
@@ -200,6 +225,7 @@ id_rsa_keysize = keysize</tt></pre>
             return stdout.toString().trim()
         }
     }
+
     /**
       Uses RSA asymetric encryption to decrypt a cipher text <tt>String</tt> and outputs plain text.
 
