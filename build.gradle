@@ -1,6 +1,6 @@
 apply plugin: 'groovy'
 apply plugin: 'cobertura'
-apply from: 'file:groovydoc.gradle'
+apply from: 'file:gradle/groovydoc.gradle'
 
 group = 'net.gleske'
 jar.baseName = 'jervis'
