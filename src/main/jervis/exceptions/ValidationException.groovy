@@ -4,11 +4,14 @@ import jervis.exceptions.wikiPages
 
 /**
   A group of exceptions that are thrown when validation errors occur in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycles file</a>.
- */
 
-class ValidationException extends Exception
-{
+  <h2>Sample usage</h2>
+<pre><tt>import jervis.exceptions.ValidationException
+throw new ValidationException("some text")</tt></pre><br>
+ */
+class ValidationException extends JervisException {
     private static String wiki_page = wikiPages.lifecycles_spec
+
     /**
       Throw a <tt>ValidationException</tt>
 
