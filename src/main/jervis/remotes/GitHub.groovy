@@ -91,7 +91,7 @@ class GitHub {
      * public functions *
      */
     /**
-      Get the contents of <code>{@link #gh_web}</code>.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are guaranteed to have this function.
+      Get the contents of <code>{@link #gh_web}</code>.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
       @return The contents of <code>gh_web</code>.
      */
@@ -99,7 +99,7 @@ class GitHub {
         gh_web
     }
     /**
-      Get the contents of <code>{@link #gh_clone}</code>.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are guaranteed to have this function.
+      Get the contents of <code>{@link #gh_clone}</code>.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
       @return The contents of <code>gh_clone</code>.
      */
@@ -107,7 +107,7 @@ class GitHub {
         gh_clone
     }
     /**
-      Get a list of branches for a project.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are guaranteed to have this function.
+      Get a list of branches for a project.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
       @param  project  A GitHub project including the org.  e.g. <code>"samrocketman/jervis"</code>
       @return          A <code>List</code> where each element is a branch in the project.
@@ -118,7 +118,7 @@ class GitHub {
         return list
     }
     /**
-      Get the contents of a file from a project.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are guaranteed to have this function.
+      Get the contents of a file from a project.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
       @param   project    A GitHub project including the org.  e.g. <code>"samrocketman/jervis"</code>
       @param   file_path  A path to a file relative to the root of the Git repository.  e.g. <code>".travis.yml"</code>
@@ -131,7 +131,7 @@ class GitHub {
         return security.decodeBase64String(response['content'])
     }
     /**
-      Get a human readable string for this type of remote.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are guaranteed to have this function.
+      Get a human readable string for this type of remote.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
       @return A human readable <code>String</code> for this type of remote.
      */
