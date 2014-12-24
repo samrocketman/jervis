@@ -146,7 +146,7 @@ class GitHub {
     /**
       Get a human readable string for this type of remote.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
-      @return A human readable <tt>String</tt> for this type of remote.
+      @return A human readable <tt>String</tt> for this type of remote.  Value returned will be either <tt>"GitHub"</tt> or <tt>"GitHub Enterprise"</tt> depending on whether or not <tt>{@link #gh_web}</tt> has been set.
      */
     public String toString() {
         if(gh_web == "https://github.com/") {
