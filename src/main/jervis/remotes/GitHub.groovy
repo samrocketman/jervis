@@ -135,7 +135,7 @@ class GitHub {
 
       @return A human readable <code>String</code> for this type of remote.
      */
-    public String type() {
+    public String toString() {
         if(gh_web == "https://github.com/") {
             return "GitHub"
         }

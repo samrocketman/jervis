@@ -80,12 +80,12 @@ class GitHubTest extends GroovyTestCase {
         mygh.gh_clone = "http://server/"
         assert mygh.getCloneUrl() == "http://server/"
     }
-    //test GitHub().type()
-    @Test public void test_GitHub_type1() {
-        assert mygh.type() == "GitHub"
+    //test GitHub().toString()
+    @Test public void test_GitHub_toString1() {
+        assert mygh.toString() == "GitHub"
     }
-    @Test public void test_GitHub_type2() {
+    @Test public void test_GitHub_toString2() {
         mygh.gh_web = "http://server/"
-        assert mygh.type() == "GitHub Enterprise"
+        assert mygh.toString() == "GitHub Enterprise"
     }
 }
