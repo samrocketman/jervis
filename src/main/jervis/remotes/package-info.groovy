@@ -1,7 +1,6 @@
 /**
   Contains <tt>remotes</tt> for Jervis to communicate to different sources hosting Git repositories.
-  If writing a remote so Jervis can communicate to remotes other than <tt>GitHub</tt> then it is required to
-  have at a minimum the following functions.
+  If writing a remote, then it is required to have at a minimum the following functions.
 
   <ul>
       <li>
@@ -22,6 +21,7 @@
   </ul>
   <p>
   This allows remotes to be interchangeable.  Jervis will call only those functions to interact with a remote.
+  See the <tt>GitHub</tt> class as an example for the implementation of a remote.
   </p>
  */
 package jervis.remotes
