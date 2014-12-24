@@ -1,8 +1,20 @@
 package jervis.tools
 
+/**
+   A class to provide useful functions for interacting with a local git repository.
+
+   <h2>Sample usage</h2>
+
+<pre><tt>import jervis.tools.scmGit
+def x = new scmGit()
+print "Git root dir: "
+println x.getRoot()
+</tt></pre>
+ */
+
 class scmGit {
-    def git_root = ""
-    def mygit = "git"
+    String git_root = ""
+    String mygit = "git"
     def scmGit() {
         this.setRoot()
     }
@@ -10,11 +22,11 @@ class scmGit {
         mygit = git
         this.setRoot()
     }
-    def setRoot() {
+    public void setRoot() {
         def process = "${mygit} rev-parse --show-toplevel".execute()
         git_root = process.text.trim()
     }
-    def getRoot() {
+    String getRoot() {
         git_root
     }
 }
