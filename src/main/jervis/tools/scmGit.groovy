@@ -41,7 +41,7 @@ class scmGit {
     }
 
     /**
-      Gets the root directory of a repository and stores in in {@link #git_root}.  It is the equivalent of executing the following git command.
+      Gets the root directory of a repository and stores in in <tt>{@link #git_root}</tt>.  It is the equivalent of executing the following git command.
       <pre><tt>git rev-parse --show-toplevel</tt></pre><br>
      */
     public void setRoot() {
@@ -50,7 +50,7 @@ class scmGit {
     }
 
     /**
-      @return The value of {@link #git_root} which is a known directory of the git repository in the current working directory of when the <tt>scmGit</tt> class was instantiated.
+      @return The value of <tt>{@link #git_root}</tt> which is a known directory of the git repository in the current working directory of when the <tt>scmGit</tt> class was instantiated.
      */
     String getRoot() {
         git_root
