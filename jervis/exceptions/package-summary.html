@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<title>jervis.exceptions (Jervis API Docs)</title>
+<META NAME="keywords" CONTENT="jervis.exceptions package">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../stylesheet.css" TITLE="Style">
+<link href="../../groovy.ico" type="image/x-icon" rel="shortcut icon">
+<link href="../../groovy.ico" type="image/x-icon" rel="icon">
+<SCRIPT type="text/javascript">
+function windowTitle()
+{
+    parent.document.title="jervis.exceptions (Jervis API Docs)";
+}
+</SCRIPT>
+<NOSCRIPT>
+</NOSCRIPT>
+
+</head>
+
+<body BGCOLOR="white" onload="windowTitle();">
+<hr>
+
+<!-- ========= START OF TOP NAVBAR ======= -->
+<a name="navbar_top"><!-- --></a>
+<table summary="" width="100%" border="0" cellpadding="1" cellspacing="0">
+<tbody><tr>
+<td colspan="2" class="NavBarCell1" bgcolor="#eeeeff">
+<a name="navbar_top_firstrow"><!-- --></a>
+<table summary="" border="0" cellpadding="0" cellspacing="3">
+  <tbody><tr valign="top" align="center">
+  <td class="NavBarCell1" bgcolor="#eeeeff">    <a href="../../overview-summary.html"><font class="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td>
+  <td class="NavBarCell1Rev" bgcolor="#ffffff"> &nbsp;<font class="NavBarFont1Rev"><b>Package</b></font>&nbsp;</td>
+  <td class="NavBarCell1" bgcolor="#eeeeff">    <font class="NavBarFont1">Class</font>&nbsp;</td>
+  <!--
+  <td class="NavBarCell1" bgcolor="#eeeeff">    <a href="overview-tree.html"><font class="NavBarFont1"><b>Tree</b></font></a>&nbsp;</td>
+  -->
+  <td class="NavBarCell1" bgcolor="#eeeeff">    <a href="../../deprecated-list.html"><font class="NavBarFont1"><b>Deprecated</b></font></a>&nbsp;</td>
+  <td class="NavBarCell1" bgcolor="#eeeeff">    <a href="../../index-all.html"><font class="NavBarFont1"><b>Index</b></font></a>&nbsp;</td>
+  <td class="NavBarCell1" bgcolor="#eeeeff">    <a href="../../help-doc.html"><font class="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+  </tr>
+</tbody></table>
+</td>
+<td rowspan="3" valign="top" align="right"><em>
+    <b><a href="https://github.com/samrocketman/jervis" target="_blank">github.com/samrocketman/jervis</a></b>
+</em>
+</td>
+</tr>
+
+<tr>
+<td class="NavBarCell2" bgcolor="white"><font size="-2">
+&nbsp;PREV&nbsp;
+&nbsp;NEXT</font></td>
+<td class="NavBarCell2" bgcolor="white"><font size="-2">
+  <a href="../../index.html?jervis/exceptions/package-summary.html" target="_top"><b>FRAMES</b></a>  &nbsp;
+&nbsp;<a href="package-summary.html" target="_top"><b>NO FRAMES</b></a>  &nbsp;
+&nbsp;<script type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-frame.html"><B>All Classes</B></A>');
+  }
+  //-->
+</script>
+<noscript>
+  <A HREF="../../allclasses-frame.html"><B>All Classes</B></A>
+</noscript>
+
+
+</font></td>
+</tr>
+</tbody></table>
+<!-- ========= END OF TOP NAVBAR ========= -->
+
+
+<HR>
+<H2>
+Package jervis.exceptions
+</H2>
+
+
+  Contains all of the exceptions Jervis uses to provide user friendly failures.
+  Generally, all exceptions are one of two types: an <tt>exception group</tt> or an <tt>issue exception</tt>.
+  The following bullet tree generally describes the intended exception hierarchy.
+  <ul>
+      <li>
+          <tt>JervisException</tt> - The base exception class for Jervis from which all other exceptions derive.
+          <ul>
+              <li>
+              An <tt>exception group</tt> which groups related issue exceptions.
+              <ul>
+                  <li>
+                      An <tt>issue exception</tt> calling out an issue in a user friendly way.
+                  </li>
+              </ul>
+              </li>
+          </ul>
+      </li>
+  </ul>
+  <p>
+  Whenever working in Jervis the generic <tt>Exception</tt> should never be thrown.
+  Instead, the <tt>JervisException</tt> should be thrown for the more generic exceptions.
+  This way Jervis exceptions can be distinguished from other types of exceptions which might get thrown during runtime.
+  </p>
+ 
+
+
+<P>&nbsp;</P>
+
+
+
+
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#90DDF7" CLASS="TableHeadingColor">
+    <TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+    <B>Class Summary</B></FONT></TH>
+    </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="wikiPages.html" title="class in jervis/exceptions">wikiPages</A></B></TD>
+        <TD>A simple class, whose only purpose is to house static strings referencing the <a href="https://github.com/samrocketman/jervis/wiki" target="_blank">Jervis wiki</a>,
+  to be used as helpful hints when throwing exceptions.</TD>
+        </TR>
+
+</TABLE>
+&nbsp;
+<P>
+<DL>
+</DL>
+<hr>
+    
+
+
+
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#90DDF7" CLASS="TableHeadingColor">
+    <TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+    <B>Exception Summary</B></FONT></TH>
+    </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="BadValueInKeyException.html" title="class in jervis/exceptions">BadValueInKeyException</A></B></TD>
+        <TD>A type of <tt><a href='../../jervis/exceptions/ValidationException.html' title='ValidationException'>ValidationException</a></tt> which is thrown when there is a bad value in a lifecycles file key.</TD>
+        </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="InfiniteLoopException.html" title="class in jervis/exceptions">InfiniteLoopException</A></B></TD>
+        <TD>A type of <tt><a href='../../jervis/exceptions/ValidationException.html' title='ValidationException'>ValidationException</a></tt> which is thrown when a lifecycles file keys reference in an infinite loop.</TD>
+        </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="JervisException.html" title="class in jervis/exceptions">JervisException</A></B></TD>
+        <TD>The base exception class for Jervis from which all other exceptions derive.</TD>
+        </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="LifecycleException.html" title="class in jervis/exceptions">LifecycleException</A></B></TD>
+        <TD>A group of exceptions that are thrown when undesireable lifecycle generation conditions occur.</TD>
+        </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="MissingKeyException.html" title="class in jervis/exceptions">MissingKeyException</A></B></TD>
+        <TD>A type of <tt><a href='../../jervis/exceptions/ValidationException.html' title='ValidationException'>ValidationException</a></tt> which is thrown when a lifecycles file key is referenced but missing.</TD>
+        </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="MissingLifecyclesException.html" title="class in jervis/exceptions">MissingLifecyclesException</A></B></TD>
+        <TD>A type of <tt><a href='../../jervis/exceptions/LifecycleException.html' title='LifecycleException'>LifecycleException</a></tt> which is thrown when lifecycles are not loaded from a yaml file.</TD>
+        </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="UnsupportedLanguageException.html" title="class in jervis/exceptions">UnsupportedLanguageException</A></B></TD>
+        <TD>A type of <tt><a href='../../jervis/exceptions/LifecycleException.html' title='LifecycleException'>LifecycleException</a></tt> which is thrown when an unsupported language lifecycle generation is attempted.</TD>
+        </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="ValidationException.html" title="class in jervis/exceptions">ValidationException</A></B></TD>
+        <TD>A group of exceptions that are thrown when validation errors occur in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycles file</a>.</TD>
+        </TR>
+
+</TABLE>
+&nbsp;
+<P>
+<DL>
+</DL>
+<hr>
+    
+
+
+
+
+<p><a href="https://github.com/samrocketman/jervis" target="_blank">Jervis</a> API documentation was generated at 02:04 (GMT-0500) on December 29, 2014.</p>
+<hr>
+</body>
+</html>
