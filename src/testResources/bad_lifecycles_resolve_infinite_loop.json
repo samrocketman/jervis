@@ -1,5 +1,6 @@
 {
     "groovy": {
+        "friendlyName": "Ruby",
         "defaultKey": "gradle",
         "gradle": {
             "fileExistsCondition": ["/", "build.gradle"],

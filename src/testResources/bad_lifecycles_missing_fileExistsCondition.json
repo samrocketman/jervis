@@ -1,5 +1,6 @@
 {
     "ruby": {
+        "friendlyName": "Ruby",
         "defaultKey": "rake1",
         "rake1": {
             "fallbackKey": "rake2",

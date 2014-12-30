@@ -1,5 +1,6 @@
 {
     "groovy": {
+        "friendlyName": "Groovy",
         "defaultKey": "gradle",
         "gradle": {
             "fileExistsCondition": ["/", "build.gradle"],
@@ -19,6 +20,7 @@
         }
     },
     "ruby": {
+        "friendlyName": "Ruby",
         "defaultKey": "rake1",
         "rake1": {
             "fileExistsCondition": ["/", "Gemfile.lock"],

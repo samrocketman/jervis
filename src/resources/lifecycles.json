@@ -1,23 +1,27 @@
 {
     "c": {
+        "friendlyName": "C",
         "defaultKey": "make",
         "make": {
             "script": "./configure && make && make test"
         }
     },
     "cpp": {
+        "friendlyName": "C++",
         "defaultKey": "make",
         "make": {
             "script": "./configure && make && make test"
         }
     },
     "clojure": {
+        "friendlyName": "Clojure",
         "defaultKey": "lein",
         "lein": {
             "script": "lein test"
         }
     },
     "erlang": {
+        "friendlyName": "Erlang",
         "defaultKey": "rebar1",
         "rebar1": {
             "fileExistsCondition": ["/", "rebar.config"],
@@ -36,6 +40,7 @@
         }
     },
     "go": {
+        "friendlyName": "Go",
         "defaultKey": "make",
         "make": {
             "fileExistsCondition": ["/", "Makefile"],
@@ -49,6 +54,7 @@
         }
     },
     "groovy": {
+        "friendlyName": "Groovy",
         "defaultKey": "gradlew",
         "gradlew": {
             "fileExistsCondition": ["/", "gradlew"],
@@ -74,6 +80,7 @@
         }
     },
     "haskell": {
+        "friendlyName": "Haskell",
         "defaultKey": "cabal",
         "cabal": {
             "install": "cabal install --only-dependencies --enable-tests",
@@ -81,6 +88,7 @@
         }
     },
     "java": {
+        "friendlyName": "Java",
         "defaultKey": "gradlew",
         "gradlew": {
             "fileExistsCondition": ["/", "gradlew"],
@@ -106,6 +114,7 @@
         }
     },
     "node_js": {
+        "friendlyName": "Node.JS",
         "defaultKey": "npm",
         "npm": {
             "install": "npm install",
@@ -113,6 +122,7 @@
         }
     },
     "perl": {
+        "friendlyName": "Perl",
         "defaultKey": "Module::Build",
         "Module::Build": {
             "fileExistsCondition": ["/", "Build.PL"],
@@ -132,16 +142,19 @@
         }
     },
     "php": {
+        "friendlyName": "PHP",
         "defaultKey": "phpunit",
         "phpunit": {
             "script": "phpunit",
         }
     },
     "python": {
+        "friendlyName": "Python",
         "defaultKey": "dummy",
         "dummy": {}
     },
     "ruby": {
+        "friendlyName": "Ruby",
         "defaultKey": "rake1",
         "rake1": {
             "fileExistsCondition": ["/", "Gemfile.lock"],
@@ -157,6 +170,7 @@
         }
     },
     "rust": {
+        "friendlyName": "Rust",
         "defaultKey": "cargo",
         "cargo": {
             "script": [
@@ -166,6 +180,7 @@
         }
     },
     "scala": {
+        "friendlyName": "Scala",
         "defaultKey": "sbt",
         "sbt": {
             "script": "sbt ++$TRAVIS_SCALA_VERSION test"

@@ -1,5 +1,6 @@
 {
     "ruby": {
+        "friendlyName": "Ruby",
         "defaultKey": "rake3",
         "rake1": {
             "fileExistsCondition": ["/", "Gemfile.lock"],

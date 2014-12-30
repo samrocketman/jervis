@@ -13,11 +13,24 @@ import jervis.exceptions.ValidationException
 //x.load_JSON(url)
 //x.validate()
 
+/**
+  Validates the contents of a lifecycle file and provides quick access to supported languages.
+
+  <h2>Sample usage</h2>
+<pre><tt>import jervis.lang.lifecycleValidator
+import jervis.tools.scmGit
+def git = new scmGit()
+def lifecycles = new lifecycleValidator()
+lifecycles.load_JSON(git.getRoot() + "/src/resources/lifecycles.json")
+println "Does the file validate? " + lifecycles.validate()
+println "Supported languages include:"
+lifecycles.languages.each { println it }</tt></pre>
+ */
 class lifecycleValidator {
     def lifecycles
     def languages
-    def load_JSON(URL url) {
-        lifecycles = new groovy.json.JsonSlurper().parse(new File(url.getFile()).newReader())
+    def load_JSON(String file) {
+        lifecycles = new groovy.json.JsonSlurper().parse(new File(file).newReader())
         languages = lifecycles.keySet() as String[];
     }
     def supportedLanguage(String lang) {
@@ -37,6 +50,9 @@ class lifecycleValidator {
             def tools = lifecycles[it].keySet() as String[]
             if(!("defaultKey" in tools)) {
                 throw new MissingKeyException([it,"defaultKey"].join('.'))
+            }
+            if(!("friendlyName" in tools)) {
+                throw new MissingKeyException([it,"friendlyName"].join('.'))
             }
             if(!(lifecycles[it]["defaultKey"] in tools)) {
                 throw new MissingKeyException([it,"defaultKey",lifecycles[it]["defaultKey"]].join('.'))
