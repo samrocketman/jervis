@@ -10,7 +10,8 @@ your own Contributions for any other purpose.
 
 - [Corporate contributor license agreement][ccla] (original signed Agreement
   required)
-- [Individual contributor license agreement][icla] ([sign this agreement][sign])
+- [Individual contributor license agreement][icla] ([sign this agreement
+  online][sign])
 
 [ccla]: corporate_contributor_license_agreement.md
 [icla]: individual_contributor_license_agreement.md
