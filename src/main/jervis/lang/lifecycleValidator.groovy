@@ -14,7 +14,7 @@ import jervis.exceptions.ValidationException
 //x.validate()
 
 /**
-  Validates the contents of a lifecycle file and provides quick access to supported languages.
+  Validates the contents of a <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycle file</a> and provides quick access to supported languages.
 
   <h2>Sample usage</h2>
 <pre><tt>import jervis.lang.lifecycleValidator
@@ -31,16 +31,35 @@ Collections.sort(supported_languages)
 supported_languages.each{ println it }</tt></pre>
  */
 class lifecycleValidator {
+    /**
+      A <tt>{@link HashMap}</tt> of the parsed lifecycles file.
+     */
     def lifecycles
+    /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of supported languages in the lifecycles file.  This is just a list of the keys.
+     */
     def languages
-    def load_JSON(String file) {
+    /**
+      Load the JSON of a lifecycles file and parse it.  This should be the first function called upon class instantiation.  It populates <tt>{@link #lifecycles}</tt> and <tt>{@link #languages}</tt>.
+      @param file A <tt>String</tt> which is a path to a lifecycles file.
+     */
+    public void load_JSON(String file) {
         lifecycles = new groovy.json.JsonSlurper().parse(new File(file).newReader())
         languages = lifecycles.keySet() as String[];
     }
-    def supportedLanguage(String lang) {
+    /**
+      Checks to see if a language is a supported language based on the lifecycles file.
+      @param lang A <tt>String</tt> which is a language to look up based on the keys in the lifecycles file.
+      @return     <tt>true</tt> if the language is supported or <tt>false</tt> if the language is not supported.
+     */
+    public Boolean supportedLanguage(String lang) {
         lang in languages
     }
-    def validate_asBool() {
+    /**
+      Executes the <tt>{@link #validate()}</tt> function but always returns a <tt>Boolean</tt> instead of throwing an exception upon failed validation.
+      @return     <tt>true</tt> if the lifecycles file validates or <tt>false</tt> if it fails validation.
+     */
+    public Boolean validate_asBool() {
         try {
             this.validate()
             return true
@@ -49,7 +68,11 @@ class lifecycleValidator {
             return false
         }
     }
-    def validate() {
+    /**
+      Validates the lifecycles file.
+      @return     <tt>true</tt> if the lifecycles file validates.  If the lifecycles file fails validation then it will throw a <tt>{@link jervis.exceptions.ValidationException}</tt>.
+     */
+    public Boolean validate() {
         lifecycles.keySet().each {
             def tools = lifecycles[it].keySet() as String[]
             if(!("defaultKey" in tools)) {

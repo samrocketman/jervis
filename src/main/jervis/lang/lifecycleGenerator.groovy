@@ -6,7 +6,7 @@ import jervis.lang.lifecycleValidator
 import org.yaml.snakeyaml.Yaml
 
 /**
-  WIP: Docs will be written once class as stabilized.
+  WIP: Docs will be written once this class has stabilized.
  */
 class lifecycleGenerator {
     def jervis_yaml
