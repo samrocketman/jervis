@@ -174,7 +174,7 @@ function windowTitle()
 <dl>
 
 <dt><a href="jervis/tools/securityIO.html#decodeBase64Bytes(java.lang.String)" title="Method in securityIO"><b>decodeBase64Bytes</b>(String)</b></a> - Method in <a href="jervis/tools/securityIO.html">securityIO</a>
-</dt><dd>Decode a base64 <tt>String</tt> into <tt><a href='http://download.oracle.com/javase/6/docs/api/java/lang/Byte.html' title='Byte'>Byte</a>s</tt>.</dd>
+</dt><dd>Decode a base64 <tt>String</tt> into <tt><a href='http://download.oracle.com/javase/7/docs/api/java/lang/Byte.html' title='Byte'>Byte</a>s</tt>.</dd>
 <dt><a href="jervis/tools/securityIO.html#decodeBase64String(java.lang.String)" title="Method in securityIO"><b>decodeBase64String</b>(String)</b></a> - Method in <a href="jervis/tools/securityIO.html">securityIO</a>
 </dt><dd>Decode a base64 <tt>String</tt>.</dd>
 <dt><a href="jervis/tools/securityIO.html#default_key_size" title="Field in securityIO"><b>default_key_size</b></a> - Field in <a href="jervis/tools/securityIO.html">securityIO</a>
@@ -191,7 +191,7 @@ function windowTitle()
 <dl>
 
 <dt><a href="jervis/tools/securityIO.html#encodeBase64(byte[])" title="Method in securityIO"><b>encodeBase64</b>(byte[])</b></a> - Method in <a href="jervis/tools/securityIO.html">securityIO</a>
-</dt><dd>Encode raw <tt><a href='http://download.oracle.com/javase/6/docs/api/java/lang/Byte.html' title='Byte'>Byte</a>s</tt> into a base64 <tt>String</tt>.</dd>
+</dt><dd>Encode raw <tt><a href='http://download.oracle.com/javase/7/docs/api/java/lang/Byte.html' title='Byte'>Byte</a>s</tt> into a base64 <tt>String</tt>.</dd>
 </dl>
 
     
@@ -202,12 +202,12 @@ function windowTitle()
 
 <dl>
 
-<dt><a href="jervis/tools/fileIO.html#fileContents(java.lang.String)" title="Method in fileIO"><b>fileContents</b>(String)</b></a> - Method in <a href="jervis/tools/fileIO.html">fileIO</a>
-</dt><dd></dd>
 <dt><a href="jervis/tools/fileIO.html#fileExists(java.lang.String)" title="Method in fileIO"><b>fileExists</b>(String)</b></a> - Method in <a href="jervis/tools/fileIO.html">fileIO</a>
-</dt><dd></dd>
+</dt><dd>Checks the file path inside the parenthesis of <tt>"readFile(/path/to/file.sh)"</tt> exists.
+      </dd>
 <dt><a href="jervis/tools/fileIO.html" title="Class in jervis.tools"><b>fileIO</b></a> - Class in <a href="./jervis/tools/package-summary.html">jervis.tools</a>
-</dt><dd></dd>
+</dt><dd>A class to provide basic file operations from <tt>readFile()</tt> strings in a yaml file.
+  </dd>
 </dl>
 
     
@@ -261,7 +261,7 @@ function windowTitle()
 <dt><a href="jervis/exceptions/InfiniteLoopException.html#InfiniteLoopException(java.lang.String)" title="Constructor in InfiniteLoopException"><b>InfiniteLoopException</b>(String)</b></a> - Constructor in <a href="jervis/exceptions/InfiniteLoopException.html">InfiniteLoopException</a>
 </dt><dd>Throw an exception when lifecycle keys reference in an infinite loop.</dd>
 <dt><a href="jervis/tools/fileIO.html#isReadFile(java.lang.String)" title="Method in fileIO"><b>isReadFile</b>(String)</b></a> - Method in <a href="jervis/tools/fileIO.html">fileIO</a>
-</dt><dd></dd>
+</dt><dd>Checks if the <tt>String</tt> starts with <tt>readFile(</tt> and ends with <tt>)</tt>.</dd>
 </dl>
 
     
@@ -301,15 +301,15 @@ function windowTitle()
 <dt><a href="jervis/exceptions/LifecycleException.html#LifecycleException(java.lang.String)" title="Constructor in LifecycleException"><b>LifecycleException</b>(String)</b></a> - Constructor in <a href="jervis/exceptions/LifecycleException.html">LifecycleException</a>
 </dt><dd>Throw a <tt>LifecycleException</tt>.</dd>
 <dt><a href="jervis/lang/lifecycleGenerator.html" title="Class in jervis.lang"><b>lifecycleGenerator</b></a> - Class in <a href="./jervis/lang/package-summary.html">jervis.lang</a>
-</dt><dd></dd>
+</dt><dd>WIP: Docs will be written once this class has stabilized.</dd>
 <dt><a href="jervis/lang/lifecycleGenerator.html#lifecycleGenerator()" title="Constructor in lifecycleGenerator"><b>lifecycleGenerator</b>()</b></a> - Constructor in <a href="jervis/lang/lifecycleGenerator.html">lifecycleGenerator</a>
 </dt><dd></dd>
 <dt><a href="jervis/exceptions/wikiPages.html#lifecycles_spec" title="Field in wikiPages"><b>lifecycles_spec</b></a> - Field in <a href="jervis/exceptions/wikiPages.html">wikiPages</a>
 </dt><dd>A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycles file spec wiki page</a>.</dd>
 <dt><a href="jervis/lang/lifecycleValidator.html" title="Class in jervis.lang"><b>lifecycleValidator</b></a> - Class in <a href="./jervis/lang/package-summary.html">jervis.lang</a>
-</dt><dd></dd>
-<dt><a href="jervis/lang/lifecycleValidator.html#load_JSON(java.net.URL)" title="Method in lifecycleValidator"><b>load_JSON</b>(URL)</b></a> - Method in <a href="jervis/lang/lifecycleValidator.html">lifecycleValidator</a>
-</dt><dd></dd>
+</dt><dd>Validates the contents of a <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycle file</a> and provides quick access to supported languages.</dd>
+<dt><a href="jervis/lang/lifecycleValidator.html#load_JSON(java.lang.String)" title="Method in lifecycleValidator"><b>load_JSON</b>(String)</b></a> - Method in <a href="jervis/lang/lifecycleValidator.html">lifecycleValidator</a>
+</dt><dd>Load the JSON of a lifecycles file and parse it.  </dd>
 <dt><a href="jervis/lang/lifecycleGenerator.html#loadLifecycles(java.net.URL)" title="Method in lifecycleGenerator"><b>loadLifecycles</b>(URL)</b></a> - Method in <a href="jervis/lang/lifecycleGenerator.html">lifecycleGenerator</a>
 </dt><dd></dd>
 <dt><a href="jervis/lang/lifecycleGenerator.html#loadYaml(java.lang.String)" title="Method in lifecycleGenerator"><b>loadYaml</b>(String)</b></a> - Method in <a href="jervis/lang/lifecycleGenerator.html">lifecycleGenerator</a>
@@ -383,7 +383,7 @@ function windowTitle()
 <dl>
 
 <dt><a href="jervis/tools/fileIO.html#readFile(java.lang.String)" title="Method in fileIO"><b>readFile</b>(String)</b></a> - Method in <a href="jervis/tools/fileIO.html">fileIO</a>
-</dt><dd></dd>
+</dt><dd>Read the contents of the file in a <tt>readFile()</tt> <tt>String</tt>.</dd>
 <dt><a href="jervis/tools/securityIO.html#rsaDecrypt(java.lang.String)" title="Method in securityIO"><b>rsaDecrypt</b>(String)</b></a> - Method in <a href="jervis/tools/securityIO.html">securityIO</a>
 </dt><dd>Uses RSA asymetric encryption to decrypt a cipher text <tt>String</tt> and outputs plain text.</dd>
 <dt><a href="jervis/tools/securityIO.html#rsaEncrypt(java.lang.String)" title="Method in securityIO"><b>rsaEncrypt</b>(String)</b></a> - Method in <a href="jervis/tools/securityIO.html">securityIO</a>
@@ -420,7 +420,7 @@ function windowTitle()
 <dt><a href="jervis/exceptions/wikiPages.html#supported_languages" title="Field in wikiPages"><b>supported_languages</b></a> - Field in <a href="jervis/exceptions/wikiPages.html">wikiPages</a>
 </dt><dd>A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Supported-Languages" target="_blank">supported languages wiki page</a>.</dd>
 <dt><a href="jervis/lang/lifecycleValidator.html#supportedLanguage(java.lang.String)" title="Method in lifecycleValidator"><b>supportedLanguage</b>(String)</b></a> - Method in <a href="jervis/lang/lifecycleValidator.html">lifecycleValidator</a>
-</dt><dd></dd>
+</dt><dd>Checks to see if a language is a supported language based on the lifecycles file.</dd>
 </dl>
 
     
@@ -458,9 +458,9 @@ function windowTitle()
 <dl>
 
 <dt><a href="jervis/lang/lifecycleValidator.html#validate_asBool()" title="Method in lifecycleValidator"><b>validate_asBool</b>()</b></a> - Method in <a href="jervis/lang/lifecycleValidator.html">lifecycleValidator</a>
-</dt><dd></dd>
+</dt><dd>Executes the <tt><a href='#validate()'>validate()</a></tt> function but always returns a <tt>Boolean</tt> instead of throwing an exception upon failed validation.</dd>
 <dt><a href="jervis/lang/lifecycleValidator.html#validate()" title="Method in lifecycleValidator"><b>validate</b>()</b></a> - Method in <a href="jervis/lang/lifecycleValidator.html">lifecycleValidator</a>
-</dt><dd></dd>
+</dt><dd>Validates the lifecycles file.</dd>
 <dt><a href="jervis/exceptions/ValidationException.html" title="Class in jervis.exceptions"><b>ValidationException</b></a> - Class in <a href="./jervis/exceptions/package-summary.html">jervis.exceptions</a>
 </dt><dd>A group of exceptions that are thrown when validation errors occur in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycles file</a>.</dd>
 <dt><a href="jervis/exceptions/ValidationException.html#ValidationException(java.lang.String)" title="Constructor in ValidationException"><b>ValidationException</b>(String)</b></a> - Constructor in <a href="jervis/exceptions/ValidationException.html">ValidationException</a>
@@ -523,7 +523,7 @@ function windowTitle()
     
 
 <hr>
-<p><a href="https://github.com/samrocketman/jervis" target="_blank">Jervis</a> API documentation was generated at 02:04 (GMT-0500) on December 29, 2014.</p>
+<p><a href="https://github.com/samrocketman/jervis" target="_blank">Jervis</a> API documentation was generated at 23:43 (GMT-0500) on December 29, 2014.</p>
 <hr>
 
 </body></html>
