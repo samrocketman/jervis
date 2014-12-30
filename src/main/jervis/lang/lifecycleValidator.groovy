@@ -24,7 +24,11 @@ def lifecycles = new lifecycleValidator()
 lifecycles.load_JSON(git.getRoot() + "/src/resources/lifecycles.json")
 println "Does the file validate? " + lifecycles.validate()
 println "Supported languages include:"
-lifecycles.languages.each { println it }</tt></pre>
+//print out a sorted ArrayList of supported languages
+supported_languages = []
+lifecycles.languages.each { supported_languages << lifecycles.lifecycles[it]["friendlyName"] }
+Collections.sort(supported_languages)
+supported_languages.each{ println it }</tt></pre>
  */
 class lifecycleValidator {
     def lifecycles
