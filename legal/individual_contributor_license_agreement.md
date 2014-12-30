@@ -84,12 +84,14 @@ all right, title, and interest in and to Your Contributions.
 8.  You agree to notify the Developer of any facts or circumstances of which you
   become aware that would make these representations inaccurate in any respect.
 
-If you agree to this licence then please [sign this form][john_hancock] filling
-out all required information.  If you're contributing through GitHub then please
-fill out your GitHub account name.  Information you submit to this form will be
-used solely as a record of agreement to this CLA and will not be shared with any
-third parties.  Since the records are hosted on Google services they are also
-subject to the [Google Privacy Policy][google_pp].
+**If you agree to this licence then please [sign this form][john_hancock].**
+
+If you're contributing through GitHub then please fill out your GitHub account
+name.  If you're contributing through GitLab then please fill out your GitLab
+account name.  Information you submit to this form will be used solely as a
+record of agreement to this CLA and will not be shared with any third parties.
+Since the records are hosted on Google services they are also subject to the
+[Google Privacy Policy][google_pp].
 
 This text is licensed under the [Creative Commons Attribution 3.0 License][cc]
 and the original source is the [Google Open Source Programs Office][gospo].
