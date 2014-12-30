@@ -84,7 +84,7 @@ all right, title, and interest in and to Your Contributions.
 8.  You agree to notify the Developer of any facts or circumstances of which you
   become aware that would make these representations inaccurate in any respect.
 
-**If you agree to this licence then please [sign this form][john_hancock].**
+**If you agree to this document then please [sign this form][john_hancock].**
 
 If you're contributing through GitHub then please fill out your GitHub account
 name.  If you're contributing through GitLab then please fill out your GitLab
