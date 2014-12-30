@@ -12,12 +12,13 @@ you.  So please get it out of the way before submitting a pull request.  See
 
 # Issue tracker
 
-This is where I do all of my project planning.  Feel free to collaborate on open
-issues or create an issue for a problem you're having.
+[GitHub Issues][issues] is where I do all of my project planning.  Feel free to
+collaborate on open issues or create an issue for a problem you're having.
 
 # The wiki
 
 [The wiki][wiki] is used as a comprehensive guide for users and developers of
 Jervis.  All material is mirrored and regularly tagged in case of vandalism.
 
+[issues]: https://github.com/samrocketman/jervis/issues
 [wiki]: https://github.com/samrocketman/jervis/wiki
