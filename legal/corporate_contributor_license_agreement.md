@@ -11,10 +11,10 @@ sam.mxracer@gmail.com.
 
 We also accept mailed forms to the following address:
 
-> Sam Gleske
-> Attn: Jervis CCLA
-> 911 S Farragut Terrace, Apt 2
-> Philadelphia, PA 19143
+>     Sam Gleske
+>     Attn: Jervis CCLA
+>     911 S Farragut Terrace, Apt 2
+>     Philadelphia, PA 19143
 
 Please read this document carefully before signing and keep a copy for your
 records.
