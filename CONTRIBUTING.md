@@ -17,7 +17,7 @@ issues or create an issue for a problem you're having.
 
 # The wiki
 
-The wiki is used as a comprehensive guide for users and developers of Jervis.
-All material is mirrored and regularly tagged in case of vandalism.
+[The wiki][wiki] is used as a comprehensive guide for users and developers of
+Jervis.  All material is mirrored and regularly tagged in case of vandalism.
 
 [wiki]: https://github.com/samrocketman/jervis/wiki
