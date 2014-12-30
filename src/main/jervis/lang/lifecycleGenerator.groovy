@@ -5,6 +5,9 @@ import jervis.exceptions.UnsupportedLanguageException
 import jervis.lang.lifecycleValidator
 import org.yaml.snakeyaml.Yaml
 
+/**
+  WIP: Docs will be written once class as stabilized.
+ */
 class lifecycleGenerator {
     def jervis_yaml
     def language
