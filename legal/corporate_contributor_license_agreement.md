@@ -1,5 +1,52 @@
 # Corporate contributor license agreement
 
+This version of the Agreement allows an entity (the "Corporation") to submit
+Contributions to Sam Gleske or any entity he represents (herein "the
+Developer"), to authorize Contributions submitted by its designated employees to
+the Developer, and to grant copyright and patent licenses thereto. If you have
+not already done so, please complete and send an original signed Agreement.
+
+Scanned agreements are greatly preferred, and may be emailed in PDF form to
+sam.mxracer@gmail.com.
+
+We also accept mailed forms to the following address:
+
+> Sam Gleske
+> Attn: Jervis CCLA
+> 911 S Farragut Terrace, Apt 2
+> Philadelphia, PA 19143
+
+Please read this document carefully before signing and keep a copy for your
+records.
+
+```
+
+
+   Corporation name: ___________________________________________________
+
+
+   Corporation address: ________________________________________________
+
+
+   _____________________________________________________________________
+
+
+   _____________________________________________________________________
+
+
+   Point of Contact: ___________________________________________________
+
+
+   E-Mail:  ____________________________________________________________
+
+
+   Telephone: _____________________
+
+
+   Fax: ___________________________
+
+```
+
 You accept and agree to the following terms and conditions for Your present and
 future Contributions submitted to Sam Gleske or any entity he represents
 (henceforth "the Developer"). Except for the license granted herein to the
@@ -81,8 +128,30 @@ all right, title, and interest in and to Your Contributions.
   behalf of the Corporation, or to the Corporation's Point of Contact with the
   Developer.
 
-This text is licensed under the [Creative Commons Attribution 3.0 License][cc]
-and the original source is the [Google Open Source Programs Office][gospo].
+```
+
+
+Please sign: __________________________________   Date: _______________
+
+
+Title:  _______________________________________________________________
+
+
+Corporation: __________________________________________________________
+```
+
+### Schedule A
+
+[Initial list of designated employees. NB: authorization is not tied to
+particular Contributions.]
+
+### Schedule B
+
+[Identification of optional concurrent software grant. Would be left blank or
+omitted if there is no concurrent software grant.]
+
+*This text is licensed under the [Creative Commons Attribution 3.0 License][cc]
+and the original source is the [Google Open Source Programs Office][gospo].*
 
 [cc]: http://creativecommons.org/licenses/by/3.0/
 [gospo]: https://developers.google.com/open-source/cla/corporate
