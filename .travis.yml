@@ -16,13 +16,12 @@ env:
   - GROOVY_VERSION="2.3.9"
 matrix:
   allow_failures:
-    - env:
-      - GROOVY_VERSION="2.3.1"
-      - GROOVY_VERSION="2.3.2"
-      - GROOVY_VERSION="2.3.3"
-      - GROOVY_VERSION="2.3.4"
-      - GROOVY_VERSION="2.3.5"
-      - GROOVY_VERSION="2.3.6"
-      - GROOVY_VERSION="2.3.7"
-      - GROOVY_VERSION="2.3.8"
-      - GROOVY_VERSION="2.3.9"
+    - env: GROOVY_VERSION="2.3.1"
+    - env: GROOVY_VERSION="2.3.2"
+    - env: GROOVY_VERSION="2.3.3"
+    - env: GROOVY_VERSION="2.3.4"
+    - env: GROOVY_VERSION="2.3.5"
+    - env: GROOVY_VERSION="2.3.6"
+    - env: GROOVY_VERSION="2.3.7"
+    - env: GROOVY_VERSION="2.3.8"
+    - env: GROOVY_VERSION="2.3.9"
