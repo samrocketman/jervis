@@ -1,1 +1,13 @@
 language: groovy
+env:
+  - GROOVY_VERSION="1.8.9"
+  - GROOVY_VERSION="2.0.8"
+  - GROOVY_VERSION="2.1.9"
+  - GROOVY_VERSION="2.2.2"
+  - GROOVY_VERSION="2.3.0"
+  - GROOVY_VERSION="2.3.1"
+  - GROOVY_VERSION="2.3.9"
+matrix:
+  allow_failures:
+    - env: GROOVY_VERSION="2.3.1"
+    - env: GROOVY_VERSION="2.3.9"
