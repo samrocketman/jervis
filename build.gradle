@@ -5,22 +5,43 @@ apply from: 'file:gradle/groovydoc.gradle'
 group = 'net.gleske'
 jar.baseName = 'jervis'
 version = '0.1.0-SNAPSHOT'
+if("${System.env.GROOVY_VERSION}".length() > 0) {
+    println "Using Groovy ${System.env.GROOVY_VERSION}"
+}
+else {
+    println "Using Groovy 1.8.9"
+}
 
 buildscript {
     repositories { mavenCentral() }
     dependencies {
         classpath "net.saliman:gradle-cobertura-plugin:2.2.5"
-        classpath "org.codehaus.groovy:groovy-all:1.8.9"
+        if("${System.env.GROOVY_VERSION}".length() > 0) {
+            classpath "org.codehaus.groovy:groovy-all:${System.env.GROOVY_VERSION}"
+        }
+        else {
+            classpath "org.codehaus.groovy:groovy-all:1.8.9"
+        }
         classpath "org.yaml:snakeyaml:1.14"
     }
 }
 
 repositories { mavenCentral() }
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:1.8.9'
+    if("${System.env.GROOVY_VERSION}".length() > 0) {
+        compile "org.codehaus.groovy:groovy-all:${System.env.GROOVY_VERSION}"
+    }
+    else {
+        compile "org.codehaus.groovy:groovy-all:1.8.9"
+    }
     compile 'org.yaml:snakeyaml:1.14'
     testCompile 'junit:junit:4.11'
-    testCompile "org.codehaus.groovy:groovy:1.8.9"
+    if("${System.env.GROOVY_VERSION}".length() > 0) {
+        testCompile "org.codehaus.groovy:groovy:${System.env.GROOVY_VERSION}"
+    }
+    else {
+        testCompile "org.codehaus.groovy:groovy:1.8.9"
+    }
     testCompile 'org.yaml:snakeyaml:1.14'
 }
 
