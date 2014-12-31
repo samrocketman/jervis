@@ -7,7 +7,7 @@ the Developer, and to grant copyright and patent licenses thereto. If you have
 not already done so, please complete and send an original signed Agreement.
 
 Scanned agreements are greatly preferred, and may be emailed in PDF form to
-sam.mxracer@gmail.com.
+cla@gleske.net.
 
 We also accept mailed forms to the following address:
 
