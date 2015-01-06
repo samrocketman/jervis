@@ -88,6 +88,10 @@ Generate a test coverage report.  See the report in `build/reports/cobertura`.
 
     ./gradlew cobertura
 
+Test against another version of groovy.
+
+    GROOVY_VERSION="2.2.2" ./gradlew check
+
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jervis-wiki]: https://github.com/samrocketman/jervis/wiki
