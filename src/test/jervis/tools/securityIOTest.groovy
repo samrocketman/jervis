@@ -1,6 +1,8 @@
 package jervis.tools
 //the securityIOTest() class automatically sees the securityIO() class because they're in the same package
 import org.junit.*
+import java.nio.file.Path
+import java.nio.file.Files
 
 class securityIOTest extends GroovyTestCase {
     def security
@@ -48,6 +50,8 @@ class securityIOTest extends GroovyTestCase {
         assert 'tmp' == security.checkPath('tmp/')
         assert '/tmp' == security.checkPath('/tmp')
         assert '/tmp' == security.checkPath('/tmp/')
+        assert '' == security.checkPath('/')
+        assert '' == security.checkPath('')
     }
     //test securityIO().decodeBase64()
     @Test public void test_securityIO_decodeBase64String() {
@@ -67,5 +71,46 @@ class securityIOTest extends GroovyTestCase {
     }
     @Test public void test_securityIO_encodeBase64Bytes() {
         assert "ZGF0YQ==" == security.encodeBase64("data".bytes)
+    }
+    @Test public void test_securityIO_generate_rsa_pair() {
+        //generate keys based on a random tmp dir
+        Path jervis_tmp = Files.createTempDirectory('Jervis_Testing_')
+        security = new securityIO(jervis_tmp.toString())
+        //test the things
+        security.generate_rsa_pair()
+        assert true == (new File(jervis_tmp.toString() + '/id_rsa.pem')).exists()
+        assert true == (new File(jervis_tmp.toString() + '/id_rsa.pub.pem')).exists()
+        //clean up the tmp dir
+        def stdout = new StringBuilder()
+        def stderr = new StringBuilder()
+        def proc = ['rm','-rf',jervis_tmp.toString()].execute()
+        proc.waitForProcessOutput(stdout, stderr)
+        if(proc.exitValue()) {
+            throw new IOException(stderr.toString())
+        }
+    }
+    @Test public void test_securityIO_rsaEncrypt_rsaDecrypt() {
+        //generate keys based on a random tmp dir
+        Path jervis_tmp = Files.createTempDirectory('Jervis_Testing_')
+        security = new securityIO(jervis_tmp.toString())
+        //test the things
+        String plaintext = "secret message"
+        String ciphertext
+        String decodedtext
+        security.generate_rsa_pair()
+        assert true == (new File(jervis_tmp.toString() + '/id_rsa.pem')).exists()
+        assert true == (new File(jervis_tmp.toString() + '/id_rsa.pub.pem')).exists()
+        ciphertext = security.rsaEncrypt(plaintext)
+        assert ciphertext.length() > 0
+        decodedtext = security.rsaDecrypt(ciphertext)
+        assert plaintext == decodedtext
+        //clean up the tmp dir
+        def stdout = new StringBuilder()
+        def stderr = new StringBuilder()
+        def proc = ['rm','-rf',jervis_tmp.toString()].execute()
+        proc.waitForProcessOutput(stdout, stderr)
+        if(proc.exitValue()) {
+            throw new IOException(stderr.toString())
+        }
     }
 }
