@@ -43,6 +43,14 @@ class lifecycleValidatorTest extends GroovyTestCase {
         }
         assert false == lifecycles.validate_asBool()
     }
+    @Test public void test_lifecycleValidator_bad_lifecycles_missing_friendlyName() {
+        URL url = this.getClass().getResource("/bad_lifecycles_missing_friendlyName.json");
+        lifecycles.load_JSON(url.getFile())
+        shouldFail(MissingKeyException) {
+            lifecycles.validate()
+        }
+        assert false == lifecycles.validate_asBool()
+    }
     @Test public void test_lifecycleValidator_bad_lifecycles_resolve_defaultKey() {
         URL url = this.getClass().getResource("/bad_lifecycles_resolve_defaultKey.json");
         lifecycles.load_JSON(url.getFile())
