@@ -1,10 +1,10 @@
 package jervis.lang
 
 import groovy.json.JsonSlurper
-import jervis.exceptions.BadValueInKeyException
-import jervis.exceptions.InfiniteLoopException
-import jervis.exceptions.MissingKeyException
-import jervis.exceptions.ValidationException
+import jervis.exceptions.LifecycleBadValueInKeyException
+import jervis.exceptions.LifecycleInfiniteLoopException
+import jervis.exceptions.LifecycleMissingKeyException
+import jervis.exceptions.LifecycleValidationException
 
 
 //import jervis.lang.lifecycleValidator
@@ -64,25 +64,25 @@ class lifecycleValidator {
             this.validate()
             return true
         }
-        catch(ValidationException E) {
+        catch(LifecycleValidationException E) {
             return false
         }
     }
     /**
       Validates the lifecycles file.
-      @return     <tt>true</tt> if the lifecycles file validates.  If the lifecycles file fails validation then it will throw a <tt>{@link jervis.exceptions.ValidationException}</tt>.
+      @return     <tt>true</tt> if the lifecycles file validates.  If the lifecycles file fails validation then it will throw a <tt>{@link jervis.exceptions.LifecycleValidationException}</tt>.
      */
     public Boolean validate() {
         lifecycles.keySet().each {
             def tools = lifecycles[it].keySet() as String[]
             if(!("defaultKey" in tools)) {
-                throw new MissingKeyException([it,"defaultKey"].join('.'))
+                throw new LifecycleMissingKeyException([it,"defaultKey"].join('.'))
             }
             if(!("friendlyName" in tools)) {
-                throw new MissingKeyException([it,"friendlyName"].join('.'))
+                throw new LifecycleMissingKeyException([it,"friendlyName"].join('.'))
             }
             if(!(lifecycles[it]["defaultKey"] in tools)) {
-                throw new MissingKeyException([it,"defaultKey",lifecycles[it]["defaultKey"]].join('.'))
+                throw new LifecycleMissingKeyException([it,"defaultKey",lifecycles[it]["defaultKey"]].join('.'))
             }
             def current_key = lifecycles[it]["defaultKey"]
             def count=0
@@ -91,20 +91,20 @@ class lifecycleValidator {
                 if("fileExistsCondition" in cycles) {
                     //check for leading slash in the first element of fileExistsCondition
                     if(lifecycles[it][current_key]["fileExistsCondition"][0][0] != '/') {
-                        throw new BadValueInKeyException([it,current_key,"fileExistsCondition","[0]"].join('.') + " first element does not begin with a '/'.")
+                        throw new LifecycleBadValueInKeyException([it,current_key,"fileExistsCondition","[0]"].join('.') + " first element does not begin with a '/'.")
                     }
                 }
                 if("fallbackKey" in cycles) {
                     if(!(lifecycles[it][current_key]["fallbackKey"] in tools)) {
-                        throw new MissingKeyException([it,current_key,"fallbackKey",lifecycles[it][current_key]["fallbackKey"]].join('.'))
+                        throw new LifecycleMissingKeyException([it,current_key,"fallbackKey",lifecycles[it][current_key]["fallbackKey"]].join('.'))
                     }
                     if(!("fileExistsCondition" in cycles)) {
-                        throw new MissingKeyException([it,current_key,"fileExistsCondition"].join('.') + " required by " + [it,current_key,"fallbackKey"].join('.'))
+                        throw new LifecycleMissingKeyException([it,current_key,"fileExistsCondition"].join('.') + " required by " + [it,current_key,"fallbackKey"].join('.'))
                     }
                 }
                 count++
                 if(count > 1000) {
-                    throw new InfiniteLoopException([it,current_key].join('.'))
+                    throw new LifecycleInfiniteLoopException([it,current_key].join('.'))
                 }
                 current_key = lifecycles[it][current_key]["fallbackKey"]
             }

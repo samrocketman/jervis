@@ -1,7 +1,10 @@
 package jervis.lang
 //the lifecycleValidatorTest() class automatically sees the lifecycleValidator() class because they're in the same package
 import org.junit.*
-import jervis.exceptions.*
+import jervis.exceptions.LifecycleBadValueInKeyException
+import jervis.exceptions.LifecycleInfiniteLoopException
+import jervis.exceptions.LifecycleMissingKeyException
+import jervis.exceptions.LifecycleValidationException
 
 class lifecycleValidatorTest extends GroovyTestCase {
     def lifecycles
@@ -30,7 +33,7 @@ class lifecycleValidatorTest extends GroovyTestCase {
     @Test public void test_lifecycleValidator_bad_lifecycles_missing_defaultKey() {
         URL url = this.getClass().getResource("/bad_lifecycles_missing_defaultKey.json");
         lifecycles.load_JSON(url.getFile())
-        shouldFail(MissingKeyException) {
+        shouldFail(LifecycleMissingKeyException) {
             lifecycles.validate()
         }
         assert false == lifecycles.validate_asBool()
@@ -38,7 +41,7 @@ class lifecycleValidatorTest extends GroovyTestCase {
     @Test public void test_lifecycleValidator_bad_lifecycles_missing_fileExistsCondition() {
         URL url = this.getClass().getResource("/bad_lifecycles_missing_fileExistsCondition.json");
         lifecycles.load_JSON(url.getFile())
-        shouldFail(MissingKeyException) {
+        shouldFail(LifecycleMissingKeyException) {
             lifecycles.validate()
         }
         assert false == lifecycles.validate_asBool()
@@ -46,7 +49,7 @@ class lifecycleValidatorTest extends GroovyTestCase {
     @Test public void test_lifecycleValidator_bad_lifecycles_missing_friendlyName() {
         URL url = this.getClass().getResource("/bad_lifecycles_missing_friendlyName.json");
         lifecycles.load_JSON(url.getFile())
-        shouldFail(MissingKeyException) {
+        shouldFail(LifecycleMissingKeyException) {
             lifecycles.validate()
         }
         assert false == lifecycles.validate_asBool()
@@ -54,7 +57,7 @@ class lifecycleValidatorTest extends GroovyTestCase {
     @Test public void test_lifecycleValidator_bad_lifecycles_resolve_defaultKey() {
         URL url = this.getClass().getResource("/bad_lifecycles_resolve_defaultKey.json");
         lifecycles.load_JSON(url.getFile())
-        shouldFail(MissingKeyException) {
+        shouldFail(LifecycleMissingKeyException) {
             lifecycles.validate()
         }
         assert false == lifecycles.validate_asBool()
@@ -62,7 +65,7 @@ class lifecycleValidatorTest extends GroovyTestCase {
     @Test public void test_lifecycleValidator_bad_lifecycles_resolve_fallbackKey() {
         URL url = this.getClass().getResource("/bad_lifecycles_resolve_fallbackKey.json");
         lifecycles.load_JSON(url.getFile())
-        shouldFail(MissingKeyException) {
+        shouldFail(LifecycleMissingKeyException) {
             lifecycles.validate()
         }
         assert false == lifecycles.validate_asBool()
@@ -70,7 +73,7 @@ class lifecycleValidatorTest extends GroovyTestCase {
     @Test public void test_lifecycleValidator_bad_lifecycles_resolve_fileExistsCondition() {
         URL url = this.getClass().getResource("/bad_lifecycles_resolve_fileExistsCondition.json");
         lifecycles.load_JSON(url.getFile())
-        shouldFail(BadValueInKeyException) {
+        shouldFail(LifecycleBadValueInKeyException) {
             lifecycles.validate()
         }
         assert false == lifecycles.validate_asBool()
@@ -78,7 +81,7 @@ class lifecycleValidatorTest extends GroovyTestCase {
     @Test public void test_lifecycleValidator_bad_lifecycles_resolve_infinite_loop() {
         URL url = this.getClass().getResource("/bad_lifecycles_resolve_infinite_loop.json");
         lifecycles.load_JSON(url.getFile())
-        shouldFail(InfiniteLoopException) {
+        shouldFail(LifecycleInfiniteLoopException) {
             lifecycles.validate()
         }
         assert false == lifecycles.validate_asBool()
