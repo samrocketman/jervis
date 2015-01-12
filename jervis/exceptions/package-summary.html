@@ -139,18 +139,13 @@ Package jervis.exceptions
     </TR>
 
         <TR BGCOLOR="white" CLASS="TableRowColor">
-        <TD WIDTH="15%"><B><A HREF="BadValueInKeyException.html" title="class in jervis/exceptions">BadValueInKeyException</A></B></TD>
-        <TD>A type of <tt><a href='../../jervis/exceptions/ValidationException.html' title='ValidationException'>ValidationException</a></tt> which is thrown when there is a bad value in a lifecycles file key.</TD>
-        </TR>
-
-        <TR BGCOLOR="white" CLASS="TableRowColor">
-        <TD WIDTH="15%"><B><A HREF="InfiniteLoopException.html" title="class in jervis/exceptions">InfiniteLoopException</A></B></TD>
-        <TD>A type of <tt><a href='../../jervis/exceptions/ValidationException.html' title='ValidationException'>ValidationException</a></tt> which is thrown when a lifecycles file keys reference in an infinite loop.</TD>
-        </TR>
-
-        <TR BGCOLOR="white" CLASS="TableRowColor">
         <TD WIDTH="15%"><B><A HREF="JervisException.html" title="class in jervis/exceptions">JervisException</A></B></TD>
         <TD>The base exception class for Jervis from which all other exceptions derive.</TD>
+        </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="LifecycleBadValueInKeyException.html" title="class in jervis/exceptions">LifecycleBadValueInKeyException</A></B></TD>
+        <TD>A type of <tt><a href='../../jervis/exceptions/LifecycleValidationException.html' title='LifecycleValidationException'>LifecycleValidationException</a></tt> which is thrown when there is a bad value in a lifecycles file key.</TD>
         </TR>
 
         <TR BGCOLOR="white" CLASS="TableRowColor">
@@ -159,8 +154,18 @@ Package jervis.exceptions
         </TR>
 
         <TR BGCOLOR="white" CLASS="TableRowColor">
-        <TD WIDTH="15%"><B><A HREF="MissingKeyException.html" title="class in jervis/exceptions">MissingKeyException</A></B></TD>
-        <TD>A type of <tt><a href='../../jervis/exceptions/ValidationException.html' title='ValidationException'>ValidationException</a></tt> which is thrown when a lifecycles file key is referenced but missing.</TD>
+        <TD WIDTH="15%"><B><A HREF="LifecycleInfiniteLoopException.html" title="class in jervis/exceptions">LifecycleInfiniteLoopException</A></B></TD>
+        <TD>A type of <tt><a href='../../jervis/exceptions/LifecycleValidationException.html' title='LifecycleValidationException'>LifecycleValidationException</a></tt> which is thrown when a lifecycles file keys reference in an infinite loop.</TD>
+        </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="LifecycleMissingKeyException.html" title="class in jervis/exceptions">LifecycleMissingKeyException</A></B></TD>
+        <TD>A type of <tt><a href='../../jervis/exceptions/LifecycleValidationException.html' title='LifecycleValidationException'>LifecycleValidationException</a></tt> which is thrown when a lifecycles file key is referenced but missing.</TD>
+        </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="LifecycleValidationException.html" title="class in jervis/exceptions">LifecycleValidationException</A></B></TD>
+        <TD>A group of exceptions that are thrown when validation errors occur in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycles file</a>.</TD>
         </TR>
 
         <TR BGCOLOR="white" CLASS="TableRowColor">
@@ -169,13 +174,18 @@ Package jervis.exceptions
         </TR>
 
         <TR BGCOLOR="white" CLASS="TableRowColor">
-        <TD WIDTH="15%"><B><A HREF="UnsupportedLanguageException.html" title="class in jervis/exceptions">UnsupportedLanguageException</A></B></TD>
-        <TD>A type of <tt><a href='../../jervis/exceptions/LifecycleException.html' title='LifecycleException'>LifecycleException</a></tt> which is thrown when an unsupported language lifecycle generation is attempted.</TD>
+        <TD WIDTH="15%"><B><A HREF="ToolchainMissingKeyException.html" title="class in jervis/exceptions">ToolchainMissingKeyException</A></B></TD>
+        <TD>A type of <tt><a href='../../jervis/exceptions/ToolchainValidationException.html' title='ToolchainValidationException'>ToolchainValidationException</a></tt> which is thrown when a lifecycles file key is referenced but missing.</TD>
         </TR>
 
         <TR BGCOLOR="white" CLASS="TableRowColor">
-        <TD WIDTH="15%"><B><A HREF="ValidationException.html" title="class in jervis/exceptions">ValidationException</A></B></TD>
-        <TD>A group of exceptions that are thrown when validation errors occur in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycles file</a>.</TD>
+        <TD WIDTH="15%"><B><A HREF="ToolchainValidationException.html" title="class in jervis/exceptions">ToolchainValidationException</A></B></TD>
+        <TD>A group of exceptions that are thrown when validation errors occur in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file" target="_blank">toolchains file</a>.</TD>
+        </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="UnsupportedLanguageException.html" title="class in jervis/exceptions">UnsupportedLanguageException</A></B></TD>
+        <TD>A type of <tt><a href='../../jervis/exceptions/LifecycleException.html' title='LifecycleException'>LifecycleException</a></tt> which is thrown when an unsupported language lifecycle generation is attempted.</TD>
         </TR>
 
 </TABLE>
@@ -189,7 +199,7 @@ Package jervis.exceptions
 
 
 
-<p><a href="https://github.com/samrocketman/jervis" target="_blank">Jervis</a> API documentation was generated at 23:43 (GMT-0500) on December 29, 2014.</p>
+<p><a href="https://github.com/samrocketman/jervis" target="_blank">Jervis</a> API documentation was generated at 23:15 (GMT-0500) on January 11, 2015.</p>
 <hr>
 </body>
 </html>
