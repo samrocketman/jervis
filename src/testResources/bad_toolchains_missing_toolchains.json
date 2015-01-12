@@ -1,0 +1,25 @@
+{
+    "env": {
+        "*": [
+            "export ${jervis_toolchain_ivalue}"
+        ]
+    },
+    "gemfile": {
+        "default_ivalue": "${PWD}/Gemfile",
+        "*": [
+            "export BUNDLE_GEMFILE=\"${jervis_toolchain_ivalue}\""
+        ]
+    },
+    "jdk": {
+        "default_ivalue": "openjdk7",
+        "openjdk7": [
+            "some commands"
+        ],
+    },
+    "rvm": {
+        "default_ivalue": "1.9.3",
+        "*": [
+            "some commands"
+        ]
+    }
+}
