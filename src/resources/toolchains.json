@@ -1,0 +1,102 @@
+{
+    "toolchains": {
+        "groovy": ["env", "jdk"],
+        "java": ["env", "jdk"],
+        "python": ["env", "python"],
+        "ruby": ["gemfile", "env", "rvm", "jdk"]
+    },
+    "compiler": {
+        "gcc": [
+            "export CXX=\"g++\"",
+            "export CC=\"gcc\""
+        ],
+        "clang": [
+            "export CXX=\"clang++\"",
+            "export CC=\"clang\""
+        ]
+    },
+    "env": {
+        "*": [
+            "export ${jervis_toolchain_ivalue}"
+        ]
+    },
+    "gemfile": {
+        "default_ivalue": "${PWD}/Gemfile",
+        "*": [
+            "export BUNDLE_GEMFILE=\"${jervis_toolchain_ivalue}\""
+        ]
+    },
+    "jdk": {
+        "default_ivalue": "openjdk7",
+        "openjdk6": [
+            "export JAVA_HOME=\"/usr/lib/jvm/java-6-openjdk-amd64/\"",
+            "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
+            "java -version"
+        ],
+        "openjdk7": [
+            "export JAVA_HOME=\"/usr/lib/jvm/java-7-openjdk-amd64/\"",
+            "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
+            "java -version"
+        ],
+        "oraclejdk7": [
+            "export JAVA_HOME=\"/opt/java-7-oraclejdk-amd64/\"",
+            "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
+            "java -version"
+        ],
+        "oraclejdk8": [
+            "export JAVA_HOME=\"/opt/java-8-oraclejdk-amd64/\"",
+            "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
+            "java -version"
+        ]
+    },
+    "python": {
+        "default_ivalue": "2.7",
+        "2.6": [
+            "source ~/virtualenv/python2.6/bin/activate",
+            "python --version",
+            "pip --version"
+        ],
+        "2.7": [
+            "source ~/virtualenv/python2.7/bin/activate",
+            "python --version",
+            "pip --version"
+        ],
+        "3.2": [
+            "source ~/virtualenv/python3.2/bin/activate",
+            "python --version",
+            "pip --version"
+        ],
+        "3.3": [
+            "source ~/virtualenv/python3.3/bin/activate",
+            "python --version",
+            "pip --version"
+        ],
+        "3.4": [
+            "source ~/virtualenv/python3.4/bin/activate",
+            "python --version",
+            "pip --version"
+        ],
+        "pypy": [
+            "source ~/virtualenv/pypy/bin/activate",
+            "python --version",
+            "pip --version"
+        ],
+        "pypy3": [
+            "source ~/virtualenv/pypy3/bin/activate",
+            "python --version",
+            "pip --version"
+        ]
+    },
+    "rvm": {
+        "default_ivalue": "1.9.3",
+        "*": [
+            "source \"$HOME/.rvm/scripts/rvm\"",
+            "if ! rvm list | grep -q \"${jervis_toolchain_ivalue}\";then",
+            "  rvm install \"${jervis_toolchain_ivalue}\"",
+            "  rvm \"${jervis_toolchain_ivalue}\" do gem install bundler",
+            "fi",
+            "rvm use ${jervis_toolchain_ivalue}",
+            "ruby --version"
+        ]
+    }
+}
