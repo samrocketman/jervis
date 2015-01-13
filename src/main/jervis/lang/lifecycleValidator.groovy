@@ -84,7 +84,7 @@ class lifecycleValidator {
             }
             def current_key = lifecycles[it]["defaultKey"]
             def count=0
-            while(lifecycles[it][current_key] != null) {
+            while(current_key != null) {
                 def cycles = lifecycles[it][current_key].keySet() as String[]
                 if("fileExistsCondition" in cycles) {
                     //check for leading slash in the first element of fileExistsCondition
