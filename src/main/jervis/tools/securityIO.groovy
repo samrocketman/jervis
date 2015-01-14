@@ -180,6 +180,11 @@ id_rsa_keysize = keysize</tt></pre>
       Generate an RSA key pair (private key and public key).
       It does not take values from <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, nor <tt>{@link #id_rsa_keysize}</tt>.
 
+      For third party reference, this is essentially executing the following commands in a terminal.
+
+<pre><tt>openssl genrsa -out /tmp/id_rsa 1024
+openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
+
       @param priv_key_file_path A file path where the private key will be written on the filesystem.
       @param pub_key_file_path  A file path where the public key will be written on the filesystem.
       @param keysize            The key size in bits of the key pair.
@@ -209,6 +214,10 @@ id_rsa_keysize = keysize</tt></pre>
     /**
       Uses RSA asymetric encryption to encrypt a plain text <tt>String</tt> and outputs cipher text.
 
+      For third party reference, this is essentially executing the following commands in a terminal.
+
+<pre><tt>echo -n 'plaintext' | openssl rsautl -encrypt -inkey /tmp/id_rsa.pub -pubin | base64 -w0</tt></pre>
+
       @param  plaintext A plain text <tt>String</tt> to be encrypted.
       @return A Base64 encoded cipher text or more generically: <tt>ciphertext = base64encode(RSAPublicKeyEncrypt(plaintext))</tt>
      */
@@ -231,13 +240,17 @@ id_rsa_keysize = keysize</tt></pre>
     /**
       Uses RSA asymetric encryption to decrypt a cipher text <tt>String</tt> and outputs plain text.
 
+      For third party reference, this is essentially executing the following commands in a terminal.
+
+<pre><tt>echo 'ciphertext' | base64 -d | openssl rsautl -decrypt -inkey /tmp/id_rsa</tt></pre>
+
       @param  ciphertext A Base64 encoded cipher text <tt>String</tt> to be decrypted.
       @return A plain text <tt>String</tt> or more generically: <tt>plaintext = RSAPrivateKeyDecrypt(base64decode(ciphertext))</tt>
      */
     public String rsaDecrypt(String ciphertext) {
         def stdout = new StringBuilder()
         def stderr = new StringBuilder()
-        def proc1 = ['echo', ciphertext.trim()].execute()
+        def proc1 = ['echo', '-n', ciphertext.trim()].execute()
         def proc2 = ['base64','-d'].execute()
         def proc3 = ['openssl', 'rsautl', '-decrypt', '-inkey', id_rsa_priv].execute()
         proc1 | proc2 | proc3
