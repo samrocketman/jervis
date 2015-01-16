@@ -42,4 +42,28 @@ class lifecycleGenerator {
             throw new UnsupportedLanguageException(this.language)
         }
     }
+    public Boolean isMatrixBuild() {
+    }
+    public String excludeFilter() {
+    }
+    public String generateToolchainSection() {
+    }
+    public String generateBeforeInstall() {
+    }
+    public String generateInstall() {
+    }
+    public String generateInstall() {
+    }
+    public String generateBeforeScript() {
+    }
+    public String generateScript() {
+    }
+    public String generateAfterSuccess() {
+    }
+    public String generateAfterFailure() {
+    }
+    public String generateAfterScript() {
+    }
+    public String generateAll() {
+    }
 }
