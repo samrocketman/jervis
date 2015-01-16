@@ -9,7 +9,7 @@ import jervis.exceptions.wikiPages
 <pre><tt>import jervis.exceptions.UnsupportedLanguageException
 throw new UnsupportedLanguageException("derpy")</tt></pre><br>
  */
-class UnsupportedLanguageException extends LifecycleException {
+class UnsupportedLanguageException extends GeneratorException {
     private static String wiki_page = wikiPages.supported_languages
 
     /**
