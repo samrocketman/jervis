@@ -8,7 +8,7 @@ version = '0.1.0-SNAPSHOT'
 
 ext { groovyVersion = System.getenv("GROOVY_VERSION")?: "1.8.9" }
 
-println "Using Groovy ${project.groovyVersion}"
+println "Using Groovy ${groovyVersion}"
 
 buildscript {
     repositories { mavenCentral() }

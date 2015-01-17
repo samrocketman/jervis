@@ -10,10 +10,27 @@ import org.yaml.snakeyaml.Yaml
   WIP: Docs will be written once this class has stabilized.
  */
 class lifecycleGenerator {
+
+    /**
+      Contains the Jervis YAML loaded as an object.
+     */
     def jervis_yaml
+
+    /**
+      A quick access variable for what language is selected for the loaded Jervis YAML.
+     */
     def language
+
+    /**
+      An instance of the {@link jervis.lang.lifecyclesValidator} class which has loaded a lifecycles file.
+     */
     def lifecycle_obj
+
+    /**
+      An instance of the {@link jervis.lang.toolchainsValidator} class which as loaded a toolchains file.
+     */
     def toolchain_obj
+
     def lifecycleGenerator() {
         def git = new scmGit()
         this.loadLifecycles("${git.getRoot()}/src/resources/lifecycles.json")
