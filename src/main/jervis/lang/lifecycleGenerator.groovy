@@ -30,7 +30,7 @@ class lifecycleGenerator {
         this.toolchain_obj.validate()
     }
     /**
-      Call loadLifecycles function before the loadYaml function.
+      Load Jervis YAML to be interpreted.  This YAML will be used to generate the build scripts and components of a Jenkins job.
      */
     public void loadYaml(String raw_yaml) {
         if(!lifecycle_obj) {
