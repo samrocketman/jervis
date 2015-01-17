@@ -52,8 +52,6 @@ class lifecycleGenerator {
     }
     public String generateInstall() {
     }
-    public String generateInstall() {
-    }
     public String generateBeforeScript() {
     }
     public String generateScript() {
