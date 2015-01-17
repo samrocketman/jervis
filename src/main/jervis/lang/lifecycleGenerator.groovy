@@ -15,7 +15,7 @@ class lifecycleGenerator {
     def lifecycle_obj
     def toolchain_obj
     def lifecycleGenerator() {
-        scmGit git = new scmGit()
+        def git = new scmGit()
         this.loadLifecycles("${git.getRoot()}/src/resources/lifecycles.json")
         this.loadToolchains("${git.getRoot()}/src/resources/toolchains.json")
     }
@@ -42,7 +42,36 @@ class lifecycleGenerator {
             throw new UnsupportedLanguageException(this.language)
         }
     }
+    /**
+      This will check if the loaded YAML is a matrix build.  The requirements for it
+      to be a matrix build is that it must be a matrix specifically for the selected
+      language and the array for the section must be greater than 1.
+
+      <p>For example the following YAML would not produce a matrix build.</p>
+      <pre><tt>language: groovy
+env: foo=bar</tt></pre>
+      <pre><tt>language: groovy
+env:
+  - foo=bar</tt></pre>
+      <p>However, the following YAML will produce a matrix build.
+      <pre><tt>language: groovy
+env:
+  - foobar=foo
+  - foobar=bar</tt></pre>
+
+      @return <tt>true</tt> if a matrix build will be generated or <tt>false</tt> if it will just be a regular build.
+     */
     public Boolean isMatrixBuild() {
+        def keys = jervis_yaml.keySet() as String[]
+        Boolean result=false
+        keys.each{
+            if(toolchain_obj.supportedMatrix(language, it)) {
+                if(jervis_yaml[it] instanceof ArrayList && jervis_yaml[it].size() > 1) {
+                     result=true
+                }
+            }
+        }
+        return result
     }
     public String excludeFilter() {
     }
