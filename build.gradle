@@ -14,7 +14,6 @@ buildscript {
     repositories { mavenCentral() }
     dependencies {
         classpath "net.saliman:gradle-cobertura-plugin:2.2.5"
-        classpath "org.codehaus.groovy:groovy-all:${groovyVersion}"
         classpath "org.yaml:snakeyaml:1.14"
     }
 }
