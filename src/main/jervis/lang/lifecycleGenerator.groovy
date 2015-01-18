@@ -1,6 +1,7 @@
 package jervis.lang
 
 import jervis.exceptions.UnsupportedLanguageException
+import jervis.exceptions.UnsupportedToolException
 import jervis.lang.lifecycleValidator
 import jervis.lang.toolchainValidator
 import jervis.tools.scmGit
@@ -131,7 +132,6 @@ env:
         z
     }
     /**
-      ................................................................................
       Generate the toolchains shell script based on the Jervis YAML or taking defaults
       from the toolchains file.
       @return A bash script setting up the toolchains for building.
@@ -147,6 +147,9 @@ env:
             if(toolchain in yaml_keys) {
                 //do non-default stuff
                 ArrayList user_toolchain
+                if(!(jervis_yaml[toolchain] instanceof String) && !(jervis_yaml[toolchain] instanceof ArrayList)) {
+                        throw new UnsupportedToolException("${toolchain}: ${jervis_yaml[toolchain]}")
+                }
                 if(jervis_yaml[toolchain] instanceof String) {
                     user_toolchain = [jervis_yaml[toolchain]]
                 }
@@ -158,6 +161,9 @@ env:
                 }
                 else {
                     //not a matrix build
+                    if(!toolchain_obj.supportedTool(toolchain, user_toolchain[0])) {
+                        throw new UnsupportedToolException("${toolchain}: ${user_toolchain[0]}")
+                    }
                     if(user_toolchain[0] in toolchain_keys) {
                         output += toolchain_obj.toolchains[toolchain][user_toolchain[0]].join('\n') + '\n'
                     }
