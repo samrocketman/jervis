@@ -130,10 +130,16 @@ env:
         cmds.each{ z << it.replace('${jervis_toolchain_ivalue}',ivalue) }
         z
     }
+    /**
+      ................................................................................
+      Generate the toolchains shell script based on the Jervis YAML or taking defaults
+      from the toolchains file.
+      @return A bash script setting up the toolchains for building.
+     */
     public String generateToolchainSection() {
         //get toolchain order for this language
         def toolchains_order = toolchain_obj.toolchains["toolchains"][yaml_language]
-        String output = ""
+        String output = "#\n# TOOLCHAINS SECTION\n#\n"
         toolchains_order.each {
             def toolchain = it
             def toolchain_keys = toolchain_obj.toolchains[toolchain].keySet() as String[]
