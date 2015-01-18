@@ -75,6 +75,20 @@ class toolchainValidator {
     }
 
     /**
+      Check to see if a given <tt>tool</tt> is supported in the <tt>toolchain</tt>.  A
+      <tt>tool</tt> is supported if there is a key for it in the toolchains file.  If
+      there is no key for it then it is still supported if there is a <tt>*</tt> key.
+      If there is no key for it and no <tt>*</tt> key for that toolchain then the
+      <tt>tool</tt> is not supported.  There is no checking to see if a
+      <tt>toolchain</tt> is actually valid.
+      @return <tt>true</tt> if the <tt>tool</tt> is supported or <tt>false</tt> if it is not supported.
+     */
+    public Boolean supportedTool(String toolchain, String tool) {
+        def tools = toolchains[toolchain].keySet() as String[]
+        return (tool in tools) || ('*' in tools)
+    }
+
+    /**
       Checks to see if a toolchain is a supported build matrix based on a specific language.
       @param lang      A <tt>String</tt> which is a language to look up in the toolchains file.
       @param toolchain A <tt>String</tt> which is a toolchain to look up based on the <tt>lang</tt> to see if it is a matrix building attribute.

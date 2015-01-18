@@ -37,6 +37,18 @@ class toolchainValidatorTest extends GroovyTestCase {
         toolchains.load_JSON(url.getFile())
         assert false == toolchains.supportedToolchain("derpy")
     }
+    //test supportedTool()
+    @Test public void test_toolchainValidator_supportedTool_yes() {
+        URL url = this.getClass().getResource("/good_toolchains_simple.json");
+        toolchains.load_JSON(url.getFile())
+        assert true == toolchains.supportedTool("jdk","openjdk7")
+        assert true == toolchains.supportedTool("rvm","derpy")
+    }
+    @Test public void test_toolchainValidator_supportedTool_no() {
+        URL url = this.getClass().getResource("/good_toolchains_simple.json");
+        toolchains.load_JSON(url.getFile())
+        assert false == toolchains.supportedTool("jdk","derpy")
+    }
     //test supportedMatrix()
     @Test public void test_toolchainValidator_supportedMatrix_yes() {
         URL url = this.getClass().getResource("/good_toolchains_simple.json");
