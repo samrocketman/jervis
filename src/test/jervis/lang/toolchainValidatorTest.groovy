@@ -15,6 +15,17 @@ class toolchainValidatorTest extends GroovyTestCase {
         toolchains = null
         super.tearDown()
     }
+    //test supportedLanguage()
+    @Test public void test_toolchainValidator_supportedLanguage_yes() {
+        URL url = this.getClass().getResource("/good_toolchains_simple.json");
+        toolchains.load_JSON(url.getFile())
+        assert true == toolchains.supportedLanguage("ruby")
+    }
+    @Test public void test_toolchainValidator_supportedLanguage_no() {
+        URL url = this.getClass().getResource("/good_toolchains_simple.json");
+        toolchains.load_JSON(url.getFile())
+        assert false == toolchains.supportedLanguage("derpy")
+    }
     //test supportedToolchain()
     @Test public void test_toolchainValidator_supportedToolchain_yes() {
         URL url = this.getClass().getResource("/good_toolchains_simple.json");

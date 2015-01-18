@@ -40,12 +40,29 @@ class toolchainValidator {
     def toolchain_list
 
     /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of supported languages in the lifecycles file.  This is just a list of the keys in {@link #lifecycles}.
+     */
+    def languages
+
+    /**
       Load the JSON of a toolchains file and parse it.  This should be the first function called after class instantiation.  It populates <tt>{@link #toolchains}</tt> and <tt>{@link #toolchain_list}</tt>.
       @param file A <tt>String</tt> which is a path to a toolchains file.
      */
     public void load_JSON(String file) {
         toolchains = new groovy.json.JsonSlurper().parse(new File(file).newReader())
-        toolchain_list = toolchains.keySet() as String[];
+        toolchain_list = toolchains.keySet() as String[]
+        if('toolchains' in toolchain_list) {
+            languages = toolchains.toolchains.keySet() as String[]
+        }
+    }
+
+    /**
+      Checks to see if a language is a supported language based on the toolchains file.
+      @param lang A <tt>String</tt> which is a language to look up based on the keys in the toolchains file.
+      @return     <tt>true</tt> if the language is supported or <tt>false</tt> if the language is not supported.
+     */
+    public Boolean supportedLanguage(String lang) {
+        lang in languages
     }
 
     /**
