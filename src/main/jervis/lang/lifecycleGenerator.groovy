@@ -80,6 +80,7 @@ class lifecycleGenerator {
         def yaml = new Yaml()
         this.jervis_yaml = yaml.load(raw_yaml)
         this.yaml_language = this.jervis_yaml['language']
+        this.yaml_keys = this.jervis_yaml.keySet() as String[]
         if(!lifecycle_obj.supportedLanguage(this.yaml_language)) {
             throw new UnsupportedLanguageException(this.yaml_language)
         }
@@ -117,12 +118,44 @@ env:
     }
     public String excludeFilter() {
     }
+    /**
+      Interpolate <tt>${jervis_toolchain_ivalue}</tt> on an ArrayList of strings.
+      This is mostly used by the <tt>{@link #generateToolchainSection()}</tt> function.
+      @param  cmds   A list of strings which contain bash commands.
+      @param  ivalue A value which will be string interpolated on the <tt>cmds</tt>
+      @return        A list of strings which contain bash commands that have had string interpolation done.
+     */
+    private ArrayList interpolate_ivalue(ArrayList cmds, String ivalue) {
+        def z = []
+        cmds.each{ z << it.replace('${jervis_toolchain_ivalue}',ivalue) }
+        z
+    }
     public String generateToolchainSection() {
         //get toolchain order for this language
-        //def toolchains_order = toolchain_obj.toolchains["toolchains"][yaml_language]
-        //toolchains_order.each {
-        //    def toolchain = it
-        //}
+        def toolchains_order = toolchain_obj.toolchains["toolchains"][yaml_language]
+        String output = ""
+        toolchains_order.each {
+            def toolchain = it
+            output += "#${toolchain} toolchain section\n"
+            if(toolchain in yaml_keys) {
+                //do non-default stuff
+            }
+            else {
+                //falling back to default behavior in toolchains.json
+                String default_ivalue = toolchain_obj.toolchains[toolchain].default_ivalue
+                def toolchain_keys = toolchain_obj.toolchains[toolchain].keySet() as String[]
+                if(default_ivalue) {
+                    if(default_ivalue in toolchain_keys) {
+                        output += toolchain_obj.toolchains[toolchain][default_ivalue].join('\n') + '\n'
+                    }
+                    else {
+                        //assume using "*" key
+                        output += this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], default_ivalue).join('\n') + '\n'
+                    }
+                }
+            }
+        }
+        return output
     }
     public String generateBeforeInstall() {
     }
