@@ -36,11 +36,32 @@ class lifecycleGenerator {
         this.loadLifecycles("${git.getRoot()}/src/resources/lifecycles.json")
         this.loadToolchains("${git.getRoot()}/src/resources/toolchains.json")
     }
+    /**
+      Load a lifecycles file so that default scripts can be generated.  Lifecycles
+      provide the build portions of the script.  This project comes with a lifecycles
+      file which gets loaded by default when you instantiate this class.  The path to
+      the lifecycles in this repository relative to the repository root is
+      <tt>/src/resources/lifecycles.json</tt>.  This can be overridden by calling
+      this method.
+
+      @param file A path to a lifecycles file.
+     */
     public void loadLifecycles(String file) {
         this.lifecycle_obj = new lifecycleValidator()
         this.lifecycle_obj.load_JSON(file)
         this.lifecycle_obj.validate()
     }
+    /**
+      ................................................................................
+      Load a toolchains file so that default scripts can be generated.  Toolchains
+      provide the default tool setup of the script (e.g. what version of Java will be
+      used).  This project comes with a toolchains file which gets loaded by default
+      when you instantiate this class.  The path to the toolchains in this repository
+      relative to the repository root os <tt>/src/resources/toolchains.json</tt>.
+      This can be overridden by calling this method.
+
+      @param file A path to a toolchains file.
+     */
     public void loadToolchains(String file) {
         this.toolchain_obj = new toolchainValidator()
         this.toolchain_obj.load_JSON(file)
