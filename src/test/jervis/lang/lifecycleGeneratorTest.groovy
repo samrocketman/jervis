@@ -17,7 +17,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
     }
     @Test public void test_lifecycleGenerator_loadYaml_supportedLanguage_yes() {
         generator.loadYaml("language: groovy")
-        assert "groovy" == generator.language
+        assert "groovy" == generator.yaml_language
     }
     @Test public void test_lifecycleGenerator_loadYaml_supportedLanguage_no() {
         shouldFail(UnsupportedLanguageException) {

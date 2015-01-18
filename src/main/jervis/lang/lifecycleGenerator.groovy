@@ -19,7 +19,12 @@ class lifecycleGenerator {
     /**
       A quick access variable for what language is selected for the loaded Jervis YAML.
      */
-    def language
+    def yaml_language
+
+    /**
+      A quick access variable for what root keys are in the loaded Jervis YAML.
+     */
+    def yaml_keys
 
     /**
       An instance of the <tt>{@link jervis.lang.lifecycleValidator}</tt> class which has loaded a lifecycles file.
@@ -74,9 +79,9 @@ class lifecycleGenerator {
         }
         def yaml = new Yaml()
         this.jervis_yaml = yaml.load(raw_yaml)
-        this.language = this.jervis_yaml['language']
-        if(!lifecycle_obj.supportedLanguage(this.language)) {
-            throw new UnsupportedLanguageException(this.language)
+        this.yaml_language = this.jervis_yaml['language']
+        if(!lifecycle_obj.supportedLanguage(this.yaml_language)) {
+            throw new UnsupportedLanguageException(this.yaml_language)
         }
     }
     /**
@@ -102,7 +107,7 @@ env:
         def keys = jervis_yaml.keySet() as String[]
         Boolean result=false
         keys.each{
-            if(toolchain_obj.supportedMatrix(language, it)) {
+            if(toolchain_obj.supportedMatrix(yaml_language, it)) {
                 if(jervis_yaml[it] instanceof ArrayList && jervis_yaml[it].size() > 1) {
                      result=true
                 }
@@ -113,6 +118,11 @@ env:
     public String excludeFilter() {
     }
     public String generateToolchainSection() {
+        //get toolchain order for this language
+        //def toolchains_order = toolchain_obj.toolchains["toolchains"][yaml_language]
+        //toolchains_order.each {
+        //    def toolchain = it
+        //}
     }
     public String generateBeforeInstall() {
     }
