@@ -81,7 +81,7 @@ class lifecycleGenerator {
         this.jervis_yaml = yaml.load(raw_yaml)
         this.yaml_language = this.jervis_yaml['language']
         this.yaml_keys = this.jervis_yaml.keySet() as String[]
-        if(!lifecycle_obj.supportedLanguage(this.yaml_language)) {
+        if(!lifecycle_obj.supportedLanguage(this.yaml_language) || !toolchain_obj.supportedLanguage(this.yaml_language)) {
             throw new UnsupportedLanguageException(this.yaml_language)
         }
     }
@@ -136,14 +136,34 @@ env:
         String output = ""
         toolchains_order.each {
             def toolchain = it
+            def toolchain_keys = toolchain_obj.toolchains[toolchain].keySet() as String[]
             output += "#${toolchain} toolchain section\n"
             if(toolchain in yaml_keys) {
                 //do non-default stuff
+                ArrayList user_toolchain
+                if(jervis_yaml[toolchain] instanceof String) {
+                    user_toolchain = [jervis_yaml[toolchain]]
+                }
+                else {
+                    user_toolchain = jervis_yaml[toolchain]
+                }
+                //check if a matrix build
+                if(user_toolchain.size() > 1) {
+                }
+                else {
+                    //not a matrix build
+                    if(user_toolchain[0] in toolchain_keys) {
+                        output += toolchain_obj.toolchains[toolchain][user_toolchain[0]].join('\n') + '\n'
+                    }
+                    else {
+                        //assume using "*" key
+                        output += this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], user_toolchain[0]).join('\n') + '\n'
+                    }
+                }
             }
             else {
                 //falling back to default behavior in toolchains.json
                 String default_ivalue = toolchain_obj.toolchains[toolchain].default_ivalue
-                def toolchain_keys = toolchain_obj.toolchains[toolchain].keySet() as String[]
                 if(default_ivalue) {
                     if(default_ivalue in toolchain_keys) {
                         output += toolchain_obj.toolchains[toolchain][default_ivalue].join('\n') + '\n'
