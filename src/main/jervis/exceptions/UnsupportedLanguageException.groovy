@@ -3,7 +3,7 @@ package jervis.exceptions
 import jervis.exceptions.wikiPages
 
 /**
-  A type of <tt>{@link jervis.exceptions.LifecycleException}</tt> which is thrown when an unsupported language lifecycle generation is attempted.
+  A type of <tt>{@link jervis.exceptions.GeneratorException}</tt> which is thrown when an unsupported language lifecycle generation is attempted.
 
   <h2>Sample usage</h2>
 <pre><tt>import jervis.exceptions.UnsupportedLanguageException
