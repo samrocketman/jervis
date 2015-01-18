@@ -22,12 +22,12 @@ class lifecycleGenerator {
     def language
 
     /**
-      An instance of the {@link jervis.lang.lifecyclesValidator} class which has loaded a lifecycles file.
+      An instance of the <tt>{@link jervis.lang.lifecycleValidator}</tt> class which has loaded a lifecycles file.
      */
     def lifecycle_obj
 
     /**
-      An instance of the {@link jervis.lang.toolchainsValidator} class which as loaded a toolchains file.
+      An instance of the <tt>{@link jervis.lang.toolchainValidator}</tt> class which as loaded a toolchains file.
      */
     def toolchain_obj
 
@@ -52,7 +52,6 @@ class lifecycleGenerator {
         this.lifecycle_obj.validate()
     }
     /**
-      ................................................................................
       Load a toolchains file so that default scripts can be generated.  Toolchains
       provide the default tool setup of the script (e.g. what version of Java will be
       used).  This project comes with a toolchains file which gets loaded by default
