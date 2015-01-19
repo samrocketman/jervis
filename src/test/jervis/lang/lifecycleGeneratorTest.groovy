@@ -10,6 +10,10 @@ class lifecycleGeneratorTest extends GroovyTestCase {
     @Before protected void setUp() {
         super.setUp()
         generator = new lifecycleGenerator()
+        URL url = this.getClass().getResource("/good_lifecycles_simple.json");
+        generator.loadLifecycles(url.getFile())
+        url = this.getClass().getResource("/good_toolchains_simple.json");
+        generator.loadToolchains(url.getFile())
     }
     //tear down after every test
     @After protected void tearDown() {
@@ -17,8 +21,8 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         super.tearDown()
     }
     @Test public void test_lifecycleGenerator_loadYaml_supportedLanguage_yes() {
-        generator.loadYaml("language: groovy")
-        assert "groovy" == generator.yaml_language
+        generator.loadYaml("language: ruby")
+        assert "ruby" == generator.yaml_language
     }
     @Test public void test_lifecycleGenerator_loadYaml_supportedLanguage_no() {
         shouldFail(UnsupportedLanguageException) {
@@ -26,9 +30,9 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         }
     }
     @Test public void test_lifecycleGenerator_isMatrixBuild_false() {
-        generator.loadYaml("language: groovy\nenv: foo=bar")
+        generator.loadYaml("language: ruby\nenv: foo=bar")
         assert false == generator.isMatrixBuild()
-        generator.loadYaml("language: groovy\nenv:\n  - foo=bar")
+        generator.loadYaml("language: ruby\nenv:\n  - foo=bar")
         assert false == generator.isMatrixBuild()
     }
     @Test public void test_lifecycleGenerator_isMatrixBuild_true() {
@@ -36,10 +40,6 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert true == generator.isMatrixBuild()
     }
     @Test public void test_lifecycleGenerator_generateToolchainSection_nonmatrix() {
-        URL url = this.getClass().getResource("/good_lifecycles_simple.json");
-        generator.loadLifecycles(url.getFile())
-        url = this.getClass().getResource("/good_toolchains_simple.json");
-        generator.loadToolchains(url.getFile())
         generator.loadYaml("language: ruby")
         assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         generator.loadYaml("language: ruby\nenv: foo=bar")
