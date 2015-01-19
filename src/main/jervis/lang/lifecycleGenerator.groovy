@@ -1,5 +1,6 @@
 package jervis.lang
 
+import jervis.exceptions.JervisException
 import jervis.exceptions.UnsupportedLanguageException
 import jervis.exceptions.UnsupportedToolException
 import jervis.lang.lifecycleValidator
@@ -36,6 +37,61 @@ class lifecycleGenerator {
       An instance of the <tt>{@link jervis.lang.toolchainValidator}</tt> class which as loaded a toolchains file.
      */
     def toolchain_obj
+
+    /**
+      This is a folder listing of the root of the repository so that scripts can be
+      conditionally generated depending on build tool is being used.  This way we can
+      do neat things like generate different script output depending on if there's a
+      <tt>build.gradle</tt>, <tt>pom.xml</tt>, or <tt>build.xml</tt>.
+      <tt>{@link #loadYaml()}</tt> should be called before this.
+     */
+    ArrayList folder_listing
+
+    /**
+      The value is the key to be looked up in the lifecycles file by default when
+      determining how to generate scripts.  This is set when a list of files is set in
+      the <tt>{@link #folder_listing}</tt>.
+     */
+    String lifecycle_key
+
+    /**
+      This function sets the <tt>{@link #folder_listing}</tt> and based on the
+      <tt>listing</tt> conditionally sets <tt>{@link #lifecycle_key}</tt>.  This uses
+      the <tt>fileExistsCondition</tt> and <tt>fallbackKey</tt> from the lifecycles
+      file to determine the contents of <tt>lifecycle_key</tt>.
+      <tt>{@link #loadYaml()}</tt> should be called before this.
+      @param listing An <tt>ArrayList</tt> which is a list of files from a directory
+                     path in a repository.
+     */
+    void setFolder_listing(ArrayList listing) {
+        if(!yaml_language) {
+            throw new JervisException("Must call loadYaml() first.")
+        }
+        folder_listing = listing
+        String current_key = lifecycle_obj.lifecycles[yaml_language].defaultKey
+        while(current_key != null) {
+            def cycles = lifecycle_obj.lifecycles[yaml_language][current_key].keySet() as String[]
+            if("fileExistsCondition" in cycles) {
+                if(lifecycle_obj.lifecycles[yaml_language][current_key]["fileExistsCondition"][1] in listing) {
+                    lifecycle_key = current_key
+                    current_key = null
+                }
+                else {
+                    if("fallbackKey" in cycles) {
+                        current_key = lifecycle_obj.lifecycles[yaml_language][current_key]["fallbackKey"]
+                    }
+                    else {
+                        lifecycle_key = current_key
+                        current_key = null
+                    }
+                }
+            }
+            else {
+                lifecycle_key = current_key
+                current_key = null
+            }
+        }
+    }
 
     def lifecycleGenerator() {
         def git = new scmGit()
@@ -85,6 +141,11 @@ class lifecycleGenerator {
         if(!lifecycle_obj.supportedLanguage(this.yaml_language) || !toolchain_obj.supportedLanguage(this.yaml_language)) {
             throw new UnsupportedLanguageException(this.yaml_language)
         }
+    }
+    /**
+     */
+    public void loadFolderListing(ArrayList listing) {
+
     }
     /**
       This will check if the loaded YAML is a matrix build.  The requirements for it
@@ -190,19 +251,34 @@ env:
         return output
     }
     public String generateBeforeInstall() {
+        String output = "#\n# BEFOREINSTALL SECTION\n#\n"
     }
     public String generateInstall() {
+        String output = "#\n# INSTALL SECTION\n#\n"
     }
     public String generateBeforeScript() {
+        String output = "#\n# BEFORESCRIPT SECTION\n#\n"
     }
     public String generateScript() {
+        String output = "#\n# SCRIPT SECTION\n#\n"
     }
     public String generateAfterSuccess() {
+        String output = "#\n# AFTERSUCCESS SECTION\n#\n"
     }
     public String generateAfterFailure() {
+        String output = "#\n# AFTERFAILURE SECTION\n#\n"
     }
     public String generateAfterScript() {
+        String output = "#\n# AFTERSCRIPT SECTION\n#\n"
     }
     public String generateAll() {
+        ArrayList script = [
+            generateToolchainSection(),
+            generateBeforeInstall(),
+            generateInstall(),
+            generateBeforeScript(),
+            generateScript()
+            ]
+        return script.join('\n\n')
     }
 }
