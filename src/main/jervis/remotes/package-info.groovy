@@ -10,10 +10,13 @@
           <tt>String getCloneUrl()</tt> returns a base git URI in which a repository can be cloned.
       </li>
       <li>
-          <tt>List branches(String project)</tt> returns a <tt>List</tt> where each element is a branch in the project.
+          <tt>ArrayList branches(String project)</tt> returns a <tt>List</tt> where each element is a branch in the project.
       </li>
       <li>
           <tt>String getFile(String project, String file_path, String ref)</tt> returns a <tt>String</tt> which contains the contents of the file requested.
+      </li>
+      <li>
+          <tt>ArrayList getFolderListing(String project, String dir_path, String ref)</tt> returns an <tt>ArrayList</tt> which contains the list of files in the requested path.
       </li>
       <li>
           <tt>String toString()</tt> returns a human readable <tt>String</tt> for this type of remote.

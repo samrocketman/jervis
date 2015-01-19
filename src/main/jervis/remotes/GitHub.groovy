@@ -144,6 +144,26 @@ class GitHub {
     }
 
     /**
+      Get the directory listing of a path from a project.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
+
+      @param   project    A GitHub project including the org.  e.g. <tt>"samrocketman/jervis"</tt>
+      @param   dir_path   A path to a directory relative to the root of the Git repository.  e.g. <tt>"/"</tt>
+      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>"master"</tt>
+      @returns            An <tt>ArrayList</tt> which contains the contents of the file requested.
+    */
+    public ArrayList getFolderListing(String project, String dir_path, String ref) {
+        if(dir_path.length() > 0 && dir_path[0] != '/') {
+            dir_path = '/' + dir_path
+        }
+        ArrayList listing = []
+        def response = this.fetch(this.gh_api + "repos/${project}/contents${dir_path}?ref=${ref}")
+        response.each {
+            listing << it.name
+        }
+        return listing
+    }
+
+    /**
       Get a human readable string for this type of remote.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
       @return A human readable <tt>String</tt> for this type of remote.  Value returned will be either <tt>"GitHub"</tt> or <tt>"GitHub Enterprise"</tt> depending on whether or not <tt>{@link #gh_web}</tt> has been set.
