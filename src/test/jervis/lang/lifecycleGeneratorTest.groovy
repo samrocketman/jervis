@@ -25,8 +25,13 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert "ruby" == generator.yaml_language
     }
     @Test public void test_lifecycleGenerator_loadYaml_supportedLanguage_no() {
+        //not in lifecycles and not in toolchains
         shouldFail(UnsupportedLanguageException) {
             generator.loadYaml("language: derp")
+        }
+        //in lifecycles but not in toolchains
+        shouldFail(UnsupportedLanguageException) {
+            generator.loadYaml("language: groovy")
         }
     }
     @Test public void test_lifecycleGenerator_isMatrixBuild_false() {
