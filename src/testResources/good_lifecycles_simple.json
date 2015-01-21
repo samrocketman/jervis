@@ -34,5 +34,31 @@
             "install": "bundle install --jobs=3 --retry=3",
             "script": "bundle exec rake"
         }
+    },
+    "java": {
+        "friendlyName": "Java",
+        "defaultKey": "gradlew",
+        "gradlew": {
+            "fileExistsCondition": ["/", "gradlew"],
+            "fallbackKey": "gradle",
+            "install": "./gradlew assemble",
+            "script": "./gradlew check"
+        },
+        "gradle": {
+            "fileExistsCondition": ["/", "build.gradle"],
+            "fallbackKey": "maven",
+            "install": "gradle assemble",
+            "script": "gradle check"
+        },
+        "maven": {
+            "fileExistsCondition": ["/", "pom.xml"],
+            "fallbackKey": "ant",
+            "install": "mvn install -DskipTests=true",
+            "script": "mvn test",
+        },
+        "ant": {
+            "fileExistsCondition": ["/", "build.xml"],
+            "script": "ant test",
+        }
     }
 }

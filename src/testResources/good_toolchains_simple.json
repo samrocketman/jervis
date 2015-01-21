@@ -1,5 +1,6 @@
 {
     "toolchains": {
+        "java": ["env", "jdk"],
         "ruby": ["gemfile", "env", "rvm", "jdk"]
     },
     "env": {
