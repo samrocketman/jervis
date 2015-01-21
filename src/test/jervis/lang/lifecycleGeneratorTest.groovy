@@ -1,5 +1,6 @@
 package jervis.lang
 //the lifecycleGeneratorTest() class automatically sees the lifecycleGenerator() class because they're in the same package
+import jervis.exceptions.JervisException
 import jervis.exceptions.UnsupportedLanguageException
 import jervis.exceptions.UnsupportedToolException
 import org.junit.*
@@ -33,6 +34,19 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         shouldFail(UnsupportedLanguageException) {
             generator.loadYaml("language: groovy")
         }
+    }
+    @Test public void test_lifecycleGenerator_setfolder_listing() {
+        shouldFail(JervisException) {
+            generator.folder_listing = ["Gemfile.lock", "Gemfile"]
+        }
+        generator.loadYaml("language: ruby")
+        generator.folder_listing = ["Gemfile.lock", "Gemfile"]
+        assert 'rake1' == generator.lifecycle_key
+        generator.folder_listing = ["Gemfile"]
+        assert 'rake2' == generator.lifecycle_key
+        generator.loadYaml("language: java")
+        generator.folder_listing = []
+        assert 'ant' == generator.lifecycle_key
     }
     @Test public void test_lifecycleGenerator_isMatrixBuild_false() {
         generator.loadYaml("language: ruby\nenv: foo=bar")
