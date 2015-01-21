@@ -93,11 +93,16 @@ class lifecycleGenerator {
         }
     }
 
+    /**
+      The default class instantiator which loads the repository lifecycles and
+      toolchains file from the resources directory.
+     */
     def lifecycleGenerator() {
         def git = new scmGit()
         this.loadLifecycles("${git.getRoot()}/src/resources/lifecycles.json")
         this.loadToolchains("${git.getRoot()}/src/resources/toolchains.json")
     }
+
     /**
       Load a lifecycles file so that default scripts can be generated.  Lifecycles
       provide the build portions of the script.  This project comes with a lifecycles
@@ -113,6 +118,7 @@ class lifecycleGenerator {
         this.lifecycle_obj.load_JSON(file)
         this.lifecycle_obj.validate()
     }
+
     /**
       Load a toolchains file so that default scripts can be generated.  Toolchains
       provide the default tool setup of the script (e.g. what version of Java will be
@@ -142,11 +148,7 @@ class lifecycleGenerator {
             throw new UnsupportedLanguageException(this.yaml_language)
         }
     }
-    /**
-     */
-    public void loadFolderListing(ArrayList listing) {
 
-    }
     /**
       This will check if the loaded YAML is a matrix build.  The requirements for it
       to be a matrix build is that it must be a matrix specifically for the selected
@@ -180,6 +182,7 @@ env:
     }
     public String excludeFilter() {
     }
+
     /**
       Interpolate <tt>${jervis_toolchain_ivalue}</tt> on an ArrayList of strings.
       This is mostly used by the <tt>{@link #generateToolchainSection()}</tt> function.
@@ -192,6 +195,7 @@ env:
         cmds.each{ z << it.replace('${jervis_toolchain_ivalue}',ivalue) }
         z
     }
+
     /**
       Generate the toolchains shell script based on the Jervis YAML or taking defaults
       from the toolchains file.
