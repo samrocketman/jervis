@@ -138,8 +138,6 @@ class lifecycleGenerator {
       Load Jervis YAML to be interpreted.  This YAML will be used to generate the build scripts and components of a Jenkins job.
      */
     public void loadYaml(String raw_yaml) {
-        if(!lifecycle_obj) {
-        }
         def yaml = new Yaml()
         this.jervis_yaml = yaml.load(raw_yaml)
         this.yaml_language = this.jervis_yaml['language']
