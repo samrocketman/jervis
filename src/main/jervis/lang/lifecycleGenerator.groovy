@@ -178,6 +178,15 @@ env:
         }
         return result
     }
+
+    /**
+      This function generates a Jenkins groovy expression from Jervis YAML which will
+      be used to exclude matrix build combinations.  This is typically done from a
+      a <a href="https://github.com/samrocketman/jervis/wiki/Matrix-job-support#matrix-exclusion" target="_blank">matrix exclusion</a>
+      in the form of a whitelist or blacklist.
+
+      @return A <tt>String</tt> which is a simple groovy expression.
+     */
     public String excludeFilter() {
     }
 
