@@ -261,6 +261,7 @@ env:
         }
         return output
     }
+
     /**
       Generate the before_install shell script based on the Jervis YAML or taking defaults
       from the lifecycles file.
@@ -269,6 +270,12 @@ env:
     public String generateBeforeInstall() {
         String output = "#\n# BEFOREINSTALL SECTION\n#\n"
     }
+
+    /**
+      Generate the install shell script based on the Jervis YAML or taking defaults
+      from the lifecycles file.
+      @return A portion of a bash script which will install dependencies.
+     */
     public String generateInstall() {
         String output = "#\n# INSTALL SECTION\n#\n"
     }
