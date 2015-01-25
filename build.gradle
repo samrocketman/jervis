@@ -6,7 +6,7 @@ group = 'net.gleske'
 jar.baseName = 'jervis'
 version = '0.1.0-SNAPSHOT'
 
-ext { groovyVersion = System.getenv("GROOVY_VERSION")?: "1.8.9" }
+ext.groovyVersion = System.getenv("GROOVY_VERSION")?: "1.8.9"
 
 println "Using Groovy ${groovyVersion}"
 
@@ -14,7 +14,6 @@ buildscript {
     repositories { mavenCentral() }
     dependencies {
         classpath "net.saliman:gradle-cobertura-plugin:2.2.5"
-        classpath "org.yaml:snakeyaml:1.14"
     }
 }
 
@@ -23,8 +22,6 @@ dependencies {
     compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
     compile 'org.yaml:snakeyaml:1.14'
     testCompile 'junit:junit:4.11'
-    testCompile "org.codehaus.groovy:groovy:${groovyVersion}"
-    testCompile 'org.yaml:snakeyaml:1.14'
 }
 
 sourceSets {
