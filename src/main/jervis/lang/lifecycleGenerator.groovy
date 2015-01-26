@@ -279,6 +279,11 @@ env:
     public String generateInstall() {
         String output = "#\n# INSTALL SECTION\n#\n"
     }
+    /**
+      Generate the before_script shell script based on the Jervis YAML or taking defaults
+      from the lifecycles file.
+      @return A portion of a bash script preparing the system for running unit tests.
+     */
     public String generateBeforeScript() {
         String output = "#\n# BEFORESCRIPT SECTION\n#\n"
     }
