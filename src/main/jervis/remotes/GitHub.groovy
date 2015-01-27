@@ -15,7 +15,7 @@ x.branches('samrocketman/jervis').each{ println it }
 println "Print the contents of .travis.yml from the master branch."
 println x.getFile('samrocketman/jervis','.travis.yml','master')</tt></pre><br>
  */
-class GitHub {
+class GitHub implements JervisRemote {
 
     /**
       URL to the GitHub web interface. Default: <tt>https://github.com/</tt>
@@ -124,7 +124,7 @@ class GitHub {
       @return          A <tt>List</tt> where each element is a branch in the project.
      */
     public List branches(String project) {
-        def list = []
+        List list = []
         this.fetch(this.gh_api + "repos/${project}/branches").each { list << it.name }
         return list
     }
