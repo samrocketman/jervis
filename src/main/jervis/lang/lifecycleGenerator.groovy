@@ -268,7 +268,17 @@ env:
       @return A portion of a bash script preparing for installing dependencies.
      */
     public String generateBeforeInstall() {
+        String[] keys = jervis_yaml.keySet() as String[]
         String output = "#\n# BEFOREINSTALL SECTION\n#\n"
+        if(!('before_install' in keys)) {
+            //take the default
+        }
+        else if(keys['before_install'] instanceof ArrayList) {
+            //do some ArrayList stuff like joining it
+        }
+        else {
+            //must be a String instance
+        }
     }
 
     /**
