@@ -26,7 +26,7 @@ class lifecycleGenerator {
     /**
       A quick access variable for what root keys are in the loaded Jervis YAML.
      */
-    def yaml_keys
+    String[] yaml_keys
 
     /**
       An instance of the <tt>{@link jervis.lang.lifecycleValidator}</tt> class which has loaded a lifecycles file.
@@ -268,16 +268,26 @@ env:
       @return A portion of a bash script preparing for installing dependencies.
      */
     public String generateBeforeInstall() {
-        String[] keys = jervis_yaml.keySet() as String[]
         String output = "#\n# BEFOREINSTALL SECTION\n#\n"
-        if(!('before_install' in keys)) {
+        def my_lifecycle = lifecycle_obj.lifecycles[yaml_language][lifecycle_key]
+        String[] my_lifecycle_keys = my_lifecycle.keySet() as String[]
+        if(!('before_install' in yaml_keys)) {
             //take the default
+            if('before_install' in my_lifecycle_keys) {
+                if(my_lifecycle['before_install'] instanceof ArrayList) {
+                    output += my_lifecycle['before_install'].join('\n') + '\n'
+                }
+                else {
+                    output += my_lifecycle['before_install'] + '\n'
+                }
+            }
         }
-        else if(keys['before_install'] instanceof ArrayList) {
-            //do some ArrayList stuff like joining it
+        else if(jervis_yaml['before_install'] instanceof ArrayList) {
+            output += jervis_yaml['before_install'].join('\n') + '\n'
         }
         else {
             //must be a String instance
+            output += jervis_yaml['before_install'] + '\n'
         }
     }
 
