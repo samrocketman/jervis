@@ -10,6 +10,14 @@ import org.yaml.snakeyaml.Yaml
 
 /**
   WIP: Docs will be written once this class has stabilized.
+
+  <h2>Sample usage</h2>
+<pre><tt>import jervis.lang.lifecycleGenerator
+def x = new lifecycleGenerator()
+x.loadYaml('language: ruby\nrvm: 2.1.0\njdk: oraclejdk8')
+x.folder_listing = ['Gemfile.lock']
+println x.generateAll()
+</tt></pre>
  */
 class lifecycleGenerator {
 
