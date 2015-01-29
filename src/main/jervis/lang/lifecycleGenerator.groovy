@@ -289,6 +289,9 @@ env:
                     output += my_lifecycle['before_install'] + '\n'
                 }
             }
+            else {
+                output = ""
+            }
         }
         else if(jervis_yaml['before_install'] instanceof ArrayList) {
             output += jervis_yaml['before_install'].join('\n') + '\n'
@@ -297,6 +300,7 @@ env:
             //must be a String instance
             output += jervis_yaml['before_install'] + '\n'
         }
+        return output
     }
 
     /**
