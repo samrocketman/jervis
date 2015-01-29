@@ -364,6 +364,6 @@ env:
             generateBeforeScript(),
             generateScript()
             ]
-        return script.join('\n\n')
+        return script.grep().join('\n')
     }
 }
