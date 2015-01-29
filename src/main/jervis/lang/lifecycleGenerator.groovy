@@ -310,7 +310,32 @@ env:
      */
     public String generateInstall() {
         String output = "#\n# INSTALL SECTION\n#\n"
+        def my_lifecycle = lifecycle_obj.lifecycles[yaml_language][lifecycle_key]
+        String[] my_lifecycle_keys = my_lifecycle.keySet() as String[]
+        if(!('install' in yaml_keys)) {
+            //take the default
+            if('install' in my_lifecycle_keys) {
+                if(my_lifecycle['install'] instanceof ArrayList) {
+                    output += my_lifecycle['install'].join('\n') + '\n'
+                }
+                else {
+                    output += my_lifecycle['install'] + '\n'
+                }
+            }
+            else {
+                output = ""
+            }
+        }
+        else if(jervis_yaml['install'] instanceof ArrayList) {
+            output += jervis_yaml['install'].join('\n') + '\n'
+        }
+        else {
+            //must be a String instance
+            output += jervis_yaml['install'] + '\n'
+        }
+        return output
     }
+
     /**
       Generate the before_script shell script based on the Jervis YAML or taking defaults
       from the lifecycles file.
