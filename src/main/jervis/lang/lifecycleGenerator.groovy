@@ -271,36 +271,46 @@ env:
     }
 
     /**
-      Generate the before_install shell script based on the Jervis YAML or taking defaults
-      from the lifecycles file.
-      @return A portion of a bash script preparing for installing dependencies.
+       A generic function to generate code.
+       @param header  A header message for the section being generated.
+       @param section A section from the build lifecycle.  e.g. before_install, install, before_script, script, etc.
+       @return        Code generated from that section in the Jervis YAML, default from the lifecycles file, or returns an empty String.
      */
-    public String generateBeforeInstall() {
-        String output = "#\n# BEFOREINSTALL SECTION\n#\n"
+    private String generateSection(String section) {
+        String output = "#\n# ${section.toUpperCase()} SECTION\n#\n"
         def my_lifecycle = lifecycle_obj.lifecycles[yaml_language][lifecycle_key]
         String[] my_lifecycle_keys = my_lifecycle.keySet() as String[]
-        if(!('before_install' in yaml_keys)) {
+        if(!(section in yaml_keys)) {
             //take the default
-            if('before_install' in my_lifecycle_keys) {
-                if(my_lifecycle['before_install'] instanceof ArrayList) {
-                    output += my_lifecycle['before_install'].join('\n') + '\n'
+            if(section in my_lifecycle_keys) {
+                if(my_lifecycle[section] instanceof ArrayList) {
+                    output += my_lifecycle[section].join('\n') + '\n'
                 }
                 else {
-                    output += my_lifecycle['before_install'] + '\n'
+                    output += my_lifecycle[section] + '\n'
                 }
             }
             else {
                 output = ""
             }
         }
-        else if(jervis_yaml['before_install'] instanceof ArrayList) {
-            output += jervis_yaml['before_install'].join('\n') + '\n'
+        else if(jervis_yaml[section] instanceof ArrayList) {
+            output += jervis_yaml[section].join('\n') + '\n'
         }
         else {
             //must be a String instance
-            output += jervis_yaml['before_install'] + '\n'
+            output += jervis_yaml[section] + '\n'
         }
         return output
+    }
+
+    /**
+      Generate the before_install shell script based on the Jervis YAML or taking defaults
+      from the lifecycles file.
+      @return A portion of a bash script preparing for installing dependencies.
+     */
+    public String generateBeforeInstall() {
+        return this.generateSection('before_install')
     }
 
     /**
