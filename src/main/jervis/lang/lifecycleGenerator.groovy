@@ -328,19 +328,19 @@ env:
       @return A portion of a bash script preparing the system for running unit tests.
      */
     public String generateBeforeScript() {
-        String output = "#\n# BEFORESCRIPT SECTION\n#\n"
+        return this.generateSection('before_script')
     }
     public String generateScript() {
-        String output = "#\n# SCRIPT SECTION\n#\n"
+        return this.generateSection('script')
     }
     public String generateAfterSuccess() {
-        String output = "#\n# AFTERSUCCESS SECTION\n#\n"
+        return this.generateSection('after_success')
     }
     public String generateAfterFailure() {
-        String output = "#\n# AFTERFAILURE SECTION\n#\n"
+        return this.generateSection('after_failure')
     }
     public String generateAfterScript() {
-        String output = "#\n# AFTERSCRIPT SECTION\n#\n"
+        return this.generateSection('after_script')
     }
     public String generateAll() {
         ArrayList script = [
