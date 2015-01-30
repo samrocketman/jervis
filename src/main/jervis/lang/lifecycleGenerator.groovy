@@ -153,6 +153,9 @@ class lifecycleGenerator {
         if(!lifecycle_obj.supportedLanguage(this.yaml_language) || !toolchain_obj.supportedLanguage(this.yaml_language)) {
             throw new UnsupportedLanguageException(this.yaml_language)
         }
+        //avoid throwing a NullPointer exception if the user forgets to call obj.folder_listing to load a list of files.
+        //just load an empty file list by default initially that can then be overridden.
+        this.setFolder_listing([])
     }
 
     /**
