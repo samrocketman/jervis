@@ -1,0 +1,18 @@
+{
+  "name": ".travis.yml",
+  "path": ".travis.yml",
+  "sha": "ec46ce71c7669b3d38e15cd54cbca20c45a038f0",
+  "size": 17,
+  "url": "https://api.github.com/repos/samrocketman/jervis/contents/.travis.yml?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+  "html_url": "https://github.com/samrocketman/jervis/blob/54703e8b971bdb40dc65d161679f5f50dbd461ae/.travis.yml",
+  "git_url": "https://api.github.com/repos/samrocketman/jervis/git/blobs/ec46ce71c7669b3d38e15cd54cbca20c45a038f0",
+  "download_url": "https://raw.githubusercontent.com/samrocketman/jervis/54703e8b971bdb40dc65d161679f5f50dbd461ae/.travis.yml",
+  "type": "file",
+  "content": "bGFuZ3VhZ2U6IGdyb292eQo=\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/samrocketman/jervis/contents/.travis.yml?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+    "git": "https://api.github.com/repos/samrocketman/jervis/git/blobs/ec46ce71c7669b3d38e15cd54cbca20c45a038f0",
+    "html": "https://github.com/samrocketman/jervis/blob/54703e8b971bdb40dc65d161679f5f50dbd461ae/.travis.yml"
+  }
+}

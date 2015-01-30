@@ -1,0 +1,50 @@
+[
+  {
+    "name": "main",
+    "path": "src/main",
+    "sha": "f35713c66ce14fb77f4e7b149171fc787a3fcaf1",
+    "size": 0,
+    "url": "https://api.github.com/repos/samrocketman/jervis/contents/src/main?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+    "html_url": "https://github.com/samrocketman/jervis/tree/54703e8b971bdb40dc65d161679f5f50dbd461ae/src/main",
+    "git_url": "https://api.github.com/repos/samrocketman/jervis/git/trees/f35713c66ce14fb77f4e7b149171fc787a3fcaf1",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/samrocketman/jervis/contents/src/main?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+      "git": "https://api.github.com/repos/samrocketman/jervis/git/trees/f35713c66ce14fb77f4e7b149171fc787a3fcaf1",
+      "html": "https://github.com/samrocketman/jervis/tree/54703e8b971bdb40dc65d161679f5f50dbd461ae/src/main"
+    }
+  },
+  {
+    "name": "resources",
+    "path": "src/resources",
+    "sha": "d475459e15669260e2d79efc091e37f9a8c60ab9",
+    "size": 0,
+    "url": "https://api.github.com/repos/samrocketman/jervis/contents/src/resources?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+    "html_url": "https://github.com/samrocketman/jervis/tree/54703e8b971bdb40dc65d161679f5f50dbd461ae/src/resources",
+    "git_url": "https://api.github.com/repos/samrocketman/jervis/git/trees/d475459e15669260e2d79efc091e37f9a8c60ab9",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/samrocketman/jervis/contents/src/resources?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+      "git": "https://api.github.com/repos/samrocketman/jervis/git/trees/d475459e15669260e2d79efc091e37f9a8c60ab9",
+      "html": "https://github.com/samrocketman/jervis/tree/54703e8b971bdb40dc65d161679f5f50dbd461ae/src/resources"
+    }
+  },
+  {
+    "name": "test",
+    "path": "src/test",
+    "sha": "7ba1637c40e956cd9d3aefeb29bfb0e89afa75c1",
+    "size": 0,
+    "url": "https://api.github.com/repos/samrocketman/jervis/contents/src/test?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+    "html_url": "https://github.com/samrocketman/jervis/tree/54703e8b971bdb40dc65d161679f5f50dbd461ae/src/test",
+    "git_url": "https://api.github.com/repos/samrocketman/jervis/git/trees/7ba1637c40e956cd9d3aefeb29bfb0e89afa75c1",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/samrocketman/jervis/contents/src/test?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+      "git": "https://api.github.com/repos/samrocketman/jervis/git/trees/7ba1637c40e956cd9d3aefeb29bfb0e89afa75c1",
+      "html": "https://github.com/samrocketman/jervis/tree/54703e8b971bdb40dc65d161679f5f50dbd461ae/src/test"
+    }
+  }
+]

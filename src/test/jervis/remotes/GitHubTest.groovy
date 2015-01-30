@@ -4,9 +4,39 @@ import org.junit.*
 
 class GitHubTest extends GroovyTestCase {
     def mygh
-
+    def url
+    //Mock the HTTP calls to the GitHub API and use resource files instead.
+    //http://flyingtomoon.com/tag/mocking/
+    //http://groovy.329449.n5.nabble.com/Groovy-metaclass-invokeConstructor-td5716360.html
+    def mock(Class<URL> clazz) {
+        def mc = clazz.metaClass
+        mc.invokeMethod = { String name, args ->
+            mc.getMetaMethod(name, args).invoke(delegate, args)
+        }
+        mc.getProperty = { String name  ->
+            mc.getMetaProperty(name).getProperty(delegate)
+        }
+        mc.constructor = { String url ->
+            this.url = url
+            def constructor = delegate.getConstructor([String] as Class[])
+            constructor.newInstance(url)
+        }
+        mc.newReader = {
+            //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
+            String file = this.url.toString().replaceAll(/[:?=]/,"_").split('/')[2..-1].join('_')
+            URL resource_url = this.getClass().getResource("/mocks/${file}");
+            def resource = new File(resource_url.getFile())
+            if(resource.isFile()) {
+                return resource.newReader()
+            }
+            else {
+                throw new RuntimeException("[404] Not Found - ${resource}")
+            }
+        }
+    }
     //set up before every test
     @Before protected void setUp() {
+        mock(URL)
         super.setUp()
         mygh = new GitHub()
     }
@@ -87,5 +117,15 @@ class GitHubTest extends GroovyTestCase {
     @Test public void test_GitHub_toString2() {
         mygh.gh_web = "http://server/"
         assert mygh.toString() == "GitHub Enterprise"
+    }
+    @Test public void test_GitHub_branches() {
+        assert ['gh-pages', 'master'] == mygh.branches('samrocketman/jervis')
+    }
+    @Test public void test_GitHub_getFile() {
+        assert 'language: groovy\n' == mygh.getFile('samrocketman/jervis','.travis.yml','master')
+    }
+    @Test public void test_GitHub_getFolderListing() {
+        assert ['.gitignore', '.travis.yml', 'LICENSE', 'README.md', 'build.gradle', 'src'] == mygh.getFolderListing('samrocketman/jervis','/','master')
+        assert ['main', 'resources', 'test'] == mygh.getFolderListing('samrocketman/jervis','src','master')
     }
 }

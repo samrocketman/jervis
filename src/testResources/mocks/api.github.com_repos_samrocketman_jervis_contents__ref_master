@@ -1,0 +1,98 @@
+[
+  {
+    "name": ".gitignore",
+    "path": ".gitignore",
+    "sha": "ca611cf826f5ca1a41c92fd63f51d0c90c1fe7d8",
+    "size": 62,
+    "url": "https://api.github.com/repos/samrocketman/jervis/contents/.gitignore?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+    "html_url": "https://github.com/samrocketman/jervis/blob/54703e8b971bdb40dc65d161679f5f50dbd461ae/.gitignore",
+    "git_url": "https://api.github.com/repos/samrocketman/jervis/git/blobs/ca611cf826f5ca1a41c92fd63f51d0c90c1fe7d8",
+    "download_url": "https://raw.githubusercontent.com/samrocketman/jervis/54703e8b971bdb40dc65d161679f5f50dbd461ae/.gitignore",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/samrocketman/jervis/contents/.gitignore?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+      "git": "https://api.github.com/repos/samrocketman/jervis/git/blobs/ca611cf826f5ca1a41c92fd63f51d0c90c1fe7d8",
+      "html": "https://github.com/samrocketman/jervis/blob/54703e8b971bdb40dc65d161679f5f50dbd461ae/.gitignore"
+    }
+  },
+  {
+    "name": ".travis.yml",
+    "path": ".travis.yml",
+    "sha": "ec46ce71c7669b3d38e15cd54cbca20c45a038f0",
+    "size": 17,
+    "url": "https://api.github.com/repos/samrocketman/jervis/contents/.travis.yml?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+    "html_url": "https://github.com/samrocketman/jervis/blob/54703e8b971bdb40dc65d161679f5f50dbd461ae/.travis.yml",
+    "git_url": "https://api.github.com/repos/samrocketman/jervis/git/blobs/ec46ce71c7669b3d38e15cd54cbca20c45a038f0",
+    "download_url": "https://raw.githubusercontent.com/samrocketman/jervis/54703e8b971bdb40dc65d161679f5f50dbd461ae/.travis.yml",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/samrocketman/jervis/contents/.travis.yml?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+      "git": "https://api.github.com/repos/samrocketman/jervis/git/blobs/ec46ce71c7669b3d38e15cd54cbca20c45a038f0",
+      "html": "https://github.com/samrocketman/jervis/blob/54703e8b971bdb40dc65d161679f5f50dbd461ae/.travis.yml"
+    }
+  },
+  {
+    "name": "LICENSE",
+    "path": "LICENSE",
+    "sha": "d6a93266f748d606b884f9434ff662fe80b9dc21",
+    "size": 18027,
+    "url": "https://api.github.com/repos/samrocketman/jervis/contents/LICENSE?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+    "html_url": "https://github.com/samrocketman/jervis/blob/54703e8b971bdb40dc65d161679f5f50dbd461ae/LICENSE",
+    "git_url": "https://api.github.com/repos/samrocketman/jervis/git/blobs/d6a93266f748d606b884f9434ff662fe80b9dc21",
+    "download_url": "https://raw.githubusercontent.com/samrocketman/jervis/54703e8b971bdb40dc65d161679f5f50dbd461ae/LICENSE",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/samrocketman/jervis/contents/LICENSE?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+      "git": "https://api.github.com/repos/samrocketman/jervis/git/blobs/d6a93266f748d606b884f9434ff662fe80b9dc21",
+      "html": "https://github.com/samrocketman/jervis/blob/54703e8b971bdb40dc65d161679f5f50dbd461ae/LICENSE"
+    }
+  },
+  {
+    "name": "README.md",
+    "path": "README.md",
+    "sha": "d43ac23a6fba282b150ec81ad571f6d11feb3e7c",
+    "size": 1152,
+    "url": "https://api.github.com/repos/samrocketman/jervis/contents/README.md?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+    "html_url": "https://github.com/samrocketman/jervis/blob/54703e8b971bdb40dc65d161679f5f50dbd461ae/README.md",
+    "git_url": "https://api.github.com/repos/samrocketman/jervis/git/blobs/d43ac23a6fba282b150ec81ad571f6d11feb3e7c",
+    "download_url": "https://raw.githubusercontent.com/samrocketman/jervis/54703e8b971bdb40dc65d161679f5f50dbd461ae/README.md",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/samrocketman/jervis/contents/README.md?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+      "git": "https://api.github.com/repos/samrocketman/jervis/git/blobs/d43ac23a6fba282b150ec81ad571f6d11feb3e7c",
+      "html": "https://github.com/samrocketman/jervis/blob/54703e8b971bdb40dc65d161679f5f50dbd461ae/README.md"
+    }
+  },
+  {
+    "name": "build.gradle",
+    "path": "build.gradle",
+    "sha": "f857290ce5632987c51bd2b0fa7215bbb0cb703b",
+    "size": 1448,
+    "url": "https://api.github.com/repos/samrocketman/jervis/contents/build.gradle?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+    "html_url": "https://github.com/samrocketman/jervis/blob/54703e8b971bdb40dc65d161679f5f50dbd461ae/build.gradle",
+    "git_url": "https://api.github.com/repos/samrocketman/jervis/git/blobs/f857290ce5632987c51bd2b0fa7215bbb0cb703b",
+    "download_url": "https://raw.githubusercontent.com/samrocketman/jervis/54703e8b971bdb40dc65d161679f5f50dbd461ae/build.gradle",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/samrocketman/jervis/contents/build.gradle?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+      "git": "https://api.github.com/repos/samrocketman/jervis/git/blobs/f857290ce5632987c51bd2b0fa7215bbb0cb703b",
+      "html": "https://github.com/samrocketman/jervis/blob/54703e8b971bdb40dc65d161679f5f50dbd461ae/build.gradle"
+    }
+  },
+  {
+    "name": "src",
+    "path": "src",
+    "sha": "1c1d3d8e05577cead10d0b6557551fc6103ab01b",
+    "size": 0,
+    "url": "https://api.github.com/repos/samrocketman/jervis/contents/src?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+    "html_url": "https://github.com/samrocketman/jervis/tree/54703e8b971bdb40dc65d161679f5f50dbd461ae/src",
+    "git_url": "https://api.github.com/repos/samrocketman/jervis/git/trees/1c1d3d8e05577cead10d0b6557551fc6103ab01b",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/samrocketman/jervis/contents/src?ref=54703e8b971bdb40dc65d161679f5f50dbd461ae",
+      "git": "https://api.github.com/repos/samrocketman/jervis/git/trees/1c1d3d8e05577cead10d0b6557551fc6103ab01b",
+      "html": "https://github.com/samrocketman/jervis/tree/54703e8b971bdb40dc65d161679f5f50dbd461ae/src"
+    }
+  }
+]

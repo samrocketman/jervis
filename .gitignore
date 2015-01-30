@@ -6,3 +6,6 @@ gradle-app.setting
 
 #ignore encryption keys
 id_rsa*
+
+#ignore groovyConsole logs when testing Jervis functions
+/src/main/*.log
