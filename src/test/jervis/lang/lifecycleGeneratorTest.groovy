@@ -100,4 +100,12 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYaml("language: ruby\nbefore_script:\n - some code\n - more code")
         assert "#\n# BEFORE_SCRIPT SECTION\n#\nsome code\nmore code\n" == generator.generateBeforeScript()
     }
+    @Test public void test_lifecycleGenerator_generateScript() {
+        generator.loadYaml("language: ruby")
+        assert "#\n# SCRIPT SECTION\n#\nbundle exec rake\n" == generator.generateScript()
+        generator.loadYaml("language: ruby\nscript: some code")
+        assert "#\n# SCRIPT SECTION\n#\nsome code\n" == generator.generateScript()
+        generator.loadYaml("language: ruby\nscript:\n - some code\n - more code")
+        assert "#\n# SCRIPT SECTION\n#\nsome code\nmore code\n" == generator.generateScript()
+    }
 }
