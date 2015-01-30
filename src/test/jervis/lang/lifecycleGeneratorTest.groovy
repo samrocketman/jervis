@@ -84,4 +84,20 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYaml("language: ruby\nbefore_install:\n - some code\n - more code")
         assert "#\n# BEFORE_INSTALL SECTION\n#\nsome code\nmore code\n" == generator.generateBeforeInstall()
     }
+    @Test public void test_lifecycleGenerator_generateInstall() {
+        generator.loadYaml("language: ruby")
+        assert "#\n# INSTALL SECTION\n#\nbundle install --jobs=3 --retry=3\n" == generator.generateInstall()
+        generator.loadYaml("language: ruby\ninstall: some code")
+        assert "#\n# INSTALL SECTION\n#\nsome code\n" == generator.generateInstall()
+        generator.loadYaml("language: ruby\ninstall:\n - some code\n - more code")
+        assert "#\n# INSTALL SECTION\n#\nsome code\nmore code\n" == generator.generateInstall()
+    }
+    @Test public void test_lifecycleGenerator_generateBeforeScript() {
+        generator.loadYaml("language: ruby")
+        assert "" == generator.generateBeforeScript()
+        generator.loadYaml("language: ruby\nbefore_script: some code")
+        assert "#\n# BEFORE_SCRIPT SECTION\n#\nsome code\n" == generator.generateBeforeScript()
+        generator.loadYaml("language: ruby\nbefore_script:\n - some code\n - more code")
+        assert "#\n# BEFORE_SCRIPT SECTION\n#\nsome code\nmore code\n" == generator.generateBeforeScript()
+    }
 }
