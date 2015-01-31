@@ -12,4 +12,4 @@ matrix:
     - env: GROOVY_VERSION="2.1.9"
     - env: GROOVY_VERSION="2.2.2"
     - env: GROOVY_VERSION="2.3.9"
-    - env: GROOVY_VERSION="2.4.0-rc-1"
+    - env: GROOVY_VERSION="2.4.0"
