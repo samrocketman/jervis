@@ -78,9 +78,9 @@ cobertura {
     //coberturaCheck values 80% (./gradlew coberturaCheck test)
     //coverageCheckBranchRate = 80
     //coverageCheckLineRate = 80
-    coverageCheckPackageBranchRate = 80
+    coverageCheckPackageBranchRate = 50
     coverageCheckPackageLineRate = 80
-    coverageCheckTotalBranchRate = 80
+    coverageCheckTotalBranchRate = 50
     coverageCheckTotalLineRate = 80
     coverageCheckHaltOnFailure = true
 
