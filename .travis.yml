@@ -1,4 +1,6 @@
 language: groovy
+#enforces code coverage of at least 80%
+script: ./gradlew coberturaCheck test
 env:
   - GROOVY_VERSION="1.8.9"
   - GROOVY_VERSION="2.0.8"
