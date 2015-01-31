@@ -132,4 +132,8 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYaml("language: ruby\nafter_script:\n - some code\n - more code")
         assert "#\n# AFTER_SCRIPT SECTION\n#\nsome code\nmore code\n" == generator.generateAfterScript()
     }
+    @Test public void test_lifecycleGenerator_generateAll() {
+        generator.loadYaml("language: ruby")
+        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n\n#\n# INSTALL SECTION\n#\nbundle install --jobs=3 --retry=3\n\n#\n# SCRIPT SECTION\n#\nbundle exec rake\n' == generator.generateAll()
+    }
 }
