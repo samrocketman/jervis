@@ -81,6 +81,12 @@ class securityIOTest extends GroovyTestCase {
         security.generate_rsa_pair()
         assert true == (new File(jervis_tmp.toString() + '/id_rsa.pem')).exists()
         assert true == (new File(jervis_tmp.toString() + '/id_rsa.pub.pem')).exists()
+        shouldFail(JervisException) {
+            security.generate_rsa_pair(jervis_tmp.toString(), security.id_rsa_pub, security.id_rsa_keysize)
+        }
+        shouldFail(JervisException) {
+            security.generate_rsa_pair(security.id_rsa_priv, jervis_tmp.toString(), security.id_rsa_keysize)
+        }
         //clean up the tmp dir
         def stdout = new StringBuilder()
         def stderr = new StringBuilder()
