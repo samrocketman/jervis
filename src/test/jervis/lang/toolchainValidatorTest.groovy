@@ -1,7 +1,9 @@
 package jervis.lang
 //the toolchainValidatorTest() class automatically sees the lifecycleValidator() class because they're in the same package
-import org.junit.*
 import jervis.exceptions.ToolchainMissingKeyException
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 class toolchainValidatorTest extends GroovyTestCase {
     def toolchains

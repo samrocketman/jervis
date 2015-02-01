@@ -1,6 +1,8 @@
 package jervis.tools
 //the fileIOTest() class automatically sees the fileIO() class because they're in the same package
-import org.junit.*
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 class fileIOTest extends GroovyTestCase {
     def fileio

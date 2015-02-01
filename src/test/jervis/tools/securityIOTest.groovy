@@ -3,7 +3,9 @@ package jervis.tools
 import java.nio.file.Files
 import java.nio.file.Path
 import jervis.exceptions.JervisException
-import org.junit.*
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 class securityIOTest extends GroovyTestCase {
     def security

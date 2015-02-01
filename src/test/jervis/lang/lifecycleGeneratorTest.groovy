@@ -3,7 +3,9 @@ package jervis.lang
 import jervis.exceptions.JervisException
 import jervis.exceptions.UnsupportedLanguageException
 import jervis.exceptions.UnsupportedToolException
-import org.junit.*
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 class lifecycleGeneratorTest extends GroovyTestCase {
     def generator

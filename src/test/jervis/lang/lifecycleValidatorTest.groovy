@@ -1,10 +1,12 @@
 package jervis.lang
 //the lifecycleValidatorTest() class automatically sees the lifecycleValidator() class because they're in the same package
-import org.junit.*
 import jervis.exceptions.LifecycleBadValueInKeyException
 import jervis.exceptions.LifecycleInfiniteLoopException
 import jervis.exceptions.LifecycleMissingKeyException
 import jervis.exceptions.LifecycleValidationException
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 class lifecycleValidatorTest extends GroovyTestCase {
     def lifecycles

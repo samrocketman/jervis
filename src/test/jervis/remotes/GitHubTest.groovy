@@ -1,6 +1,8 @@
 package jervis.remotes
 //the GitHubTest() class automatically sees the GitHub() class because they're in the same package
-import org.junit.*
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 class GitHubTest extends GroovyTestCase {
     def mygh

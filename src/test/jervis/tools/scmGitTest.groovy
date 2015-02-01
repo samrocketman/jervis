@@ -1,6 +1,8 @@
 package jervis.tools
 //the scmGitTest() class automatically sees the scmGit() class because they're in the same package
-import org.junit.*
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 class scmGitTest extends GroovyTestCase {
     def git
