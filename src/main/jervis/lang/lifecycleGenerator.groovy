@@ -333,6 +333,11 @@ env:
     public String generateBeforeScript() {
         return this.generateSection('before_script')
     }
+    /**
+      Generate the <tt>script</tt> shell script based on the Jervis YAML or taking defaults
+      from the lifecycles file.
+      @return A portion of a bash script running unit tests.
+     */
     public String generateScript() {
         return this.generateSection('script')
     }
