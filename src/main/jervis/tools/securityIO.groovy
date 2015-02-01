@@ -228,8 +228,9 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
         def proc2 = ['openssl', 'rsautl', '-encrypt', '-inkey', id_rsa_pub, '-pubin'].execute()
         def proc3 = ['base64','-w0'].execute()
         proc1 | proc2 | proc3
-        proc3.waitForProcessOutput(stdout, stderr)
-        if(proc3.exitValue()) {
+        proc2.waitForProcessOutput(null, stderr)
+        proc3.waitForProcessOutput(stdout, null)
+        if(proc2.exitValue()) {
             throw new JervisException(stderr.toString())
         }
         else {

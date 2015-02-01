@@ -1,8 +1,9 @@
 package jervis.tools
 //the securityIOTest() class automatically sees the securityIO() class because they're in the same package
-import org.junit.*
-import java.nio.file.Path
 import java.nio.file.Files
+import java.nio.file.Path
+import jervis.exceptions.JervisException
+import org.junit.*
 
 class securityIOTest extends GroovyTestCase {
     def security
@@ -111,6 +112,13 @@ class securityIOTest extends GroovyTestCase {
         proc.waitForProcessOutput(stdout, stderr)
         if(proc.exitValue()) {
             throw new IOException(stderr.toString())
+        }
+        //we have removed the jervis_tmp directory so these should fail
+        shouldFail(JervisException) {
+            ciphertext = security.rsaEncrypt("some text")
+        }
+        shouldFail(JervisException) {
+            decodedtext = security.rsaDecrypt("some text")
         }
     }
 }
