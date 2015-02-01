@@ -15,6 +15,7 @@ groovydoc {
   // Create GroovyDoc for Groovy
   source = sourceSets.main.groovy
   windowTitle = "Jervis API Docs"
+  docTitle = "Jervis ${version} API"
   header = '<a href="https://github.com/samrocketman/jervis" target="_blank">github.com/samrocketman/jervis</a>'
   footer = '<a href="https://github.com/samrocketman/jervis" target="_blank">Jervis</a> API documentation was generated at ' + "$time on $date."
   link 'http://download.oracle.com/javase/7/docs/api/', 'java.'
