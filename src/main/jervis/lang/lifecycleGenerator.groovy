@@ -274,7 +274,7 @@ env:
     }
 
     /**
-       A generic function to generate code.
+       A generic function to generate code for different sections of the build script.
        @param header  A header message for the section being generated.
        @param section A section from the build lifecycle.  e.g. before_install, install, before_script, script, etc.
        @return        Code generated from that section in the Jervis YAML, default from the lifecycles file, or returns an empty String.
@@ -308,7 +308,7 @@ env:
     }
 
     /**
-      Generate the before_install shell script based on the Jervis YAML or taking defaults
+      Generate the <tt>before_install</tt> shell script based on the Jervis YAML or taking defaults
       from the lifecycles file.
       @return A portion of a bash script preparing for installing dependencies.
      */
@@ -317,7 +317,7 @@ env:
     }
 
     /**
-      Generate the install shell script based on the Jervis YAML or taking defaults
+      Generate the <tt>install</tt> shell script based on the Jervis YAML or taking defaults
       from the lifecycles file.
       @return A portion of a bash script which will install dependencies.
      */
@@ -326,7 +326,7 @@ env:
     }
 
     /**
-      Generate the before_script shell script based on the Jervis YAML or taking defaults
+      Generate the <tt>before_script</tt> shell script based on the Jervis YAML or taking defaults
       from the lifecycles file.
       @return A portion of a bash script preparing the system for running unit tests.
      */
