@@ -308,8 +308,8 @@ env:
     }
 
     /**
-      Generate the <tt>before_install</tt> shell script based on the Jervis YAML or taking defaults
-      from the lifecycles file.
+      Generate the <tt>before_install</tt> shell script based on the Jervis YAML or
+      taking defaults from the lifecycles file.
       @return A portion of a bash script preparing for installing dependencies.
      */
     public String generateBeforeInstall() {
@@ -317,8 +317,8 @@ env:
     }
 
     /**
-      Generate the <tt>install</tt> shell script based on the Jervis YAML or taking defaults
-      from the lifecycles file.
+      Generate the <tt>install</tt> shell script based on the Jervis YAML or taking
+      defaults from the lifecycles file.
       @return A portion of a bash script which will install dependencies.
      */
     public String generateInstall() {
@@ -326,16 +326,16 @@ env:
     }
 
     /**
-      Generate the <tt>before_script</tt> shell script based on the Jervis YAML or taking defaults
-      from the lifecycles file.
+      Generate the <tt>before_script</tt> shell script based on the Jervis YAML or
+      taking defaults from the lifecycles file.
       @return A portion of a bash script preparing the system for running unit tests.
      */
     public String generateBeforeScript() {
         return this.generateSection('before_script')
     }
     /**
-      Generate the <tt>script</tt> shell script based on the Jervis YAML or taking defaults
-      from the lifecycles file.
+      Generate the <tt>script</tt> shell script based on the Jervis YAML or taking
+      defaults from the lifecycles file.
       @return A portion of a bash script running unit tests.
      */
     public String generateScript() {
