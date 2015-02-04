@@ -333,6 +333,7 @@ env:
     public String generateBeforeScript() {
         return this.generateSection('before_script')
     }
+
     /**
       Generate the <tt>script</tt> shell script based on the Jervis YAML or taking
       defaults from the lifecycles file.
@@ -341,6 +342,7 @@ env:
     public String generateScript() {
         return this.generateSection('script')
     }
+
     /**
       Generate the <tt>after_success</tt> shell script based on the Jervis YAML or
       taking defaults from the lifecycles file.
@@ -349,6 +351,7 @@ env:
     public String generateAfterSuccess() {
         return this.generateSection('after_success')
     }
+
     /**
       Generate the <tt>after_failure</tt> shell script based on the Jervis YAML or
       taking defaults from the lifecycles file.
@@ -357,6 +360,12 @@ env:
     public String generateAfterFailure() {
         return this.generateSection('after_failure')
     }
+
+    /**
+      Generate the <tt>after_script</tt> shell script based on the Jervis YAML or
+      taking defaults from the lifecycles file.
+      @return A shell script which is executed after every build.
+     */
     public String generateAfterScript() {
         return this.generateSection('after_script')
     }
