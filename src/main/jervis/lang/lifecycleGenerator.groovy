@@ -349,6 +349,11 @@ env:
     public String generateAfterSuccess() {
         return this.generateSection('after_success')
     }
+    /**
+      Generate the <tt>after_failure</tt> shell script based on the Jervis YAML or
+      taking defaults from the lifecycles file.
+      @return A shell script which is executed after a failed build.
+     */
     public String generateAfterFailure() {
         return this.generateSection('after_failure')
     }
