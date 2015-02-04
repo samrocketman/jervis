@@ -1,3 +1,5 @@
+@Grab(group='org.yaml', module='snakeyaml', version='1.14')
+
 import jervis.remotes.GitHub
 
 def remote = new GitHub()
