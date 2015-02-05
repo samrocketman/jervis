@@ -2,10 +2,10 @@
 
 import jervis.remotes.GitHub
 
-def remote = new GitHub()
+def git_service = new GitHub()
 
 if("${project}".size() > 0 && "${project}".split('/').length == 2) {
-    println("Generating jobs for " + remote.toString() + " project ${project}.")
+    println("Generating jobs for " + git_service.toString() + " project ${project}.")
 
     project_folder = "${project}".split('/')[0]
     project_name = "${project}".split('/')[1]
@@ -20,7 +20,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
     println("Creating project ${project}")
     view(type: ListView) {
         name("${project}")
-        description(remote.toString() + "Project " + remote.getWebUrl() + "${project}")
+        description(git_service.toString() + "Project " + git_service.getWebUrl() + "${project}")
         filterBuildQueue()
         filterExecutors()
         jobs {
@@ -37,7 +37,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         }
     }
 
-    remote.branches("${project}").each {
+    git_service.branches("${project}").each {
         def branchName = it
         job {
             name("${project_folder}/" + "${project}-${branchName}".replaceAll('/','-'))
@@ -46,15 +46,15 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
                 //for more info about the git closure
                 git {
                     remote {
-                        url(remote.getCloneUrl() + "${project}.git")
+                        url(git_service.getCloneUrl() + "${project}.git")
                     }
                     branch(branchName)
                     shallowClone(true)
-                    switch(remote) {
+                    switch(git_service) {
                         case GitHub:
                             configure { gitHub ->
                                 gitHub / browser(class: "hudson.plugins.git.browser.GithubWeb") {
-                                    url(remote.getWebUrl() + "${project}")
+                                    url(git_service.getWebUrl() + "${project}")
                                 }
                             }
                     }
