@@ -79,26 +79,10 @@ Package jervis.remotes
 </H2>
 
 
-  Contains <tt>remotes</tt> for Jervis to communicate to different sources hosting Git repositories.
-  If writing a remote, then it is required to have at a minimum the following functions.
+  Contains <tt>remotes</tt> for Jervis to communicate to different sources hosting
+  Git repositories.  If writing a remote, be sure to follow the implementation of
+  the <tt>JervisRemote</tt> interface.
 
-  <ul>
-      <li>
-          <tt>String getWebUrl()</tt> returns a base web URL in which to browse code.
-      </li>
-      <li>
-          <tt>String getCloneUrl()</tt> returns a base git URI in which a repository can be cloned.
-      </li>
-      <li>
-          <tt>List branches(String project)</tt> returns a <tt>List</tt> where each element is a branch in the project.
-      </li>
-      <li>
-          <tt>String getFile(String project, String file_path, String ref)</tt> returns a <tt>String</tt> which contains the contents of the file requested.
-      </li>
-      <li>
-          <tt>String toString()</tt> returns a human readable <tt>String</tt> for this type of remote.
-      </li>
-  </ul>
   <p>
   This allows remotes to be interchangeable.  Jervis will call only those functions to interact with a remote.
   See the <tt>GitHub</tt> class as an example for the implementation of a remote.
@@ -109,6 +93,25 @@ Package jervis.remotes
 <P>&nbsp;</P>
 
 
+
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#90DDF7" CLASS="TableHeadingColor">
+    <TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+    <B>Interface Summary</B></FONT></TH>
+    </TR>
+
+        <TR BGCOLOR="white" CLASS="TableRowColor">
+        <TD WIDTH="15%"><B><A HREF="JervisRemote.html" title="class in jervis/remotes">JervisRemote</A></B></TD>
+        <TD>Provides a minimum standard interface a Jervis remote requires.  </TD>
+        </TR>
+
+</TABLE>
+&nbsp;
+<P>
+<DL>
+</DL>
+<hr>
+    
 
 
 <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
@@ -135,7 +138,7 @@ Package jervis.remotes
 
 
 
-<p><a href="https://github.com/samrocketman/jervis" target="_blank">Jervis</a> API documentation was generated at 22:19 (GMT-0500) on January 13, 2015.</p>
+<p><a href="https://github.com/samrocketman/jervis" target="_blank">Jervis</a> API documentation was generated at 19:55 (GMT-0500) on February 04, 2015.</p>
 <hr>
 </body>
 </html>
