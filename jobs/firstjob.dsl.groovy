@@ -24,7 +24,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         filterBuildQueue()
         filterExecutors()
         jobs {
-            regex("^" + "${project}".replaceAll('/','-') + ".*")
+            regex("^" + "${project_name}".replaceAll('/','-') + ".*")
         }
         columns {
             status()
@@ -40,7 +40,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
     git_service.branches("${project}").each {
         def branchName = it
         job {
-            name("${project_folder}/" + "${project}-${branchName}".replaceAll('/','-'))
+            name("${project_folder}/" + "${project_name}-${branchName}".replaceAll('/','-'))
             scm {
                 //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
                 //for more info about the git closure
