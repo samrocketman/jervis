@@ -28,19 +28,19 @@ dependencies {
 sourceSets {
     main {
         groovy {
-            srcDir 'src/main'
+            srcDir 'src/main/groovy'
         }
         resources {
-            srcDir 'src/resources'
+            srcDir 'src/main/resources'
         }
     }
 
     test {
         groovy {
-            srcDir 'src/test'
+            srcDir 'src/test/groovy'
         }
         resources {
-            srcDirs = ['src/resources', 'src/testResources']
+            srcDirs = ['src/main/resources', 'src/test/resources']
         }
     }
 }
