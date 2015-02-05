@@ -54,44 +54,6 @@ sub-bullet.
     seasoned build engineer and attempting to fill this gap in the Jenkins
     ecosystem.
 
-# Building Jervis
-
-## Dependencies
-
-Groovy and Gradle must be installed.  Here are some of my system components.
-
-* Gradle 1.4
-* Groovy 1.8.6
-* JVM 1.7.0\_65 (Oracle Corporation 24.65-b04)
-
-## Build
-
-Assemble dependencies.
-
-    ./gradlew assemble
-
-Run unit tests.
-
-    ./gradlew check
-
-Create a `jervis.jar` (only useful if using Jervis as a library class for your
-own development).
-
-    ./gradlew build
-
-Generate Jervis API documentation.  See the documentation in
-`build/docs/groovydoc/`.
-
-    ./gradlew groovydoc
-
-Generate a test coverage report.  See the report in `build/reports/cobertura`.
-
-    ./gradlew cobertura
-
-Test against another version of groovy.
-
-    GROOVY_VERSION="2.2.2" ./gradlew check
-
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jervis-wiki]: https://github.com/samrocketman/jervis/wiki
