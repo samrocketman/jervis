@@ -5,7 +5,7 @@ import jervis.remotes.GitHub
 def remote = new GitHub()
 
 if("${project}".size() > 0 && "${project}".split('/').length == 2) {
-println("Generating jobs for " + remote.type() + " project ${project}.")
+println("Generating jobs for " + remote.toString() + " project ${project}.")
 
 project_folder = "${project}".split('/')[0]
 project_name = "${project}".split('/')[1]
@@ -20,7 +20,7 @@ if(! new File("${JENKINS_HOME}/jobs/${project_folder}/config.xml").exists()) {
 println("Creating project ${project}")
 view(type: ListView) {
     name("${project}")
-    description(remote.type() + "Project " + remote.getWebEndpoint() + "${project}")
+    description(remote.toString() + "Project " + remote.getWebEndpoint() + "${project}")
     filterBuildQueue()
     filterExecutors()
     jobs {
