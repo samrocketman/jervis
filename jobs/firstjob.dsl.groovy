@@ -20,7 +20,7 @@ if(! new File("${JENKINS_HOME}/jobs/${project_folder}/config.xml").exists()) {
 println("Creating project ${project}")
 view(type: ListView) {
     name("${project}")
-    description(remote.toString() + "Project " + remote.getWebEndpoint() + "${project}")
+    description(remote.toString() + "Project " + remote.getWebUrl() + "${project}")
     filterBuildQueue()
     filterExecutors()
     jobs {
@@ -54,7 +54,7 @@ remote.branches("${project}").each {
                     case GitHub:
                         configure { gitHub ->
                             gitHub / browser(class: "hudson.plugins.git.browser.GithubWeb") {
-                                url(remote.getWebEndpoint() + "${project}")
+                                url(remote.getWebUrl() + "${project}")
                             }
                         }
                 }
