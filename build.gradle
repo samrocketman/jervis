@@ -25,26 +25,6 @@ dependencies {
     testCompile 'junit:junit:4.11'
 }
 
-sourceSets {
-    main {
-        groovy {
-            srcDir 'src/main/groovy'
-        }
-        resources {
-            srcDir 'src/main/resources'
-        }
-    }
-
-    test {
-        groovy {
-            srcDir 'src/test/groovy'
-        }
-        resources {
-            srcDirs = ['src/main/resources', 'src/test/resources']
-        }
-    }
-}
-
 test {
   // show standard out and standard error of the test JVM(s) on the console
   testLogging.showStandardStreams = true
@@ -73,7 +53,6 @@ cobertura {
     coverageFormats = ['html', 'xml']
     coverageIgnoreTrivial = true
     coverageIgnores = ['org.slf4j.Logger.*']
-    coverageReportDir = new File("$buildDir/reports/cobertura")
     coverageExcludes = ['.*package-info.*', '.*jervis\\.exceptions\\..*']
 
     //coberturaCheck values 80% (./gradlew coberturaCheck test)
