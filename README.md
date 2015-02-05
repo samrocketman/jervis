@@ -54,6 +54,11 @@ sub-bullet.
     seasoned build engineer and attempting to fill this gap in the Jenkins
     ecosystem.
 
+# Set up
+
+Refer to the [Job DSL example project][dsl-e.g.].
+
+[dsl-e.g.]: https://github.com/sheehan/job-dsl-gradle-example
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jervis-wiki]: https://github.com/samrocketman/jervis/wiki
