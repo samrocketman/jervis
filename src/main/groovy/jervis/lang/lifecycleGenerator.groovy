@@ -369,6 +369,13 @@ env:
     public String generateAfterScript() {
         return this.generateSection('after_script')
     }
+    /**
+      Generate the build script which would be used in the Jenkins step.  This
+      function combines the output of: <tt>generateToolchainSection()</tt>,
+      <tt>generateBeforeInstall()</tt>, <tt>generateInstall()</tt>,
+      <tt>generateBeforeScript() </tt>, and <tt>generateScript()</tt>.
+      @return A shell script which is used to build the application in Jervis.
+     */
     public String generateAll() {
         ArrayList script = [
             generateToolchainSection(),
