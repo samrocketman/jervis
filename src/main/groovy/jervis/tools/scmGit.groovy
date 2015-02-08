@@ -1,5 +1,7 @@
 package jervis.tools
 
+import jervis.exceptions.JervisException
+
 /**
    A class to provide useful functions for interacting with a local git repository.
 
@@ -45,8 +47,14 @@ class scmGit {
       <pre><tt>git rev-parse --show-toplevel</tt></pre><br>
      */
     public void setRoot() {
-        def process = "${mygit} rev-parse --show-toplevel".execute()
-        git_root = process.text.trim()
+        def stdout = new StringBuilder()
+        def stderr = new StringBuilder()
+        def process = [mygit, "rev-parse", "--show-toplevel"].execute()
+        process.waitForProcessOutput(stdout, stderr)
+        if(process.exitValue()) {
+            throw new JervisException(stderr.toString())
+        }
+        git_root = stdout.toString().trim()
     }
 
     /**
