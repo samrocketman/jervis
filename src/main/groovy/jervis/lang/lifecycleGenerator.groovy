@@ -106,9 +106,9 @@ class lifecycleGenerator {
       toolchains file from the resources directory.
      */
     def lifecycleGenerator() {
-        def git = new scmGit()
-        this.loadLifecycles("${git.getRoot()}/src/main/resources/lifecycles.json")
-        this.loadToolchains("${git.getRoot()}/src/main/resources/toolchains.json")
+        //def git = new scmGit()
+        //this.loadLifecycles("${git.getRoot()}/src/main/resources/lifecycles.json")
+        //this.loadToolchains("${git.getRoot()}/src/main/resources/toolchains.json")
     }
 
     /**
