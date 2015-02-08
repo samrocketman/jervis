@@ -1,7 +1,8 @@
 @Grab(group='org.yaml', module='snakeyaml', version='1.14')
 
-import jervis.remotes.GitHub
 import jervis.lang.lifecycleGenerator
+import jervis.remotes.GitHub
+import jervis.tools.scmGit
 
 def git_service = new GitHub()
 
@@ -38,10 +39,14 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         }
     }
 
+    def git = new scmGit()
+
     git_service.branches("${project}").each {
         def JERVIS_BRANCH = it
         def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
         def generator = new lifecycleGenerator()
+        generator.loadLifecycles("${git.getRoot()}/src/main/resources/lifecycles.json")
+        generator.loadToolchains("${git.getRoot()}/src/main/resources/toolchains.json")
         if(".jervis.yml" in folder_listing) {
             generator.loadYaml(git_service.getFile(project, "/.jervis.yml", JERVIS_BRANCH))
         }
