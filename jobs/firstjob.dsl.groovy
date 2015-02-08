@@ -40,6 +40,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
     }
 
     def git = new scmGit()
+    print 'Git root: '
     println git.getRoot()
 
     git_service.branches("${project}").each {
