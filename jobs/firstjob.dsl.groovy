@@ -6,6 +6,7 @@ import jervis.tools.scmGit
 
 
 println "The current working directory is: ${new File(".").getAbsolutePath()}"
+println System.getenv("WORKSPACE")
 
 def git_service = new GitHub()
 
