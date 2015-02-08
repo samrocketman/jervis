@@ -1,6 +1,7 @@
 @Grab(group='org.yaml', module='snakeyaml', version='1.14')
 
 import jervis.remotes.GitHub
+import jervis.lang.lifecycleGenerator
 
 def git_service = new GitHub()
 
@@ -38,9 +39,22 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
     }
 
     git_service.branches("${project}").each {
-        def branchName = it
+        def JERVIS_BRANCH = it
+        def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
+        def generator = new lifecycleGenerator()
+        if(".jervis.yml" in folder_listing) {
+            generator.loadYaml(git_service.getFile(project, "/.jervis.yml", JERVIS_BRANCH))
+        }
+        else if(".travis.yml" in folder_listing) {
+            generator.loadYaml(git_service.getFile(project, "/.travis.yml", JERVIS_BRANCH))
+        }
+        else {
+            //skip creating the job for this branch
+            return
+        }
+        generator.folder_listing = folder_listing
         job {
-            name("${project_folder}/" + "${project_name}-${branchName}".replaceAll('/','-'))
+            name("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-'))
             scm {
                 //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
                 //for more info about the git closure
@@ -48,7 +62,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
                     remote {
                         url(git_service.getCloneUrl() + "${project}.git")
                     }
-                    branch(branchName)
+                    branch(JERVIS_BRANCH)
                     shallowClone(true)
                     switch(git_service) {
                         case GitHub:
@@ -61,7 +75,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
                 }
             }
             steps {
-                shell("echo 'Hello world! ${project}/${branchName}'")
+                shell(generator.generateAll())
             }
         }
     }
