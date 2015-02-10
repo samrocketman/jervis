@@ -5,7 +5,6 @@ import jervis.exceptions.UnsupportedLanguageException
 import jervis.exceptions.UnsupportedToolException
 import jervis.lang.lifecycleValidator
 import jervis.lang.toolchainValidator
-import jervis.tools.scmGit
 import org.yaml.snakeyaml.Yaml
 
 /**
@@ -99,16 +98,6 @@ class lifecycleGenerator {
                 current_key = null
             }
         }
-    }
-
-    /**
-      The default class instantiator which loads the repository lifecycles and
-      toolchains file from the resources directory.
-     */
-    def lifecycleGenerator() {
-        //def git = new scmGit()
-        //this.loadLifecycles("${git.getRoot()}/src/main/resources/lifecycles.json")
-        //this.loadToolchains("${git.getRoot()}/src/main/resources/toolchains.json")
     }
 
     /**
