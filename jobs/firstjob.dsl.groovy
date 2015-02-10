@@ -10,7 +10,6 @@ println System.getenv("WORKSPACE")
 println ""
 println readFileFromWorkspace('src/main/resources/lifecycles.json').toString()
 
-/*
 def git_service = new GitHub()
 
 if("${project}".size() > 0 && "${project}".split('/').length == 2) {
@@ -46,16 +45,12 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         }
     }
 
-    def git = new scmGit()
-    print 'Git root: '
-    println git.getRoot()
-
     git_service.branches("${project}").each {
         def JERVIS_BRANCH = it
         def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
         def generator = new lifecycleGenerator()
-        generator.loadLifecycles("${git.getRoot()}/src/main/resources/lifecycles.json")
-        generator.loadToolchains("${git.getRoot()}/src/main/resources/toolchains.json")
+        generator.loadLifecycles(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
+        generator.loadToolchains(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
         if(".jervis.yml" in folder_listing) {
             generator.loadYaml(git_service.getFile(project, "/.jervis.yml", JERVIS_BRANCH))
         }
@@ -97,4 +92,3 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
 else {
     throw new ScriptException('Job parameter "project" must be specified correctly!  It\'s value is a GitHub project in the form of ${namespace}/${project}.  For example, the value for the jenkinsci organization jenkins project would be set as "jenkinsci/jenkins".')
 }
-*/
