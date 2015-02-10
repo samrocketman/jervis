@@ -5,11 +5,6 @@ import jervis.remotes.GitHub
 import jervis.tools.scmGit
 
 
-println "The current working directory is: ${new File(".").getAbsolutePath()}"
-println System.getenv("WORKSPACE")
-println ""
-println readFileFromWorkspace('src/main/resources/lifecycles.json').toString()
-
 def git_service = new GitHub()
 
 if("${project}".size() > 0 && "${project}".split('/').length == 2) {
