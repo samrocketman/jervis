@@ -47,10 +47,10 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         generator.loadLifecyclesString(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
         generator.loadToolchainsString(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
         if(".jervis.yml" in folder_listing) {
-            generator.loadYaml(git_service.getFile(project, "/.jervis.yml", JERVIS_BRANCH))
+            generator.loadYaml(git_service.getFile(project, ".jervis.yml", JERVIS_BRANCH))
         }
         else if(".travis.yml" in folder_listing) {
-            generator.loadYaml(git_service.getFile(project, "/.travis.yml", JERVIS_BRANCH))
+            generator.loadYaml(git_service.getFile(project, ".travis.yml", JERVIS_BRANCH))
         }
         else {
             //skip creating the job for this branch
