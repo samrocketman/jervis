@@ -2,7 +2,6 @@
 
 import jervis.lang.lifecycleGenerator
 import jervis.remotes.GitHub
-import jervis.tools.scmGit
 
 
 def git_service = new GitHub()
