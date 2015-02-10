@@ -14,7 +14,7 @@ import jervis.exceptions.LifecycleValidationException
 import jervis.tools.scmGit
 def git = new scmGit()
 def lifecycles = new lifecycleValidator()
-lifecycles.load_JSON(git.getRoot() + "/src/resources/lifecycles.json")
+lifecycles.load_JSON(git.getRoot() + "/src/main/resources/lifecycles.json")
 println "Does the file validate? " + lifecycles.validate()
 println "Supported languages include:"
 //print out a sorted ArrayList of supported languages
