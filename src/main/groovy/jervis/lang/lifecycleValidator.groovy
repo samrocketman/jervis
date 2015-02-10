@@ -36,11 +36,27 @@ class lifecycleValidator {
     def languages
 
     /**
-      Load the JSON of a lifecycles file and parse it.  This should be the first function called after class instantiation.  It populates <tt>{@link #lifecycles}</tt> and <tt>{@link #languages}</tt>.
+      Load the JSON of a lifecycles file and parse it.  This should be the first
+      function called after class instantiation.  Alternately,
+      <tt>{@link #load_JSONString()}</tt> can be called instead.  It populates
+      <tt>{@link #lifecycles}</tt> and <tt>{@link #languages}</tt>.
       @param file A <tt>String</tt> which is a path to a lifecycles file.
      */
     public void load_JSON(String file) {
         lifecycles = new groovy.json.JsonSlurper().parse(new File(file).newReader())
+        languages = lifecycles.keySet() as String[];
+    }
+
+    /**
+      Parse the JSON which is the contents of a lifecycles file.  It populates
+      <tt>{@link #lifecycles}</tt> and <tt>{@link #languages}</tt>.  This is required
+      in order to use the
+      <a href="https://github.com/samrocketman/jervis/issues/43#issuecomment-73638215" target="_blank"><tt>readFileFromWorkspace</tt></a>
+      method from the Jenkins Job DSL Plugin.
+      @param json A <tt>String</tt> the contents of a lifecycles file.
+     */
+    public void load_JSONString(String json) {
+        lifecycles = new groovy.json.JsonSlurper().parseText(json)
         languages = lifecycles.keySet() as String[];
     }
 
