@@ -114,10 +114,8 @@ class lifecycleGenerator {
     /**
       Load a lifecycles file so that default scripts can be generated.  Lifecycles
       provide the build portions of the script.  This project comes with a lifecycles
-      file which gets loaded by default when you instantiate this class.  The path to
-      the lifecycles in this repository relative to the repository root is
-      <tt>/src/resources/lifecycles.json</tt>.  This can be overridden by calling
-      this method.
+      file.  The lifecycles file in this repository relative to the repository root is
+      <tt>/src/main/resources/lifecycles.json</tt>.
 
       @param file A path to a lifecycles file.
      */
@@ -128,12 +126,25 @@ class lifecycleGenerator {
     }
 
     /**
+      Load a lifecycles JSON <tt>String</tt> so that default scripts can be generated.
+      Lifecycles provide the build portions of the script.  This project comes with a
+      lifecycles file.  The lifecycles file in this repository relative to the
+      repository root is <tt>/src/main/resources/lifecycles.json</tt>.
+
+      @param json A <tt>String</tt> containing JSON which is from a lifecycles file.
+     */
+    public void loadLifecyclesString(String json) {
+        this.lifecycle_obj = new lifecycleValidator()
+        this.lifecycle_obj.load_JSONString(json)
+        this.lifecycle_obj.validate()
+    }
+
+    /**
       Load a toolchains file so that default scripts can be generated.  Toolchains
       provide the default tool setup of the script (e.g. what version of Java will be
-      used).  This project comes with a toolchains file which gets loaded by default
-      when you instantiate this class.  The path to the toolchains in this repository
-      relative to the repository root os <tt>/src/resources/toolchains.json</tt>.
-      This can be overridden by calling this method.
+      used).  This project comes with a toolchains file.  The toolchains file in this
+      repository relative to the repository root is
+      <tt>/src/main/resources/toolchains.json</tt>.
 
       @param file A path to a toolchains file.
      */
@@ -142,6 +153,22 @@ class lifecycleGenerator {
         this.toolchain_obj.load_JSON(file)
         this.toolchain_obj.validate()
     }
+
+    /**
+      Load a toolchains JSON <tt>String</tt> so that default scripts can be generated.
+      Toolchains provide the default tool setup of the script (e.g. what version of
+      Java will be used).  This project comes with a toolchains file.  The toolchains
+      file in this repository relative to the repository root is
+      <tt>/src/main/resources/toolchains.json</tt>.
+
+      @param json A <tt>String</tt> containing JSON which is from a toolchains file.
+     */
+    public void loadToolchainsString(String json) {
+        this.toolchain_obj = new toolchainValidator()
+        this.toolchain_obj.load_JSONString(json)
+        this.toolchain_obj.validate()
+    }
+
     /**
       Load Jervis YAML to be interpreted.  This YAML will be used to generate the build scripts and components of a Jenkins job.
      */
