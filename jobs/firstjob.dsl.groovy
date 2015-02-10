@@ -7,7 +7,10 @@ import jervis.tools.scmGit
 
 println "The current working directory is: ${new File(".").getAbsolutePath()}"
 println System.getenv("WORKSPACE")
+println ""
+println readFileFromWorkspace('src/main/resources/lifecycles.json').toString()
 
+/*
 def git_service = new GitHub()
 
 if("${project}".size() > 0 && "${project}".split('/').length == 2) {
@@ -94,3 +97,4 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
 else {
     throw new ScriptException('Job parameter "project" must be specified correctly!  It\'s value is a GitHub project in the form of ${namespace}/${project}.  For example, the value for the jenkinsci organization jenkins project would be set as "jenkinsci/jenkins".')
 }
+*/
