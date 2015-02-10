@@ -44,8 +44,8 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         def JERVIS_BRANCH = it
         def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
         def generator = new lifecycleGenerator()
-        generator.loadLifecycles(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
-        generator.loadToolchains(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
+        generator.loadLifecyclesString(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
+        generator.loadToolchainsString(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
         if(".jervis.yml" in folder_listing) {
             generator.loadYaml(git_service.getFile(project, "/.jervis.yml", JERVIS_BRANCH))
         }
