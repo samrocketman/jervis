@@ -88,7 +88,7 @@ class GitHub implements JervisRemote {
     private fetch(String addr) {
         def json = new JsonSlurper()
         if(this.gh_token) {
-            return json.parse(new URL(addr).newReader(requestProperties: ["Authorization": "token ${this.gh_token}".toString(), "Accept": "application/json"]))
+            return json.parse(new URL(addr).newReader(requestProperties: ["Authorization": "token ${this.gh_token}".toString(), "Accept": "application/vnd.github.v3+json"]))
         }
         else {
             return json.parse(new URL(addr).newReader())
