@@ -22,7 +22,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
     println("Creating project ${project}")
     view(type: ListView) {
         name("${project}")
-        description(git_service.toString() + "Project " + git_service.getWebUrl() + "${project}")
+        description(git_service.toString() + " Project " + git_service.getWebUrl() + "${project}")
         filterBuildQueue()
         filterExecutors()
         jobs {
