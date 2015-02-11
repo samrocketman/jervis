@@ -13,7 +13,7 @@ import org.yaml.snakeyaml.Yaml
   <h2>Sample usage</h2>
 <pre><tt>import jervis.lang.lifecycleGenerator
 def x = new lifecycleGenerator()
-x.loadYaml('language: ruby\nrvm: 2.1.0\njdk: oraclejdk8')
+x.loadYamlString('language: ruby\nrvm: 2.1.0\njdk: oraclejdk8')
 x.folder_listing = ['Gemfile.lock']
 println x.generateAll()
 </tt></pre>
@@ -50,7 +50,7 @@ class lifecycleGenerator {
       conditionally generated depending on build tool is being used.  This way we can
       do neat things like generate different script output depending on if there's a
       <tt>build.gradle</tt>, <tt>pom.xml</tt>, or <tt>build.xml</tt>.
-      <tt>{@link #loadYaml()}</tt> should be called before this.
+      <tt>{@link #loadYamlString()}</tt> should be called before this.
      */
     ArrayList folder_listing
 
@@ -66,13 +66,13 @@ class lifecycleGenerator {
       <tt>listing</tt> conditionally sets <tt>{@link #lifecycle_key}</tt>.  This uses
       the <tt>fileExistsCondition</tt> and <tt>fallbackKey</tt> from the lifecycles
       file to determine the contents of <tt>lifecycle_key</tt>.
-      <tt>{@link #loadYaml()}</tt> should be called before this.
+      <tt>{@link #loadYamlString()}</tt> should be called before this.
       @param listing An <tt>ArrayList</tt> which is a list of files from a directory
                      path in a repository.
      */
     void setFolder_listing(ArrayList listing) {
         if(!yaml_language) {
-            throw new JervisException("Must call loadYaml() first.")
+            throw new JervisException("Must call loadYamlString() first.")
         }
         folder_listing = listing
         String current_key = lifecycle_obj.lifecycles[yaml_language].defaultKey
@@ -161,7 +161,7 @@ class lifecycleGenerator {
     /**
       Load Jervis YAML to be interpreted.  This YAML will be used to generate the build scripts and components of a Jenkins job.
      */
-    public void loadYaml(String raw_yaml) {
+    public void loadYamlString(String raw_yaml) {
         def yaml = new Yaml()
         this.jervis_yaml = yaml.load(raw_yaml)
         this.yaml_language = this.jervis_yaml['language']
