@@ -25,14 +25,14 @@ class securityIO {
     /**
       Path to the RSA private key.  This will be used by encryptiong and decryption.
       During key generation it is the location where the private key will be written.
-      Default: <tt>{@link jervis.tools.scmGit#getRoot()} + "/id_rsa.pem"</tt>
+      Default: <tt>/tmp/id_rsa.pem</tt>
      */
     public String id_rsa_priv
 
     /**
       Path to the RSA public key.  This will be used by encryptiong and decryption.
       During key generation it is the location where the public key will be written.
-      Default: <tt>{@link jervis.tools.scmGit#getRoot()} + "/id_rsa.pub.pem"</tt>
+      Default: <tt>/tmp/id_rsa.pub.pem</tt>
      */
     public String id_rsa_pub
 
@@ -52,8 +52,7 @@ class securityIO {
       Instantiates default values for <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, and <tt>{@link #id_rsa_keysize}</tt>.
      */
     def securityIO() {
-        def git = new scmGit()
-        set_vars(git.getRoot() + '/id_rsa.pem', git.getRoot() + '/id_rsa.pub.pem', default_key_size)
+        set_vars('/tmp/id_rsa.pem', '/tmp/id_rsa.pub.pem', default_key_size)
     }
 
     /**
@@ -61,8 +60,7 @@ class securityIO {
       <tt>{@link #id_rsa_keysize}</tt> is set using <tt>keysize</tt>.
      */
     def securityIO(int keysize) {
-        def git = new scmGit()
-        set_vars(git.getRoot() + '/id_rsa.pem', git.getRoot() + '/id_rsa.pub.pem', keysize)
+        set_vars('/tmp/id_rsa.pem', '/tmp/id_rsa.pub.pem', keysize)
     }
 
     /**

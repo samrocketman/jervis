@@ -18,16 +18,14 @@ class securityIOTest extends GroovyTestCase {
         security = null
     }
     @Test public void test_securityIO_init_default() {
-        def git = new scmGit()
-        assert git.getRoot() + '/id_rsa.pem' == security.id_rsa_priv
-        assert git.getRoot() + '/id_rsa.pub.pem' == security.id_rsa_pub
+        assert '/tmp/id_rsa.pem' == security.id_rsa_priv
+        assert '/tmp/id_rsa.pub.pem' == security.id_rsa_pub
         assert security.default_key_size == security.id_rsa_keysize
     }
     @Test public void test_securityIO_init_key() {
         security = new securityIO(4096)
-        def git = new scmGit()
-        assert git.getRoot() + '/id_rsa.pem' == security.id_rsa_priv
-        assert git.getRoot() + '/id_rsa.pub.pem' == security.id_rsa_pub
+        assert '/tmp/id_rsa.pem' == security.id_rsa_priv
+        assert '/tmp/id_rsa.pub.pem' == security.id_rsa_pub
         assert 4096 == security.id_rsa_keysize
     }
     @Test public void test_securityIO_init_path() {
