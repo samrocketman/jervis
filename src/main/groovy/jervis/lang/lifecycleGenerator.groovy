@@ -218,6 +218,24 @@ env:
     }
 
     /**
+      Get a value for a given axis for matrix building.  Each matrix job has multiple
+      axes.  This function is designed to return the value of the axis if given a
+      name.
+
+      @param axis A matrix building axis.  e.g. <tt>env</tt>
+      @return A <tt>String</tt> which is the value of the given axis in a matrix build.
+     */
+    public String getAxisValue(String axis) {
+        String result = ""
+        int counter = 0
+        jervis_yaml[axis].each {
+            result += " ${counter}"
+            counter++
+        }
+        result.trim()
+    }
+
+    /**
       Interpolate <tt>${jervis_toolchain_ivalue}</tt> on an ArrayList of strings.
       This is mostly used by the <tt>{@link #generateToolchainSection()}</tt> function.
       @param  cmds   A list of strings which contain bash commands.
@@ -257,6 +275,11 @@ env:
                 }
                 //check if a matrix build
                 if(user_toolchain.size() > 1) {
+                    for(int i=0; i < user_toolchain.size(); i++) {
+                        if(!toolchain_obj.supportedTool(toolchain, user_toolchain[i])) {
+                            throw new UnsupportedToolException("${toolchain}: ${user_toolchain[i]}")
+                        }
+                    }
                 }
                 else {
                     //not a matrix build
