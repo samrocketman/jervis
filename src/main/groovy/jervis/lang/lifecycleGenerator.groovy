@@ -166,6 +166,12 @@ class lifecycleGenerator {
         this.jervis_yaml = yaml.load(raw_yaml)
         this.yaml_language = this.jervis_yaml['language']
         this.yaml_keys = this.jervis_yaml.keySet() as String[]
+        if(!lifecycle_obj) {
+            throw new JervisException("ERROR: Must call lifecycleGenerator.loadLifecycles() or lifecycleGenerator.loadLifecyclesString() first.")
+        }
+        if(!toolchain_obj) {
+            throw new JervisException("ERROR: Must call lifecycleGenerator.loadToolchains() or lifecycleGenerator.loadToolchainsString() first.")
+        }
         if(!lifecycle_obj.supportedLanguage(this.yaml_language) || !toolchain_obj.supportedLanguage(this.yaml_language)) {
             throw new UnsupportedLanguageException(this.yaml_language)
         }
@@ -194,9 +200,8 @@ env:
       @return <tt>true</tt> if a matrix build will be generated or <tt>false</tt> if it will just be a regular build.
      */
     public Boolean isMatrixBuild() {
-        def keys = jervis_yaml.keySet() as String[]
         Boolean result=false
-        keys.each{
+        yaml_keys.each{
             if(toolchain_obj.supportedMatrix(yaml_language, it)) {
                 if(jervis_yaml[it] instanceof ArrayList && jervis_yaml[it].size() > 1) {
                      result=true
@@ -215,6 +220,9 @@ env:
       @return A <tt>String</tt> which is a simple groovy expression.
      */
     public String excludeFilter() {
+    }
+
+    public ArrayList getAxes() {
     }
 
     /**
