@@ -247,11 +247,16 @@ env:
     public String getAxisValue(String axis) {
         String result = ""
         int counter = 0
-        jervis_yaml[axis].each {
-            result += " ${counter}"
-            counter++
+        if(axis in yaml_axes) {
+            jervis_yaml[axis].each {
+                result += " ${counter}"
+                counter++
+            }
+            return result.trim()
         }
-        result.trim()
+        else {
+            return ""
+        }
     }
 
     /**
