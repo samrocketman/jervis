@@ -12,10 +12,14 @@ import org.yaml.snakeyaml.Yaml
 
   <h2>Sample usage</h2>
 <pre><tt>import jervis.lang.lifecycleGenerator
-def x = new lifecycleGenerator()
-x.loadYamlString('language: ruby\nrvm: 2.1.0\njdk: oraclejdk8')
-x.folder_listing = ['Gemfile.lock']
-println x.generateAll()
+import jervis.tools.scmGit
+def git = new scmGit()
+def generator = new lifecycleGenerator()
+generator.loadLifecycles(git.getRoot() + "/src/main/resources/lifecycles.json")
+generator.loadToolchains(git.getRoot() + "/src/main/resources/toolchains.json")
+generator.loadYamlString('language: ruby\nrvm: ["1.9.3", "2.1.0"]\njdk: oraclejdk8')
+generator.folder_listing = ['Gemfile.lock']
+generator.generateAll()
 </tt></pre>
  */
 class lifecycleGenerator {
@@ -298,12 +302,22 @@ env:
                     user_toolchain = jervis_yaml[toolchain]
                 }
                 //check if a matrix build
-                if(user_toolchain.size() > 1) {
+                if(toolchain in yaml_axes) {
+                    output += "case \${${toolchain}} in\n"
                     for(int i=0; i < user_toolchain.size(); i++) {
                         if(!toolchain_obj.supportedTool(toolchain, user_toolchain[i])) {
                             throw new UnsupportedToolException("${toolchain}: ${user_toolchain[i]}")
                         }
+                        output += "  ${i})\n"
+                        if(user_toolchain[i] in toolchain_keys) {
+                            output += '    ' + toolchain_obj.toolchains[toolchain][user_toolchain[i]].join('\n    ') + '\n    ;;\n'
+                        }
+                        else {
+                            //assume using "*" key
+                            output += '    ' + this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], user_toolchain[i]).join('\n    ') + '\n    ;;\n'
+                        }
                     }
+                    output += 'esac\n'
                 }
                 else {
                     //not a matrix build
