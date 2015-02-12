@@ -36,6 +36,11 @@ class lifecycleGenerator {
     String[] yaml_keys
 
     /**
+      A quick access variable for matrix build axes.
+     */
+    ArrayList yaml_axes
+
+    /**
       An instance of the <tt>{@link jervis.lang.lifecycleValidator}</tt> class which has loaded a lifecycles file.
      */
     def lifecycle_obj
@@ -178,6 +183,15 @@ class lifecycleGenerator {
         //avoid throwing a NullPointer exception if the user forgets to call obj.folder_listing to load a list of files.
         //just load an empty file list by default initially that can then be overridden.
         this.setFolder_listing([])
+        //configure the matrix axes if it is a matrix build i.e. set yaml_axes
+        if(this.isMatrixBuild()) {
+            this.yaml_axes = []
+            toolchain_obj.toolchains["toolchains"][yaml_language].each {
+                if((it != null) && (jervis_yaml[it] instanceof ArrayList) && (jervis_yaml[it].size() > 1)) {
+                    this.yaml_axes << it
+                }
+            }
+        }
     }
 
     /**
@@ -220,9 +234,6 @@ env:
       @return A <tt>String</tt> which is a simple groovy expression.
      */
     public String excludeFilter() {
-    }
-
-    public ArrayList getAxes() {
     }
 
     /**
