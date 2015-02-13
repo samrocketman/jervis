@@ -17,9 +17,30 @@ def git = new scmGit()
 def generator = new lifecycleGenerator()
 generator.loadLifecycles(git.getRoot() + "/src/main/resources/lifecycles.json")
 generator.loadToolchains(git.getRoot() + "/src/main/resources/toolchains.json")
-generator.loadYamlString('language: ruby\nrvm: ["1.9.3", "2.1.0"]\njdk: oraclejdk8')
+generator.loadYamlString("""
+language: ruby
+env:
+ - hello=world three=four
+ - hello=test three=five
+rvm: ["1.9.3", "2.1.0", "2.0.0"]
+jdk: oraclejdk8
+matrix:
+  exclude:
+    - env: hello=world three=four
+      rvm: 2.1.0
+    - rvm: 1.9.3
+  include:
+    - rvm: 2.1.0
+    - rvm: 2.0.0
+      env: hello=test three=five
+""")
 generator.folder_listing = ['Gemfile.lock']
-generator.generateAll()
+println "Exclude filter is..."
+println generator.matrixExcludeFilter()
+println "Matrix axis value for env is..."
+println generator.matrixGetAxisValue('env')
+println "Generating the matrix build script."
+println generator.generateAll()
 </tt></pre>
  */
 class lifecycleGenerator {
