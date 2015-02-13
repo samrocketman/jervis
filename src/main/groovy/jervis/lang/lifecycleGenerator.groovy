@@ -240,6 +240,82 @@ env:
       @return A <tt>String</tt> which is a simple groovy expression.
      */
     public String matrixExcludeFilter() {
+        Map matrix = jervis_yaml["matrix"]
+        String result = ''
+        if('exclude' in matrix) {
+            for(int i=0; i < matrix['exclude'].size(); i++) {
+                String temp = '!('
+                matrix['exclude'][i].each { k, v ->
+                    if(jervis_yaml[k]) {
+                        if(temp == '!(') {
+                            temp += "${k} == ${jervis_yaml[k].indexOf(v)}"
+                        }
+                        else {
+                            temp += " && ${k} == ${jervis_yaml[k].indexOf(v)}"
+                        }
+                    }
+                    else {
+                        //discard because something was nil
+                        temp = '-1'
+                    }
+                }
+                temp += ')'
+                if(temp.indexOf('-1') < 0) {
+                    if(result != '') {
+                        result += " && ${temp}"
+                    }
+                    else {
+                        result = temp
+                    }
+                }
+            }
+        }
+        if('include' in matrix) {
+            String includeString = '('
+            Boolean first = true
+            for(int i=0; i < matrix['include'].size(); i++) {
+                String temp = '('
+                matrix['include'][i].each { k, v ->
+                    if(jervis_yaml[k]) {
+                        if(temp == '(') {
+                            temp += "${k} == ${jervis_yaml[k].indexOf(v)}"
+                        }
+                        else {
+                            temp += " && ${k} == ${jervis_yaml[k].indexOf(v)}"
+                        }
+                    }
+                    else {
+                        //discard because something was nil
+                        temp = '-1'
+                    }
+                }
+                temp += ')'
+                if(temp.indexOf('-1') < 0) {
+                    if(first) {
+                        includeString += temp
+                        first = false
+                    }
+                    else {
+                        includeString += " || ${temp}"
+                    }
+                }
+            }
+            includeString += ')'
+            if(includeString != '()') {
+                if(result != '') {
+                    if(includeString.indexOf('||') > 0) {
+                        result += " && ${includeString}"
+                    }
+                    else {
+                        result += " && ${includeString[1..-1]}"
+                    }
+                }
+                else {
+                    result = includeString[1..-1]
+                }
+            }
+        }
+        return result
     }
 
     /**
