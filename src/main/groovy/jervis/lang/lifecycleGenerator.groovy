@@ -42,7 +42,7 @@ class lifecycleGenerator {
     /**
       A quick access variable for matrix build axes.
      */
-    ArrayList yaml_axes
+    ArrayList yaml_matrix_axes
 
     /**
       An instance of the <tt>{@link jervis.lang.lifecycleValidator}</tt> class which has loaded a lifecycles file.
@@ -187,12 +187,12 @@ class lifecycleGenerator {
         //avoid throwing a NullPointer exception if the user forgets to call obj.folder_listing to load a list of files.
         //just load an empty file list by default initially that can then be overridden.
         this.setFolder_listing([])
-        //configure the matrix axes if it is a matrix build i.e. set yaml_axes
+        //configure the matrix axes if it is a matrix build i.e. set yaml_matrix_axes
         if(this.isMatrixBuild()) {
-            this.yaml_axes = []
+            this.yaml_matrix_axes = []
             toolchain_obj.toolchains["toolchains"][yaml_language].each {
                 if((it != null) && (jervis_yaml[it] instanceof ArrayList) && (jervis_yaml[it].size() > 1)) {
-                    this.yaml_axes << it
+                    this.yaml_matrix_axes << it
                 }
             }
         }
@@ -237,7 +237,7 @@ env:
 
       @return A <tt>String</tt> which is a simple groovy expression.
      */
-    public String excludeFilter() {
+    public String matrixExcludeFilter() {
     }
 
     /**
@@ -248,10 +248,10 @@ env:
       @param axis A matrix building axis.  e.g. <tt>env</tt>
       @return A <tt>String</tt> which is the value of the given axis in a matrix build.
      */
-    public String getAxisValue(String axis) {
+    public String matrixGetAxisValue(String axis) {
         String result = ""
         int counter = 0
-        if(axis in yaml_axes) {
+        if(axis in yaml_matrix_axes) {
             jervis_yaml[axis].each {
                 result += " ${counter}"
                 counter++
@@ -302,7 +302,7 @@ env:
                     user_toolchain = jervis_yaml[toolchain]
                 }
                 //check if a matrix build
-                if(toolchain in yaml_axes) {
+                if(toolchain in yaml_matrix_axes) {
                     output += "case \${${toolchain}} in\n"
                     for(int i=0; i < user_toolchain.size(); i++) {
                         if(!toolchain_obj.supportedTool(toolchain, user_toolchain[i])) {
