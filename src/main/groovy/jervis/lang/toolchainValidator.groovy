@@ -12,9 +12,9 @@ import jervis.exceptions.ToolchainValidationException
 import jervis.tools.scmGit
 def git = new scmGit()
 def toolchains = new toolchainValidator()
-toolchains.load_JSON(git.getRoot() + "/src/main/resources/toolchains.json")
-println "Does the file validate? " + toolchains.validate()
-println "Supported matrices include:"
+toolchains.load_JSON(git.getRoot() + '/src/main/resources/toolchains.json')
+println 'Does the file validate? ' + toolchains.validate()
+println 'Supported matrices include:'
 toolchains.languages.each {
     String language = it
     ArrayList supported = []
