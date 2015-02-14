@@ -29,19 +29,19 @@ class securityIOTest extends GroovyTestCase {
         assert 4096 == security.id_rsa_keysize
     }
     @Test public void test_securityIO_init_path() {
-        security = new securityIO("/path")
+        security = new securityIO('/path')
         assert '/path/id_rsa.pem' == security.id_rsa_priv
         assert '/path/id_rsa.pub.pem' == security.id_rsa_pub
         assert security.default_key_size == security.id_rsa_keysize
     }
     @Test public void test_securityIO_init_path_key() {
-        security = new securityIO("/path",2048)
+        security = new securityIO('/path',2048)
         assert '/path/id_rsa.pem' == security.id_rsa_priv
         assert '/path/id_rsa.pub.pem' == security.id_rsa_pub
         assert 2048 == security.id_rsa_keysize
     }
     @Test public void test_securityIO_init_priv_pub_key() {
-        security = new securityIO("/path/rsa.key","/path/rsa.pub", 192)
+        security = new securityIO('/path/rsa.key','/path/rsa.pub', 192)
         assert '/path/rsa.key' == security.id_rsa_priv
         assert '/path/rsa.pub' == security.id_rsa_pub
         assert 192 == security.id_rsa_keysize
@@ -56,22 +56,22 @@ class securityIOTest extends GroovyTestCase {
     }
     //test securityIO().decodeBase64()
     @Test public void test_securityIO_decodeBase64String() {
-        def s = "data"
+        def s = 'data'
         String encoded = s.bytes.encodeBase64().toString()
-        assert "ZGF0YQ==" == encoded
+        assert 'ZGF0YQ==' == encoded
         assert security.decodeBase64String(encoded) == s
     }
     @Test public void test_securityIO_decodeBase64Bytes() {
-        def s = "data"
+        def s = 'data'
         String encoded = s.bytes.encodeBase64().toString()
-        assert "ZGF0YQ==" == encoded
+        assert 'ZGF0YQ==' == encoded
         assert security.decodeBase64Bytes(encoded) == s.bytes
     }
     @Test public void test_securityIO_encodeBase64String() {
-        assert "ZGF0YQ==" == security.encodeBase64("data")
+        assert 'ZGF0YQ==' == security.encodeBase64('data')
     }
     @Test public void test_securityIO_encodeBase64Bytes() {
-        assert "ZGF0YQ==" == security.encodeBase64("data".bytes)
+        assert 'ZGF0YQ==' == security.encodeBase64('data'.bytes)
     }
     @Test public void test_securityIO_generate_rsa_pair() {
         //generate keys based on a random tmp dir
@@ -101,7 +101,7 @@ class securityIOTest extends GroovyTestCase {
         Path jervis_tmp = Files.createTempDirectory('Jervis_Testing_')
         security = new securityIO(jervis_tmp.toString())
         //test the things
-        String plaintext = "secret message"
+        String plaintext = 'secret message'
         String ciphertext
         String decodedtext
         security.generate_rsa_pair()
@@ -121,10 +121,10 @@ class securityIOTest extends GroovyTestCase {
         }
         //we have removed the jervis_tmp directory so these should fail
         shouldFail(JervisException) {
-            ciphertext = security.rsaEncrypt("some text")
+            ciphertext = security.rsaEncrypt('some text')
         }
         shouldFail(JervisException) {
-            decodedtext = security.rsaDecrypt("some text")
+            decodedtext = security.rsaDecrypt('some text')
         }
     }
 }
