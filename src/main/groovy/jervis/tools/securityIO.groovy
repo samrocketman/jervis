@@ -8,16 +8,16 @@ import jervis.exceptions.JervisException
    <h2>Sample usage</h2>
 
 <pre><tt>import jervis.tools.securityIO
-def security = new securityIO("/tmp",2048)
+def security = new securityIO('/tmp',2048)
 security.generate_rsa_pair()
-println "Private key path: " + security.id_rsa_priv
-println "Public key path: " + security.id_rsa_pub
-println "Key size: " + security.id_rsa_keysize.toString()
-def s = security.rsaEncrypt("hello friend")
-println "Length of encrypted output: " + s.length()
-println "Encrypted string:"
+println 'Private key path: ' + security.id_rsa_priv
+println 'Public key path: ' + security.id_rsa_pub
+println 'Key size: ' + security.id_rsa_keysize.toString()
+def s = security.rsaEncrypt('hello friend')
+println 'Length of encrypted output: ' + s.length()
+println 'Encrypted string:'
 println s
-println "Decrypted string:"
+println 'Decrypted string:'
 println security.rsaDecrypt(s)</tt></pre>
  */
 class securityIO {
