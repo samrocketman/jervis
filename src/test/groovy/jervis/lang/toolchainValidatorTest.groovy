@@ -19,52 +19,52 @@ class toolchainValidatorTest extends GroovyTestCase {
     }
     //test supportedLanguage()
     @Test public void test_toolchainValidator_supportedLanguage_yes() {
-        URL url = this.getClass().getResource("/good_toolchains_simple.json");
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
         toolchains.load_JSON(url.getFile())
-        assert true == toolchains.supportedLanguage("ruby")
+        assert true == toolchains.supportedLanguage('ruby')
     }
     @Test public void test_toolchainValidator_supportedLanguage_no() {
-        URL url = this.getClass().getResource("/good_toolchains_simple.json");
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
         toolchains.load_JSON(url.getFile())
-        assert false == toolchains.supportedLanguage("derpy")
+        assert false == toolchains.supportedLanguage('derpy')
     }
     //test supportedToolchain()
     @Test public void test_toolchainValidator_supportedToolchain_yes() {
-        URL url = this.getClass().getResource("/good_toolchains_simple.json");
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
         toolchains.load_JSON(url.getFile())
-        assert true == toolchains.supportedToolchain("jdk")
+        assert true == toolchains.supportedToolchain('jdk')
     }
     @Test public void test_toolchainValidator_supportedToolchain_no() {
-        URL url = this.getClass().getResource("/good_toolchains_simple.json");
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
         toolchains.load_JSON(url.getFile())
-        assert false == toolchains.supportedToolchain("derpy")
+        assert false == toolchains.supportedToolchain('derpy')
     }
     //test supportedTool()
     @Test public void test_toolchainValidator_supportedTool_yes() {
-        URL url = this.getClass().getResource("/good_toolchains_simple.json");
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
         toolchains.load_JSON(url.getFile())
-        assert true == toolchains.supportedTool("jdk","openjdk7")
-        assert true == toolchains.supportedTool("rvm","derpy")
+        assert true == toolchains.supportedTool('jdk','openjdk7')
+        assert true == toolchains.supportedTool('rvm','derpy')
     }
     @Test public void test_toolchainValidator_supportedTool_no() {
-        URL url = this.getClass().getResource("/good_toolchains_simple.json");
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
         toolchains.load_JSON(url.getFile())
-        assert false == toolchains.supportedTool("jdk","derpy")
+        assert false == toolchains.supportedTool('jdk','derpy')
     }
     //test supportedMatrix()
     @Test public void test_toolchainValidator_supportedMatrix_yes() {
-        URL url = this.getClass().getResource("/good_toolchains_simple.json");
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
         toolchains.load_JSON(url.getFile())
-        assert true == toolchains.supportedMatrix("ruby", "rvm")
+        assert true == toolchains.supportedMatrix('ruby', 'rvm')
     }
     @Test public void test_toolchainValidator_supportedMatrix_no() {
-        URL url = this.getClass().getResource("/good_toolchains_simple.json");
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
         toolchains.load_JSON(url.getFile())
-        assert false == toolchains.supportedMatrix("ruby","derpy")
+        assert false == toolchains.supportedMatrix('ruby','derpy')
     }
     //test against invalid toolchains files
     @Test public void test_toolchainValidator_bad_toolchains_missing_toolchain() {
-        URL url = this.getClass().getResource("/bad_toolchains_missing_toolchain.json");
+        URL url = this.getClass().getResource('/bad_toolchains_missing_toolchain.json');
         toolchains.load_JSON(url.getFile())
         shouldFail(ToolchainMissingKeyException) {
             toolchains.validate()
@@ -72,7 +72,7 @@ class toolchainValidatorTest extends GroovyTestCase {
         assert false == toolchains.validate_asBool()
     }
     @Test public void test_toolchainValidator_bad_toolchains_missing_toolchains() {
-        URL url = this.getClass().getResource("/bad_toolchains_missing_toolchains.json");
+        URL url = this.getClass().getResource('/bad_toolchains_missing_toolchains.json');
         toolchains.load_JSON(url.getFile())
         shouldFail(ToolchainMissingKeyException) {
             toolchains.validate()
@@ -80,7 +80,7 @@ class toolchainValidatorTest extends GroovyTestCase {
         assert false == toolchains.validate_asBool()
     }
     @Test public void test_toolchainValidator_bad_toolchains_missing_default_ivalue() {
-        URL url = this.getClass().getResource("/bad_toolchains_missing_default_ivalue.json");
+        URL url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json');
         toolchains.load_JSON(url.getFile())
         shouldFail(ToolchainMissingKeyException) {
             toolchains.validate()
@@ -88,7 +88,7 @@ class toolchainValidatorTest extends GroovyTestCase {
         assert false == toolchains.validate_asBool()
     }
     @Test public void test_toolchainValidator_main_toolchains_json() {
-        URL url = this.getClass().getResource("/toolchains.json");
+        URL url = this.getClass().getResource('/toolchains.json');
         toolchains.load_JSON(url.getFile())
         assert true == toolchains.validate()
         assert true == toolchains.validate_asBool()
