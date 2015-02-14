@@ -7,7 +7,7 @@ import jervis.exceptions.wikiPages
 
   <h2>Sample usage</h2>
 <pre><tt>import jervis.exceptions.LifecycleValidationException
-throw new LifecycleValidationException("some text")</tt></pre><br>
+throw new LifecycleValidationException('some text')</tt></pre><br>
  */
 class LifecycleValidationException extends JervisException {
     private static String wiki_page = wikiPages.lifecycles_spec
@@ -15,9 +15,9 @@ class LifecycleValidationException extends JervisException {
     /**
       Throw a <tt>LifecycleValidationException</tt>
 
-      @param message A simple message that will be prepended with <tt>"ERROR: Lifecycle validation failed.  " + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link jervis.exceptions.wikiPages#lifecycles_spec}</tt>.
+      @param message A simple message that will be prepended with <tt>'ERROR: Lifecycle validation failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link jervis.exceptions.wikiPages#lifecycles_spec}</tt>.
      */
     def LifecycleValidationException(String message) {
-        super("\nERROR: Lifecycle validation failed.  " + message + ["\n\nSee wiki page:", wiki_page,"\n"].join('\n'))
+        super('\nERROR: Lifecycle validation failed.  ' + message + ['\n\nSee wiki page:', wiki_page,'\n'].join('\n'))
     }
 }

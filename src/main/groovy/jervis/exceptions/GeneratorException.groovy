@@ -5,7 +5,7 @@ package jervis.exceptions
 
   <h2>Sample usage</h2>
 <pre><tt>import jervis.exceptions.LifecycleException
-throw new GeneratorException("some text")</tt></pre><br>
+throw new GeneratorException('some text')</tt></pre><br>
  */
 class GeneratorException extends JervisException {
 

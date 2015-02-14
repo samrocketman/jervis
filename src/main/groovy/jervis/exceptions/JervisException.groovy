@@ -5,7 +5,7 @@ package jervis.exceptions
 
   <h2>Sample usage</h2>
 <pre><tt>import jervis.exceptions.JervisException
-throw new JervisException("some text")</tt></pre><br>
+throw new JervisException('some text')</tt></pre><br>
  */
 class JervisException extends Exception {
 
