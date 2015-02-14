@@ -362,6 +362,43 @@ env:
         z
     }
 
+    /*
+       This is an abstract function to generically generate matrix non-matrix toolchains.
+     */
+    private String toolchainBuilder(String toolchain, String[] toolchain_keys, ArrayList chain, Boolean matrix) {
+        String output = ''
+        if(matrix) {
+            output += "case \${${toolchain}} in\n"
+            for(int i=0; i < chain.size(); i++) {
+                if(!toolchain_obj.supportedTool(toolchain, chain[i])) {
+                    throw new UnsupportedToolException("${toolchain}: ${chain[i]}")
+                }
+                output += "  ${i})\n"
+                if(chain[i] in toolchain_keys) {
+                    output += '    ' + toolchain_obj.toolchains[toolchain][chain[i]].join('\n    ') + '\n    ;;\n'
+                }
+                else {
+                    //assume using "*" key
+                    output += '    ' + this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], chain[i]).join('\n    ') + '\n    ;;\n'
+                }
+            }
+            output += 'esac\n'
+        }
+        else {
+            if(!toolchain_obj.supportedTool(toolchain, chain[0])) {
+                throw new UnsupportedToolException("${toolchain}: ${chain[0]}")
+            }
+            if(chain[0] in toolchain_keys) {
+                output += toolchain_obj.toolchains[toolchain][chain[0]].join('\n') + '\n'
+            }
+            else {
+                //assume using "*" key
+                output += this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], chain[0]).join('\n') + '\n'
+            }
+        }
+        return output
+    }
+
     /**
       Generate the toolchains shell script based on the Jervis YAML or taking defaults
       from the toolchains file.
@@ -373,13 +410,13 @@ env:
         String output = "#\n# TOOLCHAINS SECTION\n#\n"
         toolchains_order.each {
             def toolchain = it
-            def toolchain_keys = toolchain_obj.toolchains[toolchain].keySet() as String[]
+            String[] toolchain_keys = toolchain_obj.toolchains[toolchain].keySet() as String[]
             output += "#${toolchain} toolchain section\n"
             if(toolchain in yaml_keys) {
                 //do non-default stuff
                 ArrayList user_toolchain
                 if(!(jervis_yaml[toolchain] instanceof String) && !(jervis_yaml[toolchain] instanceof ArrayList)) {
-                        throw new UnsupportedToolException("${toolchain}: ${jervis_yaml[toolchain]}")
+                    throw new UnsupportedToolException("${toolchain}: ${jervis_yaml[toolchain]}")
                 }
                 if(jervis_yaml[toolchain] instanceof String) {
                     user_toolchain = [jervis_yaml[toolchain]]
@@ -407,16 +444,7 @@ env:
                 }
                 else {
                     //not a matrix build
-                    if(!toolchain_obj.supportedTool(toolchain, user_toolchain[0])) {
-                        throw new UnsupportedToolException("${toolchain}: ${user_toolchain[0]}")
-                    }
-                    if(user_toolchain[0] in toolchain_keys) {
-                        output += toolchain_obj.toolchains[toolchain][user_toolchain[0]].join('\n') + '\n'
-                    }
-                    else {
-                        //assume using "*" key
-                        output += this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], user_toolchain[0]).join('\n') + '\n'
-                    }
+                    output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain, false)
                 }
             }
             else {
