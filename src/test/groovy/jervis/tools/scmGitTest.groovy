@@ -9,7 +9,7 @@ class scmGitTest extends GroovyTestCase {
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
-        git = new scmGit("echo")
+        git = new scmGit('echo')
     }
     //tear down after every test
     @After protected void tearDown() {
@@ -18,13 +18,13 @@ class scmGitTest extends GroovyTestCase {
     }
     //test getRoot()
     @Test public void test_scmGit_getRoot1() {
-        assert "rev-parse --show-toplevel" == git.getRoot()
+        assert 'rev-parse --show-toplevel' == git.getRoot()
     }
     @Test public void test_scmGit_getRoot2() {
-        git.git_root = "some git root"
-        assert "some git root" == git.getRoot()
+        git.git_root = 'some git root'
+        assert 'some git root' == git.getRoot()
     }
     @Test public void test_scmGit_get_mygit() {
-        assert "echo" == git.mygit
+        assert 'echo' == git.mygit
     }
 }
