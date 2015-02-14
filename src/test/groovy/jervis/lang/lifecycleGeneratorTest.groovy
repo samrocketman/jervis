@@ -60,6 +60,11 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString("language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar")
         assert true == generator.isMatrixBuild()
     }
+    @Test public void test_lifecycleGenerator_matrixGetAxisValue() {
+        generator.loadYamlString("language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar")
+        assert '0 1' == generator.matrixGetAxisValue('env')
+        assert '' == generator.matrixGetAxisValue('rvm')
+    }
     @Test public void test_lifecycleGenerator_generateToolchainSection_matrix() {
         generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]')
         assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\ncase ${env} in\n  0)\n    export world=hello\n    ;;\n  1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
