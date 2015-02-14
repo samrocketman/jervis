@@ -16,9 +16,12 @@
     },
     "jdk": {
         "default_ivalue": "openjdk7",
+        "openjdk6": [
+            "more commands"
+        ],
         "openjdk7": [
             "some commands"
-        ],
+        ]
     },
     "rvm": {
         "default_ivalue": "1.9.3",
