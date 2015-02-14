@@ -7,26 +7,26 @@ import jervis.remotes.GitHub
 def git_service = new GitHub()
 
 if("${project}".size() > 0 && "${project}".split('/').length == 2) {
-    println("Generating jobs for " + git_service.toString() + " project ${project}.")
+    println 'Generating jobs for ' + git_service.toString() + " project ${project}."
 
     project_folder = "${project}".split('/')[0]
     project_name = "${project}".split('/')[1]
 
     if(! new File("${JENKINS_HOME}/jobs/${project_folder}/config.xml").exists()) {
-        println("Creating folder ${project_folder}")
+        println "Creating folder ${project_folder}"
         folder {
             name(project_folder)
         }
     }
 
-    println("Creating project ${project}")
+    println "Creating project ${project}"
     view(type: ListView) {
         name("${project}")
-        description(git_service.toString() + " Project " + git_service.getWebUrl() + "${project}")
+        description(git_service.toString() + ' Project ' + git_service.getWebUrl() + "${project}")
         filterBuildQueue()
         filterExecutors()
         jobs {
-            regex("^" + "${project_name}".replaceAll('/','-') + ".*")
+            regex('^' + "${project_name}".replaceAll('/','-') + '.*')
         }
         columns {
             status()
@@ -45,11 +45,11 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         def generator = new lifecycleGenerator()
         generator.loadLifecyclesString(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
         generator.loadToolchainsString(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
-        if(".jervis.yml" in folder_listing) {
-            generator.loadYamlString(git_service.getFile(project, ".jervis.yml", JERVIS_BRANCH))
+        if('.jervis.yml' in folder_listing) {
+            generator.loadYamlString(git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH))
         }
-        else if(".travis.yml" in folder_listing) {
-            generator.loadYamlString(git_service.getFile(project, ".travis.yml", JERVIS_BRANCH))
+        else if('.travis.yml' in folder_listing) {
+            generator.loadYamlString(git_service.getFile(project, '.travis.yml', JERVIS_BRANCH))
         }
         else {
             //skip creating the job for this branch
@@ -70,7 +70,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
                     switch(git_service) {
                         case GitHub:
                             configure { gitHub ->
-                                gitHub / browser(class: "hudson.plugins.git.browser.GithubWeb") {
+                                gitHub / browser(class: 'hudson.plugins.git.browser.GithubWeb') {
                                     url(git_service.getWebUrl() + "${project}")
                                 }
                             }
