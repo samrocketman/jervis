@@ -9,11 +9,11 @@ import jervis.tools.scmGit
   <h2>Sample usage</h2>
 <pre><tt>import jervis.tools.fileIO
 //mystring path is relative to the root of the git repository
-def mystring = "readFile(/src/testResources/sample_script.sh)"
+def mystring = 'readFile(/src/testResources/sample_script.sh)'
 def x = new fileIO()
-print "Is readFile? " + x.isReadFile(mystring) + "\n"
-print "Does the file exist?" + x.fileExists(mystring) + "\n"
-println "What are the contents of the file?"
+println 'Is readFile? ' + x.isReadFile(mystring)
+println 'Does the file exist?' + x.fileExists(mystring)
+println 'What are the contents of the file?'
 println x.readFile(mystring)</tt></pre>
  */
 class fileIO {
@@ -26,7 +26,7 @@ class fileIO {
         return (filestring =~ /^readFile\(\/.*\)$/).asBoolean()
     }
     /**
-      Checks the file path inside the parenthesis of <tt>"readFile(/path/to/file.sh)"</tt> exists.
+      Checks the file path inside the parenthesis of <tt>'readFile(/path/to/file.sh)'</tt> exists.
       Relative to the root of the Git repository, if the file <tt>/path/to/file.sh</tt> exists then it would return <tt>true</tt>.
       @param filestring A simple <tt>String</tt> that starts with <tt>readFile(</tt>, contains a path to a file, and ends with <tt>)</tt>.
       @return           A boolean.  If the file exists then it is <tt>true</tt>.  If the the file doesn't exist or it is a malformed <tt>String</tt> then it returns <tt>false</tt>.
