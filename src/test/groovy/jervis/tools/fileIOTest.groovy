@@ -17,27 +17,27 @@ class fileIOTest extends GroovyTestCase {
         super.tearDown()
     }
     @Test public void test_fileIO_isReadFile1() {
-        assert true == fileio.isReadFile("readFile(/path/to/file.sh)")
+        assert true == fileio.isReadFile('readFile(/path/to/file.sh)')
     }
     @Test public void test_fileIO_isReadFile2() {
-        assert false == fileio.isReadFile("readFile(path/to/file.sh)")
+        assert false == fileio.isReadFile('readFile(path/to/file.sh)')
     }
     @Test public void test_fileIO_fileExists1() {
-        assert true == fileio.fileExists("readFile(/src/test/resources/sample_script.sh)")
+        assert true == fileio.fileExists('readFile(/src/test/resources/sample_script.sh)')
     }
     @Test public void test_fileIO_fileExists2() {
-        assert false == fileio.fileExists("readFile(/src/test/resources/does_not_exist.sh)")
+        assert false == fileio.fileExists('readFile(/src/test/resources/does_not_exist.sh)')
     }
     @Test public void test_fileIO_fileExists3() {
-        assert false == fileio.fileExists("readFile(/src/test/resources/sample_script.sh")
+        assert false == fileio.fileExists('readFile(/src/test/resources/sample_script.sh')
     }
     @Test public void test_fileIO_readFile1() {
-        assert '#!/bin/bash\necho "this is a sample script"' == fileio.readFile("readFile(/src/test/resources/sample_script.sh)")
+        assert '#!/bin/bash\necho "this is a sample script"' == fileio.readFile('readFile(/src/test/resources/sample_script.sh)')
     }
     @Test public void test_fileIO_readFile2() {
-        assert 'readFile(/src/test/resources/does_not_exist.sh)' == fileio.readFile("readFile(/src/test/resources/does_not_exist.sh)")
+        assert 'readFile(/src/test/resources/does_not_exist.sh)' == fileio.readFile('readFile(/src/test/resources/does_not_exist.sh)')
     }
     @Test public void test_fileIO_readFile3() {
-        assert 'readFile(/src/test/resources/does_not_exist.sh' == fileio.readFile("readFile(/src/test/resources/does_not_exist.sh")
+        assert 'readFile(/src/test/resources/does_not_exist.sh' == fileio.readFile('readFile(/src/test/resources/does_not_exist.sh')
     }
 }
