@@ -14,12 +14,12 @@ import jervis.exceptions.LifecycleValidationException
 import jervis.tools.scmGit
 def git = new scmGit()
 def lifecycles = new lifecycleValidator()
-lifecycles.load_JSON(git.getRoot() + "/src/main/resources/lifecycles.json")
-println "Does the file validate? " + lifecycles.validate()
-println "Supported languages include:"
+lifecycles.load_JSON(git.getRoot() + '/src/main/resources/lifecycles.json')
+println 'Does the file validate? ' + lifecycles.validate()
+println 'Supported languages include:'
 //print out a sorted ArrayList of supported languages
 supported_languages = []
-lifecycles.languages.each { supported_languages << lifecycles.lifecycles[it]["friendlyName"] }
+ifecycles.languages.each { supported_languages << lifecycles.lifecycles[it]['friendlyName'] }
 Collections.sort(supported_languages)
 supported_languages.each{ println it }</tt></pre>
  */
@@ -89,38 +89,38 @@ class lifecycleValidator {
     public Boolean validate() {
         lifecycles.keySet().each {
             def tools = lifecycles[it].keySet() as String[]
-            if(!("defaultKey" in tools)) {
-                throw new LifecycleMissingKeyException([it,"defaultKey"].join('.'))
+            if(!('defaultKey' in tools)) {
+                throw new LifecycleMissingKeyException([it,'defaultKey'].join('.'))
             }
-            if(!("friendlyName" in tools)) {
-                throw new LifecycleMissingKeyException([it,"friendlyName"].join('.'))
+            if(!('friendlyName' in tools)) {
+                throw new LifecycleMissingKeyException([it,'friendlyName'].join('.'))
             }
-            if(!(lifecycles[it]["defaultKey"] in tools)) {
-                throw new LifecycleMissingKeyException([it,"defaultKey",lifecycles[it]["defaultKey"]].join('.'))
+            if(!(lifecycles[it]['defaultKey'] in tools)) {
+                throw new LifecycleMissingKeyException([it,'defaultKey',lifecycles[it]['defaultKey']].join('.'))
             }
-            def current_key = lifecycles[it]["defaultKey"]
+            def current_key = lifecycles[it]['defaultKey']
             def count=0
             while(current_key != null) {
                 def cycles = lifecycles[it][current_key].keySet() as String[]
-                if("fileExistsCondition" in cycles) {
+                if('fileExistsCondition' in cycles) {
                     //check for leading slash in the first element of fileExistsCondition
-                    if(lifecycles[it][current_key]["fileExistsCondition"][0][0] != '/') {
-                        throw new LifecycleBadValueInKeyException([it,current_key,"fileExistsCondition","[0]"].join('.') + " first element does not begin with a '/'.")
+                    if(lifecycles[it][current_key]['fileExistsCondition'][0][0] != '/') {
+                        throw new LifecycleBadValueInKeyException([it,current_key,'fileExistsCondition','[0]'].join('.') + ' first element does not begin with a "/".')
                     }
                 }
-                if("fallbackKey" in cycles) {
-                    if(!(lifecycles[it][current_key]["fallbackKey"] in tools)) {
-                        throw new LifecycleMissingKeyException([it,current_key,"fallbackKey",lifecycles[it][current_key]["fallbackKey"]].join('.'))
+                if('fallbackKey' in cycles) {
+                    if(!(lifecycles[it][current_key]['fallbackKey'] in tools)) {
+                        throw new LifecycleMissingKeyException([it,current_key,'fallbackKey',lifecycles[it][current_key]['fallbackKey']].join('.'))
                     }
-                    if(!("fileExistsCondition" in cycles)) {
-                        throw new LifecycleMissingKeyException([it,current_key,"fileExistsCondition"].join('.') + " required by " + [it,current_key,"fallbackKey"].join('.'))
+                    if(!('fileExistsCondition' in cycles)) {
+                        throw new LifecycleMissingKeyException([it,current_key,'fileExistsCondition'].join('.') + ' required by ' + [it,current_key,'fallbackKey'].join('.'))
                     }
                 }
                 count++
                 if(count > 1000) {
                     throw new LifecycleInfiniteLoopException([it,current_key].join('.'))
                 }
-                current_key = lifecycles[it][current_key]["fallbackKey"]
+                current_key = lifecycles[it][current_key]['fallbackKey']
             }
         }
         return true
