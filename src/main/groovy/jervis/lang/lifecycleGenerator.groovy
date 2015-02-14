@@ -363,7 +363,11 @@ env:
     }
 
     /*
-       This is an abstract function to generically generate matrix non-matrix toolchains.
+       This is an abstracted function to generate matrix and non-matrix toolchains.
+       @param toolchain      A toolchain that comes from the matrix build toolchain order for a given language.
+       @param toolchain_keys The known keys for a given toolchain to look up <tt>*</tt> or a given toolchain value.
+       @param chain          The matrix list from the Jervis YAML for the given toolchain.
+       @param matrix         Should the input be considered a matrix build?  If so then set to <tt>true</tt>.
      */
     private String toolchainBuilder(String toolchain, String[] toolchain_keys, ArrayList chain, Boolean matrix) {
         String output = ''
@@ -426,21 +430,7 @@ env:
                 }
                 //check if a matrix build
                 if(toolchain in yaml_matrix_axes) {
-                    output += "case \${${toolchain}} in\n"
-                    for(int i=0; i < user_toolchain.size(); i++) {
-                        if(!toolchain_obj.supportedTool(toolchain, user_toolchain[i])) {
-                            throw new UnsupportedToolException("${toolchain}: ${user_toolchain[i]}")
-                        }
-                        output += "  ${i})\n"
-                        if(user_toolchain[i] in toolchain_keys) {
-                            output += '    ' + toolchain_obj.toolchains[toolchain][user_toolchain[i]].join('\n    ') + '\n    ;;\n'
-                        }
-                        else {
-                            //assume using "*" key
-                            output += '    ' + this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], user_toolchain[i]).join('\n    ') + '\n    ;;\n'
-                        }
-                    }
-                    output += 'esac\n'
+                    output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain, true)
                 }
                 else {
                     //not a matrix build
