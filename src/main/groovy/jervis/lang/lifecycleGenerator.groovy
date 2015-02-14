@@ -252,6 +252,59 @@ env:
         return result
     }
 
+    /*
+       This is a builder for groovy expressions to be used by the <tt>{@link #matrixExcludeFilter()}</tt>.
+       @param filterType    The type of filter in the matrix.  Possible values: <tt>include</tt>, <tt>exclude</tt>.
+       @param exprSeparator The separator between multiple expressions.  This is typically <tt>&amp;&amp;</tt> or <tt>||</tt>.
+       @param inverse       Each expression can be inversed.  For example, <tt>!(a == b)</tt> is inverse of <tt>(a == b)</tt>.
+       @param group         When all of the expressions are finished being build should they be grouped together?  If so then this should be <tt>true</tt>.
+     */
+    private String matrixExcludeFilterBuilder(String filterType, String exprSeparator, Boolean inverse, Boolean group) {
+        Map matrix = jervis_yaml["matrix"]
+        String result = ''
+        if(filterType in matrix) {
+            Boolean first_in_group = true
+            for(int i=0; i < matrix[filterType].size(); i++) {
+                String temp = '('
+                Boolean first_in_expr = true
+                if(inverse) {
+                    temp = "!${temp}"
+                }
+                matrix[filterType][i].each { k, v ->
+                    if(jervis_yaml[k] && (k in yaml_matrix_axes)) {
+                        if(first_in_expr) {
+                            temp += "${k} == ${jervis_yaml[k].indexOf(v)}"
+                            first_in_expr = false
+                        }
+                        else {
+                            temp += " && ${k} == ${jervis_yaml[k].indexOf(v)}"
+                        }
+                    }
+                    else {
+                        //discard because something was nil
+                        temp = '-1'
+                    }
+                }
+                temp += ')'
+                if(temp.indexOf('-1') < 0) {
+                    if(first_in_group) {
+                        result += temp
+                        first_in_group = false
+                    }
+                    else {
+                        result += " ${exprSeparator} ${temp}"
+                    }
+                }
+            }
+            if(result != '' && group) {
+                if(result.indexOf(exprSeparator) >= 0) {
+                    result = "(${result})"
+                }
+            }
+        }
+        return result
+    }
+
     /**
       This function generates a Jenkins groovy expression from Jervis YAML which will
       be used to exclude matrix build combinations.  This is typically done from a
@@ -261,80 +314,14 @@ env:
       @return A <tt>String</tt> which is a simple groovy expression.
      */
     public String matrixExcludeFilter() {
-        Map matrix = jervis_yaml["matrix"]
         String result = ''
-        if('exclude' in matrix) {
-            for(int i=0; i < matrix['exclude'].size(); i++) {
-                String temp = '!('
-                matrix['exclude'][i].each { k, v ->
-                    if(jervis_yaml[k]) {
-                        if(temp == '!(') {
-                            temp += "${k} == ${jervis_yaml[k].indexOf(v)}"
-                        }
-                        else {
-                            temp += " && ${k} == ${jervis_yaml[k].indexOf(v)}"
-                        }
-                    }
-                    else {
-                        //discard because something was nil
-                        temp = '-1'
-                    }
-                }
-                temp += ')'
-                if(temp.indexOf('-1') < 0) {
-                    if(result != '') {
-                        result += " && ${temp}"
-                    }
-                    else {
-                        result = temp
-                    }
-                }
-            }
+        String exclude = this.matrixExcludeFilterBuilder('exclude', '&&', true, false)
+        String include = this.matrixExcludeFilterBuilder('include', '||', false, true)
+        if(exclude.length() > 0 && include.length() > 0) {
+            result = "${exclude} && ${include}"
         }
-        if('include' in matrix) {
-            String includeString = '('
-            Boolean first = true
-            for(int i=0; i < matrix['include'].size(); i++) {
-                String temp = '('
-                matrix['include'][i].each { k, v ->
-                    if(jervis_yaml[k]) {
-                        if(temp == '(') {
-                            temp += "${k} == ${jervis_yaml[k].indexOf(v)}"
-                        }
-                        else {
-                            temp += " && ${k} == ${jervis_yaml[k].indexOf(v)}"
-                        }
-                    }
-                    else {
-                        //discard because something was nil
-                        temp = '-1'
-                    }
-                }
-                temp += ')'
-                if(temp.indexOf('-1') < 0) {
-                    if(first) {
-                        includeString += temp
-                        first = false
-                    }
-                    else {
-                        includeString += " || ${temp}"
-                    }
-                }
-            }
-            includeString += ')'
-            if(includeString != '()') {
-                if(result != '') {
-                    if(includeString.indexOf('||') > 0) {
-                        result += " && ${includeString}"
-                    }
-                    else {
-                        result += " && ${includeString[1..-1]}"
-                    }
-                }
-                else {
-                    result = includeString[1..-1]
-                }
-            }
+        else {
+            result = exclude + include
         }
         return result
     }
