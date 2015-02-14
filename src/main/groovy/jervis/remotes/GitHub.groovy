@@ -10,9 +10,9 @@ import jervis.tools.securityIO
 
 <pre><tt>import jervis.remotes.GitHub
 def x = new GitHub()
-println "Print each branch."
+println 'Print each branch.'
 x.branches('samrocketman/jervis').each{ println it }
-println "Print the contents of .travis.yml from the master branch."
+println 'Print the contents of .travis.yml from the master branch.'
 println x.getFile('samrocketman/jervis','.travis.yml','master')</tt></pre><br>
  */
 class GitHub implements JervisRemote {
@@ -20,17 +20,17 @@ class GitHub implements JervisRemote {
     /**
       URL to the GitHub web interface. Default: <tt>https://github.com/</tt>
      */
-    String gh_web = "https://github.com/"
+    String gh_web = 'https://github.com/'
 
     /**
-      URL to the <a href="https://developer.github.com/v3/" target="_blank">GitHub API</a>. For GitHub Enterprise it should be <tt>{@link #gh_web} + "api/v3/"</tt>.  Default: <tt>https://api.github.com/</tt>
+      URL to the <a href="https://developer.github.com/v3/" target="_blank">GitHub API</a>. For GitHub Enterprise it should be <tt>{@link #gh_web} + 'api/v3/'</tt>.  Default: <tt>https://api.github.com/</tt>
      */
-    String gh_api = "https://api.github.com/"
+    String gh_api = 'https://api.github.com/'
 
     /**
       The base clone URI in which repositories will be cloned.  Default: <tt>git://github.com/</tt>
      */
-    String gh_clone = "git://github.com/"
+    String gh_clone = 'git://github.com/'
 
     /**
       The <a href="https://github.com/blog/1509-personal-api-tokens" target="_blank">API token</a>, which can be used to communicate with GitHub using authentication.  Default: <tt>null</tt>
@@ -88,7 +88,7 @@ class GitHub implements JervisRemote {
     private fetch(String addr) {
         def json = new JsonSlurper()
         if(this.gh_token) {
-            return json.parse(new URL(addr).newReader(requestProperties: ["Authorization": "token ${this.gh_token}".toString(), "Accept": "application/vnd.github.v3+json"]))
+            return json.parse(new URL(addr).newReader(requestProperties: ['Authorization': "token ${this.gh_token}".toString(), 'Accept': 'application/vnd.github.v3+json']))
         }
         else {
             return json.parse(new URL(addr).newReader())
@@ -96,7 +96,7 @@ class GitHub implements JervisRemote {
     }
 
     /*
-     * public functions *
+     * public functions
      */
 
     /**
@@ -146,9 +146,9 @@ class GitHub implements JervisRemote {
     /**
       Get the directory listing of a path from a project.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
-      @param   project    A GitHub project including the org.  e.g. <tt>"samrocketman/jervis"</tt>
-      @param   dir_path   A path to a directory relative to the root of the Git repository.  e.g. <tt>"/"</tt>
-      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>"master"</tt>
+      @param   project    A GitHub project including the org.  e.g. <tt>samrocketman/jervis</tt>
+      @param   dir_path   A path to a directory relative to the root of the Git repository.  e.g. <tt>/</tt>
+      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>master</tt>
       @returns            An <tt>ArrayList</tt> which contains the contents of the file requested.
     */
     public ArrayList getFolderListing(String project, String dir_path, String ref) {
@@ -169,11 +169,11 @@ class GitHub implements JervisRemote {
       @return A human readable <tt>String</tt> for this type of remote.  Value returned will be either <tt>"GitHub"</tt> or <tt>"GitHub Enterprise"</tt> depending on whether or not <tt>{@link #gh_web}</tt> has been set.
      */
     public String toString() {
-        if(gh_web == "https://github.com/") {
-            return "GitHub"
+        if(gh_web == 'https://github.com/') {
+            return 'GitHub'
         }
         else {
-            return "GitHub Enterprise"
+            return 'GitHub Enterprise'
         }
     }
 }
