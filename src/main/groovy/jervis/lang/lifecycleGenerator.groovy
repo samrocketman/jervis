@@ -15,8 +15,8 @@ import org.yaml.snakeyaml.Yaml
 import jervis.tools.scmGit
 def git = new scmGit()
 def generator = new lifecycleGenerator()
-generator.loadLifecycles(git.getRoot() + "/src/main/resources/lifecycles.json")
-generator.loadToolchains(git.getRoot() + "/src/main/resources/toolchains.json")
+generator.loadLifecycles(git.getRoot() + '/src/main/resources/lifecycles.json')
+generator.loadToolchains(git.getRoot() + '/src/main/resources/toolchains.json')
 generator.loadYamlString("""
 language: ruby
 env:
@@ -35,11 +35,11 @@ matrix:
       env: hello=test three=five
 """)
 generator.folder_listing = ['Gemfile.lock']
-println "Exclude filter is..."
+println 'Exclude filter is...'
 println generator.matrixExcludeFilter()
-println "Matrix axis value for env is..."
+println 'Matrix axis value for env is...'
 println generator.matrixGetAxisValue('env')
-println "Generating the matrix build script."
+println 'Generating the matrix build script.'
 println generator.generateAll()
 </tt></pre>
  */
@@ -102,20 +102,20 @@ class lifecycleGenerator {
      */
     void setFolder_listing(ArrayList listing) {
         if(!yaml_language) {
-            throw new JervisException("Must call loadYamlString() first.")
+            throw new JervisException('Must call loadYamlString() first.')
         }
         folder_listing = listing
         String current_key = lifecycle_obj.lifecycles[yaml_language].defaultKey
         while(current_key != null) {
             def cycles = lifecycle_obj.lifecycles[yaml_language][current_key].keySet() as String[]
-            if("fileExistsCondition" in cycles) {
-                if(lifecycle_obj.lifecycles[yaml_language][current_key]["fileExistsCondition"][1] in listing) {
+            if('fileExistsCondition' in cycles) {
+                if(lifecycle_obj.lifecycles[yaml_language][current_key]['fileExistsCondition'][1] in listing) {
                     lifecycle_key = current_key
                     current_key = null
                 }
                 else {
-                    if("fallbackKey" in cycles) {
-                        current_key = lifecycle_obj.lifecycles[yaml_language][current_key]["fallbackKey"]
+                    if('fallbackKey' in cycles) {
+                        current_key = lifecycle_obj.lifecycles[yaml_language][current_key]['fallbackKey']
                     }
                     else {
                         lifecycle_key = current_key
@@ -199,10 +199,10 @@ class lifecycleGenerator {
         this.yaml_language = this.jervis_yaml['language']
         this.yaml_keys = this.jervis_yaml.keySet() as String[]
         if(!lifecycle_obj) {
-            throw new JervisException("ERROR: Must call lifecycleGenerator.loadLifecycles() or lifecycleGenerator.loadLifecyclesString() first.")
+            throw new JervisException('ERROR: Must call lifecycleGenerator.loadLifecycles() or lifecycleGenerator.loadLifecyclesString() first.')
         }
         if(!toolchain_obj) {
-            throw new JervisException("ERROR: Must call lifecycleGenerator.loadToolchains() or lifecycleGenerator.loadToolchainsString() first.")
+            throw new JervisException('ERROR: Must call lifecycleGenerator.loadToolchains() or lifecycleGenerator.loadToolchainsString() first.')
         }
         if(!lifecycle_obj.supportedLanguage(this.yaml_language) || !toolchain_obj.supportedLanguage(this.yaml_language)) {
             throw new UnsupportedLanguageException(this.yaml_language)
@@ -260,7 +260,7 @@ env:
        @param group         When all of the expressions are finished being build should they be grouped together?  If so then this should be <tt>true</tt>.
      */
     private String matrixExcludeFilterBuilder(String filterType, String exprSeparator, Boolean inverse, Boolean group) {
-        Map matrix = jervis_yaml["matrix"]
+        Map matrix = jervis_yaml['matrix']
         String result = ''
         if(filterType in matrix) {
             Boolean first_in_group = true
@@ -335,7 +335,7 @@ env:
       @return A <tt>String</tt> which is the value of the given axis in a matrix build.
      */
     public String matrixGetAxisValue(String axis) {
-        String result = ""
+        String result = ''
         int counter = 0
         if(axis in yaml_matrix_axes) {
             jervis_yaml[axis].each {
@@ -345,7 +345,7 @@ env:
             return result.trim()
         }
         else {
-            return ""
+            return ''
         }
     }
 
@@ -410,8 +410,8 @@ env:
      */
     public String generateToolchainSection() {
         //get toolchain order for this language
-        def toolchains_order = toolchain_obj.toolchains["toolchains"][yaml_language]
-        String output = "#\n# TOOLCHAINS SECTION\n#\n"
+        def toolchains_order = toolchain_obj.toolchains['toolchains'][yaml_language]
+        String output = '#\n# TOOLCHAINS SECTION\n#\n'
         toolchains_order.each {
             def toolchain = it
             String[] toolchain_keys = toolchain_obj.toolchains[toolchain].keySet() as String[]
@@ -475,7 +475,7 @@ env:
                 }
             }
             else {
-                output = ""
+                output = ''
             }
         }
         else if(jervis_yaml[section] instanceof ArrayList) {
