@@ -30,6 +30,18 @@ class lifecycleValidatorTest extends GroovyTestCase {
         assert lifecycles.lifecycles['groovy']['friendlyName'] == 'Groovy'
         assert lifecycles.languages == ['groovy', 'ruby', 'java']
     }
+    @Test public void test_lifecycleValidator_load_JSONString() {
+        assert lifecycles.lifecycles == null
+        assert lifecycles.languages == null
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        String contents = new File(url.getFile()).getText()
+        //use a string this time
+        lifecycles.load_JSONString(contents)
+        assert lifecycles.lifecycles instanceof Map
+        assert lifecycles.languages instanceof String[]
+        assert lifecycles.lifecycles['groovy']['friendlyName'] == 'Groovy'
+        assert lifecycles.languages == ['groovy', 'ruby', 'java']
+    }
     //test supportedLanguage()
     @Test public void test_lifecycleValidator_supportedLanguage_yes() {
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
