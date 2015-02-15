@@ -28,12 +28,12 @@ class lifecycleValidator {
     /**
       A <tt>{@link HashMap}</tt> of the parsed lifecycles file.
      */
-    def lifecycles
+    Map lifecycles
 
     /**
       A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of supported languages in the lifecycles file.  This is just a list of the keys in {@link #lifecycles}.
      */
-    def languages
+    String[] languages
 
     /**
       Load the JSON of a lifecycles file and parse it.  This should be the first
