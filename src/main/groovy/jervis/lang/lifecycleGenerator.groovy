@@ -80,7 +80,7 @@ class lifecycleGenerator {
       conditionally generated depending on build tool is being used.  This way we can
       do neat things like generate different script output depending on if there's a
       <tt>build.gradle</tt>, <tt>pom.xml</tt>, or <tt>build.xml</tt>.
-      <tt>{@link #loadYamlString()}</tt> should be called before this.
+      <tt>{@link #loadYamlString(java.lang.String)}</tt> should be called before this.
      */
     ArrayList folder_listing
 
@@ -96,7 +96,7 @@ class lifecycleGenerator {
       <tt>listing</tt> conditionally sets <tt>{@link #lifecycle_key}</tt>.  This uses
       the <tt>fileExistsCondition</tt> and <tt>fallbackKey</tt> from the lifecycles
       file to determine the contents of <tt>lifecycle_key</tt>.
-      <tt>{@link #loadYamlString()}</tt> should be called before this.
+      <tt>{@link #loadYamlString(java.lang.String)}</tt> should be called before this.
       @param listing An <tt>ArrayList</tt> which is a list of files from a directory
                      path in a repository.
      */
