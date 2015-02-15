@@ -3,7 +3,7 @@
         "friendlyName": "Ruby",
         "defaultKey1": "rake1",
         "rake1": {
-            "fileExistsCondition": ["/", "Gemfile.lock"],
+            "fileExistsCondition": "Gemfile.lock",
             "fallbackKey": "rake2",
             "env": "export BUNDLE_GEMFILE=$PWD/Gemfile",
             "install": "bundle install --jobs=3 --retry=3 --deployment",
