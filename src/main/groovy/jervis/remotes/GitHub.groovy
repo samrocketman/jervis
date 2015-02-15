@@ -46,7 +46,7 @@ class GitHub implements JervisRemote {
       Sets the <tt>{@link #gh_web}</tt> and <tt>{@link #gh_api}</tt> properties.  This automatically sets <tt>gh_api</tt> based on <tt>gh_web</tt>.
      */
     //gh_web will always end with a trailing slash
-    void setGh_web(gh_web) {
+    void setGh_web(String gh_web) {
         this.gh_web = (gh_web[-1] == '/')? gh_web : gh_web + '/'
         this.setGh_api(this.gh_web + 'api/v3/')
     }
@@ -55,7 +55,7 @@ class GitHub implements JervisRemote {
       Sets the <tt>{@link #gh_api}</tt> property.
      */
     //gh_api will always end with a trailing slash
-    void setGh_api(gh_api) {
+    void setGh_api(String gh_api) {
         this.gh_api = (gh_api[-1] == '/')? gh_api : gh_api + '/'
     }
 
@@ -63,7 +63,7 @@ class GitHub implements JervisRemote {
       Sets the <tt>{@link #gh_clone}</tt> property.
      */
     //gh_clone will always end with a trailing slash
-    void setGh_clone(gh_clone) {
+    void setGh_clone(String gh_clone) {
         this.gh_clone = (gh_clone[-1] == '/')? gh_clone : gh_clone + '/'
     }
 
@@ -71,8 +71,8 @@ class GitHub implements JervisRemote {
       Sets the <tt>{@link #gh_token}</tt> property.
      */
     //gh_token should be null if it is a zero length string.
-    void setGh_token(gh_token) {
-        this.gh_token = (gh_token.toString().length() > 0)? gh_token : null
+    void setGh_token(String gh_token) {
+        this.gh_token = (gh_token.length() > 0)? gh_token : null
     }
 
     /*
