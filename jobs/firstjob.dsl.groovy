@@ -80,6 +80,15 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
             steps {
                 shell(generator.generateAll())
             }
+            //if a matrix build then generate matrix bits
+            if(generator.isMatrixBuild()) {
+                axes {
+                    generator.yaml_matrix_axes.each {
+                        text(it, generator.matrixGetAxisValue(it))
+                    }
+                }
+                combinationFilter(generator.matrixExcludeFilter())
+            }
         }
     }
 }
