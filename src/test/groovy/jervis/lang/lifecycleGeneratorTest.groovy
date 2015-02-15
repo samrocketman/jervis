@@ -70,6 +70,13 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert generator.toolchain_obj != null
         assert generator.toolchain_obj.class == toolchainValidator
         assert generator.toolchain_obj.toolchains['jdk']['default_ivalue'] == 'openjdk7'
+        generator = null
+        generator = new lifecycleGenerator()
+        assert generator.toolchain_obj == null
+        url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json');
+        shouldFail(JervisException) {
+            generator.loadToolchains(url.getFile())
+        }
     }
     @Test public void test_lifecycleGenerator_loadToolchainsString() {
         generator = null
@@ -81,6 +88,14 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert generator.toolchain_obj != null
         assert generator.toolchain_obj.class == toolchainValidator
         assert generator.toolchain_obj.toolchains['jdk']['default_ivalue'] == 'openjdk7'
+        generator = null
+        generator = new lifecycleGenerator()
+        assert generator.toolchain_obj == null
+        url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json');
+        contents = new File(url.getFile()).getText()
+        shouldFail(JervisException) {
+            generator.loadToolchainsString(contents)
+        }
     }
     @Test public void test_lifecycleGenerator_loadYaml_supportedLanguage_yes() {
         generator.loadYamlString('language: ruby')
