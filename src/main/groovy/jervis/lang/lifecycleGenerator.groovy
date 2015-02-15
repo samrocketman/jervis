@@ -283,11 +283,21 @@ env:
                 matrix[filterType][i].each { k, v ->
                     if(k in yaml_matrix_axes) {
                         if(first_in_expr) {
-                            temp += "${k} == ${jervis_yaml[k].indexOf(v)}"
+                            if(('env' == k) && (jervis_yaml[k] instanceof Map)) {
+                                temp += "${k} == '${k}${jervis_yaml[k]['matrix'].indexOf(v)}'"
+                            }
+                            else {
+                                temp += "${k} == '${k}${jervis_yaml[k].indexOf(v)}'"
+                            }
                             first_in_expr = false
                         }
                         else {
-                            temp += " && ${k} == ${jervis_yaml[k].indexOf(v)}"
+                            if(('env' == k) && (jervis_yaml[k] instanceof Map)) {
+                                temp += " && ${k} == '${k}${jervis_yaml[k]['matrix'].indexOf(v)}'"
+                            }
+                            else {
+                                temp += " && ${k} == '${k}${jervis_yaml[k].indexOf(v)}'"
+                            }
                         }
                     }
                     else {
