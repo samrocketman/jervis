@@ -71,6 +71,17 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert generator.toolchain_obj.class == toolchainValidator
         assert generator.toolchain_obj.toolchains['jdk']['default_ivalue'] == 'openjdk7'
     }
+    @Test public void test_lifecycleGenerator_loadToolchainsString() {
+        generator = null
+        generator = new lifecycleGenerator()
+        assert generator.toolchain_obj == null
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
+        String contents = new File(url.getFile()).getText()
+        generator.loadToolchainsString(contents)
+        assert generator.toolchain_obj != null
+        assert generator.toolchain_obj.class == toolchainValidator
+        assert generator.toolchain_obj.toolchains['jdk']['default_ivalue'] == 'openjdk7'
+    }
     @Test public void test_lifecycleGenerator_loadYaml_supportedLanguage_yes() {
         generator.loadYamlString('language: ruby')
         assert 'ruby' == generator.yaml_language
