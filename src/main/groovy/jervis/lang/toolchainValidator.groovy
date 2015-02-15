@@ -5,9 +5,16 @@ import jervis.exceptions.ToolchainMissingKeyException
 import jervis.exceptions.ToolchainValidationException
 
 /**
-  Validates the contents of a <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file" target="_blank">toolchains file</a> and provides quick access to supported matrices.
+  Validates the contents of a
+  <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file" target="_blank">toolchains file</a>
+  and provides quick access to supported matrices.
 
   <h2>Sample usage</h2>
+  <p>Please note, if you are writing Job DSL plugin groovy scripts you should not
+  use the <tt>scmGit</tt> class to access files in the repository where your DSL
+  scripts reside.  Instead, use the
+  <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
+  method provided by the Job DSL plugin in Jenkins.</p>
 <pre><tt>import jervis.lang.toolchainValidator
 import jervis.tools.scmGit
 def git = new scmGit()
