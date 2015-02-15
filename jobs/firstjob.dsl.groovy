@@ -91,7 +91,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
             if(generator.isMatrixBuild()) {
                 axes {
                     generator.yaml_matrix_axes.each {
-                        text(it, generator.matrixGetAxisValue(it).toString())
+                        text(it, generator.matrixGetAxisValue(it).split())
                     }
                 }
                 combinationFilter(generator.matrixExcludeFilter())
