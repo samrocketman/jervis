@@ -167,14 +167,14 @@ class lifecycleGeneratorTest extends GroovyTestCase {
     }
     @Test public void test_lifecycleGenerator_matrixGetAxisValue() {
         generator.loadYamlString('language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar')
-        assert '0 1' == generator.matrixGetAxisValue('env')
+        assert 'env0 env1' == generator.matrixGetAxisValue('env')
         assert '' == generator.matrixGetAxisValue('rvm')
     }
     @Test public void test_lifecycleGenerator_generateToolchainSection_matrix() {
         generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\ncase ${env} in\n  0)\n    export world=hello\n    ;;\n  1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         generator.loadYamlString('language: ruby\njdk: [openjdk6, openjdk7]')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\ncase ${jdk} in\n  0)\n    more commands\n    ;;\n  1)\n    some commands\n    ;;\nesac\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\ncase ${jdk} in\n  jdk0)\n    more commands\n    ;;\n  jdk1)\n    some commands\n    ;;\nesac\n' == generator.generateToolchainSection()
         generator.loadYamlString('language: ruby\njdk: [openjdk6, openjdk7, derp]')
         shouldFail(UnsupportedToolException) {
             generator.generateToolchainSection()

@@ -343,7 +343,7 @@ env:
         int counter = 0
         if(axis in yaml_matrix_axes) {
             jervis_yaml[axis].each {
-                result += " ${counter}"
+                result += " ${axis}${counter}"
                 counter++
             }
             return result.trim()
@@ -382,7 +382,7 @@ env:
                 if(!toolchain_obj.supportedTool(toolchain, tempchain)) {
                     throw new UnsupportedToolException("${toolchain}: ${tempchain}")
                 }
-                output += "  ${i})\n"
+                output += "  ${toolchain}${i})\n"
                 if(tempchain in toolchain_keys) {
                     output += '    ' + toolchain_obj.toolchains[toolchain][tempchain].join('\n    ') + '\n    ;;\n'
                 }
