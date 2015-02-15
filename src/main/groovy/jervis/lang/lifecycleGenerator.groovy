@@ -273,7 +273,7 @@ env:
                     temp = "!${temp}"
                 }
                 matrix[filterType][i].each { k, v ->
-                    if(jervis_yaml[k] && (k in yaml_matrix_axes)) {
+                    if(k in yaml_matrix_axes) {
                         if(first_in_expr) {
                             temp += "${k} == ${jervis_yaml[k].indexOf(v)}"
                             first_in_expr = false
@@ -298,7 +298,7 @@ env:
                     }
                 }
             }
-            if(result != '' && group) {
+            if(group) {
                 if(result.indexOf(exprSeparator) >= 0) {
                     result = "(${result})"
                 }
