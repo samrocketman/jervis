@@ -35,6 +35,17 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert generator.lifecycle_obj.class == lifecycleValidator
         assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
     }
+    @Test public void test_lifecycleGenerator_loadLifecyclesString() {
+        generator = null
+        generator = new lifecycleGenerator()
+        assert generator.lifecycle_obj == null
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        String contents = new File(url.getFile()).getText()
+        generator.loadLifecyclesString(contents)
+        assert generator.lifecycle_obj != null
+        assert generator.lifecycle_obj.class == lifecycleValidator
+        assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
+    }
     @Test public void test_lifecycleGenerator_loadToolchains() {
         generator = null
         generator = new lifecycleGenerator()
