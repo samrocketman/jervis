@@ -183,14 +183,29 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert 'env0 env1' == generator.matrixGetAxisValue('env')
     }
     @Test public void test_lifecycleGenerator_generateToolchainSection_matrix() {
+        //basic env matrix
         generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]')
         assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        //using jdk as matrix
         generator.loadYamlString('language: ruby\njdk: [openjdk6, openjdk7]')
         assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\ncase ${jdk} in\n  jdk0)\n    more commands\n    ;;\n  jdk1)\n    some commands\n    ;;\nesac\n' == generator.generateToolchainSection()
+        //advanced env section which has a matrix section
         generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]')
         assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
-        generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        generator.loadYamlString('language: ruby\nenv:\n  matrix: {hello: three}')
+        shouldFail(UnsupportedToolException) {
+            generator.generateToolchainSection()
+        }
+        ///advanced env section which has a matrix and global section
+        generator.loadYamlString('language: ruby\nenv:\n  global: foobar=foo\n  matrix: [world=hello, world=goodbye]')
+        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foobar=foo\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        generator.loadYamlString('language: ruby\nenv:\n  global: [foobar=foo, foobar=bar]\n  matrix: [world=hello, world=goodbye]')
+        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foobar=foo\nexport foobar=bar\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        generator.loadYamlString('language: ruby\nenv:\n  global: {hello: three}')
+        shouldFail(UnsupportedToolException) {
+            generator.generateToolchainSection()
+        }
+        //check for bad value in jdk matrix
         generator.loadYamlString('language: ruby\njdk: [openjdk6, openjdk7, derp]')
         shouldFail(UnsupportedToolException) {
             generator.generateToolchainSection()
@@ -212,10 +227,6 @@ class lifecycleGeneratorTest extends GroovyTestCase {
             generator.generateToolchainSection()
         }
         generator.loadYamlString('language: ruby\njdk: 2.5')
-        shouldFail(UnsupportedToolException) {
-            generator.generateToolchainSection()
-        }
-        generator.loadYamlString('language: ruby\nenv:\n  matrix: {hello: three}')
         shouldFail(UnsupportedToolException) {
             generator.generateToolchainSection()
         }
