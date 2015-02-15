@@ -239,7 +239,7 @@ env: foo=bar</tt></pre>
       <pre><tt>language: groovy
 env:
   - foo=bar</tt></pre>
-      <p>However, the following YAML will produce a matrix build.
+      <p>However, the following YAML will produce a matrix build.</p>
       <pre><tt>language: groovy
 env:
   - foobar=foo
