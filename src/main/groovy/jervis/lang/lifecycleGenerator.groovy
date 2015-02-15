@@ -460,7 +460,7 @@ env:
                 }
                 //check if a matrix build
                 if(toolchain in yaml_matrix_axes) {
-                    if(('env' == toolchain) && user_toolchain instanceof Map) {
+                    if(('env' == toolchain) && (user_toolchain instanceof Map)) {
                         //special env behavior for global and matrix values
                         def env = user_toolchain
                         if('global' in env) {
@@ -495,7 +495,27 @@ env:
                 }
                 else {
                     //not a matrix build
-                    output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain, false)
+                    if(('env' == toolchain) && (user_toolchain instanceof Map)) {
+                        if('global' in user_toolchain) {
+                            if(user_toolchain['global'] instanceof String) {
+                                output += this.toolchainBuilder(toolchain, toolchain_keys, [user_toolchain['global']], false)
+                            }
+                            else if(user_toolchain['global'] instanceof ArrayList) {
+                                user_toolchain['global'].each {
+                                    output += this.toolchainBuilder(toolchain, toolchain_keys, [it], false)
+                                }
+                            }
+                            else {
+                                    throw new UnsupportedToolException("${toolchain}: global.${user_toolchain['global']}")
+                            }
+                        }
+                        if('matrix' in user_toolchain) {
+                            output += this.toolchainBuilder(toolchain, toolchain_keys, [user_toolchain['matrix']], false)
+                        }
+                    }
+                    else {
+                        output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain, false)
+                    }
                 }
             }
             else {
