@@ -218,7 +218,10 @@ class lifecycleGenerator {
         if(this.isMatrixBuild()) {
             yaml_matrix_axes = []
             toolchain_obj.toolchains["toolchains"][yaml_language].each {
-                if((it != null) && (jervis_yaml[it] instanceof ArrayList) && (jervis_yaml[it].size() > 1)) {
+                if((jervis_yaml[it] instanceof ArrayList) && (jervis_yaml[it].size() > 1)) {
+                    yaml_matrix_axes << it
+                }
+                else if((it == 'env') && (jervis_yaml[it] instanceof Map) && ('matrix' in jervis_yaml[it]) && (jervis_yaml[it]['matrix'].size() > 1)) {
                     yaml_matrix_axes << it
                 }
             }
@@ -249,6 +252,9 @@ env:
         yaml_keys.each{
             if(toolchain_obj.supportedMatrix(yaml_language, it)) {
                 if(jervis_yaml[it] instanceof ArrayList && jervis_yaml[it].size() > 1) {
+                     result=true
+                }
+                else if(('env' == it) && (jervis_yaml[it] instanceof Map) && ('matrix' in jervis_yaml[it]) && (jervis_yaml[it]['matrix'].size() > 1)) {
                      result=true
                 }
             }
