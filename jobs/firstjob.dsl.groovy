@@ -56,7 +56,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
             return
         }
         generator.folder_listing = folder_listing
-        job(type: MatrixJob) {
+        job(type: Matrix) {
             name("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-'))
             scm {
                 //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
