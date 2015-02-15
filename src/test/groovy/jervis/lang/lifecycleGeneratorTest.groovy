@@ -97,6 +97,21 @@ class lifecycleGeneratorTest extends GroovyTestCase {
             generator.loadToolchainsString(contents)
         }
     }
+    @Test public void test_lifecycleGenerator_loadYaml_exceptions() {
+        generator = new lifecycleGenerator()
+        shouldFail(JervisException) {
+            generator.loadYamlString('language: ruby')
+        }
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        generator.loadLifecycles(url.getFile())
+        shouldFail(JervisException) {
+            generator.loadYamlString('language: ruby')
+        }
+        url = this.getClass().getResource('/good_toolchains_simple.json');
+        generator.loadToolchains(url.getFile())
+        generator.loadYamlString('language: ruby')
+        assert 'ruby' == generator.yaml_language
+    }
     @Test public void test_lifecycleGenerator_loadYaml_supportedLanguage_yes() {
         generator.loadYamlString('language: ruby')
         assert 'ruby' == generator.yaml_language
