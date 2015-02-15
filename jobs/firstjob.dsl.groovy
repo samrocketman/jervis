@@ -1,7 +1,5 @@
 @Grab(group='org.yaml', module='snakeyaml', version='1.14')
 
-import javaposse.jobdsl.dsl.Freeform
-import javaposse.jobdsl.dsl.MatrixJob
 import jervis.lang.lifecycleGenerator
 import jervis.remotes.GitHub
 
@@ -58,14 +56,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
             return
         }
         generator.folder_listing = folder_listing
-        def jobType
-        if(generator.isMatrixBuild()) {
-            jobType = MatrixJob
-        }
-        else {
-            jobType = Freeform
-        }
-        job(type: jobType) {
+        job(type: MatrixJob) {
             name("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-'))
             scm {
                 //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
