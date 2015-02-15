@@ -35,11 +35,23 @@ class GitHubTest extends GroovyTestCase {
                 throw new RuntimeException("[404] Not Found - ${resource}")
             }
         }
+        mc.newReader = { Map parameters ->
+            //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
+            String file = this.url.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
+            URL resource_url = this.getClass().getResource("/mocks/${file}");
+            def resource = new File(resource_url.getFile())
+            if(resource.isFile()) {
+                return resource.newReader()
+            }
+            else {
+                throw new RuntimeException("[404] Not Found - ${resource}")
+            }
+        }
     }
     //set up before every test
     @Before protected void setUp() {
-        mock(URL)
         super.setUp()
+        mock(URL)
         mygh = new GitHub()
     }
     //tear down after every test
@@ -93,6 +105,10 @@ class GitHubTest extends GroovyTestCase {
     @Test public void test_GitHub_set2Gh_token() {
         mygh.gh_token = ''
         assert mygh.gh_token == null
+    }
+    @Test public void test_GitHub_set3Gh_token() {
+        mygh.gh_token = 'a'
+        assert 'language: groovy\n' == mygh.getFile('samrocketman/jervis','.travis.yml','master')
     }
     //test GitHub().getWebUrl()
     @Test public void test_GitHub_getWebUrl1() {
