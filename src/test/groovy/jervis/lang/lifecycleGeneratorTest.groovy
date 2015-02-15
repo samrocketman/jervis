@@ -34,6 +34,13 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert generator.lifecycle_obj != null
         assert generator.lifecycle_obj.class == lifecycleValidator
         assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
+        generator = null
+        generator = new lifecycleGenerator()
+        assert generator.lifecycle_obj == null
+        url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
+        shouldFail(JervisException) {
+            generator.loadLifecycles(url.getFile())
+        }
     }
     @Test public void test_lifecycleGenerator_loadLifecyclesString() {
         generator = null
@@ -45,6 +52,14 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert generator.lifecycle_obj != null
         assert generator.lifecycle_obj.class == lifecycleValidator
         assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
+        generator = null
+        generator = new lifecycleGenerator()
+        assert generator.lifecycle_obj == null
+        url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
+        contents = new File(url.getFile()).getText()
+        shouldFail(JervisException) {
+            generator.loadLifecyclesString(contents)
+        }
     }
     @Test public void test_lifecycleGenerator_loadToolchains() {
         generator = null
