@@ -197,9 +197,11 @@ class lifecycleGenerator {
      */
     public void loadYamlString(String raw_yaml) throws JervisException, UnsupportedLanguageException {
         def yaml = new Yaml()
-        this.jervis_yaml = yaml.load(raw_yaml)
-        this.yaml_language = this.jervis_yaml['language']
-        this.yaml_keys = this.jervis_yaml.keySet() as String[]
+        jervis_yaml = yaml.load(raw_yaml)
+        yaml_keys = jervis_yaml.keySet() as String[]
+        if(jervis_yaml['language']) {
+            yaml_language = jervis_yaml['language']
+        }
         if(!lifecycle_obj) {
             throw new JervisException('ERROR: Must call lifecycleGenerator.loadLifecycles() or lifecycleGenerator.loadLifecyclesString() first.')
         }
@@ -214,10 +216,10 @@ class lifecycleGenerator {
         this.setFolder_listing([])
         //configure the matrix axes if it is a matrix build i.e. set yaml_matrix_axes
         if(this.isMatrixBuild()) {
-            this.yaml_matrix_axes = []
+            yaml_matrix_axes = []
             toolchain_obj.toolchains["toolchains"][yaml_language].each {
                 if((it != null) && (jervis_yaml[it] instanceof ArrayList) && (jervis_yaml[it].size() > 1)) {
-                    this.yaml_matrix_axes << it
+                    yaml_matrix_axes << it
                 }
             }
         }
