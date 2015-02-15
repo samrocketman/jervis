@@ -56,7 +56,14 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
             return
         }
         generator.folder_listing = folder_listing
-        job(type: Matrix) {
+        def jobType
+        if(generator.isMatrixBuild()) {
+            jobType = Matrix
+        }
+        else {
+            jobType = Freeform
+        }
+        job(type: jobType) {
             name("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-'))
             scm {
                 //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
@@ -84,7 +91,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
             if(generator.isMatrixBuild()) {
                 axes {
                     generator.yaml_matrix_axes.each {
-                        text(it, generator.matrixGetAxisValue(it))
+                        text(it, generator.matrixGetAxisValue(it).toString())
                     }
                 }
                 combinationFilter(generator.matrixExcludeFilter())
