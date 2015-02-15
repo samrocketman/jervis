@@ -4,8 +4,11 @@ import jervis.exceptions.UnsupportedLanguageException
 import jervis.lang.lifecycleGenerator
 import jervis.remotes.GitHub
 
-
 def git_service = new GitHub()
+//authenticate
+if(System.getenv('GITHUB_TOKEN')) {
+    git_service.gh_token = System.getenv('GITHUB_TOKEN')
+}
 
 if("${project}".size() > 0 && "${project}".split('/').length == 2) {
     println 'Generating jobs for ' + git_service.toString() + " project ${project}."
