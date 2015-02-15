@@ -254,7 +254,7 @@ env:
                 if(jervis_yaml[it] instanceof ArrayList && jervis_yaml[it].size() > 1) {
                      result=true
                 }
-                else if(('env' == it) && (jervis_yaml[it] instanceof Map) && ('matrix' in jervis_yaml[it]) && (jervis_yaml[it]['matrix'].size() > 1)) {
+                else if(('env' == it) && (jervis_yaml[it] instanceof Map) && ('matrix' in jervis_yaml[it]) && (jervis_yaml[it]['matrix'] instanceof ArrayList) && (jervis_yaml[it]['matrix'].size() > 1)) {
                      result=true
                 }
             }
@@ -477,10 +477,7 @@ env:
                             }
                         }
                         if('matrix' in env) {
-                            if(env['matrix'] instanceof String) {
-                                output += this.toolchainBuilder(toolchain, toolchain_keys, [env['matrix']], false)
-                            }
-                            else if(env['matrix'] instanceof ArrayList) {
+                            if(env['matrix'] instanceof ArrayList) {
                                 output += this.toolchainBuilder(toolchain, toolchain_keys, env['matrix'], true)
                             }
                             else {
@@ -510,7 +507,12 @@ env:
                             }
                         }
                         if('matrix' in user_toolchain) {
-                            output += this.toolchainBuilder(toolchain, toolchain_keys, [user_toolchain['matrix']], false)
+                            if(user_toolchain['matrix'] instanceof String) {
+                                output += this.toolchainBuilder(toolchain, toolchain_keys, [user_toolchain['matrix']], false)
+                            }
+                            else {
+                                output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain['matrix'], false)
+                            }
                         }
                     }
                     else {
