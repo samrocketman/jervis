@@ -24,13 +24,13 @@
         "friendlyName": "Erlang",
         "defaultKey": "rebar1",
         "rebar1": {
-            "fileExistsCondition": ["/", "rebar.config"],
+            "fileExistsCondition": "rebar.config",
             "fallbackKey": "rebar2",
             "install": "rebar get-deps",
             "script": "rebar compile && rebar skip_deps=true eunit"
         },
         "rebar2": {
-            "fileExistsCondition": ["/", "Rebar.config"],
+            "fileExistsCondition": "Rebar.config",
             "fallbackKey": "make",
             "install": "rebar get-deps",
             "script": "rebar compile && rebar skip_deps=true eunit"
@@ -43,7 +43,7 @@
         "friendlyName": "Go",
         "defaultKey": "make",
         "make": {
-            "fileExistsCondition": ["/", "Makefile"],
+            "fileExistsCondition": "Makefile",
             "fallbackKey": "go",
             "install": "go get -d -v ./... && go build -v ./...",
             "script": "make"
@@ -57,25 +57,25 @@
         "friendlyName": "Groovy",
         "defaultKey": "gradlew",
         "gradlew": {
-            "fileExistsCondition": ["/", "gradlew"],
+            "fileExistsCondition": "gradlew",
             "fallbackKey": "gradle",
             "install": "./gradlew assemble",
             "script": "./gradlew check"
         },
         "gradle": {
-            "fileExistsCondition": ["/", "build.gradle"],
+            "fileExistsCondition": "build.gradle",
             "fallbackKey": "maven",
             "install": "gradle assemble",
             "script": "gradle check"
         },
         "maven": {
-            "fileExistsCondition": ["/", "pom.xml"],
+            "fileExistsCondition": "pom.xml",
             "fallbackKey": "ant",
             "install": "mvn install -DskipTests=true",
             "script": "mvn test",
         },
         "ant": {
-            "fileExistsCondition": ["/", "build.xml"],
+            "fileExistsCondition": "build.xml",
             "script": "ant test",
         }
     },
@@ -91,25 +91,25 @@
         "friendlyName": "Java",
         "defaultKey": "gradlew",
         "gradlew": {
-            "fileExistsCondition": ["/", "gradlew"],
+            "fileExistsCondition": "gradlew",
             "fallbackKey": "gradle",
             "install": "./gradlew assemble",
             "script": "./gradlew check"
         },
         "gradle": {
-            "fileExistsCondition": ["/", "build.gradle"],
+            "fileExistsCondition": "build.gradle",
             "fallbackKey": "maven",
             "install": "gradle assemble",
             "script": "gradle check"
         },
         "maven": {
-            "fileExistsCondition": ["/", "pom.xml"],
+            "fileExistsCondition": "pom.xml",
             "fallbackKey": "ant",
             "install": "mvn install -DskipTests=true",
             "script": "mvn test",
         },
         "ant": {
-            "fileExistsCondition": ["/", "build.xml"],
+            "fileExistsCondition": "build.xml",
             "script": "ant test",
         }
     },
@@ -125,13 +125,13 @@
         "friendlyName": "Perl",
         "defaultKey": "Module::Build",
         "Module::Build": {
-            "fileExistsCondition": ["/", "Build.PL"],
+            "fileExistsCondition": "Build.PL",
             "fallbackKey": "EUMM",
             "install": "cpanm --quiet --installdeps --notest .",
             "script": "perl Build.PL && ./Build test"
         },
         "EUMM": {
-            "fileExistsCondition": ["/", "Makefile.PL"],
+            "fileExistsCondition": "Makefile.PL",
             "fallbackKey": "make",
             "install": "cpanm --quiet --installdeps --notest .",
             "script": "perl Makefile.PL && make test"
@@ -157,7 +157,7 @@
         "friendlyName": "Ruby",
         "defaultKey": "rake1",
         "rake1": {
-            "fileExistsCondition": ["/", "Gemfile.lock"],
+            "fileExistsCondition": "Gemfile.lock",
             "fallbackKey": "rake2",
             "install": "bundle install --jobs=3 --retry=3 --deployment",
             "script": "bundle exec rake"
