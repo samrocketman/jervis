@@ -44,6 +44,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
 
     git_service.branches("${project}").each {
         def JERVIS_BRANCH = it
+        println "Generating branch: ${JERVIS_BRANCH}"
         def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
         def generator = new lifecycleGenerator()
         generator.loadLifecyclesString(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
