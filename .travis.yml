@@ -7,8 +7,6 @@ env:
   - GROOVY_VERSION="2.3.9"
   - GROOVY_VERSION="2.4.0"
 matrix:
-  exclude:
-    - env: GROOVY_VERSION="2.1.9"
   allow_failures:
     - env: GROOVY_VERSION="2.0.8"
     - env: GROOVY_VERSION="2.1.9"
