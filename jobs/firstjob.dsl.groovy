@@ -1,5 +1,7 @@
 @Grab(group='org.yaml', module='snakeyaml', version='1.14')
 
+import javaposse.jobdsl.dsl.Freeform
+import javaposse.jobdsl.dsl.MatrixJob
 import jervis.lang.lifecycleGenerator
 import jervis.remotes.GitHub
 
