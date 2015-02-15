@@ -59,6 +59,9 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
             //skip creating the job for this branch
             return
         }
+        if(!generator.yaml_language) {
+            generator.yaml_language = 'ruby'
+        }
         generator.folder_listing = folder_listing
         def jobType
         if(generator.isMatrixBuild()) {
