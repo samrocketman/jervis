@@ -189,8 +189,10 @@ class lifecycleGenerator {
     }
 
     /**
-      Load Jervis YAML to be interpreted.  This YAML will be used to generate the build scripts
-      and components of a Jenkins job.
+      Load Jervis YAML to be interpreted.  This YAML will be used to generate the
+      build scripts and components of a Jenkins job.  Please note: you must call
+      <tt>{@link #loadToolchains(java.lang.String)}</tt> and
+      <tt>{@link #loadLifecycles(java.lang.String)}</tt> before calling this function.
       @param raw_yaml A <tt>String</tt> which contains Jervis YAML to be parsed.
      */
     public void loadYamlString(String raw_yaml) {
