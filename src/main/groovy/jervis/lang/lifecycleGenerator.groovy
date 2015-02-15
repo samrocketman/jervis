@@ -429,8 +429,9 @@ env:
             output += "#${toolchain} toolchain section\n"
             if(toolchain in yaml_keys) {
                 //do non-default stuff
-                ArrayList user_toolchain
-                if(!(jervis_yaml[toolchain] instanceof String) && !(jervis_yaml[toolchain] instanceof ArrayList)) {
+                def user_toolchain
+                //toolchain must be an instance of String, ArrayList, or (in the case of only env) Map.
+                if(!(jervis_yaml[toolchain] instanceof String) && !(jervis_yaml[toolchain] instanceof ArrayList) && !(('env' == toolchain) && (jervis_yaml['env'] instanceof Map))) {
                     throw new UnsupportedToolException("${toolchain}: ${jervis_yaml[toolchain]}")
                 }
                 if(jervis_yaml[toolchain] instanceof String) {
@@ -441,7 +442,38 @@ env:
                 }
                 //check if a matrix build
                 if(toolchain in yaml_matrix_axes) {
-                    output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain, true)
+                    if(('env' == toolchain) && user_toolchain instanceof Map) {
+                        //special env behavior for global and matrix values
+                        def env = user_toolchain
+                        if('global' in env) {
+                            if(env['global'] instanceof String) {
+                                output += this.toolchainBuilder(toolchain, toolchain_keys, [env['global']], false)
+                            }
+                            else if(env['global'] instanceof ArrayList) {
+                                env['global'].each {
+                                    output += this.toolchainBuilder(toolchain, toolchain_keys, [it], false)
+                                }
+                            }
+                            else {
+                                throw new UnsupportedToolException("${toolchain}: global.${env['global']}")
+                            }
+                        }
+                        if('matrix' in env) {
+                            if(env['matrix'] instanceof String) {
+                                output += this.toolchainBuilder(toolchain, toolchain_keys, [env['global']], false)
+                            }
+                            else if(env['matrix'] instanceof ArrayList) {
+                                output += this.toolchainBuilder(toolchain, toolchain_keys, env['matrix'], true)
+                            }
+                            else {
+                                throw new UnsupportedToolException("${toolchain}: matrix.${env['matrix']}")
+                            }
+                        }
+                    }
+                    else {
+                        //normal toolchain behavior
+                        output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain, true)
+                    }
                 }
                 else {
                     //not a matrix build
