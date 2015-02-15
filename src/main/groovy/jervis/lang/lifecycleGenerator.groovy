@@ -378,16 +378,17 @@ env:
         if(matrix) {
             output += "case \${${toolchain}} in\n"
             for(int i=0; i < chain.size(); i++) {
-                if(!toolchain_obj.supportedTool(toolchain, chain[i])) {
-                    throw new UnsupportedToolException("${toolchain}: ${chain[i]}")
+                String tempchain = chain[i].toString()
+                if(!toolchain_obj.supportedTool(toolchain, tempchain)) {
+                    throw new UnsupportedToolException("${toolchain}: ${tempchain}")
                 }
                 output += "  ${i})\n"
-                if(chain[i] in toolchain_keys) {
-                    output += '    ' + toolchain_obj.toolchains[toolchain][chain[i]].join('\n    ') + '\n    ;;\n'
+                if(tempchain in toolchain_keys) {
+                    output += '    ' + toolchain_obj.toolchains[toolchain][tempchain].join('\n    ') + '\n    ;;\n'
                 }
                 else {
                     //assume using "*" key
-                    output += '    ' + this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], chain[i]).join('\n    ') + '\n    ;;\n'
+                    output += '    ' + this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], tempchain).join('\n    ') + '\n    ;;\n'
                 }
             }
             output += 'esac\n'
@@ -401,7 +402,7 @@ env:
             }
             else {
                 //assume using "*" key
-                output += this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], chain[0]).join('\n') + '\n'
+                output += this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], chain[0].toString()).join('\n') + '\n'
             }
         }
         return output
