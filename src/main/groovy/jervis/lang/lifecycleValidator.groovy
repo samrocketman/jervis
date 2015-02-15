@@ -7,9 +7,16 @@ import jervis.exceptions.LifecycleMissingKeyException
 import jervis.exceptions.LifecycleValidationException
 
 /**
-  Validates the contents of a <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycle file</a> and provides quick access to supported languages.
+  Validates the contents of a
+  <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycle file</a>
+  and provides quick access to supported languages.
 
   <h2>Sample usage</h2>
+  <p>Please note, if you are writing Job DSL plugin groovy scripts you should not
+  use the <tt>scmGit</tt> class to access files in the repository where your DSL
+  scripts reside.  Instead, use the
+  <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
+  method provided by the Job DSL plugin in Jenkins.</p>
 <pre><tt>import jervis.lang.lifecycleValidator
 import jervis.tools.scmGit
 def git = new scmGit()
