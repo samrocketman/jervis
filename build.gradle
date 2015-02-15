@@ -7,15 +7,15 @@ version = '0.1.0-SNAPSHOT'
 
 apply from: 'file:gradle/groovydoc.gradle'
 
-ext.groovyVersion = System.getenv("GROOVY_VERSION")?: "1.8.9"
+ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '1.8.9'
 
 println "Using Groovy ${groovyVersion}"
-println "Using Gradle ${GradleVersion.current().toString()}"
+println "Using Gradle ${GradleVersion.current().getVersion()}"
 
 buildscript {
     repositories { mavenCentral() }
     dependencies {
-        classpath "net.saliman:gradle-cobertura-plugin:2.2.5"
+        classpath 'net.saliman:gradle-cobertura-plugin:2.2.5'
     }
 }
 
@@ -31,20 +31,20 @@ test {
   testLogging.showStandardStreams = true
 
   // set heap size for the test JVM(s)
-  minHeapSize = "128m"
-  maxHeapSize = "512m"
+  minHeapSize = '128m'
+  maxHeapSize = '512m'
 
   // set JVM arguments for the test JVM(s)
   jvmArgs '-XX:MaxPermSize=256m'
 
   // listen to events in the test execution lifecycle
   beforeTest { descriptor ->
-     logger.lifecycle("Running test: " + descriptor)
+     logger.lifecycle('Running test: ' + descriptor)
   }
 
   // listen to standard out and standard error of the test JVM(s)
   onOutput { descriptor, event ->
-     logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
+     logger.lifecycle('Test: ' + descriptor + ' produced standard out/err: ' + event.message )
   }
 }
 
