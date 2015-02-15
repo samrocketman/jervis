@@ -28,7 +28,9 @@ class lifecycleValidatorTest extends GroovyTestCase {
         assert lifecycles.lifecycles instanceof Map
         assert lifecycles.languages instanceof String[]
         assert lifecycles.lifecycles['groovy']['friendlyName'] == 'Groovy'
-        assert lifecycles.languages == ['groovy', 'ruby', 'java']
+        assert 'groovy' in lifecycles.languages
+        assert 'ruby' in lifecycles.languages
+        assert 'java' in lifecycles.languages
     }
     @Test public void test_lifecycleValidator_load_JSONString() {
         assert lifecycles.lifecycles == null
@@ -40,7 +42,9 @@ class lifecycleValidatorTest extends GroovyTestCase {
         assert lifecycles.lifecycles instanceof Map
         assert lifecycles.languages instanceof String[]
         assert lifecycles.lifecycles['groovy']['friendlyName'] == 'Groovy'
-        assert lifecycles.languages == ['groovy', 'ruby', 'java']
+        assert 'groovy' in lifecycles.languages
+        assert 'ruby' in lifecycles.languages
+        assert 'java' in lifecycles.languages
     }
     //test supportedLanguage()
     @Test public void test_lifecycleValidator_supportedLanguage_yes() {

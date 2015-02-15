@@ -27,8 +27,13 @@ class toolchainValidatorTest extends GroovyTestCase {
         assert toolchains.toolchain_list instanceof String[]
         assert toolchains.languages instanceof String[]
         assert toolchains.toolchains['jdk']['default_ivalue'] == 'openjdk7'
-        assert toolchains.toolchain_list == ['toolchains', 'gemfile', 'jdk', 'env', 'rvm']
-        assert toolchains.languages == ['ruby', 'java']
+        assert 'toolchains' in toolchains.toolchain_list
+        assert 'gemfile' in toolchains.toolchain_list
+        assert 'jdk' in toolchains.toolchain_list
+        assert 'env' in toolchains.toolchain_list
+        assert 'rvm' in toolchains.toolchain_list
+        assert 'ruby' in toolchains.languages
+        assert 'java' in toolchains.languages
         toolchains == null
         toolchains = new toolchainValidator()
         assert toolchains.toolchains == null
@@ -52,8 +57,13 @@ class toolchainValidatorTest extends GroovyTestCase {
         assert toolchains.toolchain_list instanceof String[]
         assert toolchains.languages instanceof String[]
         assert toolchains.toolchains['jdk']['default_ivalue'] == 'openjdk7'
-        assert toolchains.toolchain_list == ['toolchains', 'gemfile', 'jdk', 'env', 'rvm']
-        assert toolchains.languages == ['ruby', 'java']
+        assert 'toolchains' in toolchains.toolchain_list
+        assert 'gemfile' in toolchains.toolchain_list
+        assert 'jdk' in toolchains.toolchain_list
+        assert 'env' in toolchains.toolchain_list
+        assert 'rvm' in toolchains.toolchain_list
+        assert 'ruby' in toolchains.languages
+        assert 'java' in toolchains.languages
         toolchains == null
         toolchains = new toolchainValidator()
         assert toolchains.toolchains == null
