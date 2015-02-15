@@ -150,7 +150,20 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert true == generator.isMatrixBuild()
     }
     @Test public void test_lifecycleGenerator_matrixExcludeFilter() {
-        generator.loadYamlString('language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar')
+        generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  exclude:\n    - env: world=goodbye\n      rvm: "2.1"')
+        assert '!(env == 1 && rvm == 2)' == generator.matrixExcludeFilter()
+        generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  include:\n    - env: world=goodbye\n      rvm: "2.1"')
+        assert '(env == 1 && rvm == 2)' == generator.matrixExcludeFilter()
+        generator.loadYamlString('language: ruby\njdk: openjdk6\nenv: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  include:\n    - env: world=goodbye\n      rvm: "2.1"\n    - jdk: openjdk6')
+        assert '(env == 1 && rvm == 2)' == generator.matrixExcludeFilter()
+        generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  exclude:\n    - env: world=goodbye\n      rvm: "2.1"\n    - env: world=hello\n      rvm: 1.9.3')
+        assert '!(env == 1 && rvm == 2) && !(env == 0 && rvm == 0)' == generator.matrixExcludeFilter()
+        generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  include:\n    - env: world=goodbye\n      rvm: "2.1"\n    - env: world=hello\n      rvm: 1.9.3')
+        assert '((env == 1 && rvm == 2) || (env == 0 && rvm == 0))' == generator.matrixExcludeFilter()
+        generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  exclude:\n    - env: world=hello\n      rvm: 1.9.3\n  include:\n    - rvm: "1.9.3"\n    - rvm: "2.1"')
+        assert '!(env == 0 && rvm == 0) && ((rvm == 0) || (rvm == 2))' == generator.matrixExcludeFilter()
+        generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  include:\n    - env: world=hello\n      rvm: 1.9.3\n  exclude:\n    - rvm: "1.9.3"\n    - rvm: "2.1"')
+        assert '!(rvm == 0) && !(rvm == 2) && (env == 0 && rvm == 0)' == generator.matrixExcludeFilter()
     }
     @Test public void test_lifecycleGenerator_matrixGetAxisValue() {
         generator.loadYamlString('language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar')
