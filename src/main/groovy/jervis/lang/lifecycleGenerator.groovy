@@ -8,7 +8,7 @@ import jervis.lang.toolchainValidator
 import org.yaml.snakeyaml.Yaml
 
 /**
-  WIP: Docs will be written once this class has stabilized.
+  Generates the build scripts from the Jervis YAML.
 
   <h2>Sample usage</h2>
 <pre><tt>import jervis.lang.lifecycleGenerator
