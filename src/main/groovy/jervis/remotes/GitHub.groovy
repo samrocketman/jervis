@@ -91,7 +91,7 @@ class GitHub implements JervisRemote {
             return json.parse(new URL(addr).newReader(requestProperties: ['Authorization': "token ${this.gh_token}".toString(), 'Accept': 'application/vnd.github.v3+json']))
         }
         else {
-            return json.parse(new URL(addr).newReader())
+            return json.parse(new URL(addr).newReader(requestProperties: ['Accept': 'application/vnd.github.v3+json']))
         }
     }
 
