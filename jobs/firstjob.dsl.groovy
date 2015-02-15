@@ -1,5 +1,6 @@
 @Grab(group='org.yaml', module='snakeyaml', version='1.14')
 
+import jervis.exceptions.UnsupportedLanguageException
 import jervis.lang.lifecycleGenerator
 import jervis.remotes.GitHub
 
@@ -40,62 +41,67 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
     }
 
     git_service.branches("${project}").each {
-        def JERVIS_BRANCH = it
-        def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
-        def generator = new lifecycleGenerator()
-        generator.loadLifecyclesString(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
-        generator.loadToolchainsString(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
-        if('.jervis.yml' in folder_listing) {
-            generator.loadYamlString(git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH))
-        }
-        else if('.travis.yml' in folder_listing) {
-            generator.loadYamlString(git_service.getFile(project, '.travis.yml', JERVIS_BRANCH))
-        }
-        else {
-            //skip creating the job for this branch
-            return
-        }
-        generator.folder_listing = folder_listing
-        def jobType
-        if(generator.isMatrixBuild()) {
-            jobType = Matrix
-        }
-        else {
-            jobType = Freeform
-        }
-        job(type: jobType) {
-            name("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-'))
-            scm {
-                //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
-                //for more info about the git closure
-                git {
-                    remote {
-                        url(git_service.getCloneUrl() + "${project}.git")
-                    }
-                    branch(JERVIS_BRANCH)
-                    shallowClone(true)
-                    switch(git_service) {
-                        case GitHub:
-                            configure { gitHub ->
-                                gitHub / browser(class: 'hudson.plugins.git.browser.GithubWeb') {
-                                    url(git_service.getWebUrl() + "${project}")
-                                }
-                            }
-                    }
-                }
+        try {
+            def JERVIS_BRANCH = it
+            def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
+            def generator = new lifecycleGenerator()
+            generator.loadLifecyclesString(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
+            generator.loadToolchainsString(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
+            if('.jervis.yml' in folder_listing) {
+                generator.loadYamlString(git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH))
             }
-            steps {
-                shell(generator.generateAll())
+            else if('.travis.yml' in folder_listing) {
+                generator.loadYamlString(git_service.getFile(project, '.travis.yml', JERVIS_BRANCH))
             }
-            //if a matrix build then generate matrix bits
+            else {
+                //skip creating the job for this branch
+                return
+            }
+            generator.folder_listing = folder_listing
+            def jobType
             if(generator.isMatrixBuild()) {
-                axes {
-                    generator.yaml_matrix_axes.each {
-                        text(it, generator.matrixGetAxisValue(it).split())
+                jobType = Matrix
+            }
+            else {
+                jobType = Freeform
+            }
+            job(type: jobType) {
+                name("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-'))
+                scm {
+                    //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
+                    //for more info about the git closure
+                    git {
+                        remote {
+                            url(git_service.getCloneUrl() + "${project}.git")
+                        }
+                        branch(JERVIS_BRANCH)
+                        shallowClone(true)
+                        switch(git_service) {
+                            case GitHub:
+                                configure { gitHub ->
+                                    gitHub / browser(class: 'hudson.plugins.git.browser.GithubWeb') {
+                                        url(git_service.getWebUrl() + "${project}")
+                                    }
+                                }
+                        }
                     }
                 }
-                combinationFilter(generator.matrixExcludeFilter())
+                steps {
+                    shell(generator.generateAll())
+                }
+                //if a matrix build then generate matrix bits
+                if(generator.isMatrixBuild()) {
+                    axes {
+                        generator.yaml_matrix_axes.each {
+                            text(it, generator.matrixGetAxisValue(it).split())
+                        }
+                    }
+                    combinationFilter(generator.matrixExcludeFilter())
+                }
             }
+        }
+        catch(UnsupportedLanguageException) {
+            //unsupported language encountered so we'll skip this branch.
         }
     }
 }
