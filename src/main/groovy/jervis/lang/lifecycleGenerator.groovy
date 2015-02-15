@@ -478,7 +478,7 @@ env:
                         }
                         if('matrix' in env) {
                             if(env['matrix'] instanceof String) {
-                                output += this.toolchainBuilder(toolchain, toolchain_keys, [env['global']], false)
+                                output += this.toolchainBuilder(toolchain, toolchain_keys, [env['matrix']], false)
                             }
                             else if(env['matrix'] instanceof ArrayList) {
                                 output += this.toolchainBuilder(toolchain, toolchain_keys, env['matrix'], true)
