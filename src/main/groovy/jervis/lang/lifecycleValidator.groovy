@@ -93,7 +93,7 @@ class lifecycleValidator {
       Validates the lifecycles file.
       @return <tt>true</tt> if the lifecycles file validates.  If the lifecycles file fails validation then it will throw a <tt>{@link jervis.exceptions.LifecycleValidationException}</tt>.
      */
-    public Boolean validate() {
+    public Boolean validate() throws LifecycleMissingKeyException, LifecycleBadValueInKeyException, LifecycleInfiniteLoopException {
         lifecycles.keySet().each {
             def tools = lifecycles[it].keySet() as String[]
             if(!('defaultKey' in tools)) {

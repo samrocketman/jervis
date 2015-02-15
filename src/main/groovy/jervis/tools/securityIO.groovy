@@ -187,7 +187,7 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       @param pub_key_file_path  A file path where the public key will be written on the filesystem.
       @param keysize            The key size in bits of the key pair.
      */
-    public void generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize) {
+    public void generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize) throws JervisException {
         def stdout = new StringBuilder()
         def stderr = new StringBuilder()
         def process = ['openssl', 'genrsa', '-out', priv_key_file_path, keysize.toString()].execute()
@@ -219,7 +219,7 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       @param  plaintext A plain text <tt>String</tt> to be encrypted.
       @return A Base64 encoded cipher text or more generically: <tt>ciphertext = base64encode(RSAPublicKeyEncrypt(plaintext))</tt>
      */
-    public String rsaEncrypt(String plaintext) {
+    public String rsaEncrypt(String plaintext) throws JervisException {
         def stdout = new StringBuilder()
         def stderr = new StringBuilder()
         def proc1 = ['echo', plaintext.trim()].execute()
@@ -246,7 +246,7 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       @param  ciphertext A Base64 encoded cipher text <tt>String</tt> to be decrypted.
       @return A plain text <tt>String</tt> or more generically: <tt>plaintext = RSAPrivateKeyDecrypt(base64decode(ciphertext))</tt>
      */
-    public String rsaDecrypt(String ciphertext) {
+    public String rsaDecrypt(String ciphertext) throws JervisException {
         def stdout = new StringBuilder()
         def stderr = new StringBuilder()
         def proc1 = ['echo', '-n', ciphertext.trim()].execute()

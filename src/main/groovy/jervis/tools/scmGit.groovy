@@ -46,7 +46,7 @@ class scmGit {
       Gets the root directory of a repository and stores in in <tt>{@link #git_root}</tt>.  It is the equivalent of executing the following git command.
       <pre><tt>git rev-parse --show-toplevel</tt></pre><br>
      */
-    public void setRoot() {
+    public void setRoot() throws JervisException {
         def stdout = new StringBuilder()
         def stderr = new StringBuilder()
         def process = [mygit, "rev-parse", "--show-toplevel"].execute()

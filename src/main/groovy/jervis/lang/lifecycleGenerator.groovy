@@ -100,7 +100,7 @@ class lifecycleGenerator {
       @param listing An <tt>ArrayList</tt> which is a list of files from a directory
                      path in a repository.
      */
-    void setFolder_listing(ArrayList listing) {
+    void setFolder_listing(ArrayList listing) throws JervisException {
         if(!yaml_language) {
             throw new JervisException('Must call loadYamlString() first.')
         }
@@ -195,7 +195,7 @@ class lifecycleGenerator {
       <tt>{@link #loadLifecycles(java.lang.String)}</tt> before calling this function.
       @param raw_yaml A <tt>String</tt> which contains Jervis YAML to be parsed.
      */
-    public void loadYamlString(String raw_yaml) {
+    public void loadYamlString(String raw_yaml) throws JervisException, UnsupportedLanguageException {
         def yaml = new Yaml()
         this.jervis_yaml = yaml.load(raw_yaml)
         this.yaml_language = this.jervis_yaml['language']
@@ -371,7 +371,7 @@ env:
        @param chain          The matrix list from the Jervis YAML for the given toolchain.
        @param matrix         Should the input be considered a matrix build?  If so then set to <tt>true</tt>.
      */
-    private String toolchainBuilder(String toolchain, String[] toolchain_keys, ArrayList chain, Boolean matrix) {
+    private String toolchainBuilder(String toolchain, String[] toolchain_keys, ArrayList chain, Boolean matrix) throws UnsupportedToolException {
         String output = ''
         if(matrix) {
             output += "case \${${toolchain}} in\n"
@@ -410,7 +410,7 @@ env:
       from the toolchains file.
       @return A bash script setting up the toolchains for building.
      */
-    public String generateToolchainSection() {
+    public String generateToolchainSection() throws UnsupportedToolException {
         //get toolchain order for this language
         def toolchains_order = toolchain_obj.toolchains['toolchains'][yaml_language]
         String output = '#\n# TOOLCHAINS SECTION\n#\n'
