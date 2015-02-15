@@ -3,6 +3,8 @@ package jervis.lang
 import jervis.exceptions.JervisException
 import jervis.exceptions.UnsupportedLanguageException
 import jervis.exceptions.UnsupportedToolException
+import jervis.lang.lifecycleValidator
+import jervis.lang.toolchainValidator
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -22,6 +24,26 @@ class lifecycleGeneratorTest extends GroovyTestCase {
     @After protected void tearDown() {
         generator = null
         super.tearDown()
+    }
+    @Test public void test_lifecycleGenerator_loadLifecycles() {
+        generator = null
+        generator = new lifecycleGenerator()
+        assert generator.lifecycle_obj == null
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        generator.loadLifecycles(url.getFile())
+        assert generator.lifecycle_obj != null
+        assert generator.lifecycle_obj.class == lifecycleValidator
+        assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
+    }
+    @Test public void test_lifecycleGenerator_loadToolchains() {
+        generator = null
+        generator = new lifecycleGenerator()
+        assert generator.toolchain_obj == null
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
+        generator.loadToolchains(url.getFile())
+        assert generator.toolchain_obj != null
+        assert generator.toolchain_obj.class == toolchainValidator
+        assert generator.toolchain_obj.toolchains['jdk']['default_ivalue'] == 'openjdk7'
     }
     @Test public void test_lifecycleGenerator_loadYaml_supportedLanguage_yes() {
         generator.loadYamlString('language: ruby')
