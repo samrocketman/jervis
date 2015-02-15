@@ -1,5 +1,6 @@
 @Grab(group='org.yaml', module='snakeyaml', version='1.14')
 
+import jervis.exceptions.UnsupportedLanguageException
 import jervis.lang.lifecycleGenerator
 import jervis.remotes.GitHub
 
@@ -49,19 +50,22 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         def generator = new lifecycleGenerator()
         generator.loadLifecyclesString(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
         generator.loadToolchainsString(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
+        String jervis_yaml
         if('.jervis.yml' in folder_listing) {
-            generator.loadYamlString(git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH))
+            jervis_yaml = git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH)
         }
         else if('.travis.yml' in folder_listing) {
-            generator.loadYamlString(git_service.getFile(project, '.travis.yml', JERVIS_BRANCH))
+            jervis_yaml = git_service.getFile(project, '.travis.yml', JERVIS_BRANCH)
         }
         else {
             //skip creating the job for this branch
             return
         }
-        if(!generator.yaml_language) {
+        //try detecting no default language and setting to ruby
+        if(jervis_yaml.indexOf('language:') < 0) {
             generator.yaml_language = 'ruby'
         }
+        generator.loadYamlString(jervis_yaml)
         generator.folder_listing = folder_listing
         def jobType
         if(generator.isMatrixBuild()) {
