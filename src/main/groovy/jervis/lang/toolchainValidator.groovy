@@ -32,17 +32,17 @@ class toolchainValidator {
       A <tt>{@link HashMap}</tt> of the parsed toolchains file.
      */
 
-    def toolchains
+    Map toolchains
 
     /**
       A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of toolchains in the toolchains file.  This is just a list of the keys in <tt>{@link #toolchains}</tt>.
      */
-    def toolchain_list
+    String[] toolchain_list
 
     /**
       A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of supported languages in the lifecycles file.  This is just a list of the keys in {@link #lifecycles}.
      */
-    def languages
+    String[] languages
 
     /**
       Load the JSON of a toolchains file and parse it.  This should be the first
