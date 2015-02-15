@@ -40,6 +40,32 @@ class toolchainValidatorTest extends GroovyTestCase {
         assert toolchains.toolchain_list instanceof String[]
         assert toolchains.languages == null
     }
+    @Test public void test_toolchainValidator_load_JSONString() {
+        assert toolchains.toolchains == null
+        assert toolchains.toolchain_list == null
+        assert toolchains.languages == null
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
+        String contents = new File(url.getFile()).getText()
+        //pass the string contents
+        toolchains.load_JSONString(contents)
+        assert toolchains.toolchains instanceof Map
+        assert toolchains.toolchain_list instanceof String[]
+        assert toolchains.languages instanceof String[]
+        assert toolchains.toolchains['jdk']['default_ivalue'] == 'openjdk7'
+        assert toolchains.toolchain_list == ['toolchains', 'gemfile', 'jdk', 'env', 'rvm']
+        assert toolchains.languages == ['ruby', 'java']
+        toolchains == null
+        toolchains = new toolchainValidator()
+        assert toolchains.toolchains == null
+        assert toolchains.toolchain_list == null
+        assert toolchains.languages == null
+        url = this.getClass().getResource('/bad_toolchains_missing_toolchains.json');
+        contents = new File(url.getFile()).getText()
+        toolchains.load_JSONString(contents)
+        assert toolchains.toolchains instanceof Map
+        assert toolchains.toolchain_list instanceof String[]
+        assert toolchains.languages == null
+    }
     //test supportedLanguage()
     @Test public void test_toolchainValidator_supportedLanguage_yes() {
         URL url = this.getClass().getResource('/good_toolchains_simple.json');
