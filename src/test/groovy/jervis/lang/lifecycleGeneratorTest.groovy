@@ -213,6 +213,10 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         shouldFail(UnsupportedToolException) {
             generator.generateToolchainSection()
         }
+        generator.loadYamlString('language: ruby\nenv:\n  matrix: {hello: three}')
+        shouldFail(UnsupportedToolException) {
+            generator.generateToolchainSection()
+        }
     }
     @Test public void test_lifecycleGenerator_generateBeforeInstall() {
         generator.loadYamlString('language: ruby')
