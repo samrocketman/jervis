@@ -1,5 +1,6 @@
 package jervis.tools
 //the scmGitTest() class automatically sees the scmGit() class because they're in the same package
+import jervis.exceptions.JervisException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -16,9 +17,15 @@ class scmGitTest extends GroovyTestCase {
         git = null
         super.tearDown()
     }
+    @Test public void test_scmGit_setRoot() {
+        assert 'echo' == git.mygit
+    }
     //test getRoot()
     @Test public void test_scmGit_getRoot1() {
-        assert 'rev-parse --show-toplevel' == git.getRoot()
+        git = null
+        shouldFail(JervisException) {
+            git = new scmGit('false')
+        }
     }
     @Test public void test_scmGit_getRoot2() {
         git.git_root = 'some git root'
