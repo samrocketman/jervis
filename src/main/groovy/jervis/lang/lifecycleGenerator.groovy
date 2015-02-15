@@ -348,9 +348,17 @@ env:
         String result = ''
         int counter = 0
         if(axis in yaml_matrix_axes) {
-            jervis_yaml[axis].each {
-                result += " ${axis}${counter}"
-                counter++
+            if(('env' == axis) && (jervis_yaml[axis] instanceof Map)) {
+                jervis_yaml[axis]['matrix'].each {
+                    result += " ${axis}${counter}"
+                    counter++
+                }
+            }
+            else {
+                jervis_yaml[axis].each {
+                    result += " ${axis}${counter}"
+                    counter++
+                }
             }
             return result.trim()
         }
