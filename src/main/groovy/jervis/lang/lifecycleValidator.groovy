@@ -109,12 +109,6 @@ class lifecycleValidator {
             def count=0
             while(current_key != null) {
                 def cycles = lifecycles[it][current_key].keySet() as String[]
-                if('fileExistsCondition' in cycles) {
-                    //check for leading slash in the first element of fileExistsCondition
-                    if(lifecycles[it][current_key]['fileExistsCondition'][0][0] != '/') {
-                        throw new LifecycleBadValueInKeyException([it,current_key,'fileExistsCondition','[0]'].join('.') + ' first element does not begin with a "/".')
-                    }
-                }
                 if('fallbackKey' in cycles) {
                     if(!(lifecycles[it][current_key]['fallbackKey'] in tools)) {
                         throw new LifecycleMissingKeyException([it,current_key,'fallbackKey',lifecycles[it][current_key]['fallbackKey']].join('.'))

@@ -109,7 +109,7 @@ class lifecycleGenerator {
         while(current_key != null) {
             def cycles = lifecycle_obj.lifecycles[yaml_language][current_key].keySet() as String[]
             if('fileExistsCondition' in cycles) {
-                if(lifecycle_obj.lifecycles[yaml_language][current_key]['fileExistsCondition'][1] in listing) {
+                if(lifecycle_obj.lifecycles[yaml_language][current_key]['fileExistsCondition'] in listing) {
                     lifecycle_key = current_key
                     current_key = null
                 }
