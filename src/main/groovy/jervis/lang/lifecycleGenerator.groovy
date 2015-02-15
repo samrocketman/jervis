@@ -48,12 +48,12 @@ class lifecycleGenerator {
     /**
       Contains the Jervis YAML loaded as an object.
      */
-    def jervis_yaml
+    Map jervis_yaml
 
     /**
       A quick access variable for what language is selected for the loaded Jervis YAML.
      */
-    def yaml_language
+    String yaml_language
 
     /**
       A quick access variable for what root keys are in the loaded Jervis YAML.
