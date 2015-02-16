@@ -7,15 +7,7 @@ env:
   - GROOVY_VERSION="2.3.9"
   - GROOVY_VERSION="2.4.0"
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
-install:
-  - count=0
-  - while ! ./gradlew assemble;do
-  -   if [ "${count}" = 3 ];then
-  -     break
-  -   fi
-  -   sleep 5
-  -   ((count++))
-  - done
+install: ./assemble.sh
 matrix:
   allow_failures:
     - env: GROOVY_VERSION="2.0.8"
