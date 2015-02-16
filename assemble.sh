@@ -1,10 +1,11 @@
 #!/bin/bash
 set +e
 count=0
-STATUS=0
-while ! ./gradlew assemble;do
+STATUS=1
+while [ ! "${STATUS}" = "0" ];do
+  ./gradlew assemble
   STATUS=$?
-  if [ "${count}" = 3 ];then
+  if [ ${STATUS} -eq 0 -o ${count} -ge 2 ];then
     break
   fi
   echo "Failed to assemble dependencies.  Sleep 5 and retry."
