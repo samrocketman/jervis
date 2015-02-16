@@ -3,7 +3,7 @@ set +e
 count=0
 STATUS=1
 while [ ! "${STATUS}" = "0" ];do
-  ./gradlew assemble
+  ./gradlew check
   STATUS=$?
   if [ ${STATUS} -eq 0 -o ${count} -ge 2 ];then
     break
