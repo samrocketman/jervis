@@ -7,6 +7,7 @@ import jervis.remotes.GitHub
 def git_service = new GitHub()
 //authenticate
 if(System.getenv('GITHUB_TOKEN')) {
+    println 'Found GITHUB_TOKEN environment variable.'
     git_service.gh_token = System.getenv('GITHUB_TOKEN')
 }
 
