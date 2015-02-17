@@ -309,4 +309,10 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby')
         assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n\n#\n# INSTALL SECTION\n#\nbundle install --jobs=3 --retry=3\n\n#\n# SCRIPT SECTION\n#\nbundle exec rake\n' == generator.generateAll()
     }
+    @Test public void test_lifecycleGenerator_boolean_bug() {
+        generator.loadYamlString('language: ruby\ninstall: true')
+        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n\n#\n# INSTALL SECTION\n#\ntrue\n\n#\n# SCRIPT SECTION\n#\nbundle exec rake\n' == generator.generateAll()
+        generator.loadYamlString('language: ruby\ninstall: [true,true]')
+        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n\n#\n# INSTALL SECTION\n#\ntrue\ntrue\n\n#\n# SCRIPT SECTION\n#\nbundle exec rake\n' == generator.generateAll()
+    }
 }

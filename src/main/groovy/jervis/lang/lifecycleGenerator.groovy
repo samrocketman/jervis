@@ -566,7 +566,7 @@ env:
         }
         else {
             //must be a String instance
-            output += jervis_yaml[section] + '\n'
+            output += jervis_yaml[section].toString() + '\n'
         }
         return output
     }
