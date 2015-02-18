@@ -1,7 +1,11 @@
 apply plugin: 'groovy'
 apply plugin: 'cobertura'
+//maven central
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 group = 'net.gleske'
+archivesBaseName = 'jervis'
 jar.baseName = 'jervis'
 version = '0.1-SNAPSHOT'
 
@@ -72,4 +76,65 @@ test.finalizedBy(project.tasks.cobertura)
 //generate gradlew with: gradle wrapper
 task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
+}
+
+//Maven Central uploads
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+artifacts {
+    archives javadocJar, sourcesJar
+}
+signing {
+    sign configurations.archives
+}
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Jervis'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'Travis-like Jenkins job generation using Jenkins Job DSL plugin groovy scripts. Reads .travis.yml and generates a job in Jenkins.'
+                url 'https://github.com/samrocketman/jervis'
+
+                scm {
+                    connection 'https://github.com/samrocketman/jervis.git'
+                    developerConnection 'git@github.com:samrocketman/jervis.git'
+                    url 'https://github.com/samrocketman/jervis'
+                }
+
+                licenses {
+                    license {
+                        name 'GNU GPL v2'
+                        url 'https://raw.githubusercontent.com/samrocketman/jervis/master/LICENSE'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'sag47'
+                        name 'Sam Gleske'
+                        email 'sam.mxracer@gmail.com'
+                    }
+                }
+            }
+        }
+    }
 }
