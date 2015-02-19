@@ -1,4 +1,4 @@
-# Jervis - [![Build Status][status-build]][travis-jervis]
+# Jervis - [![Build Status][status-build]][travis-jervis] [![Coverage Status][status-coverage]][coveralls-jervis]
 
 * *Project status:* pre-alpha ([progress to first release][milestone-progress])
 * *Initially Targeted platforms:* Linux
@@ -58,12 +58,14 @@ sub-bullet.
 
 Refer to the [Job DSL example project][dsl-e.g.].
 
+[coveralls-jervis]: https://coveralls.io/r/samrocketman/jervis?branch=master
 [dsl-e.g.]: https://github.com/sheehan/job-dsl-gradle-example
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jervis-wiki]: https://github.com/samrocketman/jervis/wiki
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=master
+[status-coverage]: https://coveralls.io/repos/samrocketman/jervis/badge.svg?branch=master
 [travis]: https://travis-ci.org/
 [travis-jervis]: https://travis-ci.org/samrocketman/jervis
 [travis-yaml]: http://docs.travis-ci.com/user/build-configuration/
