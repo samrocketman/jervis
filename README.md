@@ -56,10 +56,9 @@ sub-bullet.
 
 # Set up
 
-Refer to the [Job DSL example project][dsl-e.g.].
+Refer to the [Jervis Wiki][jervis-wiki] for a quickstart guide and rolling Jervis out for production.
 
 [coveralls-jervis]: https://coveralls.io/r/samrocketman/jervis?branch=master
-[dsl-e.g.]: https://github.com/sheehan/job-dsl-gradle-example
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jervis-wiki]: https://github.com/samrocketman/jervis/wiki
