@@ -3,21 +3,22 @@ should adhere to it in order to be accepted.
 
 # Style Guide
 
-1. Use consistent indenting.  Indent using four spaces.
-2. `print` and `println` statements should never use parenthesis.
-3. Use single quotes `'` when quoting string literals.  Use double quotes `"`
-   when quoting strings that require string interpolation.
-4. Every conditional and loop requires curly brackets.  Even if it is only
-   enclosing one statement.
-5. Opening curly brackets must be on the same line as the conditional or loop.
-   Closing curly brackets must be alone on the line.
-6. Opening curly brackets must have a single space between the conditional and
-   the curly bracket.
-7. Comma separated values must have a single space before the next value.
-8. When setting variables there must be a space on either side of the equal
-   sign.
-9. Use specific type definitions as much as possible and only use generic type
-   definitions where appropriate.
+1.  Use consistent indenting.  Indent using four spaces.
+2.  `print` and `println` statements should never use parenthesis.
+3.  Use single quotes `'` when quoting string literals.  Use double quotes `"`
+    when quoting strings that require string interpolation.
+4.  Every conditional and loop requires curly brackets.  Even if it is only
+    enclosing one statement.
+5.  Opening curly brackets must be on the same line as the conditional or loop.
+    Closing curly brackets must be alone on the line.
+6.  Opening curly brackets must have a single space between the conditional and
+    the curly bracket.
+7.  Comma separated values must have a single space before the next value.
+8.  When setting variables there must be a space on either side of the equal
+    sign.
+9.  Use specific type definitions as much as possible and only use generic type
+    definitions where appropriate.
+10. No semicolons at the end of code lines.  Keep lack of using semicolons consistent.
 
 # Style guide examples.
 
