@@ -1,5 +1,6 @@
 apply plugin: 'groovy'
 apply plugin: 'cobertura'
+apply plugin: 'com.github.kt3k.coveralls'
 //maven central
 apply plugin: 'maven'
 apply plugin: 'signing'
@@ -20,6 +21,7 @@ buildscript {
     repositories { mavenCentral() }
     dependencies {
         classpath 'net.saliman:gradle-cobertura-plugin:2.2.5'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.3.1'
     }
 }
 
