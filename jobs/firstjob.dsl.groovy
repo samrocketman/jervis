@@ -4,17 +4,19 @@ import jervis.lang.lifecycleGenerator
 import jervis.remotes.GitHub
 
 def git_service = new GitHub()
-if(git_service.getClass() == GitHub) {
-    //authenticate
-    if(System.getenv('GITHUB_TOKEN')) {
-        println 'Found GITHUB_TOKEN environment variable.'
-        git_service.gh_token = System.getenv('GITHUB_TOKEN')
-    }
-    //GitHub Enterprise web URL; otherwise it will simply be github.com
-    if(System.getenv('GITHUB_URL')) {
-        println 'Found GITHUB_URL environment variable.'
-        git_service.gh_web = System.getenv('GITHUB_URL')
-    }
+//Pre-job setup based on the type of remote
+switch(git_service) {
+    case GitHub:
+        //authenticate
+        if(System.getenv('GITHUB_TOKEN')) {
+            println 'Found GITHUB_TOKEN environment variable.'
+            git_service.gh_token = System.getenv('GITHUB_TOKEN')
+        }
+        //GitHub Enterprise web URL; otherwise it will simply be github.com
+        if(System.getenv('GITHUB_URL')) {
+            println 'Found GITHUB_URL environment variable.'
+            git_service.gh_web = System.getenv('GITHUB_URL')
+        }
 }
 
 if("${project}".size() > 0 && "${project}".split('/').length == 2) {
@@ -92,6 +94,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
                     }
                     branch(JERVIS_BRANCH)
                     shallowClone(true)
+                    //configure git web browser based on the type of remote
                     switch(git_service) {
                         case GitHub:
                             configure { gitHub ->
