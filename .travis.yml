@@ -10,7 +10,7 @@ env:
 install: true
 script: ./assemble.sh
 after_success:
-  - GROOVY_VERSION="1.8.9" ./gradlew cobertura coveralls
+  - ./gradlew cobertura coveralls
 matrix:
   allow_failures:
     - env: GROOVY_VERSION="2.0.8"
