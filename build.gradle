@@ -20,7 +20,7 @@ println "Using Gradle ${GradleVersion.current().getVersion()}"
 buildscript {
     repositories { mavenCentral() }
     dependencies {
-        classpath 'net.saliman:gradle-cobertura-plugin:2.2.5'
+        classpath 'net.saliman:gradle-cobertura-plugin:2.2.6'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.3.1'
     }
 }
