@@ -37,8 +37,11 @@ class fileIO {
       repository, if the file <tt>/path/to/file.sh</tt> exists then it would return
       <tt>true</tt>.  This method uses <tt>{@link jervis.tools.scmGit}</tt> to
       determine the root of the Git repository.
-      @param filestring A simple <tt>String</tt> that starts with <tt>readFile(</tt>, contains a path to a file, and ends with <tt>)</tt>.
-      @return           A boolean.  If the file exists then it is <tt>true</tt>.  If the the file doesn't exist or it is a malformed <tt>String</tt> then it returns <tt>false</tt>.
+      @param filestring A simple <tt>String</tt> that starts with <tt>readFile(</tt>,
+                        contains a path to a file, and ends with <tt>)</tt>.
+      @return           A boolean.  If the file exists then it is <tt>true</tt>.  If
+                        the the file doesn't exist or it is a malformed
+                        <tt>String</tt> then it returns <tt>false</tt>.
      */
     public Boolean fileExists(String filestring) {
         def git = new scmGit()
@@ -54,8 +57,11 @@ class fileIO {
       Read the contents of the file in a <tt>readFile()</tt> <tt>String</tt>.  This
       method uses <tt>{@link jervis.tools.scmGit}</tt> to determine the root of the
       Git repository.
-      @param filestring Read the contents of <tt>/path/to/file.sh</tt> in the <tt>String</tt> <tt>readFile(/path/to/file.sh)</tt>.
-      @return           A <tt>String</tt> which is the contents of the file read.  If the <tt>filestring</tt> is malformed or the file doesn't exist then it simply returns the original string.
+      @param filestring Read the contents of <tt>/path/to/file.sh</tt> in the
+                        <tt>String</tt> <tt>readFile(/path/to/file.sh)</tt>.
+      @return           A <tt>String</tt> which is the contents of the file read.  If
+                        the <tt>filestring</tt> is malformed or the file doesn't exist
+                        then it simply returns the original string.
      */
     public String readFile(String filestring) {
         def contents = []
