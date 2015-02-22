@@ -1,11 +1,13 @@
 package jervis.lang
 
+import java.util.regex.Pattern
 import jervis.exceptions.JervisException
 import jervis.exceptions.UnsupportedLanguageException
 import jervis.exceptions.UnsupportedToolException
 import jervis.lang.lifecycleValidator
 import jervis.lang.toolchainValidator
 import org.yaml.snakeyaml.Yaml
+
 
 /**
   Generates the build scripts from the Jervis YAML.
@@ -664,7 +666,18 @@ env:
                 //set a new default result
                 result=false
                 jervis_yaml['branches']['only'].each {
-                    if(it == branch) {
+                    if(result) {
+                        //skip to the end because a result has been found
+                        return
+                    }
+                    if(it[0] == '/' && it[-1] == '/') {
+                        //regular expression detected
+                        Pattern pattern = Pattern.compile(it[1..-2])
+                        if(pattern.matcher(branch).matches()) {
+                            result = true
+                        }
+                    }
+                    else if(it == branch) {
                         result = true
                     }
                 }
@@ -672,7 +685,18 @@ env:
             else if('except' in jervis_yaml['branches']) {
                 //result is true by default
                 jervis_yaml['branches']['except'].each {
-                    if(it == branch) {
+                    if(!result) {
+                        //skip to the end because a result has been found
+                        return
+                    }
+                    if(it[0] == '/' && it[-1] == '/') {
+                        //regular expression detected
+                        Pattern pattern = Pattern.compile(it[1..-2])
+                        if(pattern.matcher(branch).matches()) {
+                            result = false
+                        }
+                    }
+                    else if(it == branch) {
                         result = false
                     }
                 }
