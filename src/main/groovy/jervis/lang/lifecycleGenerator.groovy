@@ -633,6 +633,7 @@ env:
     public String generateAfterScript() {
         return this.generateSection('after_script')
     }
+
     /**
       Generate the build script which would be used in the Jenkins step.  This
       function combines the output of: <tt>generateToolchainSection()</tt>,
@@ -649,5 +650,14 @@ env:
             generateScript()
             ]
         return script.grep().join('\n')
+    }
+
+    /**
+      Is this a branch which will generate a job?
+      @param branch A branch to check if the job should be generated.
+      @return       Returns <tt>true</tt> if the job should be generated or <tt>false</tt> if it should not.
+     */
+    public Boolean isGenerateBranch(String branch) {
+        true
     }
 }
