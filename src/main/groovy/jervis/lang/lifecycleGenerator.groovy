@@ -658,6 +658,26 @@ env:
       @return       Returns <tt>true</tt> if the job should be generated or <tt>false</tt> if it should not.
      */
     public Boolean isGenerateBranch(String branch) {
-        true
+        Boolean result=true
+        if(('branches' in jervis_yaml) && (jervis_yaml['branches'] instanceof Map)) {
+            if('only' in jervis_yaml['branches']) {
+                //set a new default result
+                result=false
+                jervis_yaml['branches']['only'].each {
+                    if(it == branch) {
+                        result = true
+                    }
+                }
+            }
+            else if('except' in jervis_yaml['branches']) {
+                //result is true by default
+                jervis_yaml['branches']['except'].each {
+                    if(it == branch) {
+                        result = false
+                    }
+                }
+            }
+        }
+        return result
     }
 }
