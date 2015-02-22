@@ -76,6 +76,11 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         }
         generator.loadYamlString(jervis_yaml)
         generator.folder_listing = folder_listing
+        if(!generator.isGenerateBranch(JERVIS_BRANCH)) {
+            //the job should not be generated for this branch
+            //based on the branches section of .jervis.yml
+            return
+        }
         def jobType
         if(generator.isMatrixBuild()) {
             jobType = Matrix
