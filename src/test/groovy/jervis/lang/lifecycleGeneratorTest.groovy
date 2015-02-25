@@ -330,4 +330,9 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\ninstall: [true,true]')
         assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n\n#\n# INSTALL SECTION\n#\ntrue\ntrue\n\n#\n# SCRIPT SECTION\n#\nbundle exec rake\n' == generator.generateAll()
     }
+    @Test public void test_lifecycleGenerator_isGenerateBranch() {
+
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - master')
+        assert true == generator.isGenerateBranch('master')
+    }
 }
