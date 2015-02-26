@@ -341,5 +341,8 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - development\n    - /^ma.*$/')
         assert true == generator.isGenerateBranch('master')
         assert true == generator.isGenerateBranch('development')
+        generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - development\n    - /^ma.*$/')
+        assert false == generator.isGenerateBranch('many')
+        assert false == generator.isGenerateBranch('development')
     }
 }
