@@ -56,7 +56,8 @@ sub-bullet.
 
 # Set up
 
-Refer to the [Jervis Wiki][jervis-wiki] for a quickstart guide and rolling Jervis out for production.
+Refer to the [Jervis Wiki][jervis-wiki] for a quickstart guide and rolling
+Jervis out for production.
 
 # License
 
