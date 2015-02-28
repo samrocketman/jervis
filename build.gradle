@@ -59,6 +59,10 @@ test {
 //http://jdpgrailsdev.github.io/blog/2014/04/29/gradle_cobertura.html
 //https://github.com/stevesaliman/gradle-cobertura-plugin/blob/master/usage.md
 cobertura {
+    //fix cobertura version
+    //https://github.com/stevesaliman/gradle-cobertura-plugin/issues/72
+    //coberturaVersion = '2.1.1'
+    //coberturaVersion = '2.0.3'
     coverageFormats = ['html', 'xml']
     coverageIgnoreTrivial = true
     coverageIgnores = ['org.slf4j.Logger.*']
