@@ -1,4 +1,4 @@
-# Jervis - [![Build Status][status-build]][travis-jervis] [![Coverage Status][status-coverage]][coveralls-jervis]
+# Jervis - [![Build Status][status-build]][jervis-travis] [![Coverage Status][status-coverage]][jervis-coveralls] [![Dependency Status][status-versioneye]][jervis-versioneye]
 
 * *Project status:* pre-alpha ([progress to first release][milestone-progress])
 * *Initially Targeted platforms:* Linux
@@ -75,15 +75,17 @@ Jervis out for production.
     See the License for the specific language governing permissions and
     limitations under the License.
 
-[coveralls-jervis]: https://coveralls.io/r/samrocketman/jervis?branch=master
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
+[jervis-coveralls]: https://coveralls.io/r/samrocketman/jervis?branch=master
+[jervis-travis]: https://travis-ci.org/samrocketman/jervis
+[jervis-versioneye]: https://www.versioneye.com/user/projects/54f2a1cc4f3108959a0007f1
 [jervis-wiki]: https://github.com/samrocketman/jervis/wiki
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=master
 [status-coverage]: https://coveralls.io/repos/samrocketman/jervis/badge.svg?branch=master
+[status-versioneye]: https://www.versioneye.com/user/projects/54f2a1cc4f3108959a0007f1/badge.svg?style=flat
 [travis]: https://travis-ci.org/
-[travis-jervis]: https://travis-ci.org/samrocketman/jervis
 [travis-yaml]: http://docs.travis-ci.com/user/build-configuration/
 [watch-repo]: https://help.github.com/articles/watching-repositories/
 [wiki-ci]: https://en.wikipedia.org/wiki/Continuous_integration
