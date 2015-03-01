@@ -140,7 +140,13 @@ class GitHub implements JervisRemote {
      */
     public List branches(String project) {
         List list = []
-        this.fetch(this.gh_api + "repos/${project}/branches").each { list << it.name }
+        List parsed = ['']
+        int count = 1
+        while(parsed.size() > 0) {
+            parsed = this.fetch(this.gh_api + "repos/${project}/branches?page=${count}")
+            parsed.each { list << it.name }
+            count++
+        }
         return list
     }
 
