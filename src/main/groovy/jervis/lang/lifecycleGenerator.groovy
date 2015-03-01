@@ -676,43 +676,49 @@ env:
      */
     public Boolean isGenerateBranch(String branch) {
         Boolean result=true
-        if(('branches' in jervis_yaml) && (jervis_yaml['branches'] instanceof Map)) {
-            if('only' in jervis_yaml['branches']) {
-                //set a new default result
-                result=false
-                jervis_yaml['branches']['only'].each {
-                    if(result) {
-                        //skip to the end because a result has been found
-                        return
-                    }
-                    if(it[0] == '/' && it[-1] == '/') {
-                        //regular expression detected
-                        Pattern pattern = Pattern.compile(it[1..-2])
-                        if(pattern.matcher(branch).matches()) {
+        if(('branches' in jervis_yaml)) {
+            if(jervis_yaml['branches'] instanceof ArrayList) {
+                List tmp = jervis_yaml['branches']
+                jervis_yaml['branches'] = ['only': tmp]
+            }
+            if(jervis_yaml['branches'] instanceof Map) {
+                if('only' in jervis_yaml['branches']) {
+                    //set a new default result
+                    result=false
+                    jervis_yaml['branches']['only'].each {
+                        if(result) {
+                            //skip to the end because a result has been found
+                            return
+                        }
+                        if(it[0] == '/' && it[-1] == '/') {
+                            //regular expression detected
+                            Pattern pattern = Pattern.compile(it[1..-2])
+                            if(pattern.matcher(branch).matches()) {
+                                result = true
+                            }
+                        }
+                        else if(it == branch) {
                             result = true
                         }
                     }
-                    else if(it == branch) {
-                        result = true
-                    }
                 }
-            }
-            else if('except' in jervis_yaml['branches']) {
-                //result is true by default
-                jervis_yaml['branches']['except'].each {
-                    if(!result) {
-                        //skip to the end because a result has been found
-                        return
-                    }
-                    if(it[0] == '/' && it[-1] == '/') {
-                        //regular expression detected
-                        Pattern pattern = Pattern.compile(it[1..-2])
-                        if(pattern.matcher(branch).matches()) {
+                else if('except' in jervis_yaml['branches']) {
+                    //result is true by default
+                    jervis_yaml['branches']['except'].each {
+                        if(!result) {
+                            //skip to the end because a result has been found
+                            return
+                        }
+                        if(it[0] == '/' && it[-1] == '/') {
+                            //regular expression detected
+                            Pattern pattern = Pattern.compile(it[1..-2])
+                            if(pattern.matcher(branch).matches()) {
+                                result = false
+                            }
+                        }
+                        else if(it == branch) {
                             result = false
                         }
-                    }
-                    else if(it == branch) {
-                        result = false
                     }
                 }
             }
