@@ -126,7 +126,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
                 }
             }
             steps {
-                shell(generator.generateAll())
+                shell([readFileFromWorkspace('assets/header.sh'),generator.generateAll()].join('\n'))
             }
             //if a matrix build then generate matrix bits
             if(generator.isMatrixBuild()) {
