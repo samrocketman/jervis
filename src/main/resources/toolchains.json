@@ -53,37 +53,58 @@
     "python": {
         "default_ivalue": "2.7",
         "2.6": [
-            "source ~/virtualenv/python2.6/bin/activate",
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/python2.6/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/python2.6/bin/activate\"",
+            "set -x",
             "python --version",
             "pip --version"
         ],
         "2.7": [
-            "source ~/virtualenv/python2.7/bin/activate",
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/python2.7/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/python2.7/bin/activate\"",
+            "set -x",
             "python --version",
             "pip --version"
         ],
         "3.2": [
-            "source ~/virtualenv/python3.2/bin/activate",
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/python3.2/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/python3.2/bin/activate\"",
+            "set -x",
             "python --version",
             "pip --version"
         ],
         "3.3": [
-            "source ~/virtualenv/python3.3/bin/activate",
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/python3.3/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/python3.3/bin/activate\"",
+            "set -x",
             "python --version",
             "pip --version"
         ],
         "3.4": [
-            "source ~/virtualenv/python3.4/bin/activate",
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/python3.4/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/python3.4/bin/activate\"",
+            "set -x",
             "python --version",
             "pip --version"
         ],
         "pypy": [
-            "source ~/virtualenv/pypy/bin/activate",
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/pypy/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/pypy/bin/activate\"",
+            "set -x",
             "python --version",
             "pip --version"
         ],
         "pypy3": [
-            "source ~/virtualenv/pypy3/bin/activate",
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/pypy3/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/pypy3/bin/activate\"",
+            "set -x",
             "python --version",
             "pip --version"
         ]
@@ -91,12 +112,15 @@
     "rvm": {
         "default_ivalue": "1.9.3",
         "*": [
-            "source \"$HOME/.rvm/scripts/rvm\"",
+            "set +x",
+            "echo \"$ source \\\"${HOME}/.rvm/scripts/rvm\\\"\"",
+            "source \"${HOME}/.rvm/scripts/rvm\"",
             "if ! rvm list | grep -q \"${jervis_toolchain_ivalue}\";then",
             "  rvm install \"${jervis_toolchain_ivalue}\"",
             "  rvm \"${jervis_toolchain_ivalue}\" do gem install bundler",
             "fi",
             "rvm use ${jervis_toolchain_ivalue}",
+            "set -x",
             "ruby --version"
         ]
     }
