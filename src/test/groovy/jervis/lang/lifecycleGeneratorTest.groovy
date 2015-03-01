@@ -331,7 +331,6 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n\n#\n# INSTALL SECTION\n#\ntrue\ntrue\n\n#\n# SCRIPT SECTION\n#\nbundle exec rake\n' == generator.generateAll()
     }
     @Test public void test_lifecycleGenerator_isGenerateBranch() {
-
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - master')
         assert true == generator.isGenerateBranch('master')
         assert false == generator.isGenerateBranch('development')
@@ -348,5 +347,43 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert true == generator.isGenerateBranch('many')
         assert true == generator.isGenerateBranch('development')
         assert false == generator.isGenerateBranch('derp')
+    }
+    @Test public void test_lifecycleGenerator_main_toolchains_bash_syntax_check() {
+        URL url = this.getClass().getResource('/lifecycles.json');
+        generator.loadLifecycles(url.getFile())
+        url = this.getClass().getResource('/toolchains.json');
+        generator.loadToolchains(url.getFile())
+        //cycle through all permutations of the toolchains file and check bash syntax
+        generator.toolchain_obj.languages.each {
+            String language = it
+            generator.toolchain_obj.toolchains['toolchains'][language].each {
+                String toolchain = it
+                (generator.toolchain_obj.toolchains[toolchain].keySet() as String[]).each {
+                    String toolchain_value = it
+                    if(('default_ivalue' != toolchain_value) && ('secureSupport' != toolchain_value)) {
+                        //load the yaml permutations
+                        String sample_yaml
+                        if('*' == it) {
+                            sample_yaml = "language: ${language}\n${toolchain}:\n  - hello"
+                        }
+                        else {
+                            sample_yaml = "language: ${language}\n${toolchain}:\n  - \"${toolchain_value}\""
+                        }
+                        generator.loadYamlString(sample_yaml)
+                        //do the syntax checking
+                        def stdout = new StringBuilder()
+                        def stderr = new StringBuilder()
+                        def proc1 = ['echo', generator.generateToolchainSection()].execute()
+                        def proc2 = ['bash', '-n'].execute()
+                        proc1 | proc2
+                        proc2.waitForProcessOutput(stdout, stderr)
+                        if(proc2.exitValue()) {
+                            //syntax check failed so alert which section of the toolchains.json file failed.
+                            throw new JervisException("Toolchains bash syntax error when testing: ${language} > ${toolchain} > ${toolchain_value}\n\nYAML sample:\n${sample_yaml}\n\nBash error:\n" + stderr.toString())
+                        }
+                    }
+                }
+            }
+        }
     }
 }
