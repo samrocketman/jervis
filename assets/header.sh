@@ -8,4 +8,6 @@ echo -n "Kernel: "
 uname -rms
 echo -n "Bash: "
 bash --version | head -n1
+export JERVIS_RANDOM="${RANDOM}"
+echo "JERVIS_RANDOM: ${JERVIS_RANDOM}"
 set -axeE
