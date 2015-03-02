@@ -42,7 +42,6 @@ class lifecycleGeneratorTest extends GroovyTestCase {
     }
     //loadLifecycles() tests
     @Test public void test_lifecycleGenerator_loadLifecycles_isNull_instantiate() {
-        generator = null
         generator = new lifecycleGenerator()
         assert generator.lifecycle_obj == null
     }
@@ -54,7 +53,6 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
     }
     @Test public void test_lifecycleGenerator_loadLifecycles_throws_exception() {
-        generator = null
         generator = new lifecycleGenerator()
         URL url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
         shouldFail(JervisException) {
@@ -63,7 +61,6 @@ class lifecycleGeneratorTest extends GroovyTestCase {
     }
     //loadLifecyclesString() tests
     @Test public void test_lifecycleGenerator_loadLifecyclesString_type_checking() {
-        generator = null
         generator = new lifecycleGenerator()
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
         String contents = new File(url.getFile()).getText()
@@ -72,7 +69,6 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert generator.lifecycle_obj.class == lifecycleValidator
     }
     @Test public void test_lifecycleGenerator_loadLifecyclesString_simple_query() {
-        generator = null
         generator = new lifecycleGenerator()
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
         String contents = new File(url.getFile()).getText()
@@ -80,7 +76,6 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
     }
     @Test public void test_lifecycleGenerator_loadLifecyclesString_throws_exception() {
-        generator = null
         generator = new lifecycleGenerator()
         URL url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
         String contents = new File(url.getFile()).getText()
@@ -88,56 +83,63 @@ class lifecycleGeneratorTest extends GroovyTestCase {
             generator.loadLifecyclesString(contents)
         }
     }
-    @Test public void test_lifecycleGenerator_loadToolchains() {
-        generator = null
+    //loadToolchains() tests
+    @Test public void test_lifecycleGenerator_loadToolchains_isNull_instantiate() {
         generator = new lifecycleGenerator()
         assert generator.toolchain_obj == null
-        URL url = this.getClass().getResource('/good_toolchains_simple.json');
-        generator.loadToolchains(url.getFile())
+    }
+    @Test public void test_lifecycleGenerator_loadToolchains_type_checking() {
         assert generator.toolchain_obj != null
         assert generator.toolchain_obj.class == toolchainValidator
+    }
+    @Test public void test_lifecycleGenerator_loadToolchains_simple_query() {
         assert generator.toolchain_obj.toolchains['jdk']['default_ivalue'] == 'openjdk7'
-        generator = null
+    }
+    @Test public void test_lifecycleGenerator_loadToolchains_throws_exception() {
         generator = new lifecycleGenerator()
-        assert generator.toolchain_obj == null
-        url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json');
+        URL url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json');
         shouldFail(JervisException) {
             generator.loadToolchains(url.getFile())
         }
     }
-    @Test public void test_lifecycleGenerator_loadToolchainsString() {
-        generator = null
+    //loadToolchainsString() tests
+    @Test public void test_lifecycleGenerator_loadToolchainsString_type_checking() {
         generator = new lifecycleGenerator()
-        assert generator.toolchain_obj == null
         URL url = this.getClass().getResource('/good_toolchains_simple.json');
         String contents = new File(url.getFile()).getText()
         generator.loadToolchainsString(contents)
         assert generator.toolchain_obj != null
         assert generator.toolchain_obj.class == toolchainValidator
-        assert generator.toolchain_obj.toolchains['jdk']['default_ivalue'] == 'openjdk7'
-        generator = null
+    }
+    @Test public void test_lifecycleGenerator_loadToolchainsString_simple_query() {
         generator = new lifecycleGenerator()
-        assert generator.toolchain_obj == null
-        url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json');
-        contents = new File(url.getFile()).getText()
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
+        String contents = new File(url.getFile()).getText()
+        generator.loadToolchainsString(contents)
+        assert generator.toolchain_obj.toolchains['jdk']['default_ivalue'] == 'openjdk7'
+    }
+    @Test public void test_lifecycleGenerator_loadToolchainsString_throws_exception() {
+        generator = new lifecycleGenerator()
+        URL url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json');
+        String contents = new File(url.getFile()).getText()
         shouldFail(JervisException) {
             generator.loadToolchainsString(contents)
         }
     }
-    @Test public void test_lifecycleGenerator_loadYaml_exceptions() {
+    //loadYaml() tests
+    @Test public void test_lifecycleGenerator_loadYaml_exception_no_lifecycles__loaded() {
         generator = new lifecycleGenerator()
         shouldFail(JervisException) {
             generator.loadYamlString('language: ruby')
         }
+    }
+    @Test public void test_lifecycleGenerator_loadYaml_exception_no_toolchains_loaded() {
+        generator = new lifecycleGenerator()
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
         generator.loadLifecycles(url.getFile())
         shouldFail(JervisException) {
             generator.loadYamlString('language: ruby')
         }
-        url = this.getClass().getResource('/good_toolchains_simple.json');
-        generator.loadToolchains(url.getFile())
-        generator.loadYamlString('language: ruby')
-        assert 'ruby' == generator.yaml_language
     }
     @Test public void test_lifecycleGenerator_loadYaml_supportedLanguage_yes() {
         generator.loadYamlString('language: ruby')
