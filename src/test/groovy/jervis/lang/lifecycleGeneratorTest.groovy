@@ -40,38 +40,50 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator = null
         super.tearDown()
     }
-    @Test public void test_lifecycleGenerator_loadLifecycles() {
+    //loadLifecycles() tests
+    @Test public void test_lifecycleGenerator_loadLifecycles_isNull_instantiate() {
         generator = null
         generator = new lifecycleGenerator()
         assert generator.lifecycle_obj == null
-        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
-        generator.loadLifecycles(url.getFile())
+    }
+    @Test public void test_lifecycleGenerator_loadLifecycles_type_checking() {
         assert generator.lifecycle_obj != null
         assert generator.lifecycle_obj.class == lifecycleValidator
+    }
+    @Test public void test_lifecycleGenerator_loadLifecycles_simple_query() {
         assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
+    }
+    @Test public void test_lifecycleGenerator_loadLifecycles_throws_exception() {
         generator = null
         generator = new lifecycleGenerator()
-        assert generator.lifecycle_obj == null
-        url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
+        URL url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
         shouldFail(JervisException) {
             generator.loadLifecycles(url.getFile())
         }
     }
-    @Test public void test_lifecycleGenerator_loadLifecyclesString() {
+    //loadLifecyclesString() tests
+    @Test public void test_lifecycleGenerator_loadLifecyclesString_type_checking() {
         generator = null
         generator = new lifecycleGenerator()
-        assert generator.lifecycle_obj == null
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
         String contents = new File(url.getFile()).getText()
         generator.loadLifecyclesString(contents)
         assert generator.lifecycle_obj != null
         assert generator.lifecycle_obj.class == lifecycleValidator
-        assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
+    }
+    @Test public void test_lifecycleGenerator_loadLifecyclesString_simple_query() {
         generator = null
         generator = new lifecycleGenerator()
-        assert generator.lifecycle_obj == null
-        url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
-        contents = new File(url.getFile()).getText()
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        String contents = new File(url.getFile()).getText()
+        generator.loadLifecyclesString(contents)
+        assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
+    }
+    @Test public void test_lifecycleGenerator_loadLifecyclesString_throws_exception() {
+        generator = null
+        generator = new lifecycleGenerator()
+        URL url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
+        String contents = new File(url.getFile()).getText()
         shouldFail(JervisException) {
             generator.loadLifecyclesString(contents)
         }
