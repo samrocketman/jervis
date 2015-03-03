@@ -49,7 +49,6 @@ class GitHub implements JervisRemote {
 
     /**
       The <a href="https://github.com/blog/1509-personal-api-tokens" target="_blank">API token</a>, which can be used to communicate with GitHub using authentication.  Default: <tt>null</tt>
-
      */
     String gh_token
 
@@ -94,11 +93,11 @@ class GitHub implements JervisRemote {
      * private functions
      */
 
-    /*
-       HashMap fetch(String addr) - fetches a URL.
-       Args:
-           addr - a web address to fetch.  The URL must return json content.
-       returns a HashMap
+    /**
+      Fetches a URL.  This function is meant to be private used by the API under the
+      hood.
+      @param addr A web address to fetch.  The URL must return JSON content.
+      @return     A <tt>HashMap</tt> from the parsed JSON response.
     */
     private fetch(String addr) {
         def json = new JsonSlurper()
