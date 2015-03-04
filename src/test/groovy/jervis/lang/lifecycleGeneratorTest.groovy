@@ -145,25 +145,35 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby')
         assert 'ruby' == generator.yaml_language
     }
-    @Test public void test_lifecycleGenerator_loadYaml_supportedLanguage_no() {
+    @Test public void test_lifecycleGenerator_loadYaml_unsupportedLanguage_none() {
         //not in lifecycles and not in toolchains
         shouldFail(UnsupportedLanguageException) {
             generator.loadYamlString('language: derp')
         }
+    }
+    @Test public void test_lifecycleGenerator_loadYaml_unsupportedLanguage_toolchains() {
         //in lifecycles but not in toolchains
         shouldFail(UnsupportedLanguageException) {
             generator.loadYamlString('language: groovy')
         }
     }
-    @Test public void test_lifecycleGenerator_setfolder_listing() {
+    @Test public void test_lifecycleGenerator_setfolder_listing_throws_exception() {
+        //did not call loadYamlString() first
         shouldFail(JervisException) {
             generator.folder_listing = ['Gemfile.lock', 'Gemfile']
         }
+    }
+    @Test public void test_lifecycleGenerator_setfolder_listing_ruby_gemfile_lock() {
         generator.loadYamlString('language: ruby')
         generator.folder_listing = ['Gemfile.lock', 'Gemfile']
         assert 'rake1' == generator.lifecycle_key
+    }
+    @Test public void test_lifecycleGenerator_setfolder_listing_ruby_gemfile() {
+        generator.loadYamlString('language: ruby')
         generator.folder_listing = ['Gemfile']
         assert 'rake2' == generator.lifecycle_key
+    }
+    @Test public void test_lifecycleGenerator_setfolder_listing_java_ant_fallback() {
         generator.loadYamlString('language: java')
         generator.folder_listing = []
         assert 'ant' == generator.lifecycle_key
