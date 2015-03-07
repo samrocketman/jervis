@@ -214,10 +214,15 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  include:\n    - rvm: 1.9.3\n      env: world=hello\n  exclude:\n    - rvm: "1.9.3"\n    - rvm: "2.1"')
         assert '!(rvm == \'rvm0\') && !(rvm == \'rvm2\') && (rvm == \'rvm0\' && env == \'env0\')' == generator.matrixExcludeFilter()
     }
-    @Test public void test_lifecycleGenerator_matrixGetAxisValue() {
+    @Test public void test_lifecycleGenerator_matrixGetAxisValue1() {
         generator.loadYamlString('language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar')
         assert 'env0 env1' == generator.matrixGetAxisValue('env')
+    }
+    @Test public void test_lifecycleGenerator_matrixGetAxisValue2() {
+        generator.loadYamlString('language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar')
         assert '' == generator.matrixGetAxisValue('rvm')
+    }
+    @Test public void test_lifecycleGenerator_matrixGetAxisValue3() {
         generator.loadYamlString('language: ruby\nenv:\n  matrix:\n    - foobar=foo\n    - foobar=bar')
         assert 'env0 env1' == generator.matrixGetAxisValue('env')
     }
