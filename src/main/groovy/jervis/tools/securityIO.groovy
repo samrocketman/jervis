@@ -59,9 +59,9 @@ class securityIO {
 
     /**
       The default key size for <tt>{@link #id_rsa_keysize}</tt>.
-      Default: <tt>1024</tt>
+      Default: <tt>2048</tt>
      */
-    public static int default_key_size = 1024
+    public static int default_key_size = 2048
 
     /**
       Instantiates default values for <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, and <tt>{@link #id_rsa_keysize}</tt>.
@@ -195,7 +195,7 @@ id_rsa_keysize = keysize</tt></pre>
 
       For third party reference, this is essentially executing the following commands in a terminal.
 
-<pre><tt>openssl genrsa -out /tmp/id_rsa 1024
+<pre><tt>openssl genrsa -out /tmp/id_rsa 2048
 openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
 
       @param priv_key_file_path A file path where the private key will be written on the filesystem.
@@ -275,5 +275,24 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
         else {
             return stdout.toString().trim()
         }
+    }
+
+    /**
+      Checks to see if a field in the Jervis YAML is a
+      <a href="https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories" target="_blank">secure field</a>.
+      If it is then decryption should be attempted.  This only detects of decryption
+      is plausible.
+
+      @param  property A simple object that can take multiple types to check against.
+      @return Returns <tt>true</tt> if the field can potentially be decrypted.
+     */
+    public Boolean isSecureField(def field) {
+        if(field instanceof Map) {
+            String[] field_keys = field.keySet() as String[]
+            if('secure' in field_keys) {
+                return true
+            }
+        }
+        return false
     }
 }

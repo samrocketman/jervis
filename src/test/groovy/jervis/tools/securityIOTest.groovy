@@ -142,4 +142,17 @@ class securityIOTest extends GroovyTestCase {
             decodedtext = security.rsaDecrypt('some text')
         }
     }
+    @Test public void test_securityIO_isSecureField_map_nonsecure() {
+        Map myobj = new HashMap()
+        myobj.put('someprop', 'somevalue')
+        assert false == security.isSecureField(myobj)
+    }
+    @Test public void test_securityIO_isSecureField_nonmap() {
+        assert false == security.isSecureField([])
+    }
+    @Test public void test_securityIO_isSecureField_map_secure() {
+        Map myobj = new HashMap()
+        myobj.put('secure', 'somevalue')
+        assert true == security.isSecureField(myobj)
+    }
 }
