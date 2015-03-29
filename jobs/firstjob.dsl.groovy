@@ -42,14 +42,13 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
 
     if(! new File("${JENKINS_HOME}/jobs/${project_folder}/config.xml").exists()) {
         println "Creating folder ${project_folder}"
-        folder {
-            name(project_folder)
+        folder(project_folder) {
+            //displayName('some display name')
         }
     }
 
     println "Creating project ${project}"
-    view(type: ListView) {
-        name("${project}")
+    listView("${project}") {
         description(git_service.toString() + ' Project ' + git_service.getWebUrl() + "${project}")
         filterBuildQueue()
         filterExecutors()
@@ -96,15 +95,16 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
             //based on the branches section of .jervis.yml
             return
         }
+        //chooses job type based on Jervis YAML
         def jobType
         if(generator.isMatrixBuild()) {
-            jobType = Matrix
+            jervis_jobType = { String name, Closure closure -> matrixJob(name, closure) }
         }
         else {
-            jobType = Freeform
+            jervis_jobType = { String name, Closure closure -> freeStyleJob(name, closure) }
         }
-        job(type: jobType) {
-            name("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-'))
+        //the generated Job DSL enclosure depends on the job type
+        jervis_jobType("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-')) {
             scm {
                 //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
                 //for more info about the git closure
