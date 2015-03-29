@@ -13,7 +13,6 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-@Grab(group='org.yaml', module='snakeyaml', version='1.14')
 
 import jervis.lang.lifecycleGenerator
 import jervis.remotes.GitHub

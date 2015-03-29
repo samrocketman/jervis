@@ -27,11 +27,23 @@ buildscript {
     }
 }
 
+//Add due to deprecated Grab support
+//https://github.com/samrocketman/jervis/issues/60
+configurations {
+    libs
+}
+
 repositories { mavenCentral() }
 dependencies {
     compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
     compile 'org.yaml:snakeyaml:1.15'
     testCompile 'junit:junit:4.12'
+    libs 'org.yaml:snakeyaml:1.15'
+}
+
+task libs(type: Copy) {
+    into 'lib'
+    from configurations.libs
 }
 
 test {
