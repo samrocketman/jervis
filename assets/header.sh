@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 export PS4='$ '
 echo -n "Hostname: "
 hostname
