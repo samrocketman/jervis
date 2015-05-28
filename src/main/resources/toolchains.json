@@ -40,12 +40,12 @@
             "java -version"
         ],
         "oraclejdk7": [
-            "export JAVA_HOME=\"/opt/java-7-oraclejdk-amd64\"",
+            "export JAVA_HOME=\"/opt/java-7-oraclejdk-x64\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
             "java -version"
         ],
         "oraclejdk8": [
-            "export JAVA_HOME=\"/opt/java-8-oraclejdk-amd64\"",
+            "export JAVA_HOME=\"/opt/java-8-oraclejdk-x64\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
             "java -version"
         ]
