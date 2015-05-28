@@ -1,7 +1,6 @@
 language: groovy
 env:
   - GROOVY_VERSION="1.8.9"
-  - GROOVY_VERSION="1.9.0"
   - GROOVY_VERSION="2.0.8"
   - GROOVY_VERSION="2.1.9"
   - GROOVY_VERSION="2.2.2"
@@ -14,7 +13,6 @@ after_success:
   - ./gradlew cobertura coveralls
 matrix:
   allow_failures:
-    - env: GROOVY_VERSION="1.9.0"
     - env: GROOVY_VERSION="2.0.8"
     - env: GROOVY_VERSION="2.1.9"
     - env: GROOVY_VERSION="2.2.2"
