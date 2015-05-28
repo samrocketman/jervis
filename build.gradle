@@ -22,7 +22,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'net.saliman:gradle-cobertura-plugin:2.2.6'
+        classpath 'net.saliman:gradle-cobertura-plugin:2.2.8'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.3.1'
     }
 }
