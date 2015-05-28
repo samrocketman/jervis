@@ -150,7 +150,7 @@ uploadArchives {
 
                 licenses {
                     license {
-                        name 'GNU GPL v2'
+                        name 'Apache License, Version 2.0'
                         url 'https://raw.githubusercontent.com/samrocketman/jervis/master/LICENSE'
                     }
                 }
