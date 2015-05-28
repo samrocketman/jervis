@@ -1,11 +1,12 @@
 language: groovy
 env:
   - GROOVY_VERSION="1.8.9"
+  - GROOVY_VERSION="1.9.0"
   - GROOVY_VERSION="2.0.8"
   - GROOVY_VERSION="2.1.9"
   - GROOVY_VERSION="2.2.2"
-  - GROOVY_VERSION="2.3.9"
-  - GROOVY_VERSION="2.4.0"
+  - GROOVY_VERSION="2.3.11"
+  - GROOVY_VERSION="2.4.3"
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
 install: true
 script: ./assemble.sh
@@ -13,8 +14,9 @@ after_success:
   - ./gradlew cobertura coveralls
 matrix:
   allow_failures:
+    - env: GROOVY_VERSION="1.9.0"
     - env: GROOVY_VERSION="2.0.8"
     - env: GROOVY_VERSION="2.1.9"
     - env: GROOVY_VERSION="2.2.2"
-    - env: GROOVY_VERSION="2.3.9"
-    - env: GROOVY_VERSION="2.4.0"
+    - env: GROOVY_VERSION="2.3.11"
+    - env: GROOVY_VERSION="2.4.3"
