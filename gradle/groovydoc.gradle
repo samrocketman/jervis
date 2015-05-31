@@ -19,7 +19,7 @@ groovydoc {
   header = '<a href="https://github.com/samrocketman/jervis" target="_blank">github.com/samrocketman/jervis</a>'
   footer = '<a href="https://github.com/samrocketman/jervis" target="_blank">Jervis</a> API documentation was generated at ' + "$time on $date."
   link 'http://download.oracle.com/javase/7/docs/api/', 'java.'
-  link 'http://groovy.codehaus.org/api/', 'groovy.', 'org.codehaus.groovy.'
+  link 'http://docs.groovy-lang.org/latest/html/gapi/', 'groovy.', 'org.codehaus.groovy.'
   doLast {
     copy {
       from 'assets/stylesheet.css' into 'build/docs/groovydoc'
