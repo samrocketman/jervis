@@ -104,6 +104,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         }
         //the generated Job DSL enclosure depends on the job type
         jervis_jobType("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-')) {
+            displayName("${project_name} (${JERVIS_BRANCH} branch)")
             scm {
                 //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
                 //for more info about the git closure
