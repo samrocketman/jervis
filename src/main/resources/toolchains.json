@@ -119,8 +119,10 @@
             "  rvm install \"${jervis_toolchain_ivalue}\"",
             "  rvm \"${jervis_toolchain_ivalue}\" do gem install bundler",
             "fi",
-            "rvm use ${jervis_toolchain_ivalue}",
+            "export JERVIS_GEMSET=\"${jervis_toolchain_ivalue}@${JERVIS_PROJECT}-${BUILD_NUMBER}\"",
+            "rvm use \"${JERVIS_GEMSET}\" --create",
             "set -x",
+            "rvm current",
             "ruby --version"
         ]
     }

@@ -126,7 +126,14 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
                 }
             }
             steps {
-                shell([readFileFromWorkspace('assets/header.sh'),generator.generateAll()].join('\n'))
+                shell([
+                    readFileFromWorkspace('assets/header.sh'),
+                    "export JERVIS_LANG=\"${generator.yaml_language}\"",
+                    "export JERVIS_PROJECT=\"${project_name}\"",
+                    "export JERVIS_BRANCH=\"${JERVIS_BRANCH}\"",
+                    generator.generateAll(),
+                    readFileFromWorkspace('assets/footer.sh')
+                    ].join('\n'))
             }
             //if a matrix build then generate matrix bits
             if(generator.isMatrixBuild()) {
