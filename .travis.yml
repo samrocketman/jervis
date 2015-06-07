@@ -18,3 +18,7 @@ matrix:
     - env: GROOVY_VERSION="2.2.2"
     - env: GROOVY_VERSION="2.3.11"
     - env: GROOVY_VERSION="2.4.3"
+branches:
+  only:
+    - master
+    - jervis_simple
