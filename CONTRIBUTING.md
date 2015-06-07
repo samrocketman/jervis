@@ -4,12 +4,6 @@ Thanks for taking an interest in contributing to the Jervis project!  This guide
 details how to contribute to Jervis in a way that is efficient and safe for
 everyone.
 
-# Contributor license agreement
-
-Paperwork sucks...  But it helps to protect me (Sam Gleske), this project, and
-you.  So please get it out of the way before submitting a pull request.  See
-[legal fluff][legal].
-
 # Issue tracker
 
 [GitHub Issues][issues] is where I do all of my project planning.  Feel free to
@@ -28,6 +22,5 @@ likely to be merged because it would require work to fix.  So please ensure your
 code style conforms with the rest of the project.
 
 [issues]: https://github.com/samrocketman/jervis/issues
-[legal]: legal/README.md
 [style]: STYLE_GUIDE.md
 [wiki]: https://github.com/samrocketman/jervis/wiki
