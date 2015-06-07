@@ -70,7 +70,13 @@ class GitHub implements JervisRemote {
      */
     //gh_api will always end with a trailing slash
     void setGh_api(String gh_api) {
-        this.gh_api = (gh_api[-1] == '/')? gh_api : gh_api + '/'
+        gh_api = (gh_api[-1] == '/')? gh_api : gh_api + '/'
+        if('https://github.com/api/v3/'.equals(gh_api)) {
+            this.gh_api = 'https://api.github.com/'
+        }
+        else {
+            this.gh_api = gh_api
+        }
     }
 
     /**

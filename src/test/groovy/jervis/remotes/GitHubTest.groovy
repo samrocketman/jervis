@@ -85,8 +85,14 @@ class GitHubTest extends GroovyTestCase {
         assert mygh.gh_web == 'http://server/'
         assert mygh.gh_api == 'http://server/api/v3/'
     }
+    @Test public void test_GitHub_set3Gh_web() {
+        mygh.gh_web = 'https://github.com/'
+        assert mygh.gh_web == 'https://github.com/'
+        assert mygh.gh_api == 'https://api.github.com/'
+    }
     @Test public void test_GitHub_getGh_web() {
         assert mygh.gh_web == 'https://github.com/'
+        assert mygh.gh_api == 'https://api.github.com/'
     }
     //test GitHub().gh_api
     @Test public void test_GitHub_set1Gh_api() {
@@ -96,6 +102,10 @@ class GitHubTest extends GroovyTestCase {
     @Test public void test_GitHub_set2Gh_api() {
         mygh.gh_api = 'http://server/'
         assert mygh.gh_api == 'http://server/'
+    }
+    @Test public void test_GitHub_set3Gh_api() {
+        mygh.gh_api = 'https://github.com/api/v3/'
+        assert mygh.gh_api == 'https://api.github.com/'
     }
     @Test public void test_GitHub_getGh_api() {
         assert mygh.gh_api == 'https://api.github.com/'
