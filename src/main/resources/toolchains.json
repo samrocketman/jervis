@@ -30,22 +30,22 @@
     "jdk": {
         "default_ivalue": "openjdk7",
         "openjdk6": [
-            "export JAVA_HOME=\"/usr/lib/jvm/java-6-openjdk-amd64\"",
+            "export JAVA_HOME=\"${HOME}/java/openjdk6\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
             "java -version"
         ],
         "openjdk7": [
-            "export JAVA_HOME=\"/usr/lib/jvm/java-7-openjdk-amd64\"",
+            "export JAVA_HOME=\"${HOME}/java/openjdk7\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
             "java -version"
         ],
         "oraclejdk7": [
-            "export JAVA_HOME=\"/opt/java-7-oraclejdk-x64\"",
+            "export JAVA_HOME=\"${HOME}/java/oraclejdk7\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
             "java -version"
         ],
         "oraclejdk8": [
-            "export JAVA_HOME=\"/opt/java-8-oraclejdk-x64\"",
+            "export JAVA_HOME=\"${HOME}/java/oraclejdk8\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
             "java -version"
         ]
