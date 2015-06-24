@@ -12,7 +12,7 @@ version = '0.1-SNAPSHOT'
 
 apply from: 'file:gradle/groovydoc.gradle'
 
-ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '1.8.9'
+ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.3'
 
 println "Using Groovy ${groovyVersion}"
 println "Using Gradle ${GradleVersion.current().getVersion()}"
