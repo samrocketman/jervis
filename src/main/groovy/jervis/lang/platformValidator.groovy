@@ -41,7 +41,7 @@ println 'Does the file validate? ' + platforms.validate()</tt></pre>
 class platformValidator {
 
     /**
-      A <tt>{@link HashMap}</tt> of the parsed platforms file.
+      A <tt>{@link Map}</tt> of the parsed platforms file.
      */
     Map platforms
 
@@ -91,8 +91,8 @@ class platformValidator {
             if(!platforms.containsKey(it)) {
                 throw new PlatformMissingKeyException("${it} - Must exist as a root key.")
             }
-            if(!(platforms[it] instanceof HashMap)) {
-                throw new PlatformBadValueInKeyException("${it} - Must be a HashMap.")
+            if(!(platforms[it] instanceof Map)) {
+                throw new PlatformBadValueInKeyException("${it} - Must be a Map.")
             }
         }
         //validate the supported_platforms root key for keys, types, and values
@@ -101,16 +101,16 @@ class platformValidator {
         }
         (platforms['supported_platforms'].keySet() as String[]).each {
             String platform = it
-            if(!(platforms['supported_platforms'][platform] instanceof HashMap)) {
-                throw new PlatformBadValueInKeyException("supported_platforms.${platform} - Must be a HashMap.")
+            if(!(platforms['supported_platforms'][platform] instanceof Map)) {
+                throw new PlatformBadValueInKeyException("supported_platforms.${platform} - Must be a Map.")
             }
             if(platforms['supported_platforms'][platform].size() <= 0) {
                 throw new PlatformMissingKeyException("supported_platforms.${platform}.(empty list) - OS list must not be empty.")
             }
             (platforms['supported_platforms'][platform].keySet() as String[]).each {
                 String os = it
-                if(!(platforms['supported_platforms'][platform][os] instanceof HashMap)) {
-                    throw new PlatformBadValueInKeyException(['supported_platforms', platform, os].join('.') + ' - Must be a HashMap.')
+                if(!(platforms['supported_platforms'][platform][os] instanceof Map)) {
+                    throw new PlatformBadValueInKeyException(['supported_platforms', platform, os].join('.') + ' - Must be a Map.')
                 }
                 ['language', 'toolchain'].each {
                     if(!platforms['supported_platforms'][platform][os].containsKey(it)) {
@@ -148,8 +148,8 @@ class platformValidator {
         //validate restrictions root key for keys, types, and values
         (platforms['restrictions'].keySet() as String[]).each {
             String platform = it
-            if(!(platforms['restrictions'][platform] instanceof HashMap)) {
-                throw new PlatformBadValueInKeyException(['restrictions', platform].join('.') + ' - Must be a HashMap.')
+            if(!(platforms['restrictions'][platform] instanceof Map)) {
+                throw new PlatformBadValueInKeyException(['restrictions', platform].join('.') + ' - Must be a Map.')
             }
             if(!platforms['supported_platforms'].containsKey(platform)) {
                 throw new PlatformMissingKeyException(['supported_platforms', platform].join('.') + ' - Missing restricted platform.')
