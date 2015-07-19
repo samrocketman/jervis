@@ -75,7 +75,7 @@ class lifecycleValidator {
       in order to use the
       <a href="https://github.com/samrocketman/jervis/issues/43#issuecomment-73638215" target="_blank"><tt>readFileFromWorkspace</tt></a>
       method from the Jenkins Job DSL Plugin.
-      @param json A <tt>String</tt> the contents of a lifecycles file.
+      @param json A <tt>String</tt> containing the contents of a lifecycles file.
      */
     public void load_JSONString(String json) {
         lifecycles = new groovy.json.JsonSlurper().parseText(json)
