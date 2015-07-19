@@ -74,6 +74,30 @@ class platformValidatorTest extends GroovyTestCase {
         }
         assert false == platforms.validate_asBool()
     }
+    @Test public void test_platformValidator_bad_platforms_rootkey_defaults() {
+        URL url = this.getClass().getResource('/bad_platforms_rootkey_defaults.json')
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformBadValueInKeyException) {
+            platforms.validate()
+        }
+        assert false == platforms.validate_asBool()
+    }
+    @Test public void test_platformValidator_bad_platforms_rootkey_supported_platforms() {
+        URL url = this.getClass().getResource('/bad_platforms_rootkey_supported_platforms.json')
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformBadValueInKeyException) {
+            platforms.validate()
+        }
+        assert false == platforms.validate_asBool()
+    }
+    @Test public void test_platformValidator_bad_platforms_rootkey_restrictions() {
+        URL url = this.getClass().getResource('/bad_platforms_rootkey_restrictions.json')
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformBadValueInKeyException) {
+            platforms.validate()
+        }
+        assert false == platforms.validate_asBool()
+    }
     @Test public void test_platformValidator_good_platforms_simple() {
         URL url = this.getClass().getResource('/good_platforms_simple.json');
         platforms.load_JSON(url.getFile())

@@ -1,10 +1,5 @@
 {
-    "defaults": {
-        "platform": "docker",
-        "os": "ubuntu1404",
-        "stability": "stable",
-        "sudo": "sudo"
-    },
+    "defaults": "badstring",
     "supported_platforms": {
         "docker": {
             "ubuntu1404": {
@@ -24,10 +19,5 @@
             }
         }
     },
-    "restrictions": {
-        "docker": {
-            "only_organizations": ["samrocketman"],
-            "only_projects": ["samrocketman/jervis"]
-        }
-    }
+    "restrictions": {}
 }

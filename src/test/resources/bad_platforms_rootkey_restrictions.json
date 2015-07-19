@@ -24,10 +24,5 @@
             }
         }
     },
-    "restrictions": {
-        "docker": {
-            "only_organizations": ["samrocketman"],
-            "only_projects": ["samrocketman/jervis"]
-        }
-    }
+    "restrictions": "badstring"
 }
