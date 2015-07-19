@@ -40,4 +40,9 @@ class wikiPages {
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file" target="_blank">toolchains file spec wiki page</a>.
      */
     public static String toolchains_spec = 'https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file'
+
+    /**
+      A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file" target="_blank">platforms file spec wiki page</a>.
+     */
+    public static String platforms_spec = 'https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file'
 }
