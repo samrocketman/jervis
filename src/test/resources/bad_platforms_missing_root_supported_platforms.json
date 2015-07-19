@@ -1,0 +1,9 @@
+{
+    "defaults": {
+        "platform": "docker",
+        "os": "ubuntu1404",
+        "stability": "stable",
+        "sudo": "sudo"
+    },
+    "restrictions": {}
+}

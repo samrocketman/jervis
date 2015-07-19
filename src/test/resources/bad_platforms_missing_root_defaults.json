@@ -1,0 +1,22 @@
+{
+    "supported_platforms": {
+        "docker": {
+            "ubuntu1404": {
+                "language": [
+                    "groovy",
+                    "java",
+                    "python",
+                    "ruby"
+                ],
+                "toolchain": [
+                    "env",
+                    "gemset",
+                    "rvm",
+                    "python",
+                    "jdk"
+                ]
+            }
+        }
+    },
+    "restrictions": {}
+}

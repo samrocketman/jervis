@@ -50,6 +50,30 @@ class platformValidatorTest extends GroovyTestCase {
         assert platforms.platforms instanceof Map
         assert platforms.platforms['defaults']['platform'] == 'docker'
     }
+    @Test public void test_platformValidator_bad_platforms_missing_root_defaults() {
+        URL url = this.getClass().getResource('/bad_platforms_missing_root_defaults.json')
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformMissingKeyException) {
+            platforms.validate()
+        }
+        assert false == platforms.validate_asBool()
+    }
+    @Test public void test_platformValidator_bad_platforms_missing_root_supported_platforms() {
+        URL url = this.getClass().getResource('/bad_platforms_missing_root_supported_platforms.json')
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformMissingKeyException) {
+            platforms.validate()
+        }
+        assert false == platforms.validate_asBool()
+    }
+    @Test public void test_platformValidator_bad_platforms_missing_root_restrictions() {
+        URL url = this.getClass().getResource('/bad_platforms_missing_root_restrictions.json')
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformMissingKeyException) {
+            platforms.validate()
+        }
+        assert false == platforms.validate_asBool()
+    }
     @Test public void test_platformValidator_good_platforms_simple() {
         URL url = this.getClass().getResource('/good_platforms_simple.json');
         platforms.load_JSON(url.getFile())
