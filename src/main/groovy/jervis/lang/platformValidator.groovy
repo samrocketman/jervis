@@ -70,7 +70,7 @@ class platformValidator {
 
     /**
       Executes the <tt>{@link #validate()}</tt> function but always returns a <tt>Boolean</tt> instead of throwing an exception upon failed validation.
-      @return     <tt>true</tt> if the lifecycles file validates or <tt>false</tt> if it fails validation.
+      @return     <tt>true</tt> if the platforms file validates or <tt>false</tt> if it fails validation.
      */
     public Boolean validate_asBool() {
         try {
@@ -88,7 +88,7 @@ class platformValidator {
     public Boolean validate() throws PlatformMissingKeyException, PlatformBadValueInKeyException, PlatformValidationException {
         //check for required root keys and types
         ['defaults', 'supported_platforms', 'restrictions'].each {
-            if(!(it in platforms)) {
+            if(!platforms.containsKey(it)) {
                 throw new PlatformMissingKeyException("${it} - Must exist as a root key.")
             }
             if(!(platforms[it] instanceof HashMap)) {
@@ -113,7 +113,7 @@ class platformValidator {
                     throw new PlatformBadValueInKeyException(['supported_platforms', platform, os].join('.') + ' - Must be a HashMap.')
                 }
                 ['language', 'toolchain'].each {
-                    if(!(it in platforms['supported_platforms'][platform][os])) {
+                    if(!platforms['supported_platforms'][platform][os].containsKey(it)) {
                         throw new PlatformMissingKeyException(['supported_platforms', platform, os, it].join('.'))
                     }
                     if(!(platforms['supported_platforms'][platform][os][it] instanceof ArrayList)) {
@@ -124,7 +124,7 @@ class platformValidator {
         }
         //validate defaults root key for keys, types, and  values
         ['platform', 'os', 'stability', 'sudo'].each {
-            if(!(it in platforms['defaults'])) {
+            if(!platforms['defaults'].containsKey(it)) {
                 throw new PlatformMissingKeyException(['defaults', it].join('.'))
             }
             if(!(platforms['defaults'][it] instanceof String)) {
@@ -133,26 +133,29 @@ class platformValidator {
         }
         String default_platform = platforms['defaults']['platform']
         String default_os = platforms['defaults']['os']
-        if(!(default_platform in platforms['supported_platforms'])) {
+        if(!platforms['supported_platforms'].containsKey(default_platform)) {
             throw new PlatformMissingKeyException(['supported_platforms', default_platform].join('.') + ' - Missing default platform.')
         }
-        if(!(default_os in platforms['supported_platforms'][default_platform])) {
+        if(!platforms['supported_platforms'][default_platform].containsKey(default_os)) {
             throw new PlatformMissingKeyException(['supported_platforms', default_platform, default_os].join('.') + ' - Missing default OS.')
         }
-        if(platforms['defaults']['stability'] != 'stable' or platforms['defaults']['stability'] != 'unstable') {
+        if(platforms['defaults']['stability'] != 'stable' && platforms['defaults']['stability'] != 'unstable') {
             throw new PlatformBadValueInKeyException(['defaults', 'stability'].join('.') + ' - Must be stable or unstable.')
         }
-        if(platforms['defaults']['sudo'] != 'sudo' or platforms['defaults']['sudo'] != 'nosudo') {
+        if(platforms['defaults']['sudo'] != 'sudo' && platforms['defaults']['sudo'] != 'nosudo') {
             throw new PlatformBadValueInKeyException(['defaults', 'sudo'].join('.') + ' - Must be sudo or nosudo.')
         }
         //validate restrictions root key for keys, types, and values
         (platforms['restrictions'].keySet() as String[]).each {
             String platform = it
-            if(!(platform in platforms['supported_platforms'])) {
+            if(!(platforms['restrictions'][platform] instanceof HashMap)) {
+                throw new PlatformBadValueInKeyException(['restrictions', platform].join('.') + ' - Must be a HashMap.')
+            }
+            if(!platforms['supported_platforms'].containsKey(platform)) {
                 throw new PlatformMissingKeyException(['supported_platforms', platform].join('.') + ' - Missing restricted platform.')
             }
             ['only_organizations', 'only_projects'].each {
-                if(it in platforms['restrictions'][platform]) {
+                if(platforms['restrictions'][platform].containsKey(it)) {
                     if(!(platforms['restrictions'][platform][it] instanceof ArrayList)) {
                         throw new PlatformBadValueInKeyException(['restrictions', platform, it].join('.') + ' - Must be an ArrayList.')
                     }
