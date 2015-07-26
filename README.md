@@ -84,7 +84,7 @@ include it in your build tool.
 
 #### Gradle
 
-```
+```groovy
 dependencies {
     libs 'org.yaml:snakeyaml:1.15'
     libs 'net.gleske:jervis:0.2'
