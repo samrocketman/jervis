@@ -13,6 +13,8 @@ version = '0.1-SNAPSHOT'
 apply from: 'file:gradle/groovydoc.gradle'
 
 ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.3'
+ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
+ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
 
 println "Using Groovy ${groovyVersion}"
 println "Using Gradle ${GradleVersion.current().getVersion()}"
@@ -126,15 +128,11 @@ uploadArchives {
             }
 
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                if(hasProperty('ossrhUsername') && hasProperty('ossrhPassword')) {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
+                authentication(userName: ossrhUsername, password: ossrhPassword)
             }
 
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                if(hasProperty('ossrhUsername') && hasProperty('ossrhPassword')) {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
+                authentication(userName: ossrhUsername, password: ossrhPassword)
             }
 
             pom.project {
