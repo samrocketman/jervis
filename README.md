@@ -1,7 +1,7 @@
 # Jervis - [![Build Status][status-build]][jervis-travis] [![Coverage Status][status-coverage]][jervis-coveralls] [![Dependency Status][status-versioneye]][jervis-versioneye]
 
-* *Project status:* pre-alpha ([progress to first release][milestone-progress])
-* *Initially Targeted platforms:* Linux
+* *Project status:* released.
+* *Currently Targeted platforms:* Linux
 
 Jervis is a combination of some letters in the words Jenkins and Travis: JEnkins
 tRaVIS.  [Jenkins][jenkins] is a [continuous integration][wiki-ci] tool which is
@@ -54,10 +54,33 @@ sub-bullet.
     seasoned build engineer and attempting to fill this gap in the Jenkins
     ecosystem.
 
-# Set up
+# Documentation
 
 Refer to the [Jervis Wiki][jervis-wiki] for a quickstart guide and rolling
 Jervis out for production.
+
+The library API is also fully documented.  To generate the docs do the
+following.
+
+    ./gradlew groovydoc
+
+The documentation can be found in `build/docs/groovydoc`.
+
+# Set up
+
+To include this library for use in your Job DSL plugin scripts you only need
+include it in your build tool.
+
+Maven
+
+```xml
+<dependency>
+  <groupId>net.gleske</groupId>
+  <artifactId>jervis</artifactId>
+  <version>0.2</version>
+  <type>pom</type>
+</dependency>
+```
 
 # License
 
