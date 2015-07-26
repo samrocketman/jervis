@@ -71,7 +71,7 @@ The documentation can be found in `build/docs/groovydoc`.
 To include this library for use in your Job DSL plugin scripts you only need
 include it in your build tool.
 
-Maven
+#### Maven
 
 ```xml
 <dependency>
@@ -81,6 +81,23 @@ Maven
   <type>pom</type>
 </dependency>
 ```
+
+#### Gradle
+
+```
+dependencies {
+    libs 'org.yaml:snakeyaml:1.15'
+    libs 'net.gleske:jervis:0.2'
+}
+
+task libs(type: Copy) {
+    into 'lib'
+    from configurations.libs
+}
+```
+
+Then execute `./gradlew libs` to assemble dependencies into the `lib` directory
+of the Jenkins workspace.  Don't forget to add `lib` to the classpath.
 
 # License
 
