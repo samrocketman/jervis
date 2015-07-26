@@ -1,3 +1,7 @@
+# jervis 0.2
+
+* Renamed Java package from `jervis` to `net.gleske.jervis`.
+
 # jervis 0.1
 
 * Supported languages: `groovy`, `java`, `ruby`, and `python`.
