@@ -10,11 +10,11 @@ archivesBaseName = 'jervis'
 jar.baseName = 'jervis'
 version = '0.1-SNAPSHOT'
 
-apply from: 'file:gradle/groovydoc.gradle'
-
 ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.3'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
+
+apply from: 'file:gradle/groovydoc.gradle'
 
 println "Using Groovy ${groovyVersion}"
 println "Using Gradle ${GradleVersion.current().getVersion()}"
