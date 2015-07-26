@@ -1,4 +1,8 @@
-# How to release
+# How to release to Maven Central
+
+* Follow Central recommendations for [setting up gradle][ossrh-gradle].
+  Additionally, there's decent documentation on code signing in the [gradle
+  documentation][gradle-signing]
 
 * Ensure GPG is set up for signing jars.
 * Ensure `~/.gradle/gradle.properties` has the following contents for signing
@@ -22,3 +26,13 @@ ossrhPassword=secret
 ### Perform release
 
     ./gradlew clean uploadArchives
+
+This will initially upload the artifact to a staging repository.  Once confident
+about the release visit [Maven Central Nexus][ossrh] and follow [instructions on
+releasing to production][ossrh-release].
+
+[gradle-signing]: https://docs.gradle.org/current/userguide/signing_plugin.html
+[ossrh-gradle]: http://central.sonatype.org/pages/gradle.html
+[ossrh-guide]: http://central.sonatype.org/pages/ossrh-guide.html
+[ossrh]: https://oss.sonatype.org/
+[ossrh-release]: http://central.sonatype.org/pages/releasing-the-deployment.html
