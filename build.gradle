@@ -108,14 +108,16 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
+
 artifacts {
     archives javadocJar, sourcesJar
 }
+
 signing {
-    if(hasProperty('ossrhUsername') && hasProperty('ossrhPassword')) {
-        sign configurations.archives
-    }
+    required { gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
 }
+
 uploadArchives {
     repositories {
         mavenDeployer {
