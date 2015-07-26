@@ -25,7 +25,14 @@ ossrhPassword=secret
 
 ### Perform release
 
-    ./gradlew clean uploadArchives
+1. Increment the plugin version in `build.gradle` to a stable release:
+   e.g. `0.2`.  Commit.
+2. Tag the current commit: e.g. `jervis-0.2`.
+3. Upload the release.
+   ```
+   ./gradlew clean uploadArchives
+   ```
+4. Increment plugin version to next snapshot: e.g. `0.3-SNAPSHOT`.  Commit.
 
 This will initially upload the artifact to a staging repository.  Once confident
 about the release visit [Maven Central Nexus][ossrh] and follow [instructions on
