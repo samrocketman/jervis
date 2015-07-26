@@ -1,38 +1,131 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
-<HTML>
-<HEAD>
-<TITLE>
-Index (Jervis API Docs)
-</TITLE>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="groovy.ico" type="image/x-icon" rel="shortcut icon">
-<link href="groovy.ico" type="image/x-icon" rel="icon">
-<SCRIPT type="text/javascript">
-    targetPage = "" + window.location.search;
-    if (targetPage != "" && targetPage != "undefined")
-       targetPage = targetPage.substring(1);
-    function loadFrames() {
-        if (targetPage != "" && targetPage != "undefined")
-             top.classFrame.location = top.targetPage;
-    }
-</SCRIPT>
-<NOSCRIPT>
-</NOSCRIPT>
-</HEAD>
-<FRAMESET cols="20%,80%" title="" onLoad="top.loadFrames()">
-<FRAMESET rows="30%,70%" title="" onLoad="top.loadFrames()">
-<FRAME src="overview-frame.html" name="packageListFrame" title="All Packages">
-<FRAME src="allclasses-frame.html" name="packageFrame" title="All classes and interfaces (except non-static nested types)">
-</FRAMESET>
-<FRAME src="overview-summary.html" name="classFrame" title="Package, class and interface descriptions" scrolling="yes">
-<NOFRAMES>
-<H2>
-Frame Alert</H2>
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Jervis by samrocketman</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Jervis</h1>
+      <h2 class="project-tagline">Travis-like Jenkins job generation using Job DSL plugin groovy scripts.  Reads .travis.yml and generates a job in Jenkins.</h2>
+      <a href="https://github.com/samrocketman/jervis" class="btn">View on GitHub</a>
+      <a href="https://github.com/samrocketman/jervis/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/samrocketman/jervis/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-<P>
-This document is designed to be viewed using the frames feature. If you see this message, you are using a non-frame-capable web client.
-<BR>
-Link to<A HREF="overview-summary.html">Non-frame version.</A>
-</NOFRAMES>
-</FRAMESET>
-</HTML>
+    <section class="main-content">
+      <h1>
+<a id="about-jervis" class="anchor" href="#about-jervis" aria-hidden="true"><span class="octicon octicon-link"></span></a>About Jervis</h1>
+
+<ul>
+<li>What is Jervis?  A library for <a href="https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin">Job DSL plugin</a>
+scripts.</li>
+<li>What is Jervis not?  Jervis is not a plugin.</li>
+</ul>
+
+<p>Jervis uses Travis-like job generation using the <a href="https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin">Job DSL
+plugin</a> and groovy scripts.  It reads the <code>.jervis.yml</code>
+file of a project and generates a job in Jenkins based on it.  If <code>.jervis.yml</code>
+doesn't exist then it will fall back to using the <a href="http://docs.travis-ci.com/user/build-configuration/"><code>.travis.yml</code></a>
+file.</p>
+
+<p>For development planning and other documentation see the <a href="https://github.com/samrocketman/jervis/wiki">Jervis
+wiki</a>.  If you wish to stay up to date with the latest Jervis news
+then please feel free to <a href="https://help.github.com/articles/watching-repositories/">watch this repository</a> because I use the
+issue tracking and wiki for planning.</p>
+
+<h2>
+<a id="why-jervis" class="anchor" href="#why-jervis" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why Jervis?</h2>
+
+<p>What is Jervis attempting to scale?  Let's talk about some scale bottlenecks
+that have been overcome by Jenkins (formerly Hudson) and its community.</p>
+
+<p>The scaling issue is a main bullet. The solution for the issue is in a
+sub-bullet.</p>
+
+<ul>
+<li>Developers are challenged with building often and even deploying often.
+
+<ul>
+<li>Jenkins was invented.</li>
+</ul>
+</li>
+<li>Jenkins infrastructure is strained when too many slaves are in one master and
+too many jobs are queued up on a daily basis.  A single master struggles to
+perform all requested builds in a timely manner.  Jenkins also suffers from
+single point of failure as a lone master.
+
+<ul>
+<li>Multi-master Jenkins was invented. This provides redundancy for the master.
+Throughput for daily build capacity is improved.</li>
+</ul>
+</li>
+<li>Jenkins jobs suffer from a lot of duplicate code.  It is difficult to fix a
+bug in one job and have it propagate to other jobs.
+
+<ul>
+<li>Jenkins Job DSL plugin was invented.  Configuration through code is now
+possible.  Multiple jobs can be generated and regenerated with the same code
+using templates in a domain specific language.</li>
+</ul>
+</li>
+<li>Onboarding new projects in a Jenkins installation can be difficult.  Typically
+engineers will get together and discuss the needs of the project and then
+configure a Jenkins job for the needs of the project.  For enterprises with a
+very large number of projects it is typically hard to scale number of build
+engineers to match with the large number of projects which require onboarding
+into the build ecosystem.
+
+<ul>
+<li>Jervis is being invented.  Job generation through convention over
+configuration.  Scaling the onboarding for a project by creating and abiding
+by conventions in how jobs are generated.  This is for large scale job
+generation and project onboarding.  Jervis is taking lessons learned from a
+seasoned build engineer and attempting to fill this gap in the Jenkins
+ecosystem.</li>
+</ul>
+</li>
+</ul>
+
+<h1>
+<a id="set-up" class="anchor" href="#set-up" aria-hidden="true"><span class="octicon octicon-link"></span></a>Set up</h1>
+
+<p>Refer to the <a href="https://github.com/samrocketman/jervis/wiki">Jervis Wiki</a> for a quickstart guide and rolling
+Jervis out for production.  There's also the <a href="https://github.com/samrocketman/jenkins-bootstrap-jervis">jenkins-bootstrap-jervis</a>
+project to get up and running quickly.</p>
+
+<h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
+
+<pre><code>Copyright 2014-2015 Sam Gleske
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+</code></pre>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/samrocketman/jervis">Jervis</a> is maintained by <a href="https://github.com/samrocketman">samrocketman</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
