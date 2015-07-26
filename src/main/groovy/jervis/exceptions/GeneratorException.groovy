@@ -19,7 +19,7 @@ package jervis.exceptions
   A group of exceptions that are thrown when undesireable script generation conditions occur.
 
   <h2>Sample usage</h2>
-<pre><tt>import jervis.exceptions.LifecycleException
+<pre><tt>import jervis.exceptions.GeneratorException
 throw new GeneratorException('some text')</tt></pre><br>
  */
 class GeneratorException extends JervisException {

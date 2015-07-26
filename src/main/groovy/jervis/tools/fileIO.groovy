@@ -28,7 +28,7 @@ import jervis.tools.scmGit
   <h2>Sample usage</h2>
 <pre><tt>import jervis.tools.fileIO
 //mystring path is relative to the root of the git repository
-def mystring = 'readFile(/src/testResources/sample_script.sh)'
+def mystring = 'readFile(/src/test/resources/sample_script.sh)'
 def x = new fileIO()
 println 'Is readFile? ' + x.isReadFile(mystring)
 println 'Does the file exist?' + x.fileExists(mystring)

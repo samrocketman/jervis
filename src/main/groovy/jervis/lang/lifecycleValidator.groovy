@@ -41,7 +41,7 @@ println 'Does the file validate? ' + lifecycles.validate()
 println 'Supported languages include:'
 //print out a sorted ArrayList of supported languages
 supported_languages = []
-ifecycles.languages.each { supported_languages << lifecycles.lifecycles[it]['friendlyName'] }
+lifecycles.languages.each { supported_languages << lifecycles.lifecycles[it]['friendlyName'] }
 Collections.sort(supported_languages)
 supported_languages.each{ println it }</tt></pre>
  */

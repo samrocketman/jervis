@@ -17,7 +17,10 @@ package jervis.remotes
 
 /**
   Provides a minimum standard interface a Jervis remote requires.  Throughout
-  Jervis these functions will be called on the remote.
+  Jervis these functions will be called on the remote.  It is recommended that
+  only the functions in this interface should be used by Job DSL plugin scripts
+  when accessing a remote.  Failure to do so risks the flexibility and
+  portability of switching remote sources.
  */
 interface JervisRemote {
 
