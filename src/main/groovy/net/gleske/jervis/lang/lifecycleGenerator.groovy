@@ -28,7 +28,7 @@ import org.yaml.snakeyaml.Yaml
   Generates the build scripts from the Jervis YAML.
 
   <h2>Sample usage</h2>
-<pre><tt>import jervis.lang.lifecycleGenerator
+<pre><tt>import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.tools.scmGit
 def git = new scmGit()
 def generator = new lifecycleGenerator()

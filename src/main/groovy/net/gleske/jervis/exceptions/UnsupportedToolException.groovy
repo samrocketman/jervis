@@ -21,7 +21,7 @@ import net.gleske.jervis.exceptions.wikiPages
   A type of <tt>{@link jervis.exceptions.GeneratorException}</tt> which is thrown when an unsupported language lifecycle generation is attempted.
 
   <h2>Sample usage</h2>
-<pre><tt>import jervis.exceptions.UnsupportedToolException
+<pre><tt>import net.gleske.jervis.exceptions.UnsupportedToolException
 throw new UnsupportedToolException('derpy')</tt></pre><br>
  */
 class UnsupportedToolException extends GeneratorException {

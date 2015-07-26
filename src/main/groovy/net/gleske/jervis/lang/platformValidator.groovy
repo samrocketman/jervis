@@ -31,7 +31,7 @@ import net.gleske.jervis.exceptions.PlatformValidationException
   scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
-<pre><tt>import jervis.lang.platformValidator
+<pre><tt>import net.gleske.jervis.lang.platformValidator
 import net.gleske.jervis.tools.scmGit
 def git = new scmGit()
 def platforms = new platformValidator()

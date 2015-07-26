@@ -19,7 +19,7 @@ package net.gleske.jervis.exceptions
   A type of <tt>{@link jervis.exceptions.PlatformValidationException}</tt> which is thrown when there is a bad value in a platforms file key.
 
   <h2>Sample usage</h2>
-<pre><tt>import jervis.exceptions.PlatformBadValueInKeyException
+<pre><tt>import net.gleske.jervis.exceptions.PlatformBadValueInKeyException
 throw new PlatformBadValueInKeyException('defaults.platform')</tt></pre><br>
  */
 class PlatformBadValueInKeyException extends PlatformValidationException {

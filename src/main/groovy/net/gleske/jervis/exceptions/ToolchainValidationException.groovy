@@ -21,7 +21,7 @@ import net.gleske.jervis.exceptions.wikiPages
   A group of exceptions that are thrown when validation errors occur in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file" target="_blank">toolchains file</a>.
 
   <h2>Sample usage</h2>
-<pre><tt>import jervis.exceptions.ToolchainValidationException
+<pre><tt>import net.gleske.jervis.exceptions.ToolchainValidationException
 throw new ToolchainValidationException('some text')</tt></pre><br>
  */
 class ToolchainValidationException extends JervisException {

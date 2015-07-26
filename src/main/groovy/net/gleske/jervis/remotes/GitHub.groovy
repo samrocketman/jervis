@@ -23,7 +23,7 @@ import net.gleske.jervis.tools.securityIO
 
    <h2>Sample usage</h2>
 
-<pre><tt>import jervis.remotes.GitHub
+<pre><tt>import net.gleske.jervis.remotes.GitHub
 def x = new GitHub()
 println 'Print each branch.'
 x.branches('samrocketman/jervis').each{ println it }

@@ -32,7 +32,7 @@ import net.gleske.jervis.exceptions.LifecycleValidationException
   scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
-<pre><tt>import jervis.lang.lifecycleValidator
+<pre><tt>import net.gleske.jervis.lang.lifecycleValidator
 import net.gleske.jervis.tools.scmGit
 def git = new scmGit()
 def lifecycles = new lifecycleValidator()

@@ -22,7 +22,7 @@ import net.gleske.jervis.exceptions.JervisException
 
    <h2>Sample usage</h2>
 
-<pre><tt>import jervis.tools.scmGit
+<pre><tt>import net.gleske.jervis.tools.scmGit
 def x = new scmGit()
 print "Git root dir: "
 println x.getRoot()</tt></pre><br>

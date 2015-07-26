@@ -19,7 +19,7 @@ package net.gleske.jervis.exceptions
   A type of <tt>{@link jervis.exceptions.ToolchainValidationException}</tt> which is thrown when a lifecycles file key is referenced but missing.
 
   <h2>Sample usage</h2>
-<pre><tt>import jervis.exceptions.ToolchainMissingKeyException
+<pre><tt>import net.gleske.jervis.exceptions.ToolchainMissingKeyException
 throw new ToolchainMissingKeyException('somekey')</tt></pre><br>
  */
 class ToolchainMissingKeyException extends ToolchainValidationException {

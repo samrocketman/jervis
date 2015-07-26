@@ -22,7 +22,7 @@ import net.gleske.jervis.exceptions.JervisException
 
    <h2>Sample usage</h2>
 
-<pre><tt>import jervis.tools.securityIO
+<pre><tt>import net.gleske.jervis.tools.securityIO
 def security = new securityIO('/tmp',2048)
 security.generate_rsa_pair()
 println 'Private key path: ' + security.id_rsa_priv

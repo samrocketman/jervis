@@ -19,7 +19,7 @@ package net.gleske.jervis.exceptions
   The base exception class for Jervis from which all other exceptions derive.
 
   <h2>Sample usage</h2>
-<pre><tt>import jervis.exceptions.JervisException
+<pre><tt>import net.gleske.jervis.exceptions.JervisException
 throw new JervisException('some text')</tt></pre><br>
  */
 class JervisException extends Exception {

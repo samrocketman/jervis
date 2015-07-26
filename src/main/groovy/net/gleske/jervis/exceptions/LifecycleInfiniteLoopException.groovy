@@ -19,7 +19,7 @@ package net.gleske.jervis.exceptions
   A type of <tt>{@link jervis.exceptions.LifecycleValidationException}</tt> which is thrown when a lifecycles file keys reference in an infinite loop.
 
   <h2>Sample usage</h2>
-<pre><tt>import jervis.exceptions.LifecycleInfiniteLoopException
+<pre><tt>import net.gleske.jervis.exceptions.LifecycleInfiniteLoopException
 throw new LifecycleInfiniteLoopException('groovy.maven')</tt></pre><br>
  */
 class LifecycleInfiniteLoopException extends LifecycleValidationException {

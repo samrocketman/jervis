@@ -19,7 +19,7 @@ package net.gleske.jervis.exceptions
   A type of <tt>{@link jervis.exceptions.PlatformValidationException}</tt> which is thrown when a platforms file key is referenced but missing.
 
   <h2>Sample usage</h2>
-<pre><tt>import jervis.exceptions.PlatformMissingKeyException
+<pre><tt>import net.gleske.jervis.exceptions.PlatformMissingKeyException
 throw new PlatformMissingKeyException('defaults')</tt></pre><br>
  */
 class PlatformMissingKeyException extends PlatformValidationException {

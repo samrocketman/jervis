@@ -21,7 +21,7 @@ import net.gleske.jervis.exceptions.wikiPages
   A group of exceptions that are thrown when validation errors occur in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file" target="_blank">platforms file</a>.
 
   <h2>Sample usage</h2>
-<pre><tt>import jervis.exceptions.PlatformValidationException
+<pre><tt>import net.gleske.jervis.exceptions.PlatformValidationException
 throw new PlatformValidationException('some text')</tt></pre><br>
  */
 class PlatformValidationException extends JervisException {
