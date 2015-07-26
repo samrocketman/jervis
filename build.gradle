@@ -99,9 +99,9 @@ task wrapper(type: Wrapper) {
 }
 
 //Maven Central uploads
-task javadocJar(type: Jar) {
+task javadocJar(type: Jar, dependsOn: groovydoc) {
     classifier = 'javadoc'
-    from javadoc
+    from groovydoc.destinationDir
 }
 
 task sourcesJar(type: Jar) {
