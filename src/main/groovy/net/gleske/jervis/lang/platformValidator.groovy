@@ -13,12 +13,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.lang
+package net.gleske.jervis.lang
 
 import groovy.json.JsonSlurper
-import jervis.exceptions.PlatformBadValueInKeyException
-import jervis.exceptions.PlatformMissingKeyException
-import jervis.exceptions.PlatformValidationException
+import net.gleske.jervis.exceptions.PlatformBadValueInKeyException
+import net.gleske.jervis.exceptions.PlatformMissingKeyException
+import net.gleske.jervis.exceptions.PlatformValidationException
 
 /**
   Validates the contents of a
@@ -32,7 +32,7 @@ import jervis.exceptions.PlatformValidationException
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
 <pre><tt>import jervis.lang.platformValidator
-import jervis.tools.scmGit
+import net.gleske.jervis.tools.scmGit
 def git = new scmGit()
 def platforms = new platformValidator()
 platforms.load_JSON(git.getRoot() + '/src/main/resources/platforms.json')

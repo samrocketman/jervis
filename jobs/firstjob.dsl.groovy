@@ -14,8 +14,8 @@
    limitations under the License.
    */
 
-import jervis.lang.lifecycleGenerator
-import jervis.remotes.GitHub
+import net.gleske.jervis.lang.lifecycleGenerator
+import net.gleske.jervis.remotes.GitHub
 
 def git_service = new GitHub()
 //Pre-job setup based on the type of remote

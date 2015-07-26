@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.exceptions
+package net.gleske.jervis.exceptions
 
 /**
   The base exception class for Jervis from which all other exceptions derive.

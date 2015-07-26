@@ -13,9 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.tools
+package net.gleske.jervis.tools
 
-import jervis.exceptions.JervisException
+import net.gleske.jervis.exceptions.JervisException
 
 /**
    A class to provide cryptographic features to Jervis such as RSA encryption and base64 encoding.

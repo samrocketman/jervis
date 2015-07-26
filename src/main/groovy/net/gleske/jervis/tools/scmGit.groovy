@@ -13,9 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.tools
+package net.gleske.jervis.tools
 
-import jervis.exceptions.JervisException
+import net.gleske.jervis.exceptions.JervisException
 
 /**
    A class to provide useful functions for interacting with a local git repository.

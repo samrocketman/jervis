@@ -13,11 +13,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.lang
+package net.gleske.jervis.lang
 //the platformValidatorTest() class automatically sees the platformValidator() class because they're in the same package
-import jervis.exceptions.PlatformBadValueInKeyException
-import jervis.exceptions.PlatformMissingKeyException
-import jervis.exceptions.PlatformValidationException
+import net.gleske.jervis.exceptions.PlatformBadValueInKeyException
+import net.gleske.jervis.exceptions.PlatformMissingKeyException
+import net.gleske.jervis.exceptions.PlatformValidationException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.exceptions
+package net.gleske.jervis.exceptions
 
 /**
   A type of <tt>{@link jervis.exceptions.ToolchainValidationException}</tt> which is thrown when a lifecycles file key is referenced but missing.

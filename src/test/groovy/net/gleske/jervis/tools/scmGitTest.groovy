@@ -13,9 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.tools
+package net.gleske.jervis.tools
 //the scmGitTest() class automatically sees the scmGit() class because they're in the same package
-import jervis.exceptions.JervisException
+import net.gleske.jervis.exceptions.JervisException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

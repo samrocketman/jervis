@@ -23,4 +23,4 @@
   See the <tt>GitHub</tt> class as an example for the implementation of a remote.
   </p>
  */
-package jervis.remotes
+package net.gleske.jervis.remotes

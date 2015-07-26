@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.exceptions
+package net.gleske.jervis.exceptions
 
 /**
   A group of exceptions that are thrown when undesireable script generation conditions occur.

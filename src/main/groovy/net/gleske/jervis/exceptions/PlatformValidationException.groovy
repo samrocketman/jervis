@@ -13,9 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.exceptions
+package net.gleske.jervis.exceptions
 
-import jervis.exceptions.wikiPages
+import net.gleske.jervis.exceptions.wikiPages
 
 /**
   A group of exceptions that are thrown when validation errors occur in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file" target="_blank">platforms file</a>.

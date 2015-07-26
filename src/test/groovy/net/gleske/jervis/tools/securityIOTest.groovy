@@ -13,11 +13,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.tools
+package net.gleske.jervis.tools
 //the securityIOTest() class automatically sees the securityIO() class because they're in the same package
 import java.nio.file.Files
 import java.nio.file.Path
-import jervis.exceptions.JervisException
+import net.gleske.jervis.exceptions.JervisException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

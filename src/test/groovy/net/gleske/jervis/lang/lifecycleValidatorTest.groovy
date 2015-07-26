@@ -13,12 +13,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.lang
+package net.gleske.jervis.lang
 //the lifecycleValidatorTest() class automatically sees the lifecycleValidator() class because they're in the same package
-import jervis.exceptions.LifecycleBadValueInKeyException
-import jervis.exceptions.LifecycleInfiniteLoopException
-import jervis.exceptions.LifecycleMissingKeyException
-import jervis.exceptions.LifecycleValidationException
+import net.gleske.jervis.exceptions.LifecycleBadValueInKeyException
+import net.gleske.jervis.exceptions.LifecycleInfiniteLoopException
+import net.gleske.jervis.exceptions.LifecycleMissingKeyException
+import net.gleske.jervis.exceptions.LifecycleValidationException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

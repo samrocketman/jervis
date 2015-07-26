@@ -13,8 +13,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.tools
-import jervis.tools.scmGit
+package net.gleske.jervis.tools
+import net.gleske.jervis.tools.scmGit
 
 /**
   A class to provide basic file operations from <tt>readFile()</tt> strings in a

@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.tools
+package net.gleske.jervis.tools
 //the fileIOTest() class automatically sees the fileIO() class because they're in the same package
 import org.junit.After
 import org.junit.Before

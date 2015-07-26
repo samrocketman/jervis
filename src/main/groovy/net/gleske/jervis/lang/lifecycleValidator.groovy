@@ -13,13 +13,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.lang
+package net.gleske.jervis.lang
 
 import groovy.json.JsonSlurper
-import jervis.exceptions.LifecycleBadValueInKeyException
-import jervis.exceptions.LifecycleInfiniteLoopException
-import jervis.exceptions.LifecycleMissingKeyException
-import jervis.exceptions.LifecycleValidationException
+import net.gleske.jervis.exceptions.LifecycleBadValueInKeyException
+import net.gleske.jervis.exceptions.LifecycleInfiniteLoopException
+import net.gleske.jervis.exceptions.LifecycleMissingKeyException
+import net.gleske.jervis.exceptions.LifecycleValidationException
 
 /**
   Validates the contents of a
@@ -33,7 +33,7 @@ import jervis.exceptions.LifecycleValidationException
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
 <pre><tt>import jervis.lang.lifecycleValidator
-import jervis.tools.scmGit
+import net.gleske.jervis.tools.scmGit
 def git = new scmGit()
 def lifecycles = new lifecycleValidator()
 lifecycles.load_JSON(git.getRoot() + '/src/main/resources/lifecycles.json')

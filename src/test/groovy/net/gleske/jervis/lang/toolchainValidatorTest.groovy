@@ -13,9 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.lang
+package net.gleske.jervis.lang
 //the toolchainValidatorTest() class automatically sees the lifecycleValidator() class because they're in the same package
-import jervis.exceptions.ToolchainMissingKeyException
+import net.gleske.jervis.exceptions.ToolchainMissingKeyException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

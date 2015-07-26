@@ -13,14 +13,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.lang
+package net.gleske.jervis.lang
 
 import java.util.regex.Pattern
-import jervis.exceptions.JervisException
-import jervis.exceptions.UnsupportedLanguageException
-import jervis.exceptions.UnsupportedToolException
-import jervis.lang.lifecycleValidator
-import jervis.lang.toolchainValidator
+import net.gleske.jervis.exceptions.JervisException
+import net.gleske.jervis.exceptions.UnsupportedLanguageException
+import net.gleske.jervis.exceptions.UnsupportedToolException
+import net.gleske.jervis.lang.lifecycleValidator
+import net.gleske.jervis.lang.toolchainValidator
 import org.yaml.snakeyaml.Yaml
 
 
@@ -29,7 +29,7 @@ import org.yaml.snakeyaml.Yaml
 
   <h2>Sample usage</h2>
 <pre><tt>import jervis.lang.lifecycleGenerator
-import jervis.tools.scmGit
+import net.gleske.jervis.tools.scmGit
 def git = new scmGit()
 def generator = new lifecycleGenerator()
 generator.loadLifecycles(git.getRoot() + '/src/main/resources/lifecycles.json')

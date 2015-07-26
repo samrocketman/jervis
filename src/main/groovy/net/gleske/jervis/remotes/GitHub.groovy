@@ -13,10 +13,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.remotes
+package net.gleske.jervis.remotes
 
 import groovy.json.JsonSlurper
-import jervis.tools.securityIO
+import net.gleske.jervis.tools.securityIO
 
 /**
    A simple class to interact with the GitHub API for only the parts I need.

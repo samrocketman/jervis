@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package jervis.remotes
+package net.gleske.jervis.remotes
 //the GitHubTest() class automatically sees the GitHub() class because they're in the same package
 import org.junit.After
 import org.junit.Before

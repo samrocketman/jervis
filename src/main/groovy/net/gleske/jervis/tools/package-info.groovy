@@ -18,4 +18,4 @@
   package are meant to enhance the capabilities of Jervis by providing classes which
   don't make sense as single functions in the Job DSL scripts.
  */
-package jervis.tools
+package net.gleske.jervis.tools
