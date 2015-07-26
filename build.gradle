@@ -10,7 +10,7 @@ archivesBaseName = 'jervis'
 jar.baseName = 'jervis'
 version = '0.1-SNAPSHOT'
 
-ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.3'
+ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.4'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
 
