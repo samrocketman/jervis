@@ -85,9 +85,22 @@ include it in your build tool.
 #### Gradle
 
 ```groovy
+apply plugin: 'maven'
+repositories { mavenCentral() }
+
+defaultTasks 'clean', 'libs'
+
+configurations {
+    libs
+}
+
 dependencies {
     libs 'org.yaml:snakeyaml:1.15'
     libs 'net.gleske:jervis:0.2'
+}
+
+clean {
+    delete 'lib'
 }
 
 task libs(type: Copy) {
