@@ -7,8 +7,8 @@ env:
   - GROOVY_VERSION="2.3.11"
   - GROOVY_VERSION="2.4.4"
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
-install: true
-script: ./assemble.sh
+install: ./assemble.sh
+script: ./gradlew cobertura
 after_success:
   - ./coveralls.sh
 matrix:
