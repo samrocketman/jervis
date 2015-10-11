@@ -10,7 +10,7 @@ archivesBaseName = 'jervis'
 jar.baseName = 'jervis'
 version = '0.3-SNAPSHOT'
 
-ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.4'
+ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.5'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
 
@@ -39,9 +39,9 @@ configurations {
 repositories { mavenCentral() }
 dependencies {
     compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    compile 'org.yaml:snakeyaml:1.15'
+    compile 'org.yaml:snakeyaml:1.16'
     testCompile 'junit:junit:4.12'
-    libs 'org.yaml:snakeyaml:1.15'
+    libs 'org.yaml:snakeyaml:1.16'
 }
 
 task libs(type: Copy) {
