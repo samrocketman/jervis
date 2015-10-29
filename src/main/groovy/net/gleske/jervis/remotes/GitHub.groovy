@@ -103,7 +103,7 @@ class GitHub implements JervisRemote {
       Fetches a URL.  This function is meant to be private used by the API under the
       hood.
       @param addr A web address to fetch.  The URL must return JSON content.
-      @return     A <tt>HashMap</tt> from the parsed JSON response.
+      @return     A <tt>Map</tt> from the parsed JSON response.
     */
     private fetch(String addr) {
         def json = new JsonSlurper()

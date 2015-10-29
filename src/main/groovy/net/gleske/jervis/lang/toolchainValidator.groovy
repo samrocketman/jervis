@@ -51,7 +51,7 @@ toolchains.languages.each {
 class toolchainValidator {
 
     /**
-      A <tt>{@link HashMap}</tt> of the parsed toolchains file.
+      A <tt>{@link Map}</tt> of the parsed toolchains file.
      */
 
     Map toolchains

@@ -48,7 +48,7 @@ supported_languages.each{ println it }</tt></pre>
 class lifecycleValidator {
 
     /**
-      A <tt>{@link HashMap}</tt> of the parsed lifecycles file.
+      A <tt>{@link Map}</tt> of the parsed lifecycles file.
      */
     Map lifecycles
 
