@@ -81,7 +81,7 @@ cobertura {
     coverageFormats = ['html', 'xml']
     coverageIgnoreTrivial = true
     coverageIgnores = ['org.slf4j.Logger.*']
-    coverageExcludes = ['.*package-info.*', '.*jervis\\.exceptions\\..*']
+    coverageExcludes = ['.*package-info.*', 'net\\.gleske\\.jervis\\.exceptions\\..*']
 
     //coberturaCheck values 80% (./gradlew coberturaCheck test)
     //coverageCheckBranchRate = 80

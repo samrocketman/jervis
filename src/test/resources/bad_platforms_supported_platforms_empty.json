@@ -1,0 +1,18 @@
+{
+    "defaults": {
+        "platform": "docker",
+        "os": "ubuntu1404",
+        "stability": "stable",
+        "sudo": "sudo"
+    },
+    "supported_platforms": {
+        "docker": {
+        }
+    },
+    "restrictions": {
+        "docker": {
+            "only_organizations": ["samrocketman"],
+            "only_projects": ["samrocketman/jervis"]
+        }
+    }
+}

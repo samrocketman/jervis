@@ -95,33 +95,6 @@ class platformValidator {
                 throw new PlatformBadValueInKeyException("${it} - Must be a Map.")
             }
         }
-        //validate the supported_platforms root key for keys, types, and values
-        if(platforms['supported_platforms'].size() <= 0) {
-            throw new PlatformMissingKeyException('supported_platforms.(empty list) - Platforms list must not be empty.')
-        }
-        (platforms['supported_platforms'].keySet() as String[]).each {
-            String platform = it
-            if(!(platforms['supported_platforms'][platform] instanceof Map)) {
-                throw new PlatformBadValueInKeyException("supported_platforms.${platform} - Must be a Map.")
-            }
-            if(platforms['supported_platforms'][platform].size() <= 0) {
-                throw new PlatformMissingKeyException("supported_platforms.${platform}.(empty list) - OS list must not be empty.")
-            }
-            (platforms['supported_platforms'][platform].keySet() as String[]).each {
-                String os = it
-                if(!(platforms['supported_platforms'][platform][os] instanceof Map)) {
-                    throw new PlatformBadValueInKeyException(['supported_platforms', platform, os].join('.') + ' - Must be a Map.')
-                }
-                ['language', 'toolchain'].each {
-                    if(!platforms['supported_platforms'][platform][os].containsKey(it)) {
-                        throw new PlatformMissingKeyException(['supported_platforms', platform, os, it].join('.'))
-                    }
-                    if(!(platforms['supported_platforms'][platform][os][it] instanceof ArrayList)) {
-                        throw new PlatformBadValueInKeyException(['supported_platforms', platform, os, it].join('.') + ' - Must be an ArrayList.')
-                    }
-                }
-            }
-        }
         //validate defaults root key for keys, types, and  values
         ['platform', 'os', 'stability', 'sudo'].each {
             if(!platforms['defaults'].containsKey(it)) {
@@ -145,6 +118,30 @@ class platformValidator {
         if(platforms['defaults']['sudo'] != 'sudo' && platforms['defaults']['sudo'] != 'nosudo') {
             throw new PlatformBadValueInKeyException(['defaults', 'sudo'].join('.') + ' - Must be sudo or nosudo.')
         }
+        //validate the supported_platforms root key for keys, types, and values
+        (platforms['supported_platforms'].keySet() as String[]).each {
+            String platform = it
+            if(!(platforms['supported_platforms'][platform] instanceof Map)) {
+                throw new PlatformBadValueInKeyException("supported_platforms.${platform} - Must be a Map.")
+            }
+            if((platforms['supported_platforms'][platform].keySet() as String[]).size() <= 0) {
+                throw new PlatformMissingKeyException("supported_platforms.${platform}.(empty key) - OS list must not be empty.")
+            }
+            (platforms['supported_platforms'][platform].keySet() as String[]).each {
+                String os = it
+                if(!(platforms['supported_platforms'][platform][os] instanceof Map)) {
+                    throw new PlatformBadValueInKeyException(['supported_platforms', platform, os].join('.') + ' - Must be a Map.')
+                }
+                ['language', 'toolchain'].each {
+                    if(!platforms['supported_platforms'][platform][os].containsKey(it)) {
+                        throw new PlatformMissingKeyException(['supported_platforms', platform, os, it].join('.'))
+                    }
+                    else if(!(platforms['supported_platforms'][platform][os][it] instanceof List)) {
+                        throw new PlatformBadValueInKeyException(['supported_platforms', platform, os, it].join('.') + ' - Must be an List.')
+                    }
+                }
+            }
+        }
         //validate restrictions root key for keys, types, and values
         (platforms['restrictions'].keySet() as String[]).each {
             String platform = it
@@ -156,8 +153,8 @@ class platformValidator {
             }
             ['only_organizations', 'only_projects'].each {
                 if(platforms['restrictions'][platform].containsKey(it)) {
-                    if(!(platforms['restrictions'][platform][it] instanceof ArrayList)) {
-                        throw new PlatformBadValueInKeyException(['restrictions', platform, it].join('.') + ' - Must be an ArrayList.')
+                    if(!(platforms['restrictions'][platform][it] instanceof List)) {
+                        throw new PlatformBadValueInKeyException(['restrictions', platform, it].join('.') + ' - Must be a List.')
                     }
                 }
             }

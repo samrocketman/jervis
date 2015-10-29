@@ -109,4 +109,60 @@ class platformValidatorTest extends GroovyTestCase {
         platforms.load_JSON(url.getFile())
         assert true == platforms.validate()
     }
+    @Test public void test_platformValidator_bad_missing_defaults() {
+        ['platform', 'os', 'stability', 'sudo'].each {
+            URL url = this.getClass().getResource("/bad_platforms_missing_defaults_${it}.json");
+            platforms.load_JSON(url.getFile())
+            shouldFail(PlatformMissingKeyException) {
+                platforms.validate()
+            }
+            url = this.getClass().getResource("/bad_platforms_type_defaults_${it}.json");
+            platforms.load_JSON(url.getFile())
+            shouldFail(PlatformBadValueInKeyException) {
+                platforms.validate()
+            }
+        }
+    }
+    @Test public void test_platformValidator_bad_supported_platforms_empty() {
+        URL url = this.getClass().getResource('/bad_platforms_supported_platforms_empty.json');
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformMissingKeyException) {
+            platforms.validate()
+        }
+    }
+    @Test public void test_platformValidator_bad_value_supported_platforms() {
+        URL url = this.getClass().getResource('/bad_platforms_value_supported_platforms.json');
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformBadValueInKeyException) {
+            platforms.validate()
+        }
+    }
+    @Test public void test_platformValidator_bad_value_defaults_platform() {
+        URL url = this.getClass().getResource('/bad_platforms_value_defaults_platform.json');
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformMissingKeyException) {
+            platforms.validate()
+        }
+    }
+    @Test public void test_platformValidator_bad_value_defaults_os() {
+        URL url = this.getClass().getResource('/bad_platforms_value_defaults_os.json');
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformMissingKeyException) {
+            platforms.validate()
+        }
+    }
+    @Test public void test_platformValidator_bad_value_sudo() {
+        URL url = this.getClass().getResource('/bad_platforms_value_defaults_sudo.json');
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformBadValueInKeyException) {
+            platforms.validate()
+        }
+    }
+    @Test public void test_platformValidator_bad_value_stability() {
+        URL url = this.getClass().getResource('/bad_platforms_value_defaults_stability.json');
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformBadValueInKeyException) {
+            platforms.validate()
+        }
+    }
 }
