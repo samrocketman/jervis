@@ -18,6 +18,87 @@ package net.gleske.jervis.exceptions
 /**
   A simple class, whose only purpose is to house static strings referencing the <a href="https://github.com/samrocketman/jervis/wiki" target="_blank">Jervis wiki</a>,
   to be used as helpful hints when throwing exceptions.
+
+  <h2>Overriding URLs</h2>
+  Each of the <tt>wikiPages</tt> class URLs can be overridden by making use of
+  Groovy meta programming.  This is a technique which modifies static classes
+  during the runtime.  Groovy automatically generates a camel cased setter and
+  getter methods for class properties.  Here's a list of the generated getter
+  methods for this class.
+
+  <ul>
+    <li><tt>{@link #supported_languages}</tt> has the getter <tt>getSupported_languages()</tt></li>
+    <li><tt>{@link #supported_tools}</tt> has the getter <tt>getSupported_tools()</tt></li>
+    <li><tt>{@link #lifecycles_spec}</tt> has the getter <tt>getLifecycles_spec()</tt></li>
+    <li><tt>{@link #toolchains_spec}</tt> has the getter <tt>getToolchains_spec()</tt></li>
+    <li><tt>{@link #platforms_spec}</tt> has the getter <tt>getPlatforms_spec()</tt></li>
+  </ul>
+
+  <h2>Why bother overridding URLs?</h2>
+
+  Why would one bother to override these URLs?  Because this library is meant to
+  be used with Jenkins Job DSL scripts, it is assumed that users would host their
+  own DSL scripts internally.  If there's a contributing workflow then it makes
+  sense to refer contributors to internally hosted documentation when displaying
+  error messages.  That's the intention of this explanation.
+
+  <h2>Sample usage</h2>
+
+  When overriding the URLs you must override the getter method using meta
+  programming.  The following is an example of overriding the
+  <tt>{@link #lifecycles_spec}</tt>.
+
+<pre><tt>import net.gleske.jervis.exceptions.wikiPages
+wikiPages.metaClass.static.getLifecycles_spec = {->'https://wiki.example.com/lifecycle_explanation.html'}
+
+import net.gleske.jervis.lang.lifecycleValidator
+
+def x = new lifecycleValidator()
+x.load_JSONString("""
+{
+    "ruby": {
+        "defaultKey": "rake1",
+        "rake1": {
+            "fileExistsCondition": "Gemfile.lock",
+            "fallbackKey": "rake2",
+            "env": "export BUNDLE_GEMFILE=\$PWD/Gemfile",
+            "install": "bundle install --jobs=3 --retry=3 --deployment",
+            "script": "bundle exec rake"
+        },
+        "rake2": {
+            "env": "export BUNDLE_GEMFILE=\$PWD/Gemfile",
+            "install": "bundle install --jobs=3 --retry=3",
+            "script": "bundle exec rake"
+        }
+    }
+}
+""".toString())
+x.validate()</tt></pre>
+
+  The important part of the above example is the following excerpt.
+
+<pre><tt>import net.gleske.jervis.exceptions.wikiPages
+wikiPages.metaClass.static.getLifecycles_spec = {->'https://wiki.example.com/lifecycle_explanation.html'}
+
+import net.gleske.jervis.lang.lifecycleValidator</tt></pre>
+
+  What is important is that we modified the <tt>wikiPages</tt> class
+  <strong>before</strong> we imported the <tt>{@link net.gleske.jervis.lang.lifecycleValidator}</tt> class.
+  This is important because the class can't be statically modified from within the
+  <tt>lifecycleValidator</tt> after it is imported.
+
+  Here's an example error message from the above sample.
+
+ <pre><tt>net.gleske.jervis.exceptions.LifecycleMissingKeyException: 
+ERROR: Lifecycle validation failed.  Missing key: ruby.friendlyName
+
+See wiki page:
+https://wiki.example.com/lifecycle_explanation.html
+
+
+    at net.gleske.jervis.lang.lifecycleValidator$_validate_closure1.doCall(lifecycleValidator.groovy:118)
+    at net.gleske.jervis.lang.lifecycleValidator.validate(lifecycleValidator.groovy:112)
+    at net.gleske.jervis.lang.lifecycleValidator$validate$0.call(Unknown Source)</tt></pre>
  */
 class wikiPages {
 
