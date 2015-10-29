@@ -128,7 +128,7 @@ class platformValidator {
                 throw new PlatformBadValueInKeyException("supported_platforms.${platform} - Must be a JSON Object.")
             }
             if((platforms['supported_platforms'][platform].keySet() as String[]).size() <= 0) {
-                throw new PlatformMissingKeyException("supported_platforms.${platform}.(empty key) - OS list must not be empty.")
+                throw new PlatformMissingKeyException("supported_platforms.${platform} - JSON Object must not be empty.")
             }
             (platforms['supported_platforms'][platform].keySet() as String[]).each {
                 String os = it
@@ -140,7 +140,7 @@ class platformValidator {
                         throw new PlatformMissingKeyException(['supported_platforms', platform, os, it].join('.'))
                     }
                     else if(!(platforms['supported_platforms'][platform][os][it] instanceof List)) {
-                        throw new PlatformBadValueInKeyException(['supported_platforms', platform, os, it].join('.') + ' - Must be an List.')
+                        throw new PlatformBadValueInKeyException(['supported_platforms', platform, os, it].join('.') + ' - Must be a JSON Array.')
                     }
                 }
             }
@@ -157,7 +157,7 @@ class platformValidator {
             ['only_organizations', 'only_projects'].each {
                 if(platforms['restrictions'][platform].containsKey(it)) {
                     if(!(platforms['restrictions'][platform][it] instanceof List)) {
-                        throw new PlatformBadValueInKeyException(['restrictions', platform, it].join('.') + ' - Must be a List.')
+                        throw new PlatformBadValueInKeyException(['restrictions', platform, it].join('.') + ' - Must be a JSON Array.')
                     }
                 }
             }
