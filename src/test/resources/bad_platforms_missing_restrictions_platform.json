@@ -1,0 +1,33 @@
+{
+    "defaults": {
+        "platform": "docker",
+        "os": "ubuntu1404",
+        "stability": "stable",
+        "sudo": "sudo"
+    },
+    "supported_platforms": {
+        "docker": {
+            "ubuntu1404": {
+                "language": [
+                    "groovy",
+                    "java",
+                    "python",
+                    "ruby"
+                ],
+                "toolchain": [
+                    "env",
+                    "gemset",
+                    "rvm",
+                    "python",
+                    "jdk"
+                ]
+            }
+        }
+    },
+    "restrictions": {
+        "metal": {
+            "only_organizations": ["samrocketman"],
+            "only_projects": ["samrocketman/jervis"]
+        }
+    }
+}

@@ -221,4 +221,38 @@ class platformValidatorTest extends GroovyTestCase {
             platforms.validate()
         }
     }
+    @Test public void test_platformValidator_bad_type_restrictions_platform() {
+        URL url = this.getClass().getResource('/bad_platforms_type_restrictions_platform.json');
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformBadValueInKeyException) {
+            platforms.validate()
+        }
+    }
+    @Test public void test_platformValidator_bad_type_restrictions_platform_only_organizations() {
+        URL url = this.getClass().getResource('/bad_platforms_type_restrictions_platform_only_organizations.json');
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformBadValueInKeyException) {
+            platforms.validate()
+        }
+    }
+    @Test public void test_platformValidator_bad_type_restrictions_platform_only_projects() {
+        URL url = this.getClass().getResource('/bad_platforms_type_restrictions_platform_only_projects.json');
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformBadValueInKeyException) {
+            platforms.validate()
+        }
+    }
+    @Test public void test_platformValidator_bad_missing_restrictions_platform() {
+        URL url = this.getClass().getResource('/bad_platforms_missing_restrictions_platform.json');
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformMissingKeyException) {
+            platforms.validate()
+        }
+    }
+    @Test public void test_platformValidator_good_platforms_optional() {
+        URL url = this.getClass().getResource('/good_platforms_optional.json');
+        platforms.load_JSON(url.getFile())
+        assert true == platforms.validate()
+        assert true == platforms.validate_asBool()
+    }
 }
