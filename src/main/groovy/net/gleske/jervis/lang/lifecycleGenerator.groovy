@@ -876,7 +876,7 @@ env:
      */
     public void loadPlatformsString(String json) {
         this.platform_obj = new platformValidator()
-        this.platform_obj.load_JSON(json)
+        this.platform_obj.load_JSONString(json)
         this.platform_obj.validate()
     }
 

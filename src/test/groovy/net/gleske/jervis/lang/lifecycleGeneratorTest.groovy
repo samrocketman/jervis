@@ -16,9 +16,11 @@
 package net.gleske.jervis.lang
 //the lifecycleGeneratorTest() class automatically sees the lifecycleGenerator() class because they're in the same package
 import net.gleske.jervis.exceptions.JervisException
+import net.gleske.jervis.exceptions.PlatformValidationException
 import net.gleske.jervis.exceptions.UnsupportedLanguageException
 import net.gleske.jervis.exceptions.UnsupportedToolException
 import net.gleske.jervis.lang.lifecycleValidator
+import net.gleske.jervis.lang.platformValidator
 import net.gleske.jervis.lang.toolchainValidator
 import org.junit.After
 import org.junit.Before
@@ -414,5 +416,78 @@ class lifecycleGeneratorTest extends GroovyTestCase {
                 }
             }
         }
+    }
+    @Test public void test_lifecycleGenerator_setLabal_stability() {
+        generator.label_stability = 'derp'
+        assert 'stable'.equals(generator.label_stability)
+        generator.label_stability = 'unstable'
+        assert 'unstable'.equals(generator.label_stability)
+        generator.label_stability = 'true'
+        assert 'unstable'.equals(generator.label_stability)
+        generator.label_stability = 'stable'
+        assert 'stable'.equals(generator.label_stability)
+    }
+    @Test public void test_lifecycleGenerator_setLabal_sudo() {
+        generator.label_sudo = 'derp'
+        assert 'nosudo'.equals(generator.label_sudo)
+        generator.label_sudo = 'nosudo'
+        assert 'nosudo'.equals(generator.label_sudo)
+        generator.label_sudo = 'true'
+        assert 'sudo'.equals(generator.label_sudo)
+        generator.label_sudo = 'sudo'
+        assert 'sudo'.equals(generator.label_sudo)
+    }
+    @Test public void test_lifecycleGenerator_getObjectValue() {
+        Map example = [key1: [subkey1: 'string']]
+        assert 'string'.equals(generator.getObjectValue(example, 'key1.subkey1', 'default'))
+        assert 'default'.equals(generator.getObjectValue(example, 'key2.subkey1', 'default'))
+        assert 2.equals(generator.getObjectValue(example, 'key1.subkey1', 2))
+    }
+    @Test public void test_lifecycleGenerator_loadPlatforms() {
+        assert null.equals(generator.platform_obj)
+        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        generator.loadPlatforms(url.getFile())
+        assert !null.equals(generator.platform_obj)
+        assert generator.platform_obj.class == platformValidator
+    }
+    @Test public void test_lifecycleGenerator_loadPlatformsString() {
+        assert null.equals(generator.platform_obj)
+        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        String contents = new File(url.getFile()).getText()
+        generator.loadPlatformsString(contents)
+        assert !null.equals(generator.platform_obj)
+        assert generator.platform_obj.class == platformValidator
+    }
+    @Test public void test_lifecycleGenerator_preloadYamlString() {
+        String yaml = 'language: ruby'
+        shouldFail(PlatformValidationException) {
+            generator.preloadYamlString(yaml)
+        }
+        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        generator.loadPlatforms(url.getFile())
+        generator.preloadYamlString(yaml)
+        assert 'docker'.equals(generator.label_platform)
+        assert 'ubuntu1404'.equals(generator.label_os)
+        assert 'stable'.equals(generator.label_stability)
+        assert 'sudo'.equals(generator.label_sudo)
+    }
+    @Test public void test_lifecycleGenerator_getLabels() {
+        String yaml = 'language: ruby'
+        generator.loadYamlString(yaml)
+        assert 'language:ruby&&gemfile&&env&&rvm&&jdk'.equals(generator.getLabels())
+        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        generator.loadPlatforms(url.getFile())
+        generator.preloadYamlString(yaml)
+        generator.loadYamlString(yaml)
+        assert 'stable&&docker&&ubuntu1404&&sudo&&language:ruby&&gemfile&&env&&rvm&&jdk'.equals(generator.getLabels())
+    }
+    @Test public void test_lifecycleGenerator_isRestricted() {
+        String yaml = 'language: ruby'
+        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        generator.loadPlatforms(url.getFile())
+        generator.preloadYamlString(yaml)
+        assert !generator.isRestricted('samrocketman/derp')
+        assert !generator.isRestricted('samrocketman/jervis')
+        assert generator.isRestricted('org/project')
     }
 }
