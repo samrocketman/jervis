@@ -67,11 +67,8 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
 
     git_service.branches("${project}").each {
         def JERVIS_BRANCH = it
-        println "Generating branch: ${JERVIS_BRANCH}"
         def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
         def generator = new lifecycleGenerator()
-        generator.loadLifecyclesString(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
-        generator.loadToolchainsString(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
         String jervis_yaml
         if('.jervis.yml' in folder_listing) {
             jervis_yaml = git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH)
@@ -81,17 +78,24 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         }
         else {
             //skip creating the job for this branch
+            println "Skipping branch: ${JERVIS_BRANCH}"
             return
         }
         //try detecting no default language and setting to ruby
         if(jervis_yaml.indexOf('language:') < 0) {
             generator.yaml_language = 'ruby'
         }
+        generator.loadPlatformsString(readFileFromWorkspace('src/main/resources/platforms.json').toString())
+        generator.preloadYamlString(jervis_yaml)
+        //could optionally read lifecycles and toolchains files by OS
+        generator.loadLifecyclesString(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
+        generator.loadToolchainsString(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
         generator.loadYamlString(jervis_yaml)
         generator.folder_listing = folder_listing
         if(!generator.isGenerateBranch(JERVIS_BRANCH)) {
             //the job should not be generated for this branch
             //based on the branches section of .jervis.yml
+            println "Skipping branch: ${JERVIS_BRANCH}"
             return
         }
         //chooses job type based on Jervis YAML
@@ -102,9 +106,11 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         else {
             jervis_jobType = { String name, Closure closure -> freeStyleJob(name, closure) }
         }
+        println "Generating branch: ${JERVIS_BRANCH}"
         //the generated Job DSL enclosure depends on the job type
         jervis_jobType("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-')) {
             displayName("${project_name} (${JERVIS_BRANCH} branch)")
+            label(generator.getLabels())
             scm {
                 //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
                 //for more info about the git closure
