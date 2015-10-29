@@ -30,7 +30,7 @@ class LifecycleValidationException extends JervisException {
     /**
       Throw a <tt>LifecycleValidationException</tt>
 
-      @param message A simple message that will be prepended with <tt>'ERROR: Lifecycle validation failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link jervis.exceptions.wikiPages#lifecycles_spec}</tt>.
+      @param message A simple message that will be prepended with <tt>'ERROR: Lifecycle validation failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.wikiPages#lifecycles_spec}</tt>.
      */
     def LifecycleValidationException(String message) {
         super('\nERROR: Lifecycle validation failed.  ' + message + ['\n\nSee wiki page:', wiki_page,'\n'].join('\n'))

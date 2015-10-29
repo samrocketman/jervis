@@ -30,7 +30,7 @@ class PlatformValidationException extends JervisException {
     /**
       Throw a <tt>PlatformValidationException</tt>
 
-      @param message A simple message that will be prepended with <tt>'ERROR: Platform validation failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link jervis.exceptions.wikiPages#platforms_spec}</tt>.
+      @param message A simple message that will be prepended with <tt>'ERROR: Platform validation failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.wikiPages#platforms_spec}</tt>.
      */
     def PlatformValidationException(String message) {
         super('\nERROR: Platform validation failed.  ' + message + ['\n\nSee wiki page:', wiki_page,'\n'].join('\n'))

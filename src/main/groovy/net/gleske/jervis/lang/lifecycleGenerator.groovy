@@ -83,12 +83,12 @@ class lifecycleGenerator {
     ArrayList yaml_matrix_axes
 
     /**
-      An instance of the <tt>{@link jervis.lang.lifecycleValidator}</tt> class which has loaded a lifecycles file.
+      An instance of the <tt>{@link net.gleske.jervis.lang.lifecycleValidator}</tt> class which has loaded a lifecycles file.
      */
     def lifecycle_obj
 
     /**
-      An instance of the <tt>{@link jervis.lang.toolchainValidator}</tt> class which as loaded a toolchains file.
+      An instance of the <tt>{@link net.gleske.jervis.lang.toolchainValidator}</tt> class which as loaded a toolchains file.
      */
     def toolchain_obj
 

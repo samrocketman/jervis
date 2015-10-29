@@ -50,7 +50,7 @@ class fileIO {
       Checks the file path inside the parenthesis of
       <tt>'readFile(/path/to/file.sh)'</tt> exists.  Relative to the root of the Git
       repository, if the file <tt>/path/to/file.sh</tt> exists then it would return
-      <tt>true</tt>.  This method uses <tt>{@link jervis.tools.scmGit}</tt> to
+      <tt>true</tt>.  This method uses <tt>{@link net.gleske.jervis.tools.scmGit}</tt> to
       determine the root of the Git repository.
       @param filestring A simple <tt>String</tt> that starts with <tt>readFile(</tt>,
                         contains a path to a file, and ends with <tt>)</tt>.
@@ -70,7 +70,7 @@ class fileIO {
     }
     /**
       Read the contents of the file in a <tt>readFile()</tt> <tt>String</tt>.  This
-      method uses <tt>{@link jervis.tools.scmGit}</tt> to determine the root of the
+      method uses <tt>{@link net.gleske.jervis.tools.scmGit}</tt> to determine the root of the
       Git repository.
       @param filestring Read the contents of <tt>/path/to/file.sh</tt> in the
                         <tt>String</tt> <tt>readFile(/path/to/file.sh)</tt>.

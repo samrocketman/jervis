@@ -156,7 +156,7 @@ class toolchainValidator {
 
     /**
       Validates the toolchains file.
-      @return <tt>true</tt> if the toolchains file validates.  If the toolchains file fails validation then it will throw a <tt>{@link jervis.exceptions.ToolchainValidationException}</tt>.
+      @return <tt>true</tt> if the toolchains file validates.  If the toolchains file fails validation then it will throw a <tt>{@link net.gleske.jervis.exceptions.ToolchainValidationException}</tt>.
      */
     public Boolean validate() throws ToolchainMissingKeyException {
         //check for toolchains key

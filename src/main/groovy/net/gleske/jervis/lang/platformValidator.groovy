@@ -83,7 +83,7 @@ class platformValidator {
     }
     /**
       Validates the platforms file.
-      @return <tt>true</tt> if the platforms file validates.  If the platforms file fails validation then it will throw a <tt>{@link jervis.exceptions.PlatformValidationException}</tt>.
+      @return <tt>true</tt> if the platforms file validates.  If the platforms file fails validation then it will throw a <tt>{@link net.gleske.jervis.exceptions.PlatformValidationException}</tt>.
      */
     public Boolean validate() throws PlatformMissingKeyException, PlatformBadValueInKeyException, PlatformValidationException {
         //check for required root keys and types

@@ -16,7 +16,7 @@
 package net.gleske.jervis.exceptions
 
 /**
-  A type of <tt>{@link jervis.exceptions.LifecycleValidationException}</tt> which is thrown when there is a bad value in a lifecycles file key.
+  A type of <tt>{@link net.gleske.jervis.exceptions.LifecycleValidationException}</tt> which is thrown when there is a bad value in a lifecycles file key.
 
   <h2>Sample usage</h2>
 <pre><tt>import net.gleske.jervis.exceptions.LifecycleBadValueInKeyException
