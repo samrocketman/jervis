@@ -128,7 +128,7 @@ class platformValidator {
                 throw new PlatformBadValueInKeyException("supported_platforms.${platform} - Must be a JSON Object.")
             }
             if((platforms['supported_platforms'][platform].keySet() as String[]).size() <= 0) {
-                throw new PlatformMissingKeyException("supported_platforms.${platform} - JSON Object must not be empty.")
+                throw new PlatformBadValueInKeyException("supported_platforms.${platform} - JSON Object must not be empty.")
             }
             (platforms['supported_platforms'][platform].keySet() as String[]).each {
                 String os = it
