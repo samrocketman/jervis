@@ -17,6 +17,7 @@ package net.gleske.jervis.lang
 
 import java.util.regex.Pattern
 import net.gleske.jervis.exceptions.JervisException
+import net.gleske.jervis.exceptions.PlatformValidationException
 import net.gleske.jervis.exceptions.UnsupportedLanguageException
 import net.gleske.jervis.exceptions.UnsupportedToolException
 import net.gleske.jervis.lang.lifecycleValidator
@@ -33,9 +34,10 @@ import org.yaml.snakeyaml.Yaml
 import net.gleske.jervis.tools.scmGit
 def git = new scmGit()
 def generator = new lifecycleGenerator()
+generator.loadPlatforms(git.getRoot() + '/src/main/resources/platforms.json')
 generator.loadLifecycles(git.getRoot() + '/src/main/resources/lifecycles.json')
 generator.loadToolchains(git.getRoot() + '/src/main/resources/toolchains.json')
-generator.loadYamlString("""
+String yaml = """
 language: ruby
 env:
  - hello=world three=four
@@ -51,7 +53,12 @@ matrix:
     - rvm: 2.1.0
     - rvm: 2.0.0
       env: hello=test three=five
-""")
+jenkins:
+    sudo: false
+    unstable: true
+"""
+generator.preloadYamlString(yaml)
+generator.loadYamlString(yaml)
 generator.folder_listing = ['Gemfile.lock']
 println 'Exclude filter is...'
 println generator.matrixExcludeFilter()
@@ -59,7 +66,8 @@ println 'Matrix axis value for env is...'
 println generator.matrixGetAxisValue('env')
 println 'Generating the matrix build script.'
 println generator.generateAll()
-</tt></pre>
+print 'Labels: '
+println generator.getLabels()</tt></pre>
  */
 class lifecycleGenerator {
 
@@ -81,7 +89,7 @@ class lifecycleGenerator {
     /**
       A quick access variable for matrix build axes.
      */
-    ArrayList yaml_matrix_axes
+    List yaml_matrix_axes
 
     /**
       An instance of the <tt>{@link net.gleske.jervis.lang.lifecycleValidator}</tt> class which has loaded a lifecycles file.
@@ -94,13 +102,50 @@ class lifecycleGenerator {
     def toolchain_obj
 
     /**
+      An instance of the <tt>{@link net.gleske.jervis.lang.platformValidator}</tt> class which as loaded a platforms file.
+     */
+    def platform_obj
+
+    /**
       This is a folder listing of the root of the repository so that scripts can be
       conditionally generated depending on build tool is being used.  This way we can
       do neat things like generate different script output depending on if there's a
       <tt>build.gradle</tt>, <tt>pom.xml</tt>, or <tt>build.xml</tt>.
       <tt>{@link #loadYamlString(java.lang.String)}</tt> should be called before this.
      */
-    ArrayList folder_listing
+    List folder_listing
+
+    /**
+      An optional label which is used by the <tt>{@link #getLabels()}</tt> function
+      to generate advanced job labels across different platforms.  This is populated
+      by <tt>{@link #preloadYamlString(java.lang.String)}</tt>.
+     */
+    String label_platform
+
+    /**
+      An optional label which is used by the <tt>{@link #getLabels()}</tt> function
+      to generate advanced job labels across different operating systems.  This is
+      populated by <tt>{@link #preloadYamlString(java.lang.String)}</tt>.
+     */
+    String label_os
+
+    /**
+      An optional label which is used by the <tt>{@link #getLabels()}</tt> function
+      to generate advanced job labels for agent stability.  This is populated by
+      <tt>{@link #preloadYamlString(java.lang.String)}</tt>.
+
+      The value is always <tt>stable</tt> or <tt>unstable</tt>.
+     */
+    String label_stability
+
+    /**
+      An optional label which is used by the <tt>{@link #getLabels()}</tt> function
+      to generate advanced job labels for agents with sudo or nosudo access.  This is
+      populated by <tt>{@link #preloadYamlString(java.lang.String)}</tt>.
+
+      The value is always <tt>sudo</tt> or <tt>nosudo</tt>.
+     */
+    String label_sudo
 
     /**
       The value is the key to be looked up in the lifecycles file by default when
@@ -115,10 +160,11 @@ class lifecycleGenerator {
       the <tt>fileExistsCondition</tt> and <tt>fallbackKey</tt> from the lifecycles
       file to determine the contents of <tt>lifecycle_key</tt>.
       <tt>{@link #loadYamlString(java.lang.String)}</tt> should be called before this.
-      @param listing An <tt>ArrayList</tt> which is a list of files from a directory
+
+      @param listing An <tt>List</tt> which is a list of files from a directory
                      path in a repository.
      */
-    void setFolder_listing(ArrayList listing) throws JervisException {
+    void setFolder_listing(List listing) throws JervisException {
         if(!yaml_language) {
             throw new JervisException('Must call loadYamlString() first.')
         }
@@ -145,6 +191,42 @@ class lifecycleGenerator {
                 lifecycle_key = current_key
                 current_key = null
             }
+        }
+    }
+
+    /**
+      This function sets the <tt>{@link #label_stability}</tt> property.  It forces
+      the value to always be <tt>stable</tt> or <tt>unstable</tt>.
+
+      @param stability A <tt>String</tt> which determines the stability.  A value of
+                       <tt>unstable</tt> or <tt>true</tt> will set the property as
+                       <tt>unstable</tt>.  All other values set the property as
+                       <tt>stable</tt>.
+     */
+    public void setLabel_stability(String stability) {
+        if(stability == 'unstable' || stability == 'true') {
+            label_stability = 'unstable'
+        }
+        else {
+            label_stability = 'stable'
+        }
+    }
+
+    /**
+      This function sets the <tt>{@link #label_sudo}</tt> property.  It forces the
+      value to always be <tt>sudo</tt> or <tt>nosudo</tt>.
+
+      @param sudo A <tt>String</tt> which determines sudo access required.  A value of
+                  <tt>sudo</tt> or <tt>true</tt> will set the property as
+                  <tt>sudo</tt>.  All other values set the property as
+                  <tt>nosudo</tt>.
+     */
+    public void setLabel_sudo(String sudo) {
+        if(sudo == 'sudo' || sudo == 'true') {
+            label_sudo = 'sudo'
+        }
+        else {
+            label_sudo = 'nosudo'
         }
     }
 
@@ -236,7 +318,7 @@ class lifecycleGenerator {
         if(this.isMatrixBuild()) {
             yaml_matrix_axes = []
             toolchain_obj.toolchains["toolchains"][yaml_language].each {
-                if((jervis_yaml[it] instanceof ArrayList) && (jervis_yaml[it].size() > 1)) {
+                if((jervis_yaml[it] instanceof List) && (jervis_yaml[it].size() > 1)) {
                     yaml_matrix_axes << it
                 }
                 else if((it == 'env') && (jervis_yaml[it] instanceof Map) && ('matrix' in jervis_yaml[it]) && (jervis_yaml[it]['matrix'].size() > 1)) {
@@ -269,10 +351,10 @@ env:
         Boolean result=false
         yaml_keys.each{
             if(toolchain_obj.supportedMatrix(yaml_language, it)) {
-                if(jervis_yaml[it] instanceof ArrayList && jervis_yaml[it].size() > 1) {
+                if(jervis_yaml[it] instanceof List && jervis_yaml[it].size() > 1) {
                      result=true
                 }
-                else if(('env' == it) && (jervis_yaml[it] instanceof Map) && ('matrix' in jervis_yaml[it]) && (jervis_yaml[it]['matrix'] instanceof ArrayList) && (jervis_yaml[it]['matrix'].size() > 1)) {
+                else if(('env' == it) && (jervis_yaml[it] instanceof Map) && ('matrix' in jervis_yaml[it]) && (jervis_yaml[it]['matrix'] instanceof List) && (jervis_yaml[it]['matrix'].size() > 1)) {
                      result=true
                 }
             }
@@ -396,13 +478,13 @@ env:
     }
 
     /**
-      Interpolate <tt>${jervis_toolchain_ivalue}</tt> on an ArrayList of strings.
+      Interpolate <tt>${jervis_toolchain_ivalue}</tt> on an List of strings.
       This is mostly used by the <tt>{@link #generateToolchainSection()}</tt> function.
       @param  cmds   A list of strings which contain bash commands.
       @param  ivalue A value which will be string interpolated on the <tt>cmds</tt>
       @return        A list of strings which contain bash commands that have had string interpolation done.
      */
-    private ArrayList interpolate_ivalue(ArrayList cmds, String ivalue) {
+    private List interpolate_ivalue(List cmds, String ivalue) {
         def z = []
         cmds.each{ z << it.replace('${jervis_toolchain_ivalue}',ivalue) }
         z
@@ -415,7 +497,7 @@ env:
        @param chain          The matrix list from the Jervis YAML for the given toolchain.
        @param matrix         Should the input be considered a matrix build?  If so then set to <tt>true</tt>.
      */
-    private String toolchainBuilder(String toolchain, String[] toolchain_keys, ArrayList chain, Boolean matrix) throws UnsupportedToolException {
+    private String toolchainBuilder(String toolchain, String[] toolchain_keys, List chain, Boolean matrix) throws UnsupportedToolException {
         String output = ''
         if(matrix) {
             output += "case \${${toolchain}} in\n"
@@ -466,8 +548,8 @@ env:
             if(toolchain in yaml_keys) {
                 //do non-default stuff
                 def user_toolchain
-                //toolchain must be an instance of String, ArrayList, or (in the case of only env) Map.
-                if(!(jervis_yaml[toolchain] instanceof String) && !(jervis_yaml[toolchain] instanceof ArrayList) && !(('env' == toolchain) && (jervis_yaml['env'] instanceof Map))) {
+                //toolchain must be an instance of String, List, or (in the case of only env) Map.
+                if(!(jervis_yaml[toolchain] instanceof String) && !(jervis_yaml[toolchain] instanceof List) && !(('env' == toolchain) && (jervis_yaml['env'] instanceof Map))) {
                     throw new UnsupportedToolException("${toolchain}: ${jervis_yaml[toolchain]}")
                 }
                 if(jervis_yaml[toolchain] instanceof String) {
@@ -485,7 +567,7 @@ env:
                             if(env['global'] instanceof String) {
                                 output += this.toolchainBuilder(toolchain, toolchain_keys, [env['global']], false)
                             }
-                            else if(env['global'] instanceof ArrayList) {
+                            else if(env['global'] instanceof List) {
                                 env['global'].each {
                                     output += this.toolchainBuilder(toolchain, toolchain_keys, [it], false)
                                 }
@@ -495,7 +577,7 @@ env:
                             }
                         }
                         if('matrix' in env) {
-                            if(env['matrix'] instanceof ArrayList) {
+                            if(env['matrix'] instanceof List) {
                                 output += this.toolchainBuilder(toolchain, toolchain_keys, env['matrix'], true)
                             }
                             else {
@@ -515,7 +597,7 @@ env:
                             if(user_toolchain['global'] instanceof String) {
                                 output += this.toolchainBuilder(toolchain, toolchain_keys, [user_toolchain['global']], false)
                             }
-                            else if(user_toolchain['global'] instanceof ArrayList) {
+                            else if(user_toolchain['global'] instanceof List) {
                                 user_toolchain['global'].each {
                                     output += this.toolchainBuilder(toolchain, toolchain_keys, [it], false)
                                 }
@@ -568,7 +650,7 @@ env:
         if(!(section in yaml_keys)) {
             //take the default
             if(section in my_lifecycle_keys) {
-                if(my_lifecycle[section] instanceof ArrayList) {
+                if(my_lifecycle[section] instanceof List) {
                     output += my_lifecycle[section].join('\n') + '\n'
                 }
                 else {
@@ -579,7 +661,7 @@ env:
                 output = ''
             }
         }
-        else if(jervis_yaml[section] instanceof ArrayList) {
+        else if(jervis_yaml[section] instanceof List) {
             output += jervis_yaml[section].join('\n') + '\n'
         }
         else {
@@ -660,7 +742,7 @@ env:
       @return A shell script which is used to build the application in Jervis.
      */
     public String generateAll() {
-        ArrayList script = [
+        List script = [
             generateToolchainSection(),
             generateBeforeInstall(),
             generateInstall(),
@@ -678,7 +760,7 @@ env:
     public Boolean isGenerateBranch(String branch) {
         Boolean result=true
         if(('branches' in jervis_yaml)) {
-            if(jervis_yaml['branches'] instanceof ArrayList) {
+            if(jervis_yaml['branches'] instanceof List) {
                 List tmp = jervis_yaml['branches']
                 jervis_yaml['branches'] = ['only': tmp]
             }
@@ -776,9 +858,9 @@ env:
       @param file A path to a platforms file.
      */
     public void loadPlatforms(String file) {
-        this.platforms_obj = new platformValidator()
-        this.platforms_obj.load_JSON(file)
-        this.platforms_obj.validate()
+        this.platform_obj = new platformValidator()
+        this.platform_obj.load_JSON(file)
+        this.platform_obj.validate()
     }
 
     /**
@@ -793,8 +875,68 @@ env:
       @param json A <tt>String</tt> containing JSON which is from a platforms file.
      */
     public void loadPlatformsString(String json) {
-        this.platforms_obj = new platformValidator()
-        this.platforms_obj.load_JSON(json)
-        this.platforms_obj.validate()
+        this.platform_obj = new platformValidator()
+        this.platform_obj.load_JSON(json)
+        this.platform_obj.validate()
+    }
+
+    /**
+      Preload Jervis YAML for the purpose of loading lifecycles files for other
+      platforms and operating systems.  Please note: you must call
+      <tt>{@link #loadPlatformsString(java.lang.String)}</tt> or
+      <tt>{@link #loadPlatforms(java.lang.String)}</tt> before calling this function.
+
+      @param raw_yaml A <tt>String</tt> which contains Jervis YAML to be parsed.
+     */
+    public void preloadYamlString(String raw_yaml) throws JervisException {
+        if(!platform_obj) {
+            throw new PlatformValidationException('Must load the platforms file first.')
+        }
+        def yaml = new Yaml()
+        jervis_yaml = yaml.load(raw_yaml)
+        this.label_platform = getObjectValue(jervis_yaml, 'jenkins.platform', platform_obj.platforms['defaults']['platform'])
+        this.label_os = getObjectValue(jervis_yaml, 'jenkins.os', platform_obj.platforms['defaults']['os'])
+        setLabel_stability(getObjectValue(jervis_yaml, 'jenkins.unstable', platform_obj.platforms['defaults']['stability']))
+        setLabel_sudo(getObjectValue(jervis_yaml, 'jenkins.sudo', platform_obj.platforms['defaults']['sudo']))
+    }
+
+    /**
+      Returns a groovy expression which Jenkins would use to pin a job to specific
+      nodes.
+
+      @return A <tt>String</tt> which is a groovy expression of Jenkins node labels.
+     */
+    public String getLabels() {
+        String labels = ["language:${yaml_language}", toolchain_obj.toolchains['toolchains'][yaml_language].join('&&')].join('&&')
+        if(platform_obj) {
+            labels = [this.label_stability, this.label_platform, this.label_os, this.label_sudo, labels].join('&&')
+        }
+        return labels
+    }
+
+    /**
+      Given a project combination of <tt>org/project</tt> determine if a project is
+      allowed to be generated for a platform combination.  The platform combination is
+      determined by <tt>{@link #label_platform}</tt> and <tt>{@link #label_os}</tt>.
+      A Jenkins job should not be generated if it is restricted via the restrictions
+      section of the platforms file.
+
+      @return Returns <tt>true</tt> if not allowed or <tt>false</tt> if it is allowed.
+              That is, it is not restricted.
+     */
+    public boolean isRestricted(String project) {
+        Map restrictions = platform_obj.platforms['restrictions']
+        String org = project.split('/')[0]
+        boolean restricted = false
+        if(restrictions.containsKey(label_platform)) {
+            restricted = true
+            if(restrictions[label_platform].containsKey('only_organizations') && (org in restrictions[label_platform]['only_organizations'])) {
+                restricted = false
+            }
+            if(restrictions[label_platform].containsKey('only_projects') && (project in restrictions[label_platform]['only_projects'])) {
+                restricted = false
+            }
+        }
+        return restricted
     }
 }
