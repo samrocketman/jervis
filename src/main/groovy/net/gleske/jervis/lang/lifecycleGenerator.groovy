@@ -21,6 +21,7 @@ import net.gleske.jervis.exceptions.UnsupportedLanguageException
 import net.gleske.jervis.exceptions.UnsupportedToolException
 import net.gleske.jervis.lang.lifecycleValidator
 import net.gleske.jervis.lang.toolchainValidator
+import net.gleske.jervis.lang.platformValidator
 import org.yaml.snakeyaml.Yaml
 
 
@@ -727,16 +728,17 @@ env:
     }
 
     /**
-      Get an object from a Map or return any object from defaultValue.  Guarantees
-      that what is returned is the same type as defaultValue.  This is used to get
-      optional keys from YAML or JSON files.
+      Get an object from a <tt>Map</tt> or return any object from
+      <tt>defaultValue</tt>.  Guarantees that what is returned is the same type as
+      <tt>defaultValue</tt>.  This is used to get optional keys from YAML or JSON
+      files.
 
-      @param object A Map which was likely created from a YAML or JSON file.
-      @param key A String with keys and subkeys separated by periods which is used to
-                 search the object for a possible value.
+      @param object A <tt>Map</tt> which was likely created from a YAML or JSON file.
+      @param key A <tt>String</tt> with keys and subkeys separated by periods which is
+                 used to search the <tt>object</tt> for a possible value.
       @param defaultValue A default value and type that should be returned.
-      @return Returns the value of the key or a defaultValue which is of the same
-              type as defaultValue.
+      @return Returns the value of the key or a <tt>defaultValue</tt> which is of the
+              same type as <tt>defaultValue</tt>.
      */
     public Object getObjectValue(Map object, String key, Object defaultValue) {
         if(key.indexOf('.') >= 0) {
@@ -760,5 +762,39 @@ env:
 
         //nothing worked so just return default value
         return defaultValue
+    }
+
+    /**
+      Load a platforms file so that advanced labels can be generated for multiple
+      platforms.  A platform could be a local datacenter or a cloud providor.
+      The platforms file allows labels to be generated which include stability, sudo
+      access, and even operating system.  This could be used to load lifecycles and
+      toolchains by platform and OS.  This project comes with a platforms file.  The
+      platforms file in this repository relative to the repository root is
+      <tt>/src/main/resources/platforms.json</tt>.
+
+      @param file A path to a platforms file.
+     */
+    public void loadPlatforms(String file) {
+        this.platforms_obj = new platformValidator()
+        this.platforms_obj.load_JSON(file)
+        this.platforms_obj.validate()
+    }
+
+    /**
+      Load a platforms JSON <tt>String</tt> so that advanced labels can be generated
+      for multiple platforms.  A platform could be a local datacenter or a cloud
+      providor.  The platforms file allows labels to be generated which include
+      stability, sudo access, and even operating system.  This could be used to load
+      lifecycles and toolchains by platform and OS.  This project comes with a
+      platforms file.  The platforms file in this repository relative to the
+      repository root is <tt>/src/main/resources/platforms.json</tt>.
+
+      @param json A <tt>String</tt> containing JSON which is from a platforms file.
+     */
+    public void loadPlatformsString(String json) {
+        this.platforms_obj = new platformValidator()
+        this.platforms_obj.load_JSON(json)
+        this.platforms_obj.validate()
     }
 }
