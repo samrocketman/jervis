@@ -725,4 +725,40 @@ env:
         }
         return result
     }
+
+    /**
+      Get an object from a Map or return any object from defaultValue.  Guarantees
+      that what is returned is the same type as defaultValue.  This is used to get
+      optional keys from YAML or JSON files.
+
+      @param object A Map which was likely created from a YAML or JSON file.
+      @param key A String with keys and subkeys separated by periods which is used to
+                 search the object for a possible value.
+      @param defaultValue A default value and type that should be returned.
+      @return Returns the value of the key or a defaultValue which is of the same
+              type as defaultValue.
+     */
+    public Object getObjectValue(Map object, String key, Object defaultValue) {
+        if(key.indexOf('.') >= 0) {
+            String key1 = key.split('\\.', 2)[0]
+            String key2 = key.split('\\.', 2)[1]
+            if(object.get(key1) != null && object.get(key1) instanceof Map) {
+                return getObjectValue(object.get(key1), key2, defaultValue)
+            }
+            else {
+                return defaultValue
+            }
+        }
+
+        //try returning the value casted as the same type as defaultValue
+        try {
+            if(object.get(key) != null) {
+                return object.get(key).asType(defaultValue.getClass())
+            }
+        }
+        catch(Exception e) {}
+
+        //nothing worked so just return default value
+        return defaultValue
+    }
 }
