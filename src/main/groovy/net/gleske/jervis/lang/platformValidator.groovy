@@ -92,7 +92,7 @@ class platformValidator {
                 throw new PlatformMissingKeyException("${it} - Must exist as a root key.")
             }
             if(!(platforms[it] instanceof Map)) {
-                throw new PlatformBadValueInKeyException("${it} - Must be a Map.")
+                throw new PlatformBadValueInKeyException("${it} - Must be a JSON Object.")
             }
         }
         //validate defaults root key for keys, types, and  values
@@ -109,6 +109,9 @@ class platformValidator {
         if(!platforms['supported_platforms'].containsKey(default_platform)) {
             throw new PlatformMissingKeyException(['supported_platforms', default_platform].join('.') + ' - Missing default platform.')
         }
+        if(!(platforms['supported_platforms'][default_platform] instanceof Map)) {
+            throw new PlatformBadValueInKeyException("supported_platforms.${default_platform} - Must be a JSON Object.")
+        }
         if(!platforms['supported_platforms'][default_platform].containsKey(default_os)) {
             throw new PlatformMissingKeyException(['supported_platforms', default_platform, default_os].join('.') + ' - Missing default OS.')
         }
@@ -122,7 +125,7 @@ class platformValidator {
         (platforms['supported_platforms'].keySet() as String[]).each {
             String platform = it
             if(!(platforms['supported_platforms'][platform] instanceof Map)) {
-                throw new PlatformBadValueInKeyException("supported_platforms.${platform} - Must be a Map.")
+                throw new PlatformBadValueInKeyException("supported_platforms.${platform} - Must be a JSON Object.")
             }
             if((platforms['supported_platforms'][platform].keySet() as String[]).size() <= 0) {
                 throw new PlatformMissingKeyException("supported_platforms.${platform}.(empty key) - OS list must not be empty.")
@@ -130,7 +133,7 @@ class platformValidator {
             (platforms['supported_platforms'][platform].keySet() as String[]).each {
                 String os = it
                 if(!(platforms['supported_platforms'][platform][os] instanceof Map)) {
-                    throw new PlatformBadValueInKeyException(['supported_platforms', platform, os].join('.') + ' - Must be a Map.')
+                    throw new PlatformBadValueInKeyException(['supported_platforms', platform, os].join('.') + ' - Must be a JSON Object.')
                 }
                 ['language', 'toolchain'].each {
                     if(!platforms['supported_platforms'][platform][os].containsKey(it)) {
@@ -146,7 +149,7 @@ class platformValidator {
         (platforms['restrictions'].keySet() as String[]).each {
             String platform = it
             if(!(platforms['restrictions'][platform] instanceof Map)) {
-                throw new PlatformBadValueInKeyException(['restrictions', platform].join('.') + ' - Must be a Map.')
+                throw new PlatformBadValueInKeyException(['restrictions', platform].join('.') + ' - Must be a JSON Object.')
             }
             if(!platforms['supported_platforms'].containsKey(platform)) {
                 throw new PlatformMissingKeyException(['supported_platforms', platform].join('.') + ' - Missing restricted platform.')

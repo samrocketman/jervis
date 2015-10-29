@@ -165,4 +165,11 @@ class platformValidatorTest extends GroovyTestCase {
             platforms.validate()
         }
     }
+    @Test public void test_platformValidator_bad_type_supported_platforms_defaults_platform() {
+        URL url = this.getClass().getResource('/bad_platforms_type_supported_platforms_defaults_platform.json');
+        platforms.load_JSON(url.getFile())
+        shouldFail(PlatformBadValueInKeyException) {
+            platforms.validate()
+        }
+    }
 }
