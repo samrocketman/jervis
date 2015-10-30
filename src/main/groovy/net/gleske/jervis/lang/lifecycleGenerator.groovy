@@ -383,20 +383,20 @@ env:
                 matrix[filterType][i].each { k, v ->
                     if(k in yaml_matrix_axes) {
                         if(first_in_expr) {
-                            if(('env' == k) && (jervis_yaml[k] instanceof Map)) {
-                                temp += "${k} == '${k}${jervis_yaml[k]['matrix'].indexOf(v)}'"
-                            }
-                            else {
-                                temp += "${k} == '${k}${jervis_yaml[k].indexOf(v)}'"
-                            }
                             first_in_expr = false
                         }
                         else {
-                            if(('env' == k) && (jervis_yaml[k] instanceof Map)) {
-                                temp += " && ${k} == '${k}${jervis_yaml[k]['matrix'].indexOf(v)}'"
+                            temp += " && "
+                        }
+                        if(('env' == k) && (jervis_yaml[k] instanceof Map)) {
+                            temp += "${k} == '${k}${jervis_yaml[k]['matrix'].indexOf(v)}'"
+                        }
+                        else {
+                            if(toolchain_obj.isFriendlyLabel(k)) {
+                                temp += "${k} == '${k}:${v}'"
                             }
                             else {
-                                temp += " && ${k} == '${k}${jervis_yaml[k].indexOf(v)}'"
+                                temp += "${k} == '${k}${jervis_yaml[k].indexOf(v)}'"
                             }
                         }
                     }
@@ -465,9 +465,15 @@ env:
                 }
             }
             else {
+                boolean friendly = toolchain_obj.isFriendlyLabel(axis)
                 jervis_yaml[axis].each {
-                    result += " ${axis}${counter}"
-                    counter++
+                    if(friendly) {
+                        result += " ${axis}:${it}"
+                    }
+                    else {
+                        result += " ${axis}${counter}"
+                        counter++
+                    }
                 }
             }
             return result.trim()

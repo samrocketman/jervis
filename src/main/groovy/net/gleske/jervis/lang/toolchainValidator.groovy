@@ -187,4 +187,16 @@ class toolchainValidator {
         }
         return true
     }
+
+    /**
+      Can a toolchain be used with a friendly label when Jenkins matrix axes are used?  This answers that question.
+
+      @return Returns <tt>true</tt> if a friendly label can be used otherwise <tt>false</tt>
+     */
+    public boolean isFriendlyLabel(String toolchain) {
+        if('friendlyLabel' in toolchains[toolchain].keySet()) {
+            return toolchains[toolchain]['friendlyLabel'].toString().equals('true')
+        }
+        return false
+    }
 }

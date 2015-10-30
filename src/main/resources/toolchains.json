@@ -6,6 +6,7 @@
         "ruby": ["gemfile", "env", "rvm", "jdk"]
     },
     "compiler": {
+        "friendlyLabel": true,
         "gcc": [
             "export CXX=\"g++\"",
             "export CC=\"gcc\""
@@ -29,6 +30,7 @@
     },
     "jdk": {
         "default_ivalue": "openjdk7",
+        "friendlyLabel": true,
         "openjdk6": [
             "export JAVA_HOME=\"${HOME}/java/openjdk6\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
@@ -52,6 +54,7 @@
     },
     "python": {
         "default_ivalue": "2.7",
+        "friendlyLabel": true,
         "2.6": [
             "set +x",
             "echo \"$ source \\\"${HOME}/virtualenv/python2.6/bin/activate\\\"\"",
@@ -111,6 +114,7 @@
     },
     "rvm": {
         "default_ivalue": "1.9.3",
+        "friendlyLabel": true,
         "*": [
             "set +x",
             "echo \"$ source \\\"${HOME}/.rvm/scripts/rvm\\\"\"",

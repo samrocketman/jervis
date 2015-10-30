@@ -167,4 +167,10 @@ class toolchainValidatorTest extends GroovyTestCase {
         assert true == toolchains.validate()
         assert true == toolchains.validate_asBool()
     }
+    @Test public void test_toolchainValidator_isFriendlyLabel() {
+        URL url = this.getClass().getResource('/good_toolchains_friendly.json');
+        toolchains.load_JSON(url.getFile())
+        assert false == toolchains.isFriendlyLabel('env')
+        assert true == toolchains.isFriendlyLabel('rvm')
+    }
 }

@@ -215,6 +215,11 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert '!(rvm == \'rvm0\') && !(rvm == \'rvm2\') && (env == \'env0\' && rvm == \'rvm0\')' == generator.matrixExcludeFilter()
         generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  include:\n    - rvm: 1.9.3\n      env: world=hello\n  exclude:\n    - rvm: "1.9.3"\n    - rvm: "2.1"')
         assert '!(rvm == \'rvm0\') && !(rvm == \'rvm2\') && (rvm == \'rvm0\' && env == \'env0\')' == generator.matrixExcludeFilter()
+        //test friendly labels
+        URL url = this.getClass().getResource('/good_toolchains_friendly.json');
+        generator.loadToolchains(url.getFile())
+        generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  include:\n    - rvm: 1.9.3\n      env: world=hello\n  exclude:\n    - rvm: "1.9.3"\n    - rvm: "2.1"')
+        assert '!(rvm == \'rvm:1.9.3\') && !(rvm == \'rvm:2.1\') && (rvm == \'rvm:1.9.3\' && env == \'env0\')' == generator.matrixExcludeFilter()
     }
     @Test public void test_lifecycleGenerator_matrixGetAxisValue1() {
         generator.loadYamlString('language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar')
@@ -227,6 +232,13 @@ class lifecycleGeneratorTest extends GroovyTestCase {
     @Test public void test_lifecycleGenerator_matrixGetAxisValue3() {
         generator.loadYamlString('language: ruby\nenv:\n  matrix:\n    - foobar=foo\n    - foobar=bar')
         assert 'env0 env1' == generator.matrixGetAxisValue('env')
+    }
+    @Test public void test_lifecycleGenerator_matrixGetAxisValue_friendly() {
+        URL url = this.getClass().getResource('/good_toolchains_friendly.json');
+        generator.loadToolchains(url.getFile())
+        generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]')
+        assert 'env0 env1' == generator.matrixGetAxisValue('env')
+        assert 'rvm:1.9.3 rvm:2.0.0 rvm:2.1' == generator.matrixGetAxisValue('rvm')
     }
     @Test public void test_lifecycleGenerator_generateToolchainSection_matrix() {
         //basic env matrix
@@ -384,6 +396,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadLifecycles(url.getFile())
         url = this.getClass().getResource('/toolchains.json');
         generator.loadToolchains(url.getFile())
+        List skip_keys = ['default_ivalue', 'secureSupport', 'friendlyLabel']
         //cycle through all permutations of the toolchains file and check bash syntax
         generator.toolchain_obj.languages.each {
             String language = it
@@ -391,7 +404,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
                 String toolchain = it
                 (generator.toolchain_obj.toolchains[toolchain].keySet() as String[]).each {
                     String toolchain_value = it
-                    if(('default_ivalue' != toolchain_value) && ('secureSupport' != toolchain_value)) {
+                    if(!(toolchain_value in skip_keys)) {
                         //load the yaml permutations
                         String sample_yaml
                         if('*' == it) {
