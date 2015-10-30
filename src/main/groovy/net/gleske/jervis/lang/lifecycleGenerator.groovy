@@ -512,7 +512,12 @@ env:
                 if(!toolchain_obj.supportedTool(toolchain, tempchain)) {
                     throw new UnsupportedToolException("${toolchain}: ${tempchain}")
                 }
-                output += "  ${toolchain}${i})\n"
+                if(toolchain_obj.isFriendlyLabel(toolchain)) {
+                    output += "  ${toolchain}:${tempchain})\n"
+                }
+                else {
+                    output += "  ${toolchain}${i})\n"
+                }
                 if(tempchain in toolchain_keys) {
                     output += '    ' + toolchain_obj.toolchains[toolchain][tempchain].join('\n    ') + '\n    ;;\n'
                 }

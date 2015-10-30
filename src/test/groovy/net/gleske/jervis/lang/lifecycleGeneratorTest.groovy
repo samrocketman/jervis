@@ -268,6 +268,11 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         shouldFail(UnsupportedToolException) {
             generator.generateToolchainSection()
         }
+        //test for friendly labels
+        URL url = this.getClass().getResource('/good_toolchains_friendly.json');
+        generator.loadToolchains(url.getFile())
+        generator.loadYamlString('language: ruby\njdk: [openjdk6, openjdk7]')
+        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\ncase ${jdk} in\n  jdk:openjdk6)\n    more commands\n    ;;\n  jdk:openjdk7)\n    some commands\n    ;;\nesac\n' == generator.generateToolchainSection()
     }
     @Test public void test_lifecycleGenerator_generateToolchainSection_nonmatrix() {
         //basic language test
