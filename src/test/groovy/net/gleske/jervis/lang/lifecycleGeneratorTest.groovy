@@ -490,4 +490,29 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert !generator.isRestricted('samrocketman/jervis')
         assert generator.isRestricted('org/project')
     }
+    @Test public void test_lifecycleGenerator_isSupportedPlatform() {
+        assert true == generator.isSupportedPlatform()
+        String yaml = 'language: ruby'
+        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        generator.loadPlatforms(url.getFile())
+        generator.preloadYamlString(yaml)
+        generator.loadYamlString(yaml)
+        assert true == generator.isSupportedPlatform()
+        String tmp = generator.label_platform
+        generator.label_platform = 'invalid'
+        assert false == generator.isSupportedPlatform()
+        generator.label_platform = tmp
+        tmp = generator.label_os
+        generator.label_os = 'invalid'
+        assert false == generator.isSupportedPlatform()
+        generator.label_os = tmp
+        tmp = generator.yaml_language
+        generator.yaml_language = 'invalid'
+        assert false == generator.isSupportedPlatform()
+        generator.yaml_language = tmp
+        url = this.getClass().getResource('/good_platforms_optional.json');
+        generator.loadPlatforms(url.getFile())
+        generator.preloadYamlString(yaml)
+        assert false == generator.isSupportedPlatform()
+    }
 }

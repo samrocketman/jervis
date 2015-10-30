@@ -8,10 +8,8 @@
     "supported_platforms": {
         "docker": {
             "ubuntu1404": {
-                "language": [
-                ],
-                "toolchain": [
-                ]
+                "language": [],
+                "toolchain": []
             }
         }
     },

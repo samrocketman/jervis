@@ -939,4 +939,40 @@ env:
         }
         return restricted
     }
+
+    /**
+       Checks if a job that is using a platform and toolchain which is supported in the
+       loaded platforms file.
+
+       @return Returns <tt>true</tt> if a job can be generated from the requested
+               platform.
+     */
+    public boolean isSupportedPlatform() {
+        if(platform_obj) {
+            String [] supported_platforms = platform_obj.platforms['supported_platforms'].keySet() as String[]
+            if(label_platform in supported_platforms) {
+                String[] supported_os = platform_obj.platforms['supported_platforms'][label_platform].keySet() as String[]
+                if(label_os in supported_os) {
+                    //check the support of toolchains
+                    LinkedHashSet toolchains_set = [] as Set
+                    //start with the requested toolchains
+                    toolchains_set = toolchains_set.plus(toolchain_obj.toolchains['toolchains'][yaml_language])
+                    //subtract from the list of supported tool chains
+                    toolchains_set = toolchains_set.minus(platform_obj.platforms['supported_platforms'][label_platform][label_os]['toolchain'])
+                    //toolchains_set should be empty if the platform supports all toolchains
+                    List supported_languages = platform_obj.platforms['supported_platforms'][label_platform][label_os]['language']
+                    if(!(yaml_language in supported_languages) || toolchains_set.size() > 0) {
+                        return false
+                    }
+                }
+                else {
+                    return false
+                }
+            }
+            else {
+                return false
+            }
+        }
+        return true
+    }
 }

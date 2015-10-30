@@ -16,7 +16,7 @@
                 ],
                 "toolchain": [
                     "env",
-                    "gemset",
+                    "gemfile",
                     "rvm",
                     "python",
                     "jdk"
