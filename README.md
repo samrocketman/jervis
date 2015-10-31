@@ -19,8 +19,8 @@
   * [Supported Build Tools][jervis-wiki-build-tools]
 
 
-The library API is also fully documented.  To generate the developer docs
-execute the following command.
+The library API is also [fully documented][jervis-api-docs].  To generate the
+latest developer docs execute the following command.
 
     ./gradlew groovydoc
 
@@ -161,6 +161,7 @@ must be done before you configure your Jenkins job to execute Job DSL scripts.
 [jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-docker]: https://wiki.jenkins-ci.org/display/JENKINS/Docker+Plugin
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
+[jervis-api-docs]: http://sam.gleske.net/jervis-api/
 [jervis-coveralls]: https://coveralls.io/r/samrocketman/jervis?branch=master
 [jervis-docker]: https://github.com/samrocketman/docker-jenkins-jervis
 [jervis-jenkins-bootstrap]: https://github.com/samrocketman/jenkins-bootstrap-jervis
