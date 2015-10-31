@@ -1,7 +1,45 @@
 # Jervis - [![Build Status][status-build]][jervis-travis] [![Coverage Status][status-coverage]][jervis-coveralls] [![Dependency Status][status-versioneye]][jervis-versioneye]
 
-* *Project status:* released.
-* *Currently Targeted platforms:* Linux
+* *Project status:* [released to maven central][maven-release].
+* *Currently Targeted platforms:*
+  * *Jenkins server host:* Linux
+  * *Jobs on clients:* Linux only (Multi-platform capable)
+
+##### What is Jervis?
+
+* What is Jervis? A library for [Job DSL plugin][jenkins-plugin-job-dsl]
+  scripts.  It is used to augment the automation of generating Jenkins jobs.
+* What is Jervis not? Jervis is not a Jenkins plugin.
+
+# Documentation
+
+* [Jervis Wiki][jervis-wiki]
+  * [Build Overview][jervis-wiki-overview]
+  * [Supported Languages][jervis-wiki-languages]
+  * [Supported Build Tools][jervis-wiki-build-tools]
+
+
+The library API is also fully documented.  To generate the developer docs
+execute the following command.
+
+    ./gradlew groovydoc
+
+The documentation can be found in `build/docs/groovydoc`.
+
+##### Provided examples
+
+* Bootstrapping Jenkins: Example [bootstrap for
+  Jenkins][jervis-jenkins-bootstrap] which allows you to quickly try out this
+  libray.
+* Job DSL Script: [Example Job DSL script](jobs/firstjob_dsl.groovy) is
+  provided.
+* Jenkins build node: There's also a [docker container][jervis-docker] designed
+  to be used as a Jenkins build agent through the [Jenkins Docker
+  Plugin][jenkins-plugin-docker].
+* Jervis configuration files: [`lifecycles.json`][json-lifecycles],
+  [`toolchains.json`][json-toolchains], and [`platforms.json`][json-platforms].
+
+# More about Jervis
 
 Jervis is a combination of some letters in the words Jenkins and Travis: JEnkins
 tRaVIS.  [Jenkins][jenkins] is a [continuous integration][wiki-ci] tool which is
@@ -54,18 +92,6 @@ sub-bullet.
     seasoned build engineer and attempting to fill this gap in the Jenkins
     ecosystem.
 
-# Documentation
-
-Refer to the [Jervis Wiki][jervis-wiki] for a quickstart guide and rolling
-Jervis out for production.
-
-The library API is also fully documented.  To generate the docs do the
-following.
-
-    ./gradlew groovydoc
-
-The documentation can be found in `build/docs/groovydoc`.
-
 # Set up
 
 To include this library for use in your Job DSL plugin scripts you only need
@@ -77,12 +103,15 @@ include it in your build tool.
 <dependency>
   <groupId>net.gleske</groupId>
   <artifactId>jervis</artifactId>
-  <version>0.2</version>
+  <version>0.3</version>
   <type>pom</type>
 </dependency>
 ```
 
 #### Gradle
+
+Your Job DSL scripts should have a `build.gradle` file which has the following
+contents.
 
 ```groovy
 apply plugin: 'maven'
@@ -96,7 +125,7 @@ configurations {
 
 dependencies {
     libs 'org.yaml:snakeyaml:1.15'
-    libs 'net.gleske:jervis:0.2'
+    libs 'net.gleske:jervis:0.3'
 }
 
 clean {
@@ -110,7 +139,8 @@ task libs(type: Copy) {
 ```
 
 Then execute `./gradlew libs` to assemble dependencies into the `lib` directory
-of the Jenkins workspace.  Don't forget to add `lib` to the classpath.
+of the Jenkins workspace.  Don't forget to add `lib` to the classpath.  This
+must be done before you configure your Jenkins job to execute Job DSL scripts.
 
 # License
 
@@ -129,11 +159,21 @@ of the Jenkins workspace.  Don't forget to add `lib` to the classpath.
     limitations under the License.
 
 [jenkins]: https://jenkins-ci.org/
+[jenkins-plugin-docker]: https://wiki.jenkins-ci.org/display/JENKINS/Docker+Plugin
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jervis-coveralls]: https://coveralls.io/r/samrocketman/jervis?branch=master
+[jervis-docker]: https://github.com/samrocketman/docker-jenkins-jervis
+[jervis-jenkins-bootstrap]: https://github.com/samrocketman/jenkins-bootstrap-jervis
 [jervis-travis]: https://travis-ci.org/samrocketman/jervis
 [jervis-versioneye]: https://www.versioneye.com/user/projects/54f2a1cc4f3108959a0007f1
+[jervis-wiki-build-tools]: https://github.com/samrocketman/jervis/wiki/Supported-Tools
 [jervis-wiki]: https://github.com/samrocketman/jervis/wiki
+[jervis-wiki-languages]: https://github.com/samrocketman/jervis/wiki/Supported-Languages
+[jervis-wiki-overview]: https://github.com/samrocketman/jervis/wiki/Build-overview
+[json-lifecycles]: src/main/resources/lifecycles.json
+[json-platforms]: src/main/resources/platforms.json
+[json-toolchains]: src/main/resources/toolchains.json
+[maven-release]: http://search.maven.org/#search|ga|1|g:"net.gleske"%20a:"jervis"
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=master
 [status-coverage]: https://coveralls.io/repos/samrocketman/jervis/badge.svg?branch=master

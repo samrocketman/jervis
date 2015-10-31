@@ -18,10 +18,10 @@ ossrhPassword=secret
 
 ### Prepare for release checklist
 
-[ ] Check test coverage and ensure it is high.
-[ ] Ensure groovydoc API is fully documented.
-[ ] Update wiki documentation for release.
-[ ] Update [CHANGELOG.md](CHANGELOG.md).
+- [ ] Check test coverage and ensure it is high.
+- [ ] Ensure groovydoc API is fully documented.
+- [ ] Update wiki documentation for release.
+- [ ] Update [CHANGELOG.md](CHANGELOG.md).
 
 ### Perform release
 
@@ -30,7 +30,7 @@ ossrhPassword=secret
 2. Tag the current commit: e.g. `jervis-0.2`.
 3. Upload the release.
    ```
-   ./gradlew clean uploadArchives
+   ./gradlew clean check uploadArchives
    ```
 4. Increment plugin version to next snapshot: e.g. `0.3-SNAPSHOT`.  Commit.
 
