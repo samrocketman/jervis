@@ -222,7 +222,7 @@ class lifecycleGenerator {
                   <tt>nosudo</tt>.
      */
     public void setLabel_sudo(String sudo) {
-        if(sudo == 'sudo' || sudo == 'true') {
+        if(sudo == 'sudo' || sudo == 'true' || sudo == 'required') {
             label_sudo = 'sudo'
         }
         else {

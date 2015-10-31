@@ -454,6 +454,8 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert 'sudo'.equals(generator.label_sudo)
         generator.label_sudo = 'sudo'
         assert 'sudo'.equals(generator.label_sudo)
+        generator.label_sudo = 'required'
+        assert 'sudo'.equals(generator.label_sudo)
     }
     @Test public void test_lifecycleGenerator_getObjectValue() {
         Map example = [key1: [subkey1: 'string']]
