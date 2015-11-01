@@ -99,7 +99,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
             return
         }
         //chooses job type based on Jervis YAML
-        def jobType
+        def jervis_jobType
         if(generator.isMatrixBuild()) {
             jervis_jobType = { String name, Closure closure -> matrixJob(name, closure) }
         }
