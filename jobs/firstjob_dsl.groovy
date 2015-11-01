@@ -14,8 +14,20 @@
    limitations under the License.
    */
 
+import java.util.concurrent.locks.ReentrantLock
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.remotes.GitHub
+
+//create a lock for use in threads
+ReentrantLock.metaClass.withLock = {
+    lock()
+    try {
+        it()
+    }
+    finally {
+        unlock()
+    }
+}
 
 def git_service = new GitHub()
 //Pre-job setup based on the type of remote
@@ -65,8 +77,13 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
         }
     }
 
+    //threaded code
+    List<Thread> threads = []
+    //lock for thread safe execution
+    def lock = new ReentrantLock()
     git_service.branches("${project}").each {
         def JERVIS_BRANCH = it
+        threads << Thread.start {
         def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
         def generator = new lifecycleGenerator()
         String jervis_yaml
@@ -98,6 +115,8 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
             println "Skipping branch: ${JERVIS_BRANCH}"
             return
         }
+        //lock on the following code to force it to run serially
+        lock.withLock {
         //chooses job type based on Jervis YAML
         def jervis_jobType
         if(generator.isMatrixBuild()) {
@@ -151,6 +170,12 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
                 combinationFilter(generator.matrixExcludeFilter())
             }
         }
+        }
+        }
+    }
+    //wait for all threads to finish before continuing
+    threads.each {
+        it.join()
     }
 }
 else {
