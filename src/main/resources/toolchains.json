@@ -3,6 +3,7 @@
         "c": ["env", "compiler"],
         "cpp": ["env", "compiler"],
         "erlang": ["env", "otp_release"],
+        "go": ["env", "go"],
         "groovy": ["env", "jdk"],
         "java": ["env", "jdk"],
         "node_js": ["env", "node_js"],
@@ -31,6 +32,20 @@
         "default_ivalue": "${PWD}/Gemfile",
         "*": [
             "export BUNDLE_GEMFILE=\"${jervis_toolchain_ivalue}\""
+        ]
+    },
+    "go": {
+        "default_ivalue": "1.5",
+        "friendlyLabel": true,
+        "comment": "Uses gimme - https://github.com/travis-ci/gimme",
+        "*": [
+            "export GOMAXPROCS=2",
+            "eval \"$(gimme ${jervis_toolchain_ivalue})\"",
+            "export GOTPATH=.",
+            "export PATH=\"./bin:${PATH}\"",
+            "gimme version",
+            "go version",
+            "go env"
         ]
     },
     "jdk": {
