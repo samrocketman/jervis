@@ -2,6 +2,7 @@
     "toolchains": {
         "c": ["env", "compiler"],
         "cpp": ["env", "compiler"],
+        "erlang": ["env", "otp_release"],
         "groovy": ["env", "jdk"],
         "java": ["env", "jdk"],
         "node_js": ["env", "node_js"],
@@ -73,6 +74,16 @@
             "set -x",
             "node --version",
             "npm --version"
+        ]
+    },
+    "otp_release": {
+        "default_ivalue": "0.10",
+        "friendlyLabel": true,
+        "*": [
+            "set +x",
+            "echo \"$ source \\\"${HOME}/otp/${jervis_toolchain_ivalue}/activate\\\"\"",
+            "source \"${HOME}/otp/${jervis_toolchain_ivalue}/activate\"",
+            "set -x"
         ]
     },
     "python": {
