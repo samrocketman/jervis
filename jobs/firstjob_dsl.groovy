@@ -86,7 +86,7 @@ def generate_project_for(def git_service, String JERVIS_BRANCH) {
                 remote {
                     url(git_service.getCloneUrl() + "${project}.git")
                 }
-                branch(JERVIS_BRANCH)
+                branch("refs/heads/${JERVIS_BRANCH}")
                 shallowClone(true)
                 //configure git web browser based on the type of remote
                 switch(git_service) {
