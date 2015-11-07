@@ -1,5 +1,6 @@
 {
     "toolchains": {
+        "c": ["env", "compiler"],
         "groovy": ["env", "jdk"],
         "java": ["env", "jdk"],
         "node_js": ["env", "node_js"],
@@ -7,6 +8,7 @@
         "ruby": ["gemfile", "env", "rvm", "jdk"]
     },
     "compiler": {
+        "default_ivalue": "gcc",
         "friendlyLabel": true,
         "gcc": [
             "export CXX=\"g++\"",
