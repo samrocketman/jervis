@@ -15,8 +15,9 @@
     },
     "clojure": {
         "friendlyName": "Clojure",
-        "defaultKey": "lein",
-        "lein": {
+        "defaultKey": "lein2",
+        "lein2": {
+            "install": "lein deps",
             "script": "lein test"
         }
     },
