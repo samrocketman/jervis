@@ -33,6 +33,94 @@ switch(git_service) {
         }
 }
 
+def generate_project_for(def git_service, String JERVIS_BRANCH) {
+    //def JERVIS_BRANCH = it
+    def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
+    def generator = new lifecycleGenerator()
+    String jervis_yaml
+    if('.jervis.yml' in folder_listing) {
+        jervis_yaml = git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH)
+    }
+    else if('.travis.yml' in folder_listing) {
+        jervis_yaml = git_service.getFile(project, '.travis.yml', JERVIS_BRANCH)
+    }
+    else {
+        //skip creating the job for this branch
+        println "Skipping branch: ${JERVIS_BRANCH}"
+        return
+    }
+    //try detecting no default language and setting to ruby
+    if(jervis_yaml.indexOf('language:') < 0) {
+        generator.yaml_language = 'ruby'
+    }
+    generator.loadPlatformsString(readFileFromWorkspace('src/main/resources/platforms.json').toString())
+    generator.preloadYamlString(jervis_yaml)
+    //could optionally read lifecycles and toolchains files by OS
+    generator.loadLifecyclesString(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
+    generator.loadToolchainsString(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
+    generator.loadYamlString(jervis_yaml)
+    generator.folder_listing = folder_listing
+    if(!generator.isGenerateBranch(JERVIS_BRANCH)) {
+        //the job should not be generated for this branch
+        //based on the branches section of .jervis.yml
+        println "Skipping branch: ${JERVIS_BRANCH}"
+        return
+    }
+    //chooses job type based on Jervis YAML
+    def jervis_jobType
+    if(generator.isMatrixBuild()) {
+        jervis_jobType = { String name, Closure closure -> matrixJob(name, closure) }
+    }
+    else {
+        jervis_jobType = { String name, Closure closure -> freeStyleJob(name, closure) }
+    }
+    println "Generating branch: ${JERVIS_BRANCH}"
+    //the generated Job DSL enclosure depends on the job type
+    jervis_jobType("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-')) {
+        displayName("${project_name} (${JERVIS_BRANCH} branch)")
+        label(generator.getLabels())
+        scm {
+            //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
+            //for more info about the git closure
+            git {
+                remote {
+                    url(git_service.getCloneUrl() + "${project}.git")
+                }
+                branch(JERVIS_BRANCH)
+                shallowClone(true)
+                //configure git web browser based on the type of remote
+                switch(git_service) {
+                    case GitHub:
+                        configure { gitHub ->
+                            gitHub / browser(class: 'hudson.plugins.git.browser.GithubWeb') {
+                                url(git_service.getWebUrl() + "${project}")
+                            }
+                        }
+                }
+            }
+        }
+        steps {
+            shell([
+                readFileFromWorkspace('assets/header.sh'),
+                "export JERVIS_LANG=\"${generator.yaml_language}\"",
+                "export JERVIS_PROJECT=\"${project_name}\"",
+                "export JERVIS_BRANCH=\"${JERVIS_BRANCH}\"",
+                generator.generateAll(),
+                readFileFromWorkspace('assets/footer.sh')
+                ].join('\n'))
+        }
+        //if a matrix build then generate matrix bits
+        if(generator.isMatrixBuild()) {
+            axes {
+                generator.yaml_matrix_axes.each {
+                    text(it, generator.matrixGetAxisValue(it).split())
+                }
+            }
+            combinationFilter(generator.matrixExcludeFilter())
+        }
+    }
+}
+
 if("${project}".size() > 0 && "${project}".split('/').length == 2) {
     println 'Generating jobs for ' + git_service.toString() + " project ${project}."
 
@@ -64,92 +152,13 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
             buildButton()
         }
     }
-
-    git_service.branches("${project}").each {
-        def JERVIS_BRANCH = it
-        def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
-        def generator = new lifecycleGenerator()
-        String jervis_yaml
-        if('.jervis.yml' in folder_listing) {
-            jervis_yaml = git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH)
-        }
-        else if('.travis.yml' in folder_listing) {
-            jervis_yaml = git_service.getFile(project, '.travis.yml', JERVIS_BRANCH)
-        }
-        else {
-            //skip creating the job for this branch
-            println "Skipping branch: ${JERVIS_BRANCH}"
-            return
-        }
-        //try detecting no default language and setting to ruby
-        if(jervis_yaml.indexOf('language:') < 0) {
-            generator.yaml_language = 'ruby'
-        }
-        generator.loadPlatformsString(readFileFromWorkspace('src/main/resources/platforms.json').toString())
-        generator.preloadYamlString(jervis_yaml)
-        //could optionally read lifecycles and toolchains files by OS
-        generator.loadLifecyclesString(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
-        generator.loadToolchainsString(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
-        generator.loadYamlString(jervis_yaml)
-        generator.folder_listing = folder_listing
-        if(!generator.isGenerateBranch(JERVIS_BRANCH)) {
-            //the job should not be generated for this branch
-            //based on the branches section of .jervis.yml
-            println "Skipping branch: ${JERVIS_BRANCH}"
-            return
-        }
-        //chooses job type based on Jervis YAML
-        def jervis_jobType
-        if(generator.isMatrixBuild()) {
-            jervis_jobType = { String name, Closure closure -> matrixJob(name, closure) }
-        }
-        else {
-            jervis_jobType = { String name, Closure closure -> freeStyleJob(name, closure) }
-        }
-        println "Generating branch: ${JERVIS_BRANCH}"
-        //the generated Job DSL enclosure depends on the job type
-        jervis_jobType("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-')) {
-            displayName("${project_name} (${JERVIS_BRANCH} branch)")
-            label(generator.getLabels())
-            scm {
-                //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
-                //for more info about the git closure
-                git {
-                    remote {
-                        url(git_service.getCloneUrl() + "${project}.git")
-                    }
-                    branch(JERVIS_BRANCH)
-                    shallowClone(true)
-                    //configure git web browser based on the type of remote
-                    switch(git_service) {
-                        case GitHub:
-                            configure { gitHub ->
-                                gitHub / browser(class: 'hudson.plugins.git.browser.GithubWeb') {
-                                    url(git_service.getWebUrl() + "${project}")
-                                }
-                            }
-                    }
-                }
-            }
-            steps {
-                shell([
-                    readFileFromWorkspace('assets/header.sh'),
-                    "export JERVIS_LANG=\"${generator.yaml_language}\"",
-                    "export JERVIS_PROJECT=\"${project_name}\"",
-                    "export JERVIS_BRANCH=\"${JERVIS_BRANCH}\"",
-                    generator.generateAll(),
-                    readFileFromWorkspace('assets/footer.sh')
-                    ].join('\n'))
-            }
-            //if a matrix build then generate matrix bits
-            if(generator.isMatrixBuild()) {
-                axes {
-                    generator.yaml_matrix_axes.each {
-                        text(it, generator.matrixGetAxisValue(it).split())
-                    }
-                }
-                combinationFilter(generator.matrixExcludeFilter())
-            }
+    //generate projects for one or more branches
+    if(branch != null && branch.size() > 0) {
+        generate_project_for(git_service, branch)
+    }
+    else {
+        git_service.branches("${project}").each { branch ->
+            generate_project_for(git_service, branch)
         }
     }
 }
