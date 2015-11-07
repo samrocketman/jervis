@@ -38,22 +38,26 @@
         "openjdk6": [
             "export JAVA_HOME=\"${HOME}/java/openjdk6\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
-            "java -version"
+            "java -Xmx32m -version",
+            "javac -J-Xmx32m -version"
         ],
         "openjdk7": [
             "export JAVA_HOME=\"${HOME}/java/openjdk7\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
-            "java -version"
+            "java -Xmx32m -version",
+            "javac -J-Xmx32m -version"
         ],
         "oraclejdk7": [
             "export JAVA_HOME=\"${HOME}/java/oraclejdk7\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
-            "java -version"
+            "java -Xmx32m -version",
+            "javac -J-Xmx32m -version"
         ],
         "oraclejdk8": [
             "export JAVA_HOME=\"${HOME}/java/oraclejdk8\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
-            "java -version"
+            "java -Xmx32m -version",
+            "javac -J-Xmx32m -version"
         ]
     },
     "node_js": {
