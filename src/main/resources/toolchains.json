@@ -1,6 +1,7 @@
 {
     "toolchains": {
         "c": ["env", "compiler"],
+        "cpp": ["env", "compiler"],
         "groovy": ["env", "jdk"],
         "java": ["env", "jdk"],
         "node_js": ["env", "node_js"],
