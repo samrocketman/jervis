@@ -103,6 +103,8 @@ def generate_project_for(def git_service, String JERVIS_BRANCH) {
             shell([
                 readFileFromWorkspace('assets/header.sh'),
                 "export JERVIS_LANG=\"${generator.yaml_language}\"",
+                "export JERVIS_DOMAIN=\"${git_service.getWebUrl().split('/')[2]}\"",
+                "export JERVIS_ORG=\"${project_folder}\"",
                 "export JERVIS_PROJECT=\"${project_name}\"",
                 "export JERVIS_BRANCH=\"${JERVIS_BRANCH}\"",
                 generator.generateAll(),
