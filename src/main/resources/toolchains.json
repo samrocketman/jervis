@@ -3,7 +3,7 @@
         "c": ["env", "compiler"],
         "cpp": ["env", "compiler"],
         "erlang": ["env", "otp_release"],
-        "go": ["env", "go"],
+        "go": ["env", "go_import_path", "go"],
         "groovy": ["env", "jdk"],
         "java": ["env", "jdk"],
         "node_js": ["env", "node_js"],
@@ -34,6 +34,16 @@
             "export BUNDLE_GEMFILE=\"${jervis_toolchain_ivalue}\""
         ]
     },
+    "go_import_path": {
+        "default_ivalue": "${JERVIS_DOMAIN}/${JERVIS_ORG}/${JERVIS_PROJECT}",
+        "*": [
+            "GO_IMPORT_PATH=\"${jervis_toolchain_ivalue}\"",
+            "#remove possible leading or trailing slashes",
+            "GO_IMPORT_PATH=${GO_IMPORT_PATH%/}",
+            "GO_IMPORT_PATH=${GO_IMPORT_PATH#/}",
+            "export GO_IMPORT_PATH"
+        ]
+    },
     "go": {
         "default_ivalue": "1.5",
         "friendlyLabel": true,
@@ -41,8 +51,13 @@
         "*": [
             "export GOMAXPROCS=2",
             "eval \"$(gimme ${jervis_toolchain_ivalue})\"",
-            "export GOTPATH=.",
-            "export PATH=\"./bin:${PATH}\"",
+            "export GOPATH=\"${HOME}/.gopath/${JERVIS_ORG}-${JERVIS_PROJECT}-${JERVIS_RANDOM}-${jervis_toolchain_ivalue}\"",
+            "export PATH=\"${GOPATH}/bin:${PATH}\"",
+            "mkdir -p \"${GOPATH}/src/${GO_IMPORT_PATH}\"",
+            "#remove the last directory at the end of the path so we can symlink",
+            "rmdir \"${GOPATH}/src/${GO_IMPORT_PATH}\"",
+            "ln -fs \"${PWD}\" \"${GOPATH}/src/${GO_IMPORT_PATH}\"",
+            "cd \"${GOPATH}/src/${GO_IMPORT_PATH}/\"",
             "gimme version",
             "go version",
             "go env"
