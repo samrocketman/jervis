@@ -49,7 +49,7 @@
         "friendlyLabel": true,
         "comment": "Uses gimme - https://github.com/travis-ci/gimme",
         "*": [
-            "export GOMAXPROCS=2",
+            "export GOMAXPROCS=${GOMAXPROCS:-2}",
             "eval \"$(gimme ${jervis_toolchain_ivalue})\"",
             "export GOPATH=\"${HOME}/.gopath/${JERVIS_ORG}-${JERVIS_PROJECT}-${JERVIS_RANDOM}-${jervis_toolchain_ivalue}\"",
             "export PATH=\"${GOPATH}/bin:${PATH}\"",
