@@ -64,6 +64,7 @@
     "node_js": {
         "default_ivalue": "0.10",
         "friendlyLabel": true,
+        "comment": "Uses nvm - https://github.com/creationix/nvm",
         "*": [
             "set +x",
             "echo \"$ source \\\"${HOME}/.nvm/nvm.sh\\\"\"",
@@ -79,6 +80,7 @@
     "otp_release": {
         "default_ivalue": "0.10",
         "friendlyLabel": true,
+        "comment": "Uses kerl - https://github.com/yrashk/kerl",
         "*": [
             "set +x",
             "echo \"$ source \\\"${HOME}/otp/${jervis_toolchain_ivalue}/activate\\\"\"",
@@ -149,6 +151,7 @@
     "rvm": {
         "default_ivalue": "1.9.3",
         "friendlyLabel": true,
+        "comment": "Uses rvm - https://rvm.io/",
         "*": [
             "set +x",
             "echo \"$ source \\\"${HOME}/.rvm/scripts/rvm\\\"\"",
