@@ -2,6 +2,7 @@
     "toolchains": {
         "groovy": ["env", "jdk"],
         "java": ["env", "jdk"],
+        "node_js": ["env", "node_js"],
         "python": ["env", "python"],
         "ruby": ["gemfile", "env", "rvm", "jdk"]
     },
@@ -50,6 +51,21 @@
             "export JAVA_HOME=\"${HOME}/java/oraclejdk8\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
             "java -version"
+        ]
+    },
+    "node_js": {
+        "default_ivalue": "0.10",
+        "friendlyLabel": true,
+        "*": [
+            "set +x",
+            "echo \"$ source \\\"${HOME}/.nvm/nvm.sh\\\"\"",
+            "source \"${HOME}/.nvm/nvm.sh\"",
+            "nvm install \"${jervis_toolchain_ivalue}\"",
+            "echo \"$ nvm --version\"",
+            "nvm --version",
+            "set -x",
+            "node --version",
+            "npm --version"
         ]
     },
     "python": {

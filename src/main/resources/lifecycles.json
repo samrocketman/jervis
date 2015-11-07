@@ -114,7 +114,7 @@
         }
     },
     "node_js": {
-        "friendlyName": "Node.JS",
+        "friendlyName": "Node.js",
         "defaultKey": "npm",
         "npm": {
             "install": "npm install",
