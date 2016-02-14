@@ -57,7 +57,6 @@ class platformValidator {
     }
 
     /**
-      ................................................................................
       Parse the JSON which is the contents of a platforms file.  It populates
       <tt>{@link #platforms}</tt>.  This is required in order to use the
       <a href="https://github.com/samrocketman/jervis/issues/43#issuecomment-73638215" target="_blank"><tt>readFileFromWorkspace</tt></a>
