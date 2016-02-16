@@ -14,7 +14,9 @@
    limitations under the License.
    */
 
+import hudson.util.Secret
 import jenkins.model.Jenkins
+import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.remotes.GitHub
 
@@ -34,6 +36,34 @@ switch(git_service) {
         }
 }
 
+//Get credentials from a folder
+public String getFolderRSAKeyCredentials(String folder, String credentials_id) {
+    if(folder.equals('') || credentials_id.equals('')) {
+        return ''
+    }
+    def credentials
+    def properties = Jenkins.getInstance().getJob(folder).getProperties()
+    for(int i=0; i < properties.size(); i++) {
+        if(properties.get(i).getClass().getSimpleName() == 'FolderCredentialsProperty') {
+            credentials = properties.get(i)
+        }
+    }
+    String found_credentials = ''
+    if(credentials != null ) {
+        credentials.getDomainCredentials().each { domain ->
+            domain.getCredentials().each { credential ->
+                if(credential != null && credential.getClass().getSimpleName() == 'BasicSSHUserPrivateKey') {
+                    if(credential.getId() == credentials_id) {
+                        found_credentials = credential.getPrivateKey()
+                    }
+                }
+            }
+        }
+    }
+    return found_credentials
+}
+
+//generate Jenkins jobs
 def generate_project_for(def git_service, String JERVIS_BRANCH) {
     //def JERVIS_BRANCH = it
     def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
@@ -60,6 +90,37 @@ def generate_project_for(def git_service, String JERVIS_BRANCH) {
     generator.loadLifecyclesString(readFileFromWorkspace('src/main/resources/lifecycles.json').toString())
     generator.loadToolchainsString(readFileFromWorkspace('src/main/resources/toolchains.json').toString())
     generator.loadYamlString(jervis_yaml)
+    String project_folder = "${project}".split('/')[0]
+    //attempt to get the private key else return an empty string
+    String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
+    String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
+    //try decrypting secrets
+    if(credentials_id.size() > 0 && private_key_contents.size() == 0) {
+        throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${credentials_id}")
+    }
+    if(private_key_contents.size() > 0) {
+        println "Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}."
+        File priv_key = File.createTempFile('temp', '.txt')
+        //delete file if JVM is shut down
+        priv_key.deleteOnExit()
+        try {
+            priv_key.write(private_key_contents)
+            generator.setPrivateKeyPath(priv_key.getAbsolutePath())
+            generator.decryptSecrets()
+        }
+        catch(Throwable t) {
+            //clean up temp file
+            priv_key.delete()
+            //rethrow caught throwable
+            throw t
+        }
+        //done decrypting so clean up the private key
+        priv_key.delete()
+        //print a list of the keys attempting to be decrypted
+        println "Decrypted the following properties (indented):"
+        generator.plainlist*.get('key').each { println "    ${it}" }
+    }
+    //end decrypting secrets
     generator.folder_listing = folder_listing
     if(!generator.isGenerateBranch(JERVIS_BRANCH)) {
         //the job should not be generated for this branch
@@ -80,6 +141,16 @@ def generate_project_for(def git_service, String JERVIS_BRANCH) {
     jervis_jobType("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-')) {
         displayName("${project_name} (${JERVIS_BRANCH} branch)")
         label(generator.getLabels())
+        //configure encrypted properties
+        if(generator.plainlist.size() > 0) {
+            configure { project ->
+                project / 'buildWrappers' / 'com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper' / 'varPasswordPairs'() {
+                    generator.plainlist.each { pair ->
+                        'varPasswordPair'(var: pair['key'], password: Secret.fromString(pair['secret']).getEncryptedValue())
+                    }
+                }
+            }
+        }
         scm {
             //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
             //for more info about the git closure

@@ -1018,11 +1018,11 @@ env:
         }
         cipherlist.each { item ->
             if(('key' in item.keySet()) && ('secret' in item.keySet())) {
-                //skip unwanted keys
                 item['secret'] = secret_util.rsaDecrypt(item['secret'])
                 //now that we've decrypted go ahead and append it to plainlist
                 plainlist << item
             }
+            //else skip unwanted keys
         }
     }
 
