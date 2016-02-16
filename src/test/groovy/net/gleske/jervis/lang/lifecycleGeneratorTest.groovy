@@ -545,7 +545,9 @@ class lifecycleGeneratorTest extends GroovyTestCase {
     }
     @Test public void test_lifecycleGenerator_decryptSecrets() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa');
-        String yaml = new File((this.getClass().getResource('/rsa_keys/rsa_secure_properties_test.yml') as URL).getFile()).text
+        URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_test.yml')
+        File file = new File(file_url.getFile())
+        String yaml = file.text
         generator.loadYamlString(yaml)
         shouldFail(SecurityException) {
             generator.decryptSecrets()
