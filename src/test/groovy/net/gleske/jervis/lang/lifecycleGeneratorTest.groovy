@@ -17,11 +17,13 @@ package net.gleske.jervis.lang
 //the lifecycleGeneratorTest() class automatically sees the lifecycleGenerator() class because they're in the same package
 import net.gleske.jervis.exceptions.JervisException
 import net.gleske.jervis.exceptions.PlatformValidationException
+import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.exceptions.UnsupportedLanguageException
 import net.gleske.jervis.exceptions.UnsupportedToolException
 import net.gleske.jervis.lang.lifecycleValidator
 import net.gleske.jervis.lang.platformValidator
 import net.gleske.jervis.lang.toolchainValidator
+import net.gleske.jervis.tools.securityIO
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -534,5 +536,27 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadPlatforms(url.getFile())
         generator.preloadYamlString(yaml)
         assert false == generator.isSupportedPlatform()
+    }
+    @Test public void test_lifecycleGenerator_setPrivateKeyPath() {
+        assert generator.secret_util == null
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa');
+        generator.setPrivateKeyPath(url.getPath())
+        assert generator.secret_util instanceof securityIO
+    }
+    @Test public void test_lifecycleGenerator_decryptSecrets() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa');
+        String yaml = new File((this.getClass().getResource('/rsa_keys/rsa_secure_properties_test.yml') as URL).getFile()).text
+        generator.loadYamlString(yaml)
+        shouldFail(SecurityException) {
+            generator.decryptSecrets()
+        }
+        generator.setPrivateKeyPath(url.getPath())
+        assert generator.cipherlist.size() == 1
+        assert generator.plainlist.size() == 0
+        generator.decryptSecrets()
+        assert generator.plainlist.size() == 1
+        assert generator.plainlist[0]['key'].equals('JERVIS_SECRETS_TEST')
+        //decrypted plain text
+        assert generator.plainlist[0]['secret'].equals('plaintext')
     }
 }

@@ -18,6 +18,7 @@ package net.gleske.jervis.lang
 import java.util.regex.Pattern
 import net.gleske.jervis.exceptions.JervisException
 import net.gleske.jervis.exceptions.PlatformValidationException
+import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.exceptions.UnsupportedLanguageException
 import net.gleske.jervis.exceptions.UnsupportedToolException
 import net.gleske.jervis.lang.lifecycleValidator
@@ -157,7 +158,7 @@ class lifecycleGenerator {
     /**
       A list of secrets loaded from the YAML file.
      */
-    List cipherlist
+    List cipherlist = [] as ArrayList
 
     /**
       A list of decrypted values from the <tt>{@link #cipherlist}</tt>.
@@ -1012,9 +1013,9 @@ env:
       have a <tt>secret</tt> and <tt>key</tt> item key in the <tt>HashMap</tt> will
       simply be ignored.  Decryption errors will throw an exception.
      */
-    public void decryptSecrets() {
+    public void decryptSecrets() throws SecurityException {
         if(!secret_util) {
-            throw new JervisException("Call setPrivateKeyPath before loading secrets.")
+            throw new SecurityException("Call setPrivateKeyPath before loading secrets.")
         }
         cipherlist.each { item ->
             if(('key' in item.keySet()) && ('secret' in item.keySet())) {
