@@ -21,10 +21,10 @@ import net.gleske.jervis.exceptions.PlatformValidationException
 import net.gleske.jervis.exceptions.UnsupportedLanguageException
 import net.gleske.jervis.exceptions.UnsupportedToolException
 import net.gleske.jervis.lang.lifecycleValidator
-import net.gleske.jervis.lang.toolchainValidator
 import net.gleske.jervis.lang.platformValidator
+import net.gleske.jervis.lang.toolchainValidator
+import net.gleske.jervis.tools.securityIO
 import org.yaml.snakeyaml.Yaml
-
 
 /**
   Generates the build scripts from the Jervis YAML.
@@ -153,6 +153,22 @@ class lifecycleGenerator {
       the <tt>{@link #folder_listing}</tt>.
      */
     String lifecycle_key
+
+    /**
+      A list of secrets loaded from the YAML file.
+     */
+    List cipherlist
+
+    /**
+      A list of decrypted values from the <tt>{@link #cipherlist}</tt>.
+     */
+    List plainlist = [] as ArrayList
+
+    /**
+      A utility for decrypting RSA encrypted strings in YAML files.  This is an
+      instance of the <tt>{@link net.gleske.jervis.tools.securityIO}</tt>.
+     */
+    def secret_util
 
     /**
       This function sets the <tt>{@link #folder_listing}</tt> and based on the
@@ -311,6 +327,8 @@ class lifecycleGenerator {
         if(!lifecycle_obj.supportedLanguage(this.yaml_language) || !toolchain_obj.supportedLanguage(this.yaml_language)) {
             throw new UnsupportedLanguageException(this.yaml_language)
         }
+        //load encrypted properties
+        cipherlist = getObjectValue(jervis_yaml, 'jenkins.secrets', [] as ArrayList)
         //avoid throwing a NullPointer exception if the user forgets to call obj.folder_listing to load a list of files.
         //just load an empty file list by default initially that can then be overridden.
         this.setFolder_listing([])
@@ -985,5 +1003,36 @@ env:
             }
         }
         return true
+    }
+
+    /**
+      Decrypts encrypted values stored in <tt>{@link #cipherlist}</tt>.  All decrypted
+      values will be stored in <tt>{@link #plainlist}</tt> which is where they should
+      be accessed.  Any malformatted Hash Maps within <tt>cipherlist</tt> which don't
+      have a <tt>secret</tt> and <tt>key</tt> item key in the <tt>HashMap</tt> will
+      simply be ignored.  Decryption errors will throw an exception.
+     */
+    public void decryptSecrets() {
+        if(!secret_util) {
+            throw new JervisException("Call setPrivateKeyPath before loading secrets.")
+        }
+        cipherlist.each { item ->
+            if(('key' in item.keySet()) && ('secret' in item.keySet())) {
+                //skip unwanted keys
+                item['secret'] = secret_util.rsaDecrypt(item['secret'])
+                //now that we've decrypted go ahead and append it to plainlist
+                plainlist << item
+            }
+        }
+    }
+
+    /**
+      Set the RSA private key path so secrets in a YAML file can be decrypted.  Call
+      this function before <tt>{@link #decryptSecrets()}</tt> if
+      expecting encrypted YAML keys.
+     */
+    public void setPrivateKeyPath(String path) {
+        //public key path and key size do not matter because we're only decrypting and not generating nor encrypting.
+        secret_util = new securityIO(path, '', 2048)
     }
 }
