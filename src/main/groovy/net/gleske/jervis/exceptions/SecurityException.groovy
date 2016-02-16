@@ -16,6 +16,8 @@
 
 package net.gleske.jervis.exceptions
 
+import net.gleske.jervis.exceptions.wikiPages
+
 /**
   A group of exceptions that are thrown when security issues occur.
 
@@ -24,12 +26,14 @@ package net.gleske.jervis.exceptions
 throw new SecurityException('some text')</tt></pre><br>
  */
 class SecurityException extends JervisException {
+    private static String wiki_page = wikiPages.secure_secrets
+
     /**
       Throw a <tt>SecurityException</tt>.
 
-      @param message A simple message.
+      @param message A simple message that will be prepended with <tt>'ERROR: An encryption related issue occured.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.wikiPages#secure_secrets}</tt>.
      */
     def SecurityException(String message) {
-        super(message)
+        super('\nERROR: An encryption related issue occured.  ' + message + ['\n\nSee wiki page:', wiki_page,'\n'].join('\n'))
     }
 }

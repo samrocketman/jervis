@@ -89,7 +89,7 @@ import net.gleske.jervis.lang.lifecycleValidator</tt></pre>
 
   Here's an example error message from the above sample.
 
- <pre><tt>net.gleske.jervis.exceptions.LifecycleMissingKeyException: 
+ <pre><tt>net.gleske.jervis.exceptions.LifecycleMissingKeyException:
 ERROR: Lifecycle validation failed.  Missing key: ruby.friendlyName
 
 See wiki page:
@@ -126,4 +126,9 @@ class wikiPages {
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file" target="_blank">platforms file spec wiki page</a>.
      */
     public static String platforms_spec = 'https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file'
+
+    /**
+      A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories" target="_blank">secure secrets in repositories wiki page</a>.
+     */
+    public static String secure_secrets = 'https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file'
 }

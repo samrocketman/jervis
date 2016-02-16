@@ -15,7 +15,9 @@
    */
 package net.gleske.jervis.tools
 
-import net.gleske.jervis.exceptions.JervisException
+import net.gleske.jervis.exceptions.DecryptException
+import net.gleske.jervis.exceptions.EncryptException
+import net.gleske.jervis.exceptions.KeyGenerationException
 
 /**
    A class to provide cryptographic features to Jervis such as RSA encryption and base64 encoding.
@@ -202,18 +204,18 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       @param pub_key_file_path  A file path where the public key will be written on the filesystem.
       @param keysize            The key size in bits of the key pair.
      */
-    public void generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize) throws JervisException {
+    public void generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize) throws KeyGenerationException {
         def stdout = new StringBuilder()
         def stderr = new StringBuilder()
         def process = ['openssl', 'genrsa', '-out', priv_key_file_path, keysize.toString()].execute()
         process.waitForProcessOutput(stdout, stderr)
         if(process.exitValue()) {
-            throw new JervisException(stderr.toString())
+            throw new KeyGenerationException(stderr.toString())
         }
         process = ['openssl', 'rsa', '-in', priv_key_file_path, '-pubout', '-outform', 'pem', '-out', pub_key_file_path].execute()
         process.waitForProcessOutput(stdout, stderr)
         if(process.exitValue()) {
-            throw new JervisException(stderr.toString())
+            throw new KeyGenerationException(stderr.toString())
         }
     }
 
@@ -234,7 +236,7 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       @param  plaintext A plain text <tt>String</tt> to be encrypted.
       @return A Base64 encoded cipher text or more generically: <tt>ciphertext = base64encode(RSAPublicKeyEncrypt(plaintext))</tt>
      */
-    public String rsaEncrypt(String plaintext) throws JervisException {
+    public String rsaEncrypt(String plaintext) throws EncryptException {
         def stdout = new StringBuilder()
         def stderr = new StringBuilder()
         def proc1 = ['echo', plaintext.trim()].execute()
@@ -244,7 +246,7 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
         proc2.waitForProcessOutput(null, stderr)
         proc3.waitForProcessOutput(stdout, null)
         if(proc2.exitValue()) {
-            throw new JervisException(stderr.toString())
+            throw new EncryptException(stderr.toString())
         }
         else {
             return stdout.toString().trim()
@@ -261,7 +263,7 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       @param  ciphertext A Base64 encoded cipher text <tt>String</tt> to be decrypted.
       @return A plain text <tt>String</tt> or more generically: <tt>plaintext = RSAPrivateKeyDecrypt(base64decode(ciphertext))</tt>
      */
-    public String rsaDecrypt(String ciphertext) throws JervisException {
+    public String rsaDecrypt(String ciphertext) throws DecryptException {
         def stdout = new StringBuilder()
         def stderr = new StringBuilder()
         def proc1 = ['echo', '-n', ciphertext.trim()].execute()
@@ -270,7 +272,7 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
         proc1 | proc2 | proc3
         proc3.waitForProcessOutput(stdout, stderr)
         if(proc3.exitValue()) {
-            throw new JervisException(stderr.toString())
+            throw new DecryptException(stderr.toString())
         }
         else {
             return stdout.toString().trim()

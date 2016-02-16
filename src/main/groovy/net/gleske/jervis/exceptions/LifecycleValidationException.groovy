@@ -28,7 +28,7 @@ class LifecycleValidationException extends JervisException {
     private static String wiki_page = wikiPages.lifecycles_spec
 
     /**
-      Throw a <tt>LifecycleValidationException</tt>
+      Throw a <tt>LifecycleValidationException</tt>.
 
       @param message A simple message that will be prepended with <tt>'ERROR: Lifecycle validation failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.wikiPages#lifecycles_spec}</tt>.
      */
