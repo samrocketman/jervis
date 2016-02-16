@@ -1,3 +1,9 @@
+# jervis 0.4
+
+* Better support for secure fields (encrypted values in YAML files).  [See issue
+  #64][#64].
+* Support for four new languages: `c`, `cpp`, `go`, and `node_js`.
+
 # jervis 0.3
 
 * Implement friendly matrix labels which allow Jenkins matrix jobs to have
@@ -17,5 +23,6 @@
 * Fully generated `groovydoc`.
 * At least 80% test coverage.
 
+[#64]: https://github.com/samrocketman/jervis/issues/64
 [#68]: https://github.com/samrocketman/jervis/issues/68
 [#70]: https://github.com/samrocketman/jervis/issues/70
