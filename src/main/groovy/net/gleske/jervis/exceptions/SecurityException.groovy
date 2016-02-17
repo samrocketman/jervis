@@ -31,7 +31,7 @@ class SecurityException extends JervisException {
     /**
       Throw a <tt>SecurityException</tt>.
 
-      @param message A simple message that will be prepended with <tt>'ERROR: An encryption related issue occured.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.wikiPages#secure_secrets}</tt>.
+      @param message A simple message that will be prepended with <tt>'ERROR: An encryption related issue occurred.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.wikiPages#secure_secrets}</tt>.
      */
     def SecurityException(String message) {
         super('\nERROR: An encryption related issue occured.  ' + message + ['\n\nSee wiki page:', wiki_page,'\n'].join('\n'))
