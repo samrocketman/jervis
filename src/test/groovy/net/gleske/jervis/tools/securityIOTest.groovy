@@ -17,22 +17,37 @@ package net.gleske.jervis.tools
 //the securityIOTest() class automatically sees the securityIO() class because they're in the same package
 import java.nio.file.Files
 import java.nio.file.Path
-import net.gleske.jervis.exceptions.JervisException
+import net.gleske.jervis.exceptions.DecryptException
+import net.gleske.jervis.exceptions.EncryptException
+import net.gleske.jervis.exceptions.KeyGenerationException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
 class securityIOTest extends GroovyTestCase {
+    def jervis_tmp
     def security
     //set up before every test
     @Before protected void setUp() {
-        security = new securityIO()
+        jervis_tmp = Files.createTempDirectory('Jervis_Testing_')
+        security = new securityIO(jervis_tmp.toString())
     }
     //tear down after every test
     @After protected void tearDown() {
+        //Path.deleteDir() method was introduced in Groovy 2.3.11 and later
+        //jervis_tmp.deleteDir()
+        //we must support Groovy 1.8.9 and later due to a Jenkins limitation
+        def stderr = new StringBuilder()
+        def proc = ['rm','-rf',jervis_tmp.toString()].execute()
+        proc.waitForProcessOutput(null, stderr)
+        if(proc.exitValue()) {
+            throw new IOException(stderr.toString())
+        }
+        jervis_tmp = null
         security = null
     }
     @Test public void test_securityIO_init_default() {
+        security = new securityIO()
         assert '/tmp/id_rsa.pem' == security.id_rsa_priv
         assert '/tmp/id_rsa.pub.pem' == security.id_rsa_pub
         assert security.default_key_size == security.id_rsa_keysize
@@ -89,57 +104,34 @@ class securityIOTest extends GroovyTestCase {
         assert 'ZGF0YQ==' == security.encodeBase64('data'.bytes)
     }
     @Test public void test_securityIO_generate_rsa_pair() {
-        //generate keys based on a random tmp dir
-        Path jervis_tmp = Files.createTempDirectory('Jervis_Testing_')
-        security = new securityIO(jervis_tmp.toString())
-        //test the things
         security.generate_rsa_pair()
         assert true == (new File(jervis_tmp.toString() + '/id_rsa.pem')).exists()
         assert true == (new File(jervis_tmp.toString() + '/id_rsa.pub.pem')).exists()
-        shouldFail(JervisException) {
+        shouldFail(KeyGenerationException) {
             security.generate_rsa_pair(jervis_tmp.toString(), security.id_rsa_pub, security.id_rsa_keysize)
         }
-        shouldFail(JervisException) {
+        shouldFail(KeyGenerationException) {
             security.generate_rsa_pair(security.id_rsa_priv, jervis_tmp.toString(), security.id_rsa_keysize)
-        }
-        //clean up the tmp dir
-        def stdout = new StringBuilder()
-        def stderr = new StringBuilder()
-        def proc = ['rm','-rf',jervis_tmp.toString()].execute()
-        proc.waitForProcessOutput(stdout, stderr)
-        if(proc.exitValue()) {
-            throw new IOException(stderr.toString())
         }
     }
     @Test public void test_securityIO_rsaEncrypt_rsaDecrypt() {
-        //generate keys based on a random tmp dir
-        Path jervis_tmp = Files.createTempDirectory('Jervis_Testing_')
-        security = new securityIO(jervis_tmp.toString())
-        //test the things
         String plaintext = 'secret message'
         String ciphertext
         String decodedtext
         security.generate_rsa_pair()
-        assert true == (new File(jervis_tmp.toString() + '/id_rsa.pem')).exists()
-        assert true == (new File(jervis_tmp.toString() + '/id_rsa.pub.pem')).exists()
         ciphertext = security.rsaEncrypt(plaintext)
         assert ciphertext.length() > 0
         decodedtext = security.rsaDecrypt(ciphertext)
         assert plaintext == decodedtext
-        //clean up the tmp dir
-        def stdout = new StringBuilder()
-        def stderr = new StringBuilder()
-        def proc = ['rm','-rf',jervis_tmp.toString()].execute()
-        proc.waitForProcessOutput(stdout, stderr)
-        if(proc.exitValue()) {
-            throw new IOException(stderr.toString())
+    }
+    @Test public void test_securityIO_fail_rsaEncrypt() {
+        shouldFail(EncryptException) {
+            def ciphertext = security.rsaEncrypt('some text')
         }
-        //we have removed the jervis_tmp directory so these should fail
-        shouldFail(JervisException) {
-            ciphertext = security.rsaEncrypt('some text')
-        }
-        shouldFail(JervisException) {
-            decodedtext = security.rsaDecrypt('some text')
+    }
+    @Test public void test_securityIO_fail_rsaDecrypt() {
+        shouldFail(DecryptException) {
+            def decodedtext = security.rsaDecrypt('some text')
         }
     }
     @Test public void test_securityIO_isSecureField_map_nonsecure() {

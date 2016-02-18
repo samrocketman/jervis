@@ -14,6 +14,9 @@ ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.5'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
 
+//Apparently cobertura is only accurate at Java 1.6 byte code and earlier
+sourceCompatibility = 1.6
+
 apply from: 'file:gradle/groovydoc.gradle'
 
 println "Using Groovy ${groovyVersion}"
@@ -35,11 +38,20 @@ buildscript {
 configurations {
     libs
 }
+configurations.all {
+    resolutionStrategy {
+        //https://github.com/stevesaliman/gradle-cobertura-plugin/issues/56
+        // Cobertura includes an ASM version that can't handle Java 8, ASM 5.0.3 handles Java8
+        force 'org.ow2.asm:asm:5.0.4'
+        forcedModules = [ 'org.ow2.asm:asm:5.0.4' ]
+    }
+}
 
 repositories { mavenCentral() }
 dependencies {
     compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
     compile 'org.yaml:snakeyaml:1.16'
+    compile 'org.ow2.asm:asm:5.0.4'
     testCompile 'junit:junit:4.12'
     libs 'org.yaml:snakeyaml:1.16'
 }
@@ -57,8 +69,9 @@ test {
   minHeapSize = '128m'
   maxHeapSize = '512m'
 
+  //MaxPermSize was removed from Java 1.8
   // set JVM arguments for the test JVM(s)
-  jvmArgs '-XX:MaxPermSize=256m'
+  //jvmArgs '-XX:MaxPermSize=256m'
 
   // listen to events in the test execution lifecycle
   beforeTest { descriptor ->
@@ -98,7 +111,7 @@ test.finalizedBy(project.tasks.cobertura)
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 //generate gradlew with: gradle wrapper
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.2.1'
+    gradleVersion = '2.11'
 }
 
 //Maven Central uploads

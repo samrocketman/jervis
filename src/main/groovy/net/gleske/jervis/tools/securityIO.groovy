@@ -205,15 +205,14 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       @param keysize            The key size in bits of the key pair.
      */
     public void generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize) throws KeyGenerationException {
-        def stdout = new StringBuilder()
-        def stderr = new StringBuilder()
-        def process = ['openssl', 'genrsa', '-out', priv_key_file_path, keysize.toString()].execute()
-        process.waitForProcessOutput(stdout, stderr)
+        StringBuilder stderr = new StringBuilder()
+        Process process = ['openssl', 'genrsa', '-out', priv_key_file_path, keysize.toString()].execute()
+        process.waitForProcessOutput(null, stderr)
         if(process.exitValue()) {
             throw new KeyGenerationException(stderr.toString())
         }
         process = ['openssl', 'rsa', '-in', priv_key_file_path, '-pubout', '-outform', 'pem', '-out', pub_key_file_path].execute()
-        process.waitForProcessOutput(stdout, stderr)
+        process.waitForProcessOutput(null, stderr)
         if(process.exitValue()) {
             throw new KeyGenerationException(stderr.toString())
         }
@@ -237,11 +236,12 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       @return A Base64 encoded cipher text or more generically: <tt>ciphertext = base64encode(RSAPublicKeyEncrypt(plaintext))</tt>
      */
     public String rsaEncrypt(String plaintext) throws EncryptException {
+        //build a list of processes to pipe
         def stdout = new StringBuilder()
         def stderr = new StringBuilder()
-        def proc1 = ['echo', plaintext.trim()].execute()
-        def proc2 = ['openssl', 'rsautl', '-encrypt', '-inkey', id_rsa_pub, '-pubin'].execute()
-        def proc3 = ['base64','-w0'].execute()
+        Process proc1 = ['echo', plaintext.trim()].execute()
+        Process proc2 = ['openssl', 'rsautl', '-encrypt', '-inkey', id_rsa_pub, '-pubin'].execute()
+        Process proc3 = ['openssl','enc', '-base64', '-A'].execute()
         proc1 | proc2 | proc3
         proc2.waitForProcessOutput(null, stderr)
         proc3.waitForProcessOutput(stdout, null)
@@ -266,9 +266,9 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
     public String rsaDecrypt(String ciphertext) throws DecryptException {
         def stdout = new StringBuilder()
         def stderr = new StringBuilder()
-        def proc1 = ['echo', '-n', ciphertext.trim()].execute()
-        def proc2 = ['base64','-d'].execute()
-        def proc3 = ['openssl', 'rsautl', '-decrypt', '-inkey', id_rsa_priv].execute()
+        Process proc1 = ['echo', '-n', ciphertext.trim()].execute()
+        Process proc2 = ['openssl', 'enc', '-base64', '-A', '-d'].execute()
+        Process proc3 = ['openssl', 'rsautl', '-decrypt', '-inkey', id_rsa_priv].execute()
         proc1 | proc2 | proc3
         proc3.waitForProcessOutput(stdout, stderr)
         if(proc3.exitValue()) {
