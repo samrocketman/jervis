@@ -1,3 +1,13 @@
+# jervis 0.5
+
+* Support for Mac OS X.
+* Support for building with Java 1.8.
+* Upgrade Gradle to 2.11.
+* securityIO unit testing has been cleaned up.
+* General improvements to securityIO class.
+* Force Java 1.6 byte code so cobertura reports are accurate for all versions of
+  groovy.
+
 # jervis 0.4
 
 * Better support for secure fields (encrypted values in YAML files).  [See issue
