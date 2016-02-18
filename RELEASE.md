@@ -22,6 +22,7 @@ ossrhPassword=secret
 - [ ] Ensure groovydoc API is fully documented.
 - [ ] Update wiki documentation for release.
 - [ ] Update [CHANGELOG.md](CHANGELOG.md).
+- [ ] Update README maven and gradle examples to reflect latest version.
 
 ### Perform release
 
