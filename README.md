@@ -2,7 +2,7 @@
 
 * *Project status:* [released to maven central][maven-release].
 * *Currently Targeted platforms:*
-  * *Jenkins server host:* Linux
+  * *Jenkins server host:* Linux and Mac OS X
   * *Jobs on clients:* Linux only (Multi-platform capable)
 
 ##### What is Jervis?
@@ -103,7 +103,7 @@ include it in your build tool.
 <dependency>
   <groupId>net.gleske</groupId>
   <artifactId>jervis</artifactId>
-  <version>0.3</version>
+  <version>0.5</version>
   <type>pom</type>
 </dependency>
 ```
@@ -125,7 +125,7 @@ configurations {
 
 dependencies {
     libs 'org.yaml:snakeyaml:1.15'
-    libs 'net.gleske:jervis:0.3'
+    libs 'net.gleske:jervis:0.5'
 }
 
 clean {
@@ -158,9 +158,9 @@ must be done before you configure your Jenkins job to execute Job DSL scripts.
     See the License for the specific language governing permissions and
     limitations under the License.
 
-[jenkins]: https://jenkins-ci.org/
 [jenkins-plugin-docker]: https://wiki.jenkins-ci.org/display/JENKINS/Docker+Plugin
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
+[jenkins]: https://jenkins-ci.org/
 [jervis-api-docs]: http://sam.gleske.net/jervis-api/
 [jervis-coveralls]: https://coveralls.io/r/samrocketman/jervis?branch=master
 [jervis-docker]: https://github.com/samrocketman/docker-jenkins-jervis
@@ -168,9 +168,9 @@ must be done before you configure your Jenkins job to execute Job DSL scripts.
 [jervis-travis]: https://travis-ci.org/samrocketman/jervis
 [jervis-versioneye]: https://www.versioneye.com/user/projects/54f2a1cc4f3108959a0007f1
 [jervis-wiki-build-tools]: https://github.com/samrocketman/jervis/wiki/Supported-Tools
-[jervis-wiki]: https://github.com/samrocketman/jervis/wiki
 [jervis-wiki-languages]: https://github.com/samrocketman/jervis/wiki/Supported-Languages
 [jervis-wiki-overview]: https://github.com/samrocketman/jervis/wiki/Build-overview
+[jervis-wiki]: https://github.com/samrocketman/jervis/wiki
 [json-lifecycles]: src/main/resources/lifecycles.json
 [json-platforms]: src/main/resources/platforms.json
 [json-toolchains]: src/main/resources/toolchains.json
@@ -179,8 +179,8 @@ must be done before you configure your Jenkins job to execute Job DSL scripts.
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=master
 [status-coverage]: https://coveralls.io/repos/samrocketman/jervis/badge.svg?branch=master
 [status-versioneye]: https://www.versioneye.com/user/projects/54f2a1cc4f3108959a0007f1/badge.svg?style=flat
-[travis]: https://travis-ci.org/
 [travis-yaml]: http://docs.travis-ci.com/user/build-configuration/
+[travis]: https://travis-ci.org/
 [watch-repo]: https://help.github.com/articles/watching-repositories/
 [wiki-ci]: https://en.wikipedia.org/wiki/Continuous_integration
 [wiki-os]: http://en.m.wikipedia.org/wiki/Open_source
