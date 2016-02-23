@@ -561,4 +561,10 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         //decrypted plain text
         assert generator.plainlist[0]['secret'].equals('plaintext')
     }
+    @Test public void test_lifecycleGenerator_null_env_key() {
+        //this should not generate an exception
+        generator.loadYamlString('language: java\njdk:')
+        generator.generateAll()
+        assert '#\n# TOOLCHAINS SECTION\n#\n#env toolchain section\n#jdk toolchain section\nsome commands\n'.equals(generator.generateToolchainSection())
+    }
 }

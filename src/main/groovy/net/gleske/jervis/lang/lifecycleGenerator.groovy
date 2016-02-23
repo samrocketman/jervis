@@ -315,6 +315,13 @@ class lifecycleGenerator {
     public void loadYamlString(String raw_yaml) throws JervisException, UnsupportedLanguageException {
         def yaml = new Yaml()
         jervis_yaml = yaml.load(raw_yaml)
+        //remove any empty YAML keys to fix null key bug
+        def iterator = jervis_yaml.entrySet().iterator()
+        while(iterator.hasNext()) {
+            if(iterator.next().value == null) {
+                iterator.remove()
+            }
+        }
         yaml_keys = jervis_yaml.keySet() as String[]
         if(jervis_yaml['language']) {
             yaml_language = jervis_yaml['language']
