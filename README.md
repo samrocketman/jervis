@@ -30,7 +30,7 @@ The documentation can be found in `build/docs/groovydoc`.
 
 * Bootstrapping Jenkins: Example [bootstrap for
   Jenkins][jervis-jenkins-bootstrap] which allows you to quickly try out this
-  libray.
+  library.
 * Job DSL Script: [Example Job DSL script](jobs/firstjob_dsl.groovy) is
   provided.
 * Jenkins build node: There's also a [docker container][jervis-docker] designed
