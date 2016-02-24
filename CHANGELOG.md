@@ -1,3 +1,7 @@
+# jervis 0.5.1
+
+* Bugfix a blank yaml key causing the library to throw an exception.
+
 # jervis 0.5
 
 * Support for Mac OS X.
