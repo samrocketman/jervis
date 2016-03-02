@@ -15,7 +15,10 @@ ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
 
 //Apparently cobertura is only accurate at Java 1.6 byte code and earlier
-sourceCompatibility = 1.6
+//However, this caused a bug that if this library is used on JDK7+ and then
+//throws a groovy exception.  Instead, an IncompatibleClassChangeError is thrown.
+//http://blog.proxerd.pl/article/how-to-fix-incompatibleclasschangeerror-for-your-groovy-projects-running-on-jdk7
+//sourceCompatibility = 1.6
 
 apply from: 'file:gradle/groovydoc.gradle'
 
