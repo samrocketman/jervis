@@ -1,3 +1,10 @@
+# jervis 0.6
+
+* `GitHub.fetch()` function is now public and supported as an API.
+* `GitHub.isUser()` function is a new API function which checks if a user is in
+  fact a user or an organization.
+* Bugfix mock for GitHubTest class not properly throwing a 404 on missing files.
+
 # jervis 0.5.2
 
 * Bugfix IncompatibleClassChangeError exception on JDK7
