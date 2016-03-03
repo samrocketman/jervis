@@ -24,6 +24,7 @@ apply from: 'file:gradle/groovydoc.gradle'
 
 println "Using Groovy ${groovyVersion}"
 println "Using Gradle ${GradleVersion.current().getVersion()}"
+println "Using Java ${org.gradle.internal.jvm.Jvm.current()}"
 println "Building jervis-${version}"
 
 buildscript {
