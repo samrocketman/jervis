@@ -100,18 +100,21 @@ class GitHub implements JervisRemote {
      */
 
     /**
-      Fetches a URL.  This function is meant to be private used by the API under the
-      hood.
-      @param addr A web address to fetch.  The URL must return JSON content.
-      @return     A <tt>Map</tt> from the parsed JSON response.
+      Fetches a <tt>{@link URL}</tt> from GitHub API.  This is mostly used by other
+      functions to provide minimum functionality defined in
+      <tt>{@link JervisRemote}</tt>.  It can be used for general GitHub API
+      communication.
+      @param path A GitHub API path to fetch.  The URL must return JSON content.
+                  e.g. <tt>user/repos</tt>.
+      @return     A <tt>Map</tt> or <tt>List</tt> from the parsed JSON response.
     */
-    private fetch(String addr) {
+    public Object fetch(String path) {
         def json = new JsonSlurper()
         if(this.gh_token) {
-            return json.parse(new URL(addr).newReader(requestProperties: ['Authorization': "token ${this.gh_token}".toString(), 'Accept': 'application/vnd.github.v3+json']))
+            return json.parse(new URL(this.gh_api + path).newReader(requestProperties: ['Authorization': "token ${this.gh_token}".toString(), 'Accept': 'application/vnd.github.v3+json']))
         }
         else {
-            return json.parse(new URL(addr).newReader(requestProperties: ['Accept': 'application/vnd.github.v3+json']))
+            return json.parse(new URL(this.gh_api + path).newReader(requestProperties: ['Accept': 'application/vnd.github.v3+json']))
         }
     }
 
@@ -148,7 +151,7 @@ class GitHub implements JervisRemote {
         List parsed = ['']
         int count = 1
         while(parsed.size() > 0) {
-            parsed = this.fetch(this.gh_api + "repos/${project}/branches?page=${count}")
+            parsed = this.fetch("repos/${project}/branches?page=${count}")
             parsed.each { list << it.name }
             count++
         }
@@ -164,7 +167,7 @@ class GitHub implements JervisRemote {
       @returns            A <tt>String</tt> which contains the contents of the file requested.
     */
     public String getFile(String project, String file_path, String ref) {
-        def response = this.fetch(this.gh_api + "repos/${project}/contents/${file_path}?ref=${ref}")
+        def response = this.fetch("repos/${project}/contents/${file_path}?ref=${ref}")
         def security = new securityIO()
         return security.decodeBase64String(response['content'])
     }
@@ -182,7 +185,7 @@ class GitHub implements JervisRemote {
             dir_path = '/' + dir_path
         }
         ArrayList listing = []
-        def response = this.fetch(this.gh_api + "repos/${project}/contents${dir_path}?ref=${ref}")
+        def response = this.fetch("repos/${project}/contents${dir_path}?ref=${ref}")
         response.each {
             listing << it.name
         }
