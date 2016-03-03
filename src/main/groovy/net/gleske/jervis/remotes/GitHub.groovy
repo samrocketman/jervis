@@ -205,4 +205,13 @@ class GitHub implements JervisRemote {
             return 'GitHub Enterprise'
         }
     }
+
+    /**
+      Check with the GitHub API and determine if the passed in <tt>user</tt> is a User or an Organization.
+      @param user A user name or organization name to test if it is a user.
+      @returns <tt>true</tt> if it is a user or <tt>false</tt> if it is not a user.
+     */
+    public boolean isUser(String user) {
+        return 'User'.equals(this.fetch("users/${user}")['type'])
+    }
 }

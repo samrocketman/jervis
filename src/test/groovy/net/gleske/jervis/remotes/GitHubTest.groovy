@@ -41,25 +41,35 @@ class GitHubTest extends GroovyTestCase {
         mc.newReader = {
             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
             String file = this.url.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
-            URL resource_url = this.getClass().getResource("/mocks/${file}");
-            def resource = new File(resource_url.getFile())
-            if(resource.isFile()) {
-                return resource.newReader()
+            try {
+                URL resource_url = this.getClass().getResource("/mocks/${file}");
+                def resource = new File(resource_url.getFile())
+                if(resource.isFile()) {
+                    return resource.newReader()
+                }
+                else {
+                    throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
+                }
             }
-            else {
-                throw new RuntimeException("[404] Not Found - ${resource}")
+            catch(Exception e) {
+                throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
             }
         }
         mc.newReader = { Map parameters ->
             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
             String file = this.url.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
-            URL resource_url = this.getClass().getResource("/mocks/${file}");
-            def resource = new File(resource_url.getFile())
-            if(resource.isFile()) {
-                return resource.newReader()
+            try {
+                URL resource_url = this.getClass().getResource("/mocks/${file}");
+                def resource = new File(resource_url.getFile())
+                if(resource.isFile()) {
+                    return resource.newReader()
+                }
+                else {
+                    throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
+                }
             }
-            else {
-                throw new RuntimeException("[404] Not Found - ${resource}")
+            catch(Exception e) {
+                throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
             }
         }
     }
@@ -170,5 +180,9 @@ class GitHubTest extends GroovyTestCase {
     @Test public void test_GitHub_getFolderListing() {
         assert ['.gitignore', '.travis.yml', 'LICENSE', 'README.md', 'build.gradle', 'src'] == mygh.getFolderListing('samrocketman/jervis','/','master')
         assert ['main', 'resources', 'test'] == mygh.getFolderListing('samrocketman/jervis','src','master')
+    }
+    @Test public void test_GitHub_isUser() {
+        assert true == mygh.isUser("samrocketman")
+        assert false == mygh.isUser("jenkinsci")
     }
 }
