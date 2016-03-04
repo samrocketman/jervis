@@ -124,7 +124,7 @@ configurations {
 }
 
 dependencies {
-    libs 'org.yaml:snakeyaml:1.15'
+    libs 'org.yaml:snakeyaml:1.17'
     libs 'net.gleske:jervis:0.6'
 }
 
