@@ -425,6 +425,11 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert 'default'.equals(generator.getObjectValue(example, 'key2.subkey1', 'default'))
         assert 2.equals(generator.getObjectValue(example, 'key1.subkey1', 2))
     }
+    @Test public void test_lifecycleGenerator_getObjectValue_type_bug() {
+        Map example = [key1: [subkey1: 'string'],key2: ["a", "b"]]
+        assert 'default'.equals(generator.getObjectValue(example, 'key1', 'default'))
+        assert 'default'.equals(generator.getObjectValue(example, 'key2', 'default'))
+    }
     @Test public void test_lifecycleGenerator_loadPlatforms() {
         assert null.equals(generator.platform_obj)
         URL url = this.getClass().getResource('/good_platforms_simple.json');

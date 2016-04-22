@@ -811,7 +811,12 @@ env:
         //try returning the value casted as the same type as defaultValue
         try {
             if(object.get(key) != null) {
-                return object.get(key).asType(defaultValue.getClass())
+                if((defaultValue instanceof String) && ((object.get(key) instanceof Map) || (object.get(key) instanceof List))) {
+                    return defaultValue
+                }
+                else {
+                    return object.get(key).asType(defaultValue.getClass())
+                }
             }
         }
         catch(Exception e) {}
