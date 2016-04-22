@@ -1,3 +1,17 @@
+# jervis 0.7
+
+* Bugfix urlencoding references.  This improves fetching branches with special
+  characters.  [See issue #77][#77]
+* Bugfix getObjectValue String vs Map.  [See issue #78][#78]
+* Make more use of lifecycleGenerator.generateSection() method.  Fewer unit
+  tests are required.
+* Upgrade ASM to 5.1 so all dependencies are up-to-date.
+* The changes in this version makes it easy to use the collapsable console
+  plugin for Jenkins.  This visually creates sections.  e.g.
+  * Section name: `{1}`
+  * Section starts with: `^\# ([^ ]+ [^ ]+)$`
+  * Section ends with: `^\$ set \+x$`
+
 # jervis 0.6
 
 * `GitHub.fetch()` function is now public and supported as an API.
@@ -51,3 +65,5 @@
 [#64]: https://github.com/samrocketman/jervis/issues/64
 [#68]: https://github.com/samrocketman/jervis/issues/68
 [#70]: https://github.com/samrocketman/jervis/issues/70
+[#77]: https://github.com/samrocketman/jervis/issues/77
+[#78]: https://github.com/samrocketman/jervis/issues/78
