@@ -46,8 +46,8 @@ configurations.all {
     resolutionStrategy {
         //https://github.com/stevesaliman/gradle-cobertura-plugin/issues/56
         // Cobertura includes an ASM version that can't handle Java 8, ASM 5.0.3 handles Java8
-        force 'org.ow2.asm:asm:5.0.4'
-        forcedModules = [ 'org.ow2.asm:asm:5.0.4' ]
+        force 'org.ow2.asm:asm:5.1'
+        forcedModules = [ 'org.ow2.asm:asm:5.1' ]
     }
 }
 
@@ -55,7 +55,7 @@ repositories { mavenCentral() }
 dependencies {
     compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
     compile 'org.yaml:snakeyaml:1.17'
-    compile 'org.ow2.asm:asm:5.0.4'
+    compile 'org.ow2.asm:asm:5.1'
     testCompile 'junit:junit:4.12'
     libs 'org.yaml:snakeyaml:1.17'
 }
