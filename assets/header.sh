@@ -1,5 +1,6 @@
 #!/bin/bash -l
 export PS4='$ '
+echo '# ENVIRONMENT SECTION'
 echo -n "Hostname: "
 hostname
 echo -n "Distro: "

@@ -245,22 +245,22 @@ class lifecycleGeneratorTest extends GroovyTestCase {
     @Test public void test_lifecycleGenerator_generateToolchainSection_matrix() {
         //basic env matrix
         generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         //using jdk as matrix
         generator.loadYamlString('language: ruby\njdk: [openjdk6, openjdk7]')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\ncase ${jdk} in\n  jdk0)\n    more commands\n    ;;\n  jdk1)\n    some commands\n    ;;\nesac\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\ncase ${jdk} in\n  jdk0)\n    more commands\n    ;;\n  jdk1)\n    some commands\n    ;;\nesac\n' == generator.generateToolchainSection()
         //advanced env section which has a matrix section
         generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         generator.loadYamlString('language: ruby\nenv:\n  matrix: {hello: three}')
         shouldFail(UnsupportedToolException) {
             generator.generateToolchainSection()
         }
         ///advanced env section which has a matrix and global section
         generator.loadYamlString('language: ruby\nenv:\n  global: foobar=foo\n  matrix: [world=hello, world=goodbye]')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foobar=foo\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foobar=foo\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         generator.loadYamlString('language: ruby\nenv:\n  global: [foobar=foo, foobar=bar]\n  matrix: [world=hello, world=goodbye]')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foobar=foo\nexport foobar=bar\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foobar=foo\nexport foobar=bar\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         generator.loadYamlString('language: ruby\nenv:\n  global: {hello: three}')
         shouldFail(UnsupportedToolException) {
             generator.generateToolchainSection()
@@ -274,26 +274,26 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         URL url = this.getClass().getResource('/good_toolchains_friendly.json');
         generator.loadToolchains(url.getFile())
         generator.loadYamlString('language: ruby\njdk: [openjdk6, openjdk7]')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\ncase ${jdk} in\n  jdk:openjdk6)\n    more commands\n    ;;\n  jdk:openjdk7)\n    some commands\n    ;;\nesac\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\ncase ${jdk} in\n  jdk:openjdk6)\n    more commands\n    ;;\n  jdk:openjdk7)\n    some commands\n    ;;\nesac\n' == generator.generateToolchainSection()
     }
     @Test public void test_lifecycleGenerator_generateToolchainSection_nonmatrix() {
         //basic language test
         generator.loadYamlString('language: ruby')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         //configuring basic env toolchain
         generator.loadYamlString('language: ruby\nenv: foo=bar')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         //test for env toolchain as an ArrayList
         generator.loadYamlString('language: ruby\nenv:\n  - foo=bar')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         //configuring basic jdk toolchain
         generator.loadYamlString('language: ruby\njdk: openjdk7')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         //testing env global value for non-matrix configuration
         generator.loadYamlString('language: ruby\nenv:\n  global: foo=bar')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         generator.loadYamlString('language: ruby\nenv:\n  global: [foo=bar]')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         //testing for env global throwing an exception for non-matrix configuration
         generator.loadYamlString('language: ruby\nenv:\n  global: {hello: three}')
         shouldFail(UnsupportedToolException) {
@@ -301,9 +301,9 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         }
         //testing env matrix value for non-matrix configuration
         generator.loadYamlString('language: ruby\nenv:\n  matrix: foo=bar')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         generator.loadYamlString('language: ruby\nenv:\n  matrix: [foo=bar]')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         //testing for exceptions
         generator.loadYamlString('language: ruby\njdk: derp')
         shouldFail(UnsupportedToolException) {
@@ -314,71 +314,31 @@ class lifecycleGeneratorTest extends GroovyTestCase {
             generator.generateToolchainSection()
         }
     }
-    @Test public void test_lifecycleGenerator_generateBeforeInstall() {
+    @Test public void test_lifecycleGenerator_generateSection_beforeInstall() {
         generator.loadYamlString('language: ruby')
-        assert '' == generator.generateBeforeInstall()
+        assert '' == generator.generateSection('before_install')
         generator.loadYamlString('language: ruby\nbefore_install: some code')
-        assert '#\n# BEFORE_INSTALL SECTION\n#\nsome code\n' == generator.generateBeforeInstall()
+        assert '#\n# BEFORE_INSTALL SECTION\n#\nset +x\necho \'# BEFORE_INSTALL SECTION\'\nset -x\nsome code\n' == generator.generateSection('before_install')
         generator.loadYamlString('language: ruby\nbefore_install:\n - some code\n - more code')
-        assert '#\n# BEFORE_INSTALL SECTION\n#\nsome code\nmore code\n' == generator.generateBeforeInstall()
+        assert '#\n# BEFORE_INSTALL SECTION\n#\nset +x\necho \'# BEFORE_INSTALL SECTION\'\nset -x\nsome code\nmore code\n' == generator.generateSection('before_install')
     }
-    @Test public void test_lifecycleGenerator_generateInstall() {
+    @Test public void test_lifecycleGenerator_generateSection_install() {
         generator.loadYamlString('language: ruby')
-        assert '#\n# INSTALL SECTION\n#\nbundle install --jobs=3 --retry=3\n' == generator.generateInstall()
+        assert '#\n# INSTALL SECTION\n#\nset +x\necho \'# INSTALL SECTION\'\nset -x\nbundle install --jobs=3 --retry=3\n' == generator.generateSection('install')
         generator.loadYamlString('language: ruby\ninstall: some code')
-        assert '#\n# INSTALL SECTION\n#\nsome code\n' == generator.generateInstall()
+        assert '#\n# INSTALL SECTION\n#\nset +x\necho \'# INSTALL SECTION\'\nset -x\nsome code\n' == generator.generateSection('install')
         generator.loadYamlString('language: ruby\ninstall:\n - some code\n - more code')
-        assert '#\n# INSTALL SECTION\n#\nsome code\nmore code\n' == generator.generateInstall()
-    }
-    @Test public void test_lifecycleGenerator_generateBeforeScript() {
-        generator.loadYamlString('language: ruby')
-        assert '' == generator.generateBeforeScript()
-        generator.loadYamlString('language: ruby\nbefore_script: some code')
-        assert '#\n# BEFORE_SCRIPT SECTION\n#\nsome code\n' == generator.generateBeforeScript()
-        generator.loadYamlString('language: ruby\nbefore_script:\n - some code\n - more code')
-        assert '#\n# BEFORE_SCRIPT SECTION\n#\nsome code\nmore code\n' == generator.generateBeforeScript()
-    }
-    @Test public void test_lifecycleGenerator_generateScript() {
-        generator.loadYamlString('language: ruby')
-        assert '#\n# SCRIPT SECTION\n#\nbundle exec rake\n' == generator.generateScript()
-        generator.loadYamlString('language: ruby\nscript: some code')
-        assert '#\n# SCRIPT SECTION\n#\nsome code\n' == generator.generateScript()
-        generator.loadYamlString('language: ruby\nscript:\n - some code\n - more code')
-        assert '#\n# SCRIPT SECTION\n#\nsome code\nmore code\n' == generator.generateScript()
-    }
-    @Test public void test_lifecycleGenerator_generateAfterSuccess() {
-        generator.loadYamlString('language: ruby')
-        assert '' == generator.generateAfterSuccess()
-        generator.loadYamlString('language: ruby\nafter_success: some code')
-        assert '#\n# AFTER_SUCCESS SECTION\n#\nsome code\n' == generator.generateAfterSuccess()
-        generator.loadYamlString('language: ruby\nafter_success:\n - some code\n - more code')
-        assert '#\n# AFTER_SUCCESS SECTION\n#\nsome code\nmore code\n' == generator.generateAfterSuccess()
-    }
-    @Test public void test_lifecycleGenerator_generateAfterFailure() {
-        generator.loadYamlString('language: ruby')
-        assert '' == generator.generateAfterFailure()
-        generator.loadYamlString('language: ruby\nafter_failure: some code')
-        assert '#\n# AFTER_FAILURE SECTION\n#\nsome code\n' == generator.generateAfterFailure()
-        generator.loadYamlString('language: ruby\nafter_failure:\n - some code\n - more code')
-        assert '#\n# AFTER_FAILURE SECTION\n#\nsome code\nmore code\n' == generator.generateAfterFailure()
-    }
-    @Test public void test_lifecycleGenerator_generateAfterScript() {
-        generator.loadYamlString('language: ruby')
-        assert '' == generator.generateAfterScript()
-        generator.loadYamlString('language: ruby\nafter_script: some code')
-        assert '#\n# AFTER_SCRIPT SECTION\n#\nsome code\n' == generator.generateAfterScript()
-        generator.loadYamlString('language: ruby\nafter_script:\n - some code\n - more code')
-        assert '#\n# AFTER_SCRIPT SECTION\n#\nsome code\nmore code\n' == generator.generateAfterScript()
+        assert '#\n# INSTALL SECTION\n#\nset +x\necho \'# INSTALL SECTION\'\nset -x\nsome code\nmore code\n' == generator.generateSection('install')
     }
     @Test public void test_lifecycleGenerator_generateAll() {
         generator.loadYamlString('language: ruby')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n\n#\n# INSTALL SECTION\n#\nbundle install --jobs=3 --retry=3\n\n#\n# SCRIPT SECTION\n#\nbundle exec rake\n' == generator.generateAll()
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n\n#\n# INSTALL SECTION\n#\nset +x\necho \'# INSTALL SECTION\'\nset -x\nbundle install --jobs=3 --retry=3\n\n#\n# SCRIPT SECTION\n#\nset +x\necho \'# SCRIPT SECTION\'\nset -x\nbundle exec rake\n' == generator.generateAll()
     }
     @Test public void test_lifecycleGenerator_boolean_bug() {
         generator.loadYamlString('language: ruby\ninstall: true')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n\n#\n# INSTALL SECTION\n#\ntrue\n\n#\n# SCRIPT SECTION\n#\nbundle exec rake\n' == generator.generateAll()
+        assert '#\n# INSTALL SECTION\n#\nset +x\necho \'# INSTALL SECTION\'\nset -x\ntrue\n' == generator.generateSection('install')
         generator.loadYamlString('language: ruby\ninstall: [true,true]')
-        assert '#\n# TOOLCHAINS SECTION\n#\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n\n#\n# INSTALL SECTION\n#\ntrue\ntrue\n\n#\n# SCRIPT SECTION\n#\nbundle exec rake\n' == generator.generateAll()
+        assert '#\n# INSTALL SECTION\n#\nset +x\necho \'# INSTALL SECTION\'\nset -x\ntrue\ntrue\n' == generator.generateSection('install')
     }
     @Test public void test_lifecycleGenerator_isGenerateBranch() {
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - master')
@@ -565,6 +525,6 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         //this should not generate an exception
         generator.loadYamlString('language: java\njdk:')
         generator.generateAll()
-        assert '#\n# TOOLCHAINS SECTION\n#\n#env toolchain section\n#jdk toolchain section\nsome commands\n'.equals(generator.generateToolchainSection())
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#env toolchain section\n#jdk toolchain section\nsome commands\n'.equals(generator.generateToolchainSection())
     }
 }

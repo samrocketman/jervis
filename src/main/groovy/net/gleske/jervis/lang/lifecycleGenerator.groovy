@@ -577,7 +577,7 @@ env:
     public String generateToolchainSection() throws UnsupportedToolException {
         //get toolchain order for this language
         def toolchains_order = toolchain_obj.toolchains['toolchains'][yaml_language]
-        String output = '#\n# TOOLCHAINS SECTION\n#\n'
+        String output = '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n'
         toolchains_order.each {
             def toolchain = it
             String[] toolchain_keys = toolchain_obj.toolchains[toolchain].keySet() as String[]
@@ -676,12 +676,12 @@ env:
 
     /**
        A generic function to generate code for different sections of the build script.
-       @param header  A header message for the section being generated.
+       Typical sections include: before_install, install, before_script, script
        @param section A section from the build lifecycle.  e.g. before_install, install, before_script, script, etc.
        @return        Code generated from that section in the Jervis YAML, default from the lifecycles file, or returns an empty String.
      */
-    private String generateSection(String section) {
-        String output = "#\n# ${section.toUpperCase()} SECTION\n#\n"
+    public String generateSection(String section) {
+        String output = "#\n# ${section.toUpperCase()} SECTION\n#\nset +x\necho '# ${section.toUpperCase()} SECTION'\nset -x\n"
         def my_lifecycle = lifecycle_obj.lifecycles[yaml_language][lifecycle_key]
         String[] my_lifecycle_keys = my_lifecycle.keySet() as String[]
         if(!(section in yaml_keys)) {
@@ -709,69 +709,6 @@ env:
     }
 
     /**
-      Generate the <tt>before_install</tt> shell script based on the Jervis YAML or
-      taking defaults from the lifecycles file.
-      @return A portion of a bash script preparing for installing dependencies.
-     */
-    public String generateBeforeInstall() {
-        return this.generateSection('before_install')
-    }
-
-    /**
-      Generate the <tt>install</tt> shell script based on the Jervis YAML or taking
-      defaults from the lifecycles file.
-      @return A portion of a bash script which will install dependencies.
-     */
-    public String generateInstall() {
-        return this.generateSection('install')
-    }
-
-    /**
-      Generate the <tt>before_script</tt> shell script based on the Jervis YAML or
-      taking defaults from the lifecycles file.
-      @return A portion of a bash script preparing the system for running unit tests.
-     */
-    public String generateBeforeScript() {
-        return this.generateSection('before_script')
-    }
-
-    /**
-      Generate the <tt>script</tt> shell script based on the Jervis YAML or taking
-      defaults from the lifecycles file.
-      @return A portion of a bash script running unit tests.
-     */
-    public String generateScript() {
-        return this.generateSection('script')
-    }
-
-    /**
-      Generate the <tt>after_success</tt> shell script based on the Jervis YAML or
-      taking defaults from the lifecycles file.
-      @return A shell script which is executed after a successful build.
-     */
-    public String generateAfterSuccess() {
-        return this.generateSection('after_success')
-    }
-
-    /**
-      Generate the <tt>after_failure</tt> shell script based on the Jervis YAML or
-      taking defaults from the lifecycles file.
-      @return A shell script which is executed after a failed build.
-     */
-    public String generateAfterFailure() {
-        return this.generateSection('after_failure')
-    }
-
-    /**
-      Generate the <tt>after_script</tt> shell script based on the Jervis YAML or
-      taking defaults from the lifecycles file.
-      @return A shell script which is executed after every build.
-     */
-    public String generateAfterScript() {
-        return this.generateSection('after_script')
-    }
-
-    /**
       Generate the build script which would be used in the Jenkins step.  This
       function combines the output of: <tt>generateToolchainSection()</tt>,
       <tt>generateBeforeInstall()</tt>, <tt>generateInstall()</tt>,
@@ -781,10 +718,10 @@ env:
     public String generateAll() {
         List script = [
             generateToolchainSection(),
-            generateBeforeInstall(),
-            generateInstall(),
-            generateBeforeScript(),
-            generateScript()
+            generateSection('before_install'),
+            generateSection('install'),
+            generateSection('before_script'),
+            generateSection('script')
             ]
         return script.grep().join('\n')
     }
