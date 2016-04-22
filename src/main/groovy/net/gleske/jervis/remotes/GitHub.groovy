@@ -167,7 +167,7 @@ class GitHub implements JervisRemote {
       @returns            A <tt>String</tt> which contains the contents of the file requested.
     */
     public String getFile(String project, String file_path, String ref) {
-        def response = this.fetch("repos/${project}/contents/${file_path}?ref=${ref}")
+        def response = this.fetch("repos/${project}/contents/${file_path}?ref=${java.net.URLEncoder.encode(ref)}")
         def security = new securityIO()
         return security.decodeBase64String(response['content'])
     }
@@ -185,7 +185,7 @@ class GitHub implements JervisRemote {
             dir_path = '/' + dir_path
         }
         ArrayList listing = []
-        def response = this.fetch("repos/${project}/contents${dir_path}?ref=${ref}")
+        def response = this.fetch("repos/${project}/contents${dir_path}?ref=${java.net.URLEncoder.encode(ref)}")
         response.each {
             listing << it.name
         }
