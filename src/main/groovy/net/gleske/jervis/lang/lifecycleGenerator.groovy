@@ -314,7 +314,7 @@ class lifecycleGenerator {
      */
     public void loadYamlString(String raw_yaml) throws JervisException, UnsupportedLanguageException {
         def yaml = new Yaml()
-        jervis_yaml = yaml.load(raw_yaml)
+        jervis_yaml = yaml.load(raw_yaml)?: [:]
         //remove any empty YAML keys to fix null key bug
         def iterator = jervis_yaml.entrySet().iterator()
         while(iterator.hasNext()) {
@@ -872,7 +872,7 @@ env:
             throw new PlatformValidationException('Must load the platforms file first.')
         }
         def yaml = new Yaml()
-        jervis_yaml = yaml.load(raw_yaml)
+        jervis_yaml = yaml.load(raw_yaml)?: [:]
         this.label_platform = getObjectValue(jervis_yaml, 'jenkins.platform', platform_obj.platforms['defaults']['platform'])
         this.label_os = getObjectValue(jervis_yaml, 'jenkins.os', platform_obj.platforms['defaults']['os'])
         setLabel_stability(getObjectValue(jervis_yaml, 'jenkins.unstable', platform_obj.platforms['defaults']['stability']))
