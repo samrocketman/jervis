@@ -142,6 +142,12 @@ Then execute `./gradlew libs` to assemble dependencies into the `lib` directory
 of the Jenkins workspace.  Don't forget to add `lib` to the classpath.  This
 must be done before you configure your Jenkins job to execute Job DSL scripts.
 
+# Interactive debugging
+
+Groovy Console is built into the Gradle file.
+
+    ./gradlew console
+
 # License
 
     Copyright 2014-2016 Sam Gleske

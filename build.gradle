@@ -112,6 +112,12 @@ cobertura {
 }
 test.finalizedBy(project.tasks.cobertura)
 
+//http://swalsh.org/blog/2014/07/17/running-the-groovy-console-from-gradle/
+task( console, dependsOn: "classes", type: JavaExec ) {
+    main = "groovy.ui.Console"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 //generate gradlew with: gradle wrapper
 task wrapper(type: Wrapper) {
