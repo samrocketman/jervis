@@ -1,3 +1,7 @@
+# jervis 0.8
+
+* Bugfix NPE when Yaml returns null.  [See issue #80][#80]
+
 # jervis 0.7
 
 * Bugfix urlencoding references.  This improves fetching branches with special
@@ -68,4 +72,5 @@
 [#70]: https://github.com/samrocketman/jervis/issues/70
 [#77]: https://github.com/samrocketman/jervis/issues/77
 [#78]: https://github.com/samrocketman/jervis/issues/78
+[#80]: https://github.com/samrocketman/jervis/issues/80
 [ccs-plugin]: https://wiki.jenkins-ci.org/display/JENKINS/Collapsing+Console+Sections+Plugin
