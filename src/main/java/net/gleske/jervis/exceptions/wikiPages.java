@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
   A simple class, whose only purpose is to house static strings referencing the <a href="https://github.com/samrocketman/jervis/wiki" target="_blank">Jervis wiki</a>,
@@ -100,35 +100,35 @@ https://wiki.example.com/lifecycle_explanation.html
     at net.gleske.jervis.lang.lifecycleValidator.validate(lifecycleValidator.groovy:112)
     at net.gleske.jervis.lang.lifecycleValidator$validate$0.call(Unknown Source)</tt></pre>
  */
-class wikiPages {
+public class wikiPages {
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Supported-Languages" target="_blank">supported languages wiki page</a>.
      */
-    public static String supported_languages = 'https://github.com/samrocketman/jervis/wiki/Supported-Languages'
+    public static String supported_languages = "https://github.com/samrocketman/jervis/wiki/Supported-Languages";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Supported-Tools" target="_blank">supported tools wiki page</a>.
      */
-    public static String supported_tools = 'https://github.com/samrocketman/jervis/wiki/Supported-Tools'
+    public static String supported_tools = "https://github.com/samrocketman/jervis/wiki/Supported-Tools";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycles file spec wiki page</a>.
      */
-    public static String lifecycles_spec = 'https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file'
+    public static String lifecycles_spec = "https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file" target="_blank">toolchains file spec wiki page</a>.
      */
-    public static String toolchains_spec = 'https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file'
+    public static String toolchains_spec = "https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file" target="_blank">platforms file spec wiki page</a>.
      */
-    public static String platforms_spec = 'https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file'
+    public static String platforms_spec = "https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories" target="_blank">secure secrets in repositories wiki page</a>.
      */
-    public static String secure_secrets = 'https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file'
+    public static String secure_secrets = "https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file";
 }

@@ -13,23 +13,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
-  A group of exceptions that are thrown when undesireable script generation conditions occur.
+  The base exception class for Jervis from which all other exceptions derive.
 
   <h2>Sample usage</h2>
-<pre><tt>import net.gleske.jervis.exceptions.GeneratorException
-throw new GeneratorException('some text')</tt></pre><br>
+<pre><tt>import net.gleske.jervis.exceptions.JervisException
+throw new JervisException('some text')</tt></pre><br>
  */
-class GeneratorException extends JervisException {
+public class JervisException extends Exception {
 
     /**
-      Throw a <tt>GeneratorException</tt>.
+      Throw a <tt>JervisException</tt>.
 
       @param message A simple message.
      */
-    def GeneratorException(String message) {
-        super(message)
+    public JervisException(String message) {
+        super(message);
     }
 }

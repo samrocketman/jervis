@@ -13,23 +13,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
-  The base exception class for Jervis from which all other exceptions derive.
+  A type of <tt>{@link net.gleske.jervis.exceptions.PlatformValidationException}</tt> which is thrown when a platforms file key is referenced but missing.
 
   <h2>Sample usage</h2>
-<pre><tt>import net.gleske.jervis.exceptions.JervisException
-throw new JervisException('some text')</tt></pre><br>
+<pre><tt>import net.gleske.jervis.exceptions.PlatformMissingKeyException
+throw new PlatformMissingKeyException('defaults')</tt></pre><br>
  */
-class JervisException extends Exception {
+public class PlatformMissingKeyException extends PlatformValidationException {
 
     /**
-      Throw a <tt>JervisException</tt>.
+      Throw an exception when platforms file key is referenced but missing.
 
-      @param message A simple message.
+      @param message A simple message that will be prepended with <tt>'Missing key: ' + message</tt>
      */
-    def JervisException(String message) {
-        super(message)
+    public PlatformMissingKeyException(String message) {
+        super("Missing key: " + message);
     }
 }

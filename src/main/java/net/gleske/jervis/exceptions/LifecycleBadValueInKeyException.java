@@ -13,23 +13,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
-  A type of <tt>{@link net.gleske.jervis.exceptions.PlatformValidationException}</tt> which is thrown when there is a bad value in a platforms file key.
+  A type of <tt>{@link net.gleske.jervis.exceptions.LifecycleValidationException}</tt> which is thrown when there is a bad value in a lifecycles file key.
 
   <h2>Sample usage</h2>
-<pre><tt>import net.gleske.jervis.exceptions.PlatformBadValueInKeyException
-throw new PlatformBadValueInKeyException('defaults.platform')</tt></pre><br>
+<pre><tt>import net.gleske.jervis.exceptions.LifecycleBadValueInKeyException
+throw new LifecycleBadValueInKeyException('ruby.rake1.fileExistsCondition')</tt></pre><br>
  */
-class PlatformBadValueInKeyException extends PlatformValidationException {
+public class LifecycleBadValueInKeyException extends LifecycleValidationException {
 
     /**
       Throw an exception for a bad value in a key.
 
       @param message A simple message that will be prepended with <tt>'Bad value in key: ' + message</tt>
      */
-    def PlatformBadValueInKeyException(String message) {
-        super('Bad value in key: ' + message)
+    public LifecycleBadValueInKeyException(String message) {
+        super("Bad value in key: " + message);
     }
 }

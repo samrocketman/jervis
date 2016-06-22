@@ -13,23 +13,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
-  A type of <tt>{@link net.gleske.jervis.exceptions.LifecycleValidationException}</tt> which is thrown when a lifecycles file key is referenced but missing.
+  A type of <tt>{@link net.gleske.jervis.exceptions.SecurityException}</tt> which is thrown when an encryption issue occurs.
 
   <h2>Sample usage</h2>
-<pre><tt>import net.gleske.jervis.exceptions.LifecycleMissingKeyException
-throw new LifecycleMissingKeyException('groovy.defaultKey')</tt></pre><br>
+<pre><tt>import net.gleske.jervis.exceptions.EncryptException
+throw new EncryptException('some reason')</tt></pre><br>
  */
-class LifecycleMissingKeyException extends LifecycleValidationException {
+public class EncryptException extends SecurityException {
 
     /**
-      Throw an exception when lifecycles file key is referenced but missing.
+      Throw an exception relaying why encrypting a string failed.
 
-      @param message A simple message that will be prepended with <tt>'Missing key: ' + message</tt>
+      @param message A simple message.
      */
-    def LifecycleMissingKeyException(String message) {
-        super('Missing key: ' + message)
+    public EncryptException(String message) {
+        super(message);
     }
 }

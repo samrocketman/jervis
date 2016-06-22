@@ -13,9 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
-import net.gleske.jervis.exceptions.wikiPages
+import net.gleske.jervis.exceptions.wikiPages;
 
 /**
   A type of <tt>{@link net.gleske.jervis.exceptions.GeneratorException}</tt> which is thrown when an unsupported language lifecycle generation is attempted.
@@ -24,8 +24,8 @@ import net.gleske.jervis.exceptions.wikiPages
 <pre><tt>import net.gleske.jervis.exceptions.UnsupportedToolException
 throw new UnsupportedToolException('derpy')</tt></pre><br>
  */
-class UnsupportedToolException extends GeneratorException {
-    private static String wiki_page = wikiPages.supported_tools
+public class UnsupportedToolException extends GeneratorException {
+    private static String wiki_page = wikiPages.supported_tools;
 
     /**
       Throw an exception when an unsupported tool generation is attempted.  It would
@@ -36,7 +36,7 @@ class UnsupportedToolException extends GeneratorException {
 
       @param message A simple message that will be prepended with <tt>'ERROR: Unsupported language in yaml -> ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.wikiPages#supported_tools}</tt>.
      */
-    def UnsupportedToolException(String message) {
-        super('\nERROR: Unsupported tool in yaml -> ' + message + ['\n\nSee wiki page:', wiki_page,'\n'].join('\n'))
+    public UnsupportedToolException(String message) {
+        super("\nERROR: Unsupported tool in yaml -> " + message + "\n\nSee wiki page:\n" + wiki_page + "\n\n");
     }
 }

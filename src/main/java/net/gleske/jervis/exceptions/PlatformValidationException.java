@@ -13,9 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
-import net.gleske.jervis.exceptions.wikiPages
+import net.gleske.jervis.exceptions.wikiPages;
 
 /**
   A group of exceptions that are thrown when validation errors occur in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file" target="_blank">platforms file</a>.
@@ -24,15 +24,15 @@ import net.gleske.jervis.exceptions.wikiPages
 <pre><tt>import net.gleske.jervis.exceptions.PlatformValidationException
 throw new PlatformValidationException('some text')</tt></pre><br>
  */
-class PlatformValidationException extends JervisException {
-    private static String wiki_page = wikiPages.platforms_spec
+public class PlatformValidationException extends JervisException {
+    private static String wiki_page = wikiPages.platforms_spec;
 
     /**
       Throw a <tt>PlatformValidationException</tt>
 
       @param message A simple message that will be prepended with <tt>'ERROR: Platform validation failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.wikiPages#platforms_spec}</tt>.
      */
-    def PlatformValidationException(String message) {
-        super('\nERROR: Platform validation failed.  ' + message + ['\n\nSee wiki page:', wiki_page,'\n'].join('\n'))
+    public PlatformValidationException(String message) {
+        super("\nERROR: Platform validation failed.  " + message + "\n\nSee wiki page:\n" + wiki_page + "\n\n");
     }
 }

@@ -13,23 +13,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
-  A type of <tt>{@link net.gleske.jervis.exceptions.SecurityException}</tt> which is thrown when an issue with generating key pairs occurs.
+  A group of exceptions that are thrown when undesireable script generation conditions occur.
 
   <h2>Sample usage</h2>
-<pre><tt>import net.gleske.jervis.exceptions.KeyGenerationException
-throw new KeyGenerationException('some reason')</tt></pre><br>
+<pre><tt>import net.gleske.jervis.exceptions.GeneratorException
+throw new GeneratorException('some text')</tt></pre><br>
  */
-class KeyGenerationException extends SecurityException {
+public class GeneratorException extends JervisException {
 
     /**
-      Throw an exception relaying why RSA key generation failed.
+      Throw a <tt>GeneratorException</tt>.
 
       @param message A simple message.
      */
-    def KeyGenerationException(String message) {
-        super(message)
+    public GeneratorException(String message) {
+        super(message);
     }
 }

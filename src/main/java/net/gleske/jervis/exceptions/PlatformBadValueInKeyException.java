@@ -13,23 +13,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
-  A type of <tt>{@link net.gleske.jervis.exceptions.SecurityException}</tt> which is thrown when an encryption issue occurs.
+  A type of <tt>{@link net.gleske.jervis.exceptions.PlatformValidationException}</tt> which is thrown when there is a bad value in a platforms file key.
 
   <h2>Sample usage</h2>
-<pre><tt>import net.gleske.jervis.exceptions.EncryptException
-throw new EncryptException('some reason')</tt></pre><br>
+<pre><tt>import net.gleske.jervis.exceptions.PlatformBadValueInKeyException
+throw new PlatformBadValueInKeyException('defaults.platform')</tt></pre><br>
  */
-class EncryptException extends SecurityException {
+public class PlatformBadValueInKeyException extends PlatformValidationException {
 
     /**
-      Throw an exception relaying why encrypting a string failed.
+      Throw an exception for a bad value in a key.
 
-      @param message A simple message.
+      @param message A simple message that will be prepended with <tt>'Bad value in key: ' + message</tt>
      */
-    def EncryptException(String message) {
-        super(message)
+    public PlatformBadValueInKeyException(String message) {
+        super("Bad value in key: " + message);
     }
 }
