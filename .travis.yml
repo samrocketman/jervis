@@ -5,7 +5,7 @@ env:
   - GROOVY_VERSION="2.1.9"
   - GROOVY_VERSION="2.2.2"
   - GROOVY_VERSION="2.3.11"
-  - GROOVY_VERSION="2.4.6"
+  - GROOVY_VERSION="2.4.7"
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
 install: ./assemble.sh
 script: ./gradlew cobertura
@@ -17,7 +17,7 @@ matrix:
     - env: GROOVY_VERSION="2.1.9"
     - env: GROOVY_VERSION="2.2.2"
     - env: GROOVY_VERSION="2.3.11"
-    - env: GROOVY_VERSION="2.4.6"
+    - env: GROOVY_VERSION="2.4.7"
 branches:
   only:
     - master
