@@ -38,4 +38,4 @@
   This way Jervis exceptions can be distinguished from other types of exceptions which might get thrown during runtime.
   </p>
  */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;

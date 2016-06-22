@@ -13,9 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
-import net.gleske.jervis.exceptions.wikiPages
+import net.gleske.jervis.exceptions.wikiPages;
 
 /**
   A type of <tt>{@link net.gleske.jervis.exceptions.GeneratorException}</tt> which is thrown when an unsupported language lifecycle generation is attempted.
@@ -24,15 +24,15 @@ import net.gleske.jervis.exceptions.wikiPages
 <pre><tt>import net.gleske.jervis.exceptions.UnsupportedLanguageException
 throw new UnsupportedLanguageException('derpy')</tt></pre><br>
  */
-class UnsupportedLanguageException extends GeneratorException {
-    private static String wiki_page = wikiPages.supported_languages
+public class UnsupportedLanguageException extends GeneratorException {
+    private static String wiki_page = wikiPages.supported_languages;
 
     /**
       Throw an exception when an unsupported language lifecycle generation is attempted.
 
       @param message A simple message that will be prepended with <tt>'ERROR: Unsupported language in yaml -> language: ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.wikiPages#supported_languages}</tt>.
      */
-    def UnsupportedLanguageException(String message) {
-        super('\nERROR: Unsupported language in yaml -> language: ' + message + ['\n\nSee wiki page:', wiki_page,'\n'].join('\n'))
+    public UnsupportedLanguageException(String message) {
+        super("\nERROR: Unsupported language in yaml -> language: " + message + "\n\nSee wiki page:\n" + wiki_page + "\n\n");
     }
 }

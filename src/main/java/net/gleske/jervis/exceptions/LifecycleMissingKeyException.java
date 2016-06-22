@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
   A type of <tt>{@link net.gleske.jervis.exceptions.LifecycleValidationException}</tt> which is thrown when a lifecycles file key is referenced but missing.
@@ -22,14 +22,14 @@ package net.gleske.jervis.exceptions
 <pre><tt>import net.gleske.jervis.exceptions.LifecycleMissingKeyException
 throw new LifecycleMissingKeyException('groovy.defaultKey')</tt></pre><br>
  */
-class LifecycleMissingKeyException extends LifecycleValidationException {
+public class LifecycleMissingKeyException extends LifecycleValidationException {
 
     /**
       Throw an exception when lifecycles file key is referenced but missing.
 
       @param message A simple message that will be prepended with <tt>'Missing key: ' + message</tt>
      */
-    def LifecycleMissingKeyException(String message) {
-        super('Missing key: ' + message)
+    public LifecycleMissingKeyException(String message) {
+        super("Missing key: " + message);
     }
 }

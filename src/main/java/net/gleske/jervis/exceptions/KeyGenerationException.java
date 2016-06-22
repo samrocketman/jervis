@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
   A type of <tt>{@link net.gleske.jervis.exceptions.SecurityException}</tt> which is thrown when an issue with generating key pairs occurs.
@@ -22,14 +22,14 @@ package net.gleske.jervis.exceptions
 <pre><tt>import net.gleske.jervis.exceptions.KeyGenerationException
 throw new KeyGenerationException('some reason')</tt></pre><br>
  */
-class KeyGenerationException extends SecurityException {
+public class KeyGenerationException extends SecurityException {
 
     /**
       Throw an exception relaying why RSA key generation failed.
 
       @param message A simple message.
      */
-    def KeyGenerationException(String message) {
-        super(message)
+    public KeyGenerationException(String message) {
+        super(message);
     }
 }

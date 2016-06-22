@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
   A type of <tt>{@link net.gleske.jervis.exceptions.SecurityException}</tt> which is thrown when an encryption issue occurs.
@@ -22,14 +22,14 @@ package net.gleske.jervis.exceptions
 <pre><tt>import net.gleske.jervis.exceptions.EncryptException
 throw new EncryptException('some reason')</tt></pre><br>
  */
-class EncryptException extends SecurityException {
+public class EncryptException extends SecurityException {
 
     /**
       Throw an exception relaying why encrypting a string failed.
 
       @param message A simple message.
      */
-    def EncryptException(String message) {
-        super(message)
+    public EncryptException(String message) {
+        super(message);
     }
 }

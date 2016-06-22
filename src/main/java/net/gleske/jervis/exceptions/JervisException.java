@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
   The base exception class for Jervis from which all other exceptions derive.
@@ -22,14 +22,14 @@ package net.gleske.jervis.exceptions
 <pre><tt>import net.gleske.jervis.exceptions.JervisException
 throw new JervisException('some text')</tt></pre><br>
  */
-class JervisException extends Exception {
+public class JervisException extends Exception {
 
     /**
       Throw a <tt>JervisException</tt>.
 
       @param message A simple message.
      */
-    def JervisException(String message) {
-        super(message)
+    public JervisException(String message) {
+        super(message);
     }
 }

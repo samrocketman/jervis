@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
   A group of exceptions that are thrown when undesireable script generation conditions occur.
@@ -22,14 +22,14 @@ package net.gleske.jervis.exceptions
 <pre><tt>import net.gleske.jervis.exceptions.GeneratorException
 throw new GeneratorException('some text')</tt></pre><br>
  */
-class GeneratorException extends JervisException {
+public class GeneratorException extends JervisException {
 
     /**
       Throw a <tt>GeneratorException</tt>.
 
       @param message A simple message.
      */
-    def GeneratorException(String message) {
-        super(message)
+    public GeneratorException(String message) {
+        super(message);
     }
 }

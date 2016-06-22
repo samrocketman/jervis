@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions
+package net.gleske.jervis.exceptions;
 
 /**
   A type of <tt>{@link net.gleske.jervis.exceptions.PlatformValidationException}</tt> which is thrown when a platforms file key is referenced but missing.
@@ -22,14 +22,14 @@ package net.gleske.jervis.exceptions
 <pre><tt>import net.gleske.jervis.exceptions.PlatformMissingKeyException
 throw new PlatformMissingKeyException('defaults')</tt></pre><br>
  */
-class PlatformMissingKeyException extends PlatformValidationException {
+public class PlatformMissingKeyException extends PlatformValidationException {
 
     /**
       Throw an exception when platforms file key is referenced but missing.
 
       @param message A simple message that will be prepended with <tt>'Missing key: ' + message</tt>
      */
-    def PlatformMissingKeyException(String message) {
-        super('Missing key: ' + message)
+    public PlatformMissingKeyException(String message) {
+        super("Missing key: " + message);
     }
 }
