@@ -8,7 +8,7 @@ apply plugin: 'signing'
 group = 'net.gleske'
 archivesBaseName = 'jervis'
 jar.baseName = 'jervis'
-version = '0.9'
+version = '0.10-SNAPSHOT'
 
 ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.7'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
