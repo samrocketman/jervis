@@ -37,14 +37,6 @@ buildscript {
     }
 }
 
-sourceSets {
-    main {
-        groovy {
-            srcDirs += ['src/main/java']
-        }
-    }
-}
-
 //Add due to deprecated Grab support
 //https://github.com/samrocketman/jervis/issues/60
 configurations {
