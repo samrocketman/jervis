@@ -363,7 +363,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadLifecycles(url.getFile())
         url = this.getClass().getResource('/toolchains.json');
         generator.loadToolchains(url.getFile())
-        List skip_keys = ['default_ivalue', 'secureSupport', 'friendlyLabel', 'comment']
+        List skip_keys = ['default_ivalue', 'secureSupport', 'friendlyLabel', 'comment', 'matrix']
         //cycle through all permutations of the toolchains file and check bash syntax
         generator.toolchain_obj.languages.each {
             String language = it

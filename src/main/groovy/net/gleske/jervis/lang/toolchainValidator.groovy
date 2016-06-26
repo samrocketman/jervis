@@ -18,6 +18,7 @@ package net.gleske.jervis.lang
 import groovy.json.JsonSlurper
 import net.gleske.jervis.exceptions.ToolchainMissingKeyException
 import net.gleske.jervis.exceptions.ToolchainValidationException
+import net.gleske.jervis.exceptions.ToolchainBadValueInKeyException
 
 /**
   Validates the contents of a
@@ -164,11 +165,10 @@ class toolchainValidator {
             throw new ToolchainMissingKeyException('toolchains')
         }
         //check all of the toolchains inside of the toolchains key
-        (toolchains['toolchains'].keySet() as String[]).each{
-            def language = it
-            toolchains['toolchains'][it].each{
-                if(!this.supportedToolchain(it)) {
-                    throw new ToolchainMissingKeyException("toolchains.${language}.${it}.  The toolchain for ${it} is missing from the top level of the toolchains file.")
+        (toolchains['toolchains'].keySet() as String[]).each{ language ->
+            toolchains['toolchains'][language].each{ toolchain ->
+                if(!this.supportedToolchain(toolchain)) {
+                    throw new ToolchainMissingKeyException("toolchains.${language}.${toolchain}.  The toolchain for ${toolchain} is missing from the top level of the toolchains file.")
                 }
             }
         }
@@ -182,6 +182,12 @@ class toolchainValidator {
                 if(!(default_ivalue in toolchain_ivalue) && !('*' in toolchain_ivalue)) {
                     throw new ToolchainMissingKeyException("${toolchain_list[i]}.default_ivalue.${default_ivalue} is missing.  " +
                             "Must have one of the two following keys: ${toolchain_list[i]}.${default_ivalue} or ${toolchain_list[i]}.*.")
+                }
+            }
+            if('matrix' in toolchain_ivalue) {
+                def matrix = toolchains[toolchain_list[i]]['matrix']
+                if(!(matrix instanceof String) || !(matrix in ['disabled', 'simple', 'advanced'])) {
+                    throw new ToolchainBadValueInKeyException("${toolchain_list[i]}.matrix must be a String and must have one of three values: disabled, simple, advanced.")
                 }
             }
         }
