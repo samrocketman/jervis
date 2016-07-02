@@ -15,6 +15,7 @@
    */
 package net.gleske.jervis.lang
 //the toolchainValidatorTest() class automatically sees the lifecycleValidator() class because they're in the same package
+import net.gleske.jervis.exceptions.ToolchainBadValueInKeyException
 import net.gleske.jervis.exceptions.ToolchainMissingKeyException
 import org.junit.After
 import org.junit.Before
@@ -172,5 +173,29 @@ class toolchainValidatorTest extends GroovyTestCase {
         toolchains.load_JSON(url.getFile())
         assert false == toolchains.isFriendlyLabel('env')
         assert true == toolchains.isFriendlyLabel('rvm')
+    }
+    @Test public void test_toolchainValidator_formerly_good_toolchains_simple() {
+        //this test is for migrations from jervis-0.9 to 0.10 because advanced matrices were introduced
+        URL url = this.getClass().getResource('/bad_toolchains_formerly_good_toolchains_simple.json');
+        toolchains.load_JSON(url.getFile())
+        shouldFail(ToolchainMissingKeyException) {
+            toolchains.validate()
+        }
+        assert false == toolchains.validate_asBool()
+    }
+    @Test public void test_toolchainValidator_toolchainType() {
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
+        toolchains.load_JSON(url.getFile())
+        assert 'advanced' == toolchains.toolchainType('env')
+        assert 'simple' == toolchains.toolchainType('jdk')
+        assert 'simple' == toolchains.toolchainType('foo')
+    }
+    @Test public void test_toolchainValidator_bad_toolchains_matrix_value() {
+        URL url = this.getClass().getResource('/bad_toolchains_matrix_value.json');
+        toolchains.load_JSON(url.getFile())
+        shouldFail(ToolchainBadValueInKeyException) {
+            toolchains.validate()
+        }
+        assert false == toolchains.validate_asBool()
     }
 }

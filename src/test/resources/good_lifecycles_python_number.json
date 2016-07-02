@@ -1,0 +1,9 @@
+{
+    "python": {
+        "friendlyName": "python",
+        "defaultKey": "setuptools",
+        "setuptools": {
+            "script": "python setup.py test"
+        }
+    }
+}

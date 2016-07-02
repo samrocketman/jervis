@@ -590,7 +590,7 @@ env:
                     jervis_yaml[toolchain] = jervis_yaml[toolchain].toString()
                 }
                 //toolchain must be an instance of String, List, or (in the case of only advanced toolchains) Map.
-                if(!isInstanceFromList(jervis_yaml[toolchain], [String, List]) && ((toolchain_obj.toolchainType(toolchain) == 'advanced') && !(jervis_yaml[toolchain] instanceof Map))) {
+                if(!isInstanceFromList(jervis_yaml[toolchain], [String, List]) && !((toolchain_obj.toolchainType(toolchain) == 'advanced') && (jervis_yaml[toolchain] instanceof Map))) {
                     throw new UnsupportedToolException("${toolchain}: ${jervis_yaml[toolchain]}")
                 }
                 if(jervis_yaml[toolchain] instanceof String) {
