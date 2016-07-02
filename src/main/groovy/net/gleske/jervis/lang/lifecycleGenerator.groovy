@@ -88,6 +88,11 @@ class lifecycleGenerator {
     String[] yaml_keys
 
     /**
+      A variable for determining whether or not this is a matrix build.
+     */
+    Boolean matrix_build = false
+
+    /**
       A quick access variable for matrix build axes.
      */
     List yaml_matrix_axes
@@ -341,15 +346,20 @@ class lifecycleGenerator {
         //just load an empty file list by default initially that can then be overridden.
         this.setFolder_listing([])
         //configure the matrix axes if it is a matrix build i.e. set yaml_matrix_axes
-        if(this.isMatrixBuild()) {
-            yaml_matrix_axes = []
-            toolchain_obj.toolchains["toolchains"][yaml_language].each {
-                if((jervis_yaml[it] instanceof List) && (jervis_yaml[it].size() > 1)) {
-                    yaml_matrix_axes << it
+        matrix_build = false
+        yaml_matrix_axes = []
+        toolchain_obj.toolchains["toolchains"][yaml_language].each { toolchain ->
+            if(toolchain_obj.supportedMatrix(yaml_language, toolchain)) {
+                String matrix_type = toolchain_obj.toolchainType(toolchain)
+                if((matrix_type != 'disabled') && (getObjectValue(jervis_yaml, toolchain, []).size() > 1)) {
+                    matrix_build = true
+                    yaml_matrix_axes << toolchain
                 }
-                else if((it == 'env') && (jervis_yaml[it] instanceof Map) && ('matrix' in jervis_yaml[it]) && (jervis_yaml[it]['matrix'].size() > 1)) {
-                    yaml_matrix_axes << it
+                else if((matrix_type == 'advanced') && (getObjectValue(jervis_yaml, "${toolchain}.matrix", []).size() > 1)) {
+                    matrix_build = true
+                    yaml_matrix_axes << toolchain
                 }
+                //else matrix_type == disabled
             }
         }
     }
@@ -365,7 +375,7 @@ env: foo=bar</tt></pre>
       <pre><tt>language: groovy
 env:
   - foo=bar</tt></pre>
-      <p>However, the following YAML will produce a matrix build.</p>
+      <p>However, the following YAML will produce a matrix build.  This assumes that <tt>matrix: disabled</tt> is not set for <tt>env</tt> in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file" target="_blank">toolchains file</a>.</p>
       <pre><tt>language: groovy
 env:
   - foobar=foo
@@ -374,18 +384,7 @@ env:
       @return <tt>true</tt> if a matrix build will be generated or <tt>false</tt> if it will just be a regular build.
      */
     public Boolean isMatrixBuild() {
-        Boolean result=false
-        yaml_keys.each{
-            if(toolchain_obj.supportedMatrix(yaml_language, it)) {
-                if(jervis_yaml[it] instanceof List && jervis_yaml[it].size() > 1) {
-                     result=true
-                }
-                else if(('env' == it) && (jervis_yaml[it] instanceof Map) && ('matrix' in jervis_yaml[it]) && (jervis_yaml[it]['matrix'] instanceof List) && (jervis_yaml[it]['matrix'].size() > 1)) {
-                     result=true
-                }
-            }
-        }
-        return result
+        matrix_build
     }
 
     /*
@@ -555,15 +554,17 @@ env:
             output += 'esac\n'
         }
         else {
-            if(!toolchain_obj.supportedTool(toolchain, chain[0])) {
-                throw new UnsupportedToolException("${toolchain}: ${chain[0]}")
-            }
-            if(chain[0] in toolchain_keys) {
-                output += toolchain_obj.toolchains[toolchain][chain[0]].join('\n') + '\n'
-            }
-            else {
-                //assume using "*" key
-                output += this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], chain[0].toString()).join('\n') + '\n'
+            chain.each {
+                if(!toolchain_obj.supportedTool(toolchain, it)) {
+                    throw new UnsupportedToolException("${toolchain}: ${it}")
+                }
+                if(it in toolchain_keys) {
+                    output += toolchain_obj.toolchains[toolchain][it].join('\n') + '\n'
+                }
+                else {
+                    //assume using "*" key
+                    output += this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], it).join('\n') + '\n'
+                }
             }
         }
         return output
@@ -578,15 +579,18 @@ env:
         //get toolchain order for this language
         def toolchains_order = toolchain_obj.toolchains['toolchains'][yaml_language]
         String output = '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n'
-        toolchains_order.each {
-            def toolchain = it
+        toolchains_order.each { toolchain ->
             String[] toolchain_keys = toolchain_obj.toolchains[toolchain].keySet() as String[]
             output += "#${toolchain} toolchain section\n"
             if(toolchain in yaml_keys) {
-                //do non-default stuff
+                //User wants to override default with a toolchain value in their YAML file.
                 def user_toolchain
-                //toolchain must be an instance of String, List, or (in the case of only env) Map.
-                if(!(jervis_yaml[toolchain] instanceof String) && !(jervis_yaml[toolchain] instanceof List) && !(('env' == toolchain) && (jervis_yaml['env'] instanceof Map))) {
+                //convert doubles and integers to strings fixing bug #85
+                if(jervis_yaml[toolchain] instanceof Number) {
+                    jervis_yaml[toolchain] = jervis_yaml[toolchain].toString()
+                }
+                //toolchain must be an instance of String, List, or (in the case of only advanced toolchains) Map.
+                if(!isInstanceFromList(jervis_yaml[toolchain], [String, List]) && !((toolchain_obj.toolchainType(toolchain) == 'advanced') && (jervis_yaml[toolchain] instanceof Map))) {
                     throw new UnsupportedToolException("${toolchain}: ${jervis_yaml[toolchain]}")
                 }
                 if(jervis_yaml[toolchain] instanceof String) {
@@ -595,70 +599,40 @@ env:
                 else {
                     user_toolchain = jervis_yaml[toolchain]
                 }
-                //check if a matrix build
-                if(toolchain in yaml_matrix_axes) {
-                    if(('env' == toolchain) && (user_toolchain instanceof Map)) {
-                        //special env behavior for global and matrix values
-                        def env = user_toolchain
-                        if('global' in env) {
-                            if(env['global'] instanceof String) {
-                                output += this.toolchainBuilder(toolchain, toolchain_keys, [env['global']], false)
+                //check if a matrix toolchain
+                boolean matrix_toolchain = toolchain in yaml_matrix_axes
+                if(user_toolchain instanceof Map) {
+                    //because it is an instance of a Map we assume it is an advanced toolchain
+                    //special advanced behavior for global and matrix values
+                    ['global', 'matrix'].each { key ->
+                        if(key in user_toolchain) {
+                            //convert doubles and integers to strings fixing bug #85
+                            if(user_toolchain[key] instanceof Number) {
+                                user_toolchain[key] = user_toolchain[key].toString()
                             }
-                            else if(env['global'] instanceof List) {
-                                env['global'].each {
-                                    output += this.toolchainBuilder(toolchain, toolchain_keys, [it], false)
-                                }
+                            if(user_toolchain[key] instanceof String) {
+                                user_toolchain[key] = [user_toolchain[key]]
+                            }
+
+                            if(user_toolchain[key] instanceof List) {
+                                output += toolchainBuilder(toolchain,
+                                                           toolchain_keys,
+                                                           user_toolchain[key]*.toString(),
+                                                           (key == 'global')? false : matrix_toolchain)
                             }
                             else {
-                                throw new UnsupportedToolException("${toolchain}: global.${env['global']}")
+                                throw new UnsupportedToolException("${toolchain}: ${key}.${user_toolchain[key]}")
                             }
                         }
-                        if('matrix' in env) {
-                            if(env['matrix'] instanceof List) {
-                                output += this.toolchainBuilder(toolchain, toolchain_keys, env['matrix'], true)
-                            }
-                            else {
-                                throw new UnsupportedToolException("${toolchain}: matrix.${env['matrix']}")
-                            }
-                        }
-                    }
-                    else {
-                        //normal toolchain behavior
-                        output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain, true)
                     }
                 }
                 else {
-                    //not a matrix build
-                    if(('env' == toolchain) && (user_toolchain instanceof Map)) {
-                        if('global' in user_toolchain) {
-                            if(user_toolchain['global'] instanceof String) {
-                                output += this.toolchainBuilder(toolchain, toolchain_keys, [user_toolchain['global']], false)
-                            }
-                            else if(user_toolchain['global'] instanceof List) {
-                                user_toolchain['global'].each {
-                                    output += this.toolchainBuilder(toolchain, toolchain_keys, [it], false)
-                                }
-                            }
-                            else {
-                                    throw new UnsupportedToolException("${toolchain}: global.${user_toolchain['global']}")
-                            }
-                        }
-                        if('matrix' in user_toolchain) {
-                            if(user_toolchain['matrix'] instanceof String) {
-                                output += this.toolchainBuilder(toolchain, toolchain_keys, [user_toolchain['matrix']], false)
-                            }
-                            else {
-                                output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain['matrix'], false)
-                            }
-                        }
-                    }
-                    else {
-                        output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain, false)
-                    }
+                    //normal simple toolchain behavior
+                    output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain*.toString(), matrix_toolchain)
                 }
             }
             else {
-                //falling back to default behavior in toolchains.json
+                //falling back to default behavior in toolchains.json because user has not defined it in their YAML.
                 String default_ivalue = toolchain_obj.toolchains[toolchain].default_ivalue
                 if(default_ivalue) {
                     if(default_ivalue in toolchain_keys) {
@@ -796,7 +770,7 @@ env:
       @return Returns the value of the key or a <tt>defaultValue</tt> which is of the
               same type as <tt>defaultValue</tt>.
      */
-    public Object getObjectValue(Map object, String key, Object defaultValue) {
+    public static Object getObjectValue(Map object, String key, Object defaultValue) {
         if(key.indexOf('.') >= 0) {
             String key1 = key.split('\\.', 2)[0]
             String key2 = key.split('\\.', 2)[1]
@@ -823,6 +797,18 @@ env:
 
         //nothing worked so just return default value
         return defaultValue
+    }
+
+
+    /**
+      Check if an object is an instance of any of the classes in a list.
+      @param object Any kind of object.
+      @param list   A list of classes deriving from type Class.
+      @return       <tt>true</tt> if <tt>object</tt> is an instance of any one of the
+                    items in the <tt>list</tt>.
+     */
+    public static boolean isInstanceFromList(Object object, List<Class> list) {
+        true in list*.isInstance(object)
     }
 
     /**

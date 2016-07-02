@@ -1,11 +1,9 @@
 {
     "toolchains": {
         "java": ["env", "jdk"],
-        "python": ["env", "python"],
         "ruby": ["gemfile", "env", "rvm", "jdk"]
     },
     "env": {
-        "matrix": "advanced",
         "*": [
             "export ${jervis_toolchain_ivalue}"
         ]
@@ -23,16 +21,6 @@
         ],
         "openjdk7": [
             "some commands"
-        ]
-    },
-    "python": {
-        "default_ivalue": "2.7",
-        "matrix": "advanced",
-        "2.6": [
-          "more commands"
-        ],
-        "2.7": [
-          "some commands"
         ]
     },
     "rvm": {

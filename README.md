@@ -148,6 +148,24 @@ Groovy Console is built into the Gradle file.
 
     ./gradlew console
 
+# Other development commands
+
+Generate code coverage reports.  Due to a [bug in cobertura code coverage][#39]
+is most reliable in Groovy versions 1.8.9 or 2.0.8.  See the final report in
+`build/reports/cobertura`.
+
+    GROOVY_VERSION=1.8.9 ./gradlew clean cobertura
+
+Build the jar file.
+
+    ./gradlew clean jar
+
+Sign build jars and sign archives.
+
+    ./gradlew clean check signArchives
+
+See also [RELEASE.md](RELEASE.md).
+
 # License
 
     Copyright 2014-2016 Sam Gleske
@@ -164,6 +182,7 @@ Groovy Console is built into the Gradle file.
     See the License for the specific language governing permissions and
     limitations under the License.
 
+[#39]: https://github.com/samrocketman/jervis/issues/39
 [jenkins-plugin-docker]: https://wiki.jenkins-ci.org/display/JENKINS/Docker+Plugin
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jenkins]: https://jenkins-ci.org/

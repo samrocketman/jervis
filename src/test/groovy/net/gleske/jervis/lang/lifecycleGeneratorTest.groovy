@@ -292,6 +292,8 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         //testing env global value for non-matrix configuration
         generator.loadYamlString('language: ruby\nenv:\n  global: foo=bar')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        generator.loadYamlString('language: ruby\nenv:\n  global:\n    - foo=bar\n    - hello=world')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\nexport hello=world\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         generator.loadYamlString('language: ruby\nenv:\n  global: [foo=bar]')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
         //testing for env global throwing an exception for non-matrix configuration
@@ -363,7 +365,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadLifecycles(url.getFile())
         url = this.getClass().getResource('/toolchains.json');
         generator.loadToolchains(url.getFile())
-        List skip_keys = ['default_ivalue', 'secureSupport', 'friendlyLabel', 'comment']
+        List skip_keys = ['default_ivalue', 'secureSupport', 'friendlyLabel', 'comment', 'matrix']
         //cycle through all permutations of the toolchains file and check bash syntax
         generator.toolchain_obj.languages.each {
             String language = it
@@ -531,5 +533,50 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: java\njdk:')
         generator.generateAll()
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#env toolchain section\n#jdk toolchain section\nsome commands\n'.equals(generator.generateToolchainSection())
+    }
+    @Test public void test_lifecycleGenerator_isInstanceFromList() {
+        assert true == generator.isInstanceFromList("hello", [Number, String, List])
+        assert true == generator.isInstanceFromList(3.5, [Number, String, List])
+        assert true == generator.isInstanceFromList(3, [Number, String, List])
+        assert true == generator.isInstanceFromList(['a', 'b'], [Number, String, List])
+        assert false == generator.isInstanceFromList([:], [Number, String, List])
+        assert true == generator.isInstanceFromList([:], [Number, String, Map])
+    }
+    @Test public void test_lifecycleGenerator_good_toolchains_disabled_env() {
+        URL url = this.getClass().getResource('/good_toolchains_disabled_env.json');
+        generator.loadToolchains(url.getFile())
+        generator.loadYamlString('language: ruby\nenv:\n  - foo=bar\n  - hello=world')
+        assert 'disabled' == generator.toolchain_obj.toolchainType('env')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\nexport hello=world\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+    }
+    @Test public void test_lifecycleGenerator_good_lifecycles_python_number() {
+        URL url = this.getClass().getResource('/good_lifecycles_python_number.json');
+        generator.loadLifecycles(url.getFile())
+        String compare_string = '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#env toolchain section\n#python toolchain section\nsome commands\n'
+        generator.loadYamlString('language: python\npython: 2.7')
+        assert compare_string == generator.generateToolchainSection()
+        generator.loadYamlString('language: python\npython:\n  - 2.7')
+        assert compare_string == generator.generateToolchainSection()
+        generator.loadYamlString('language: python\npython: "2.7"')
+        assert compare_string == generator.generateToolchainSection()
+        generator.loadYamlString('language: python\npython:\n  - "2.7"')
+        assert compare_string == generator.generateToolchainSection()
+        generator.loadYamlString('language: python\npython:\n  global: 2.7')
+        assert compare_string == generator.generateToolchainSection()
+        generator.loadYamlString('language: python\npython:\n  global:\n    - 2.7')
+        assert compare_string == generator.generateToolchainSection()
+        generator.loadYamlString('language: python\npython:\n  matrix: 2.7')
+        assert compare_string == generator.generateToolchainSection()
+        generator.loadYamlString('language: python\npython:\n  matrix:\n    - 2.7')
+        assert compare_string == generator.generateToolchainSection()
+    }
+    @Test public void test_lifecycleGenerator_bad_advanced_toolchain_when_not_supported() {
+        URL url = this.getClass().getResource('/good_toolchains_disabled_env.json');
+        generator.loadToolchains(url.getFile())
+        generator.loadYamlString('language: ruby\nenv:\n  global:\n    - foo=bar\n    - hello=world')
+        assert 'disabled' == generator.toolchain_obj.toolchainType('env')
+        shouldFail(UnsupportedToolException) {
+            generator.generateToolchainSection()
+        }
     }
 }
