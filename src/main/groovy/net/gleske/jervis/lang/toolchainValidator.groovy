@@ -110,11 +110,33 @@ class toolchainValidator {
 
     /**
       Checks to see if a value is a supported toolchain based on the toolchains file.
-      @param toolchain A <tt>String</tt> which is a toolchain to look up based on the keys in the toolchains file.
-      @return     <tt>true</tt> if the toolchain is supported or <tt>false</tt> if the toolchain is not supported.  Note: it can exist as a toolchain but not be supported as a matrix builder.
+
+      @param toolchain A <tt>String</tt> which is a toolchain to look up based on the
+                       keys in the toolchains file.
+
+      @return          <tt>true</tt> if the toolchain is supported or <tt>false</tt>
+                       if the toolchain is not supported.  Note: it can exist as a
+                       toolchain but not be supported as a matrix builder.
      */
     public Boolean supportedToolchain(String toolchain) {
         toolchain in toolchain_list
+    }
+
+    /**
+      Checks to see what type a toolchain is.  This function assumes successful
+      validation and will not throw an exeption for a toolchain which does not exist.
+      If the toolchain does not exist it will return <tt>simple</tt>.
+
+      @return A <tt>String</tt> which has one of three values: <tt>advanced</tt>,
+              <tt>simple</tt>, <tt>disabled</tt>.
+     */
+    public String toolchainType(String toolchain) {
+        if(matrix in toolchains[toolchain]) {
+            toolchains[toolchain]['matrix']
+        }
+        else {
+            'simple'
+        }
     }
 
     /**
@@ -138,7 +160,7 @@ class toolchainValidator {
       @return          <tt>true</tt> if the toolchain is a matrix builder or <tt>false</tt> if the matrix build is not supported for that language.  Note: it can exist as a toolchain but not be supported as a matrix builder.
      */
     public Boolean supportedMatrix(String lang, String toolchain) {
-        toolchain in toolchains['toolchains'][lang]
+        (toolchain in toolchains['toolchains'][lang]) && (toolchains[toolchain]['matrix'] != 'disabled')
     }
 
     /**
@@ -164,6 +186,10 @@ class toolchainValidator {
         if(!this.supportedToolchain('toolchains')) {
             throw new ToolchainMissingKeyException('toolchains')
         }
+        //check for deprecated "advanced" env missing the matrix key in toolchains.json
+        if(('env' in toolchains) && !('matrix' in toolchains['env'])) {
+            throw new ToolchainMissingKeyException('env.matrix; env must be updated to include a "matrix: advanced" key.')
+        }
         //check all of the toolchains inside of the toolchains key
         (toolchains['toolchains'].keySet() as String[]).each{ language ->
             toolchains['toolchains'][language].each{ toolchain ->
@@ -172,7 +198,7 @@ class toolchainValidator {
                 }
             }
         }
-        for(int i=0; i<toolchain_list.size(); i++){
+        for(int i=0; i<toolchain_list.size(); i++) {
             if('toolchains' == toolchain_list[i]) {
                 continue
             }
