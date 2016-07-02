@@ -1,3 +1,15 @@
+# jervis 0.10
+
+* Bugfix when a toolchain is a number an unsupported toolchain exception is
+  thrown.  [See issue #85][#85]
+* Enhancement: Better matrix support for toolchains.  Now, any toolchain can be
+  designated an `advanced` matrix or matrix support can be entirely `disabled`.
+  The traditional behavior is known as `simple` matrix.  [See issue #84][#84]
+
+Note: Edit your `toolchains.json` file and add `matrix: advanced` to the `env`
+toolchain.  As a migration path, an exception will now be thrown if `env` does
+not declare the type of matrix.  [See wiki for details][wiki-toolchains-spec].
+
 # jervis 0.9
 
 * Bugfix Exception number of constructors during runtime do not match by
@@ -79,4 +91,7 @@
 [#78]: https://github.com/samrocketman/jervis/issues/78
 [#80]: https://github.com/samrocketman/jervis/issues/80
 [#82]: https://github.com/samrocketman/jervis/issues/82
+[#84]: https://github.com/samrocketman/jervis/issues/84
+[#85]: https://github.com/samrocketman/jervis/issues/85
 [ccs-plugin]: https://wiki.jenkins-ci.org/display/JENKINS/Collapsing+Console+Sections+Plugin
+[wiki-toolchains-spec]: https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file
