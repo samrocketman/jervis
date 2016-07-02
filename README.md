@@ -150,7 +150,7 @@ Groovy Console is built into the Gradle file.
 
 # Other development commands
 
-Generate code coverage reports.  Due to a [bug in cobertura code coverage][#39]
+Generate code coverage reports.  Due to a [bug][#39], cobertura code coverage
 is most reliable in Groovy versions 1.8.9 or 2.0.8.  See the final report in
 `build/reports/cobertura`.
 
