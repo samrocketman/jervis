@@ -4,6 +4,7 @@
         "ruby": ["gemfile", "env", "rvm", "jdk"]
     },
     "env": {
+        "matrix": "advanced",
         "*": [
             "export ${jervis_toolchain_ivalue}"
         ]

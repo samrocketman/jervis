@@ -131,7 +131,7 @@ class toolchainValidator {
               <tt>simple</tt>, <tt>disabled</tt>.
      */
     public String toolchainType(String toolchain) {
-        if(matrix in toolchains[toolchain]) {
+        if('matrix' in toolchains[toolchain]) {
             toolchains[toolchain]['matrix']
         }
         else {

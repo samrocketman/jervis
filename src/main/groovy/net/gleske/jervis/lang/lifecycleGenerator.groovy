@@ -351,13 +351,13 @@ class lifecycleGenerator {
         toolchain_obj.toolchains["toolchains"][yaml_language].each { toolchain ->
             if(toolchain_obj.supportedMatrix(yaml_language, toolchain)) {
                 String matrix_type = toolchain_obj.toolchainType(toolchain)
-                if((matrix_type == 'simple') && (getObjectValue(jervis_yaml, toolchain, []).size() > 1)) {
+                if((matrix_type != 'disabled') && (getObjectValue(jervis_yaml, toolchain, []).size() > 1)) {
                     matrix_build = true
-                    yaml_matrix_axes << it
+                    yaml_matrix_axes << toolchain
                 }
-                else if((matrix_type == 'advanced') && (getObjectValue(jervis_yaml[toolchain],'matrix', []).size() > 1)) {
+                else if((matrix_type == 'advanced') && (getObjectValue(jervis_yaml, "${toolchain}.matrix", []).size() > 1)) {
                     matrix_build = true
-                    yaml_matrix_axes << it
+                    yaml_matrix_axes << toolchain
                 }
                 //else matrix_type == disabled
             }
@@ -600,40 +600,35 @@ env:
                     user_toolchain = jervis_yaml[toolchain]
                 }
                 //check if a matrix toolchain
-                boolean matrix_toolchan = toolchain in yaml_matrix_axes
+                boolean matrix_toolchain = toolchain in yaml_matrix_axes
                 if(user_toolchain instanceof Map) {
                     //because it is an instance of a Map we assume it is an advanced toolchain
                     //special advanced behavior for global and matrix values
-                    if('global' in user_toolchain) {
-                        //convert doubles and integers to strings fixing bug #85
-                        if(user_toolchain['global'] instanceof Number) {
-                            user_toolchain['global'] = user_toolchain['global'].toString()
-                        }
-                        if(user_toolchain['global'] instanceof String) {
-                            output += toolchainBuilder(toolchain, toolchain_keys, [user_toolchain['global']], false)
-                        }
-                        else if(user_toolchain['global'] instanceof List) {
-                            output += toolchainBuilder(toolchain, toolchain_keys, user_toolchain['global']*.toString(), false)
-                        }
-                        else {
-                            throw new UnsupportedToolException("${toolchain}: global.${user_toolchain['global']}")
-                        }
-                    }
-                    if('matrix' in user_toolchain) {
-                        if(user_toolchain['matrix'] instanceof List) {
-                            output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain['matrix'], matrix_toolchan)
-                        }
-                        else {
-                            throw new UnsupportedToolException("${toolchain}: matrix.${user_toolchain['matrix']}")
+                    ['global', 'matrix'].each { key ->
+                        if(key in user_toolchain) {
+                            //convert doubles and integers to strings fixing bug #85
+                            if(user_toolchain[key] instanceof Number) {
+                                user_toolchain[key] = user_toolchain[key].toString()
+                            }
+                            if(user_toolchain[key] instanceof String) {
+                                user_toolchain[key] = [user_toolchain[key]]
+                            }
+
+                            if(user_toolchain[key] instanceof List) {
+                                output += toolchainBuilder(toolchain,
+                                                           toolchain_keys,
+                                                           user_toolchain[key]*.toString(),
+                                                           (key == 'global')? false : matrix_toolchain)
+                            }
+                            else {
+                                throw new UnsupportedToolException("${toolchain}: ${key}.${user_toolchain[key]}")
+                            }
                         }
                     }
-                }
-                else if(user_toolchain instanceof String) {
-                    output += this.toolchainBuilder(toolchain, toolchain_keys, [user_toolchain], matrix_toolchan)
                 }
                 else {
                     //normal simple toolchain behavior
-                    output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain*.toString(), matrix_toolchan)
+                    output += this.toolchainBuilder(toolchain, toolchain_keys, user_toolchain*.toString(), matrix_toolchain)
                 }
             }
             else {

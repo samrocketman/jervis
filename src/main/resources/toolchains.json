@@ -23,7 +23,7 @@
         ]
     },
     "env": {
-        "secureSupport": true,
+        "matrix": "advanced",
         "*": [
             "export ${jervis_toolchain_ivalue}"
         ]
