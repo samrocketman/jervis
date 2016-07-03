@@ -103,7 +103,7 @@ class lifecycleGenerator {
     def lifecycle_obj
 
     /**
-      An instance of the <tt>{@link net.gleske.jervis.lang.toolchainValidator}</tt> class which as loaded a toolchains file.
+      An instance of the <tt>{@link net.gleske.jervis.lang.toolchainValidator}</tt> class which has loaded a toolchains file.
      */
     def toolchain_obj
 
