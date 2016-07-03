@@ -1,6 +1,10 @@
-# Jervis - [![Build Status][status-build]][jervis-travis] [![Coverage Status][status-coverage]][jervis-coveralls] [![Dependency Status][status-versioneye]][jervis-versioneye]
+# Jervis
 
 * *Project status:* [released to maven central][maven-release].
+  [![Maven Central Release][status-release]][maven-badge]
+* Project Health: [![Build Status][status-build]][jervis-travis]
+  [![Coverage Status][status-coverage]][jervis-coveralls]
+  [![Dependency Status][status-versioneye]][jervis-versioneye]
 * *Currently Targeted platforms:*
   * *Jenkins server host:* Linux and Mac OS X
   * *Jobs on clients:* Linux only (Multi-platform capable)
@@ -199,10 +203,12 @@ See also [RELEASE.md](RELEASE.md).
 [json-lifecycles]: src/main/resources/lifecycles.json
 [json-platforms]: src/main/resources/platforms.json
 [json-toolchains]: src/main/resources/toolchains.json
+[maven-badge]: https://github.com/jirutka/maven-badges
 [maven-release]: http://search.maven.org/#search|ga|1|g:"net.gleske"%20a:"jervis"
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=master
 [status-coverage]: https://coveralls.io/repos/samrocketman/jervis/badge.svg?branch=master
+[status-release]: https://maven-badges.herokuapp.com/maven-central/net.gleske/jervis/badge.svg
 [status-versioneye]: https://www.versioneye.com/user/projects/54f2a1cc4f3108959a0007f1/badge.svg?style=flat
 [travis-yaml]: http://docs.travis-ci.com/user/build-configuration/
 [travis]: https://travis-ci.org/
