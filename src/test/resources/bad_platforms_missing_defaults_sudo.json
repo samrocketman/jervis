@@ -2,7 +2,7 @@
     "defaults": {
         "platform": "docker",
         "os": "ubuntu1404",
-        "stability": "stable",
+        "stability": "stable"
     },
     "supported_platforms": {
         "docker": {

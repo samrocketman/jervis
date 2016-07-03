@@ -12,12 +12,12 @@
             "fileExistsCondition": "pom.xml",
             "fallbackKey": "ant",
             "install": "mvn install -DskipTests=true",
-            "script": "mvn test",
+            "script": "mvn test"
         },
         "ant": {
             "fileExistsCondition": "build.xml",
             "fallbackKey": "gradle",
-            "script": "ant test",
+            "script": "ant test"
         }
     }
 }

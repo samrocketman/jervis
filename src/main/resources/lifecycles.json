@@ -73,11 +73,11 @@
             "fileExistsCondition": "pom.xml",
             "fallbackKey": "ant",
             "install": "mvn install -DskipTests=true",
-            "script": "mvn test",
+            "script": "mvn test"
         },
         "ant": {
             "fileExistsCondition": "build.xml",
-            "script": "ant test",
+            "script": "ant test"
         }
     },
     "haskell": {
@@ -107,11 +107,11 @@
             "fileExistsCondition": "pom.xml",
             "fallbackKey": "ant",
             "install": "mvn install -DskipTests=true",
-            "script": "mvn test",
+            "script": "mvn test"
         },
         "ant": {
             "fileExistsCondition": "build.xml",
-            "script": "ant test",
+            "script": "ant test"
         }
     },
     "node_js": {
@@ -146,7 +146,7 @@
         "friendlyName": "PHP",
         "defaultKey": "phpunit",
         "phpunit": {
-            "script": "phpunit",
+            "script": "phpunit"
         }
     },
     "python": {
