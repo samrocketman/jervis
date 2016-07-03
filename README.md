@@ -1,10 +1,11 @@
 # Jervis
 
+[![Maven Central Release][status-release]][maven-badge]
+[![Build Status][status-build]][jervis-travis]
+[![Coverage Status][status-coverage]][jervis-coveralls]
+[![Dependency Status][status-versioneye]][jervis-versioneye]
+
 * *Project status:* [released to maven central][maven-release].
-  [![Maven Central Release][status-release]][maven-badge]
-* Project Health: [![Build Status][status-build]][jervis-travis]
-  [![Coverage Status][status-coverage]][jervis-coveralls]
-  [![Dependency Status][status-versioneye]][jervis-versioneye]
 * *Currently Targeted platforms:*
   * *Jenkins server host:* Linux and Mac OS X
   * *Jobs on clients:* Linux only (Multi-platform capable)
