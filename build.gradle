@@ -58,6 +58,7 @@ dependencies {
     compile 'org.ow2.asm:asm:5.1'
     testCompile 'junit:junit:4.12'
     libs 'org.yaml:snakeyaml:1.17'
+    libs 'net.gleske:jervis:0.10'
 }
 
 task libs(type: Copy) {
