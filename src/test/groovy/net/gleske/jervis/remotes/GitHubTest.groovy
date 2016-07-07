@@ -130,7 +130,7 @@ class GitHubTest extends GroovyTestCase {
         assert mygh.gh_clone == 'http://server/'
     }
     @Test public void test_GitHub_getGh_clone() {
-        assert mygh.gh_clone == 'git://github.com/'
+        assert mygh.gh_clone == 'https://github.com/'
     }
     //test GitHub().gh_token
     @Test public void test_GitHub_set1Gh_token() {
@@ -157,7 +157,7 @@ class GitHubTest extends GroovyTestCase {
     //test GitHub().getCloneUrl()
     @Test public void test_GitHub_getCloneUrl1() {
         assert mygh.getCloneUrl() == mygh.gh_clone
-        assert mygh.getCloneUrl() == 'git://github.com/'
+        assert mygh.getCloneUrl() == 'https://github.com/'
     }
     @Test public void test_GitHub_getCloneUrl2() {
         mygh.gh_clone = 'http://server/'

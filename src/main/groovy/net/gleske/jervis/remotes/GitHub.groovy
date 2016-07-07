@@ -43,9 +43,9 @@ class GitHub implements JervisRemote {
     String gh_api = 'https://api.github.com/'
 
     /**
-      The base clone URI in which repositories will be cloned.  Default: <tt>git://github.com/</tt>
+      The base clone URI in which repositories will be cloned.  Default: <tt>https://github.com/</tt>
      */
-    String gh_clone = 'git://github.com/'
+    String gh_clone = 'https://github.com/'
 
     /**
       The <a href="https://github.com/blog/1509-personal-api-tokens" target="_blank">API token</a>, which can be used to communicate with GitHub using authentication.  Default: <tt>null</tt>
