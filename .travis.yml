@@ -29,3 +29,8 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+jenkins:
+  collect:
+    artifacts: build/libs/*.jar
+    junit: build/test-results/*.xml
+    cobertura: build/reports/cobertura/coverage.xml

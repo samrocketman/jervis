@@ -191,6 +191,36 @@ def generate_project_for(def git_service, String JERVIS_BRANCH) {
             }
             combinationFilter(generator.matrixExcludeFilter())
         }
+        publishers {
+            String[] enabled_collections = generator.getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:]).keySet() as String[]
+            if('artifacts' in enabled_collections) {
+                //artifact lists as a single string or a list in YAML
+                def collect_artifacts = generator.getObjectValue(generator.jervis_yaml, 'jenkins.collect.artifacts', new Object())
+                collect_artifacts = (collect_artifacts instanceof List)? collect_artifacts.join(',') : collect_artifacts.toString()
+                if(collect_artifacts.size() > 1) {
+                    archiveArtifacts {
+                        fingerprint(true)
+                        onlyIfSuccessful(true)
+                        pattern(collect_artifacts)
+                    }
+                }
+            }
+            if('junit' in enabled_collections) {
+                String collect_junit = generator.getObjectValue(generator.jervis_yaml, 'jenkins.collect.junit', '')
+                if(collect_junit.size() > 0) {
+                    archiveJunit(collect_junit)
+                }
+            }
+            if('cobertura' in enabled_collections) {
+                String collect_cobertura = generator.getObjectValue(generator.jervis_yaml, 'jenkins.collect.cobertura', '')
+                if(collect_cobertura.size() > 0) {
+                    cobertura(collect_cobertura)
+                    covComplPlotPublisher {
+                        analyzer 'Cobertura'
+                    }
+                }
+            }
+        }
     }
 }
 
