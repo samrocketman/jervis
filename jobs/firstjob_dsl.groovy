@@ -217,6 +217,9 @@ def generate_project_for(def git_service, String JERVIS_BRANCH) {
                     cobertura(collect_cobertura)
                     covComplPlotPublisher {
                         analyzer 'Cobertura'
+                        excludeGetterSetter false
+                        verbose false
+                        locateTopMost true
                     }
                 }
             }
