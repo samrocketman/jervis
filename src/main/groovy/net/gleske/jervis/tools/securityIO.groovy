@@ -237,8 +237,8 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
      */
     public String rsaEncrypt(String plaintext) throws EncryptException {
         //build a list of processes to pipe
-        def stdout = new StringBuilder()
-        def stderr = new StringBuilder()
+        def stdout = new StringBuffer()
+        def stderr = new StringBuffer()
         Process proc1 = ['echo', plaintext.trim()].execute()
         Process proc2 = ['openssl', 'rsautl', '-encrypt', '-inkey', id_rsa_pub, '-pubin'].execute()
         Process proc3 = ['openssl','enc', '-base64', '-A'].execute()
