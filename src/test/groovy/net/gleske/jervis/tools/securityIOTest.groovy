@@ -119,6 +119,8 @@ class securityIOTest extends GroovyTestCase {
         String ciphertext
         String decodedtext
         security.generate_rsa_pair()
+        assert new File(security.id_rsa_priv).text.size() > 0
+        assert new File(security.id_rsa_pub).text.size() > 0
         ciphertext = security.rsaEncrypt(plaintext)
         assert ciphertext.length() > 0
         decodedtext = security.rsaDecrypt(ciphertext)
