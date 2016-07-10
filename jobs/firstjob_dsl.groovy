@@ -235,18 +235,7 @@ if("${project}".size() > 0 && "${project}".split('/').length == 2) {
 
     if(!Jenkins.instance.getItem(project_folder)) {
         println "Creating folder ${project_folder}"
-        folder(project_folder) {
-            //displayName('some display name')
-            //credentials section so non-admin users can configure credentials
-            configure { node ->
-                def credentials_folder = node / 'properties' / 'com.cloudbees.hudson.plugins.folder.properties.FolderCredentialsProvider_-FolderCredentialsProperty'
-                def entry = credentials_folder / 'domainCredentialsMap'(class: 'hudson.util.CopyOnWriteMap$Hash') / 'entry'
-                entry / 'com.cloudbees.plugins.credentials.domains.Domain'(plugin: 'credentials') {
-                    'specifications'
-                }
-                entry.appendNode('java.util.concurrent.CopyOnWriteArrayList')
-            }
-        }
+        folder(project_folder)
     }
 
     println "Creating project ${project}"
