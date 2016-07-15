@@ -130,5 +130,5 @@ public class wikiPages {
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories" target="_blank">secure secrets in repositories wiki page</a>.
      */
-    public static String secure_secrets = "https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file";
+    public static String secure_secrets = "https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories";
 }
