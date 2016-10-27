@@ -192,7 +192,7 @@ See also [RELEASE.md](RELEASE.md).
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jenkins]: https://jenkins-ci.org/
 [jervis-api-docs]: http://sam.gleske.net/jervis-api/
-[jervis-coveralls]: https://coveralls.io/repos/github/samrocketman/jervis/badge.svg?branch=master
+[jervis-coveralls]: https://coveralls.io/github/samrocketman/jervis
 [jervis-docker]: https://github.com/samrocketman/docker-jenkins-jervis
 [jervis-jenkins-bootstrap]: https://github.com/samrocketman/jenkins-bootstrap-jervis
 [jervis-travis]: https://travis-ci.org/samrocketman/jervis
@@ -208,7 +208,7 @@ See also [RELEASE.md](RELEASE.md).
 [maven-release]: http://search.maven.org/#search|ga|1|g:"net.gleske"%20a:"jervis"
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=master
-[status-coverage]: https://coveralls.io/repos/samrocketman/jervis/badge.svg?branch=master
+[status-coverage]: https://coveralls.io/repos/github/samrocketman/jervis/badge.svg?branch=master
 [status-release]: https://maven-badges.herokuapp.com/maven-central/net.gleske/jervis/badge.svg
 [status-versioneye]: https://www.versioneye.com/user/projects/54f2a1cc4f3108959a0007f1/badge.svg?style=flat
 [travis-yaml]: http://docs.travis-ci.com/user/build-configuration/
