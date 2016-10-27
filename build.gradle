@@ -8,7 +8,7 @@ apply plugin: 'signing'
 group = 'net.gleske'
 archivesBaseName = 'jervis'
 jar.baseName = 'jervis'
-version = '0.11-SNAPSHOT'
+version = '0.11'
 
 ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.7'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
@@ -58,7 +58,7 @@ dependencies {
     compile 'org.ow2.asm:asm:5.1'
     testCompile 'junit:junit:4.12'
     libs 'org.yaml:snakeyaml:1.17'
-    libs 'net.gleske:jervis:0.10'
+    libs 'net.gleske:jervis:0.11'
 }
 
 task libs(type: Copy) {
