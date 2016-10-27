@@ -216,6 +216,12 @@ class toolchainValidator {
                     throw new ToolchainBadValueInKeyException("${toolchain_list[i]}.matrix must be a String and must have one of three values: disabled, simple, advanced.")
                 }
             }
+            if('cleanup' in toolchain_ivalue) {
+                def cleanup = toolchains[toolchain_list[i]]['cleanup']
+                if(!(cleanup instanceof List) || (false in cleanup.collect { it instanceof String })) {
+                    throw new ToolchainBadValueInKeyException("${toolchain_list[i]}.cleanup must be a List of Strings.")
+                }
+            }
         }
         return true
     }
