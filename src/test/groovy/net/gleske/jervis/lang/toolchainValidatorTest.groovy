@@ -198,4 +198,26 @@ class toolchainValidatorTest extends GroovyTestCase {
         }
         assert false == toolchains.validate_asBool()
     }
+    @Test public void test_toolchainValidator_bad_toolchains_cleanup_list() {
+        URL url = this.getClass().getResource('/bad_toolchains_cleanup_list.json');
+        toolchains.load_JSON(url.getFile())
+        shouldFail(ToolchainBadValueInKeyException) {
+            toolchains.validate()
+        }
+        assert false == toolchains.validate_asBool()
+    }
+    @Test public void test_toolchainValidator_bad_toolchains_cleanup_string() {
+        URL url = this.getClass().getResource('/bad_toolchains_cleanup_string.json');
+        toolchains.load_JSON(url.getFile())
+        shouldFail(ToolchainBadValueInKeyException) {
+            toolchains.validate()
+        }
+        assert false == toolchains.validate_asBool()
+    }
+    @Test public void test_toolchainValidator_good_toolchains_cleanup() {
+        URL url = this.getClass().getResource('/good_toolchains_cleanup.json');
+        toolchains.load_JSON(url.getFile())
+        toolchains.validate()
+        assert true == toolchains.validate_asBool()
+    }
 }

@@ -643,4 +643,10 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nadditional_toolchains: compiler')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
     }
+    @Test public void test_toolchainValidator_good_toolchains_cleanup() {
+        URL url = this.getClass().getResource('/good_toolchains_cleanup.json');
+        generator.loadToolchains(url.getFile())
+        generator.loadYamlString('language: ruby')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#cleanup toolchain section\nfunction rvm_cleanup_on() {\n  some cleanup command\n}\ntrap rvm_cleanup_on EXIT\n' == generator.generateToolchainSection()
+    }
 }
