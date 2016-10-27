@@ -672,7 +672,7 @@ env:
         }
         //write out the cleanup steps at the end of the toolchains
         (cleanup.keySet() as String[]).each { toolchain ->
-            output += "#cleanup toolchain section\nfunction ${toolchain}_cleanup_on() {"
+            output += "#cleanup toolchain section\nfunction ${toolchain}_cleanup_on() {\n  set +x"
             output += '\n  ' + cleanup[toolchain].join('\n  ')
             output += "\n}\ntrap ${toolchain}_cleanup_on EXIT\n"
         }
