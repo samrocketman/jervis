@@ -192,7 +192,7 @@ See also [RELEASE.md](RELEASE.md).
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jenkins]: https://jenkins-ci.org/
 [jervis-api-docs]: http://sam.gleske.net/jervis-api/
-[jervis-coveralls]: https://coveralls.io/r/samrocketman/jervis?branch=master
+[jervis-coveralls]: https://coveralls.io/repos/github/samrocketman/jervis/badge.svg?branch=master
 [jervis-docker]: https://github.com/samrocketman/docker-jenkins-jervis
 [jervis-jenkins-bootstrap]: https://github.com/samrocketman/jenkins-bootstrap-jervis
 [jervis-travis]: https://travis-ci.org/samrocketman/jervis
