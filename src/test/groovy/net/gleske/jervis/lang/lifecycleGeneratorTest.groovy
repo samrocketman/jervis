@@ -583,4 +583,8 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: shell\nscript:\n  - "some command"\n  -\n  - "another command"')
         assert '#\n# SCRIPT SECTION\n#\nset +x\necho \'# SCRIPT SECTION\'\nset -x\nsome command\n\nanother command\n' == generator.generateSection('script')
     }
+    @Test public void test_lifecycleGenerator_bad_null_entry_with_false() {
+        generator.loadYamlString('language: shell\nscript:\n  - "some command"\n  -\n  - false')
+        assert '#\n# SCRIPT SECTION\n#\nset +x\necho \'# SCRIPT SECTION\'\nset -x\nsome command\n\nfalse\n' == generator.generateSection('script')
+    }
 }
