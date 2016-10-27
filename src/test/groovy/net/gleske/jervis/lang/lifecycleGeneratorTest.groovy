@@ -587,4 +587,52 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: shell\nscript:\n  - "some command"\n  -\n  - false')
         assert '#\n# SCRIPT SECTION\n#\nset +x\necho \'# SCRIPT SECTION\'\nset -x\nsome command\n\nfalse\n' == generator.generateSection('script')
     }
+    @Test public void test_lifecycleGenerator_good_additional_toolchains_dedup() {
+        //should discard duplicate
+        generator.loadYamlString('language: ruby\nadditional_toolchains: jdk')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        generator.loadYamlString('language: ruby\nadditional_toolchains:\n  - jdk')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        generator.loadYamlString('language: ruby\nadditional_toolchains:\n  - jdk\n  - compiler')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
+    }
+    @Test public void test_lifecycleGenerator_good_additional_toolchains_discard_nonexisting() {
+        //discard non-existing additional toolchain
+        generator.loadYamlString('language: ruby\nadditional_toolchains: foo')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        generator.loadYamlString('language: ruby\nadditional_toolchains:\n  - foo')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
+        generator.loadYamlString('language: ruby\nadditional_toolchains:\n  - foo\n  - compiler')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
+    }
+    @Test public void test_lifecycleGenerator_good_additional_toolchains_inline() {
+        generator.loadYamlString('language: ruby\ncompiler: gcc')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
+        generator.loadYamlString('language: ruby\ncompiler: clang')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="clang++"\nexport CC="clang"\n' == generator.generateToolchainSection()
+    }
+    @Test public void test_lifecycleGenerator_good_additional_toolchains_ordered() {
+        generator.loadYamlString('language: ruby\nadditional_toolchains:\n  - python\n  - compiler')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#python toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
+        //reset toolchains for reverse order
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
+        generator.loadToolchains(url.getFile())
+        //test reverse order
+        generator.loadYamlString('language: ruby\nadditional_toolchains:\n  - compiler\n  - python')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n#python toolchain section\nsome commands\n' == generator.generateToolchainSection()
+    }
+    @Test public void test_lifecycleGenerator_good_additional_toolchains_inline_ordered() {
+        generator.loadYamlString('language: ruby\npython: "2.7"\ncompiler: gcc')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#python toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
+        //reset toolchains for reverse order
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
+        generator.loadToolchains(url.getFile())
+        //test reverse order
+        generator.loadYamlString('language: ruby\ncompiler: gcc\npython: "2.7"')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n#python toolchain section\nsome commands\n' == generator.generateToolchainSection()
+    }
+    @Test public void test_lifecycleGenerator_good_additional_toolchains_string() {
+        generator.loadYamlString('language: ruby\nadditional_toolchains: compiler')
+        assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
+    }
 }

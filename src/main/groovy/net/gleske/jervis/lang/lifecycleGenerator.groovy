@@ -364,7 +364,9 @@ class lifecycleGenerator {
         }
         //allow ordered loading additional toolchains into a language key
         if('additional_toolchains' in jervis_yaml) {
-            if((jervis_yaml['additional_toolchains'] instanceof String) && (jervis_yaml['additional_toolchains'] in toolchain_obj.toolchains)) {
+            if((jervis_yaml['additional_toolchains'] instanceof String) &&
+                    (jervis_yaml['additional_toolchains'] in toolchain_obj.toolchains) &&
+                    !(jervis_yaml['additional_toolchains'] in toolchain_obj.toolchains["toolchains"][yaml_language])) {
                 toolchain_obj.toolchains["toolchains"][yaml_language] << jervis_yaml['additional_toolchains']
             }
             if(jervis_yaml['additional_toolchains'] instanceof List) {
