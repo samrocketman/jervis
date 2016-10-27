@@ -1,3 +1,13 @@
+# jervis 0.11
+
+* Enhancement: cleanup added to Toolchains Specification.  [See issue #61][#61]
+* New feature: additional labels can be specified.  [See issue #87][#87]
+* New feature: additional toolchains can be set up.  [See issue #87][#87]
+* Bugfix `null` from blank lines in sections.  [See issue #88][#88]
+* Additional bug fixes.
+* Cleaned up `firstjob_dsl.groovy` removing deprecated methods.  Removed
+  credentials definition from folder because Job DSL plugin fixed it.
+
 # jervis 0.10
 
 * Bugfix when a toolchain is a number an unsupported toolchain exception is
@@ -84,6 +94,7 @@ not declare the type of matrix.  [See wiki for details][wiki-toolchains-spec].
 * Fully generated `groovydoc`.
 * At least 80% test coverage.
 
+[#61]: https://github.com/samrocketman/jervis/issues/61
 [#64]: https://github.com/samrocketman/jervis/issues/64
 [#68]: https://github.com/samrocketman/jervis/issues/68
 [#70]: https://github.com/samrocketman/jervis/issues/70
@@ -93,5 +104,7 @@ not declare the type of matrix.  [See wiki for details][wiki-toolchains-spec].
 [#82]: https://github.com/samrocketman/jervis/issues/82
 [#84]: https://github.com/samrocketman/jervis/issues/84
 [#85]: https://github.com/samrocketman/jervis/issues/85
+[#87]: https://github.com/samrocketman/jervis/issues/87
+[#88]: https://github.com/samrocketman/jervis/issues/88
 [ccs-plugin]: https://wiki.jenkins-ci.org/display/JENKINS/Collapsing+Console+Sections+Plugin
 [wiki-toolchains-spec]: https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file
