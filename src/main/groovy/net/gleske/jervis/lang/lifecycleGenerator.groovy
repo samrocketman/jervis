@@ -599,9 +599,13 @@ env:
     public String generateToolchainSection() throws UnsupportedToolException {
         //get toolchain order for this language
         def toolchains_order = toolchain_obj.toolchains['toolchains'][yaml_language]
+        HashMap cleanup = [:]
         String output = '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n'
         toolchains_order.each { toolchain ->
             String[] toolchain_keys = toolchain_obj.toolchains[toolchain].keySet() as String[]
+            if('cleanup' in toolchain_obj.toolchains[toolchain]) {
+                cleanup[toolchain] = toolchain_obj.toolchains[toolchain]['cleanup']
+            }
             output += "#${toolchain} toolchain section\n"
             if(toolchain in yaml_keys) {
                 //User wants to override default with a toolchain value in their YAML file.
@@ -665,6 +669,12 @@ env:
                     }
                 }
             }
+        }
+        //write out the cleanup steps at the end of the toolchains
+        (cleanup.keySet() as String[]).each { toolchain ->
+            output += "#cleanup toolchain section\nfunction ${toolchain}_cleanup_on() {"
+            output += '\n  ' + cleanup[toolchain].join('\n  ')
+            output += "\n}\ntrap ${toolchain}_cleanup_on EXIT\n"
         }
         return output
     }

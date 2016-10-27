@@ -49,6 +49,10 @@
         "default_ivalue": "1.5",
         "friendlyLabel": true,
         "comment": "Uses gimme - https://github.com/travis-ci/gimme",
+        "cleanup": [
+            "cd \"${WORKSPACE}\"",
+            "rm -rf \"${GOPATH}\""
+        ],
         "*": [
             "export GOMAXPROCS=${GOMAXPROCS:-2}",
             "eval \"$(gimme ${jervis_toolchain_ivalue})\"",
@@ -183,6 +187,9 @@
         "default_ivalue": "1.9.3",
         "friendlyLabel": true,
         "comment": "Uses rvm - https://rvm.io/",
+        "cleanup": [
+            "rvm gemset delete \"${JERVIS_GEMSET}\" --force"
+        ],
         "*": [
             "set +x",
             "echo \"$ source \\\"${HOME}/.rvm/scripts/rvm\\\"\"",
