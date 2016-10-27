@@ -375,6 +375,12 @@ class lifecycleGenerator {
                 }
             }
         }
+        //go through any toolchains that may be left; order is not guaranteed but will likely remain the order in which they're in the YAML file.
+        yaml_keys.each { key ->
+            if((key in toolchain_obj.toolchains) && !(key in toolchain_obj.toolchains["toolchains"][yaml_language])) {
+                toolchain_obj.toolchains["toolchains"][yaml_language] << key
+            }
+        }
     }
 
     /**
