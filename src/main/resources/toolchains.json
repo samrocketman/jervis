@@ -8,7 +8,8 @@
         "java": ["env", "jdk"],
         "node_js": ["env", "node_js"],
         "python": ["env", "python"],
-        "ruby": ["gemfile", "env", "rvm", "jdk"]
+        "ruby": ["gemfile", "env", "rvm", "jdk"],
+        "shell": ["env"]
     },
     "compiler": {
         "default_ivalue": "gcc",

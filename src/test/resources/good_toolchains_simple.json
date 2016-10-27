@@ -2,7 +2,8 @@
     "toolchains": {
         "java": ["env", "jdk"],
         "python": ["env", "python"],
-        "ruby": ["gemfile", "env", "rvm", "jdk"]
+        "ruby": ["gemfile", "env", "rvm", "jdk"],
+        "shell": ["env"]
     },
     "env": {
         "matrix": "advanced",

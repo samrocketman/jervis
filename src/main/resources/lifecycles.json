@@ -184,5 +184,10 @@
         "sbt": {
             "script": "sbt ++$TRAVIS_SCALA_VERSION test"
         }
+    },
+    "shell": {
+        "friendlyName": "Shell",
+        "defaultKey": "none",
+        "none": {}
     }
 }

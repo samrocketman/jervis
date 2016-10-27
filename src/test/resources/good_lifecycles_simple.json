@@ -60,5 +60,10 @@
             "fileExistsCondition": "build.xml",
             "script": "ant test"
         }
+    },
+    "shell": {
+        "friendlyName": "Shell",
+        "defaultKey": "none",
+        "none": {}
     }
 }

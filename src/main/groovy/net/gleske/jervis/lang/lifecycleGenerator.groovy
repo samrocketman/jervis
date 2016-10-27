@@ -662,7 +662,7 @@ env:
             //take the default
             if(section in my_lifecycle_keys) {
                 if(my_lifecycle[section] instanceof List) {
-                    output += my_lifecycle[section].join('\n') + '\n'
+                    output += my_lifecycle[section].collect{ (it == null)? '' : it }.join('\n') + '\n'
                 }
                 else {
                     output += my_lifecycle[section] + '\n'
@@ -673,7 +673,7 @@ env:
             }
         }
         else if(jervis_yaml[section] instanceof List) {
-            output += jervis_yaml[section].join('\n') + '\n'
+            output += jervis_yaml[section].collect{ (it == null)? '' : it }.join('\n') + '\n'
         }
         else {
             //must be a String instance
