@@ -120,9 +120,11 @@ contents.
 
 ```groovy
 apply plugin: 'maven'
-repositories { mavenCentral() }
 
-defaultTasks 'clean', 'libs'
+repositories {
+    mavenCentral()
+}
+
 
 configurations {
     libs
@@ -133,7 +135,7 @@ dependencies {
     libs 'net.gleske:jervis:0.11'
 }
 
-clean {
+task cleanLibs(type: Delete) {
     delete 'lib'
 }
 
@@ -141,6 +143,9 @@ task libs(type: Copy) {
     into 'lib'
     from configurations.libs
 }
+
+defaultTasks 'clean', 'libs'
+clean.dependsOn cleanLibs
 ```
 
 Then execute `./gradlew libs` to assemble dependencies into the `lib` directory
