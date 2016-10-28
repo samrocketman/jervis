@@ -118,7 +118,7 @@ include it in your build tool.
 Your Job DSL scripts should have a `build.gradle` file which has the following
 contents.
 
-```groovy
+```gradle
 apply plugin: 'maven'
 
 repositories {
