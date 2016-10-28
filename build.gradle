@@ -61,7 +61,6 @@ dependencies {
     compile 'org.ow2.asm:asm:5.1'
     testCompile 'junit:junit:4.12'
     libs 'org.yaml:snakeyaml:1.17'
-    libs 'net.gleske:jervis:0.11'
 }
 
 task libs(type: Copy) {
@@ -202,3 +201,11 @@ uploadArchives {
 
 //dependencies for building a jar
 jar.dependsOn tasks.findAll { task -> task.name.endsWith('Jar') }
+
+//disable optimizations for accurate branch coverage
+//http://pbetkier.blogspot.com/2014/08/groovy-code-coverage-issues.html
+gradle.taskGraph.whenReady { graph ->
+    if (graph.hasTask(':cobertura')) {
+        compileGroovy.groovyOptions.optimizationOptions.all = false
+    }
+}
