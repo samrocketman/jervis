@@ -2299,7 +2299,7 @@ ul.blockList ul.blockList h4, ul.blockList ul.blockListLast h4, ul.blockList ul.
 }
 
 ul.blockList ul.blockList li, ul.blockList ul.blockListLast li {
-    list-style-type: none
+    list-style-type: none;
 }
 
 ul.horizontal {
@@ -2376,4 +2376,7 @@ tt:before, tt:after {
 }
 pre tt:before, pre tt:after {
     content: normal;
+}
+ul.blockListLast ol.numbered li {
+  list-style-type: decimal;
 }

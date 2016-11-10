@@ -799,7 +799,25 @@ env:
                  used to search the <tt>object</tt> for a possible value.
       @param defaultValue A default value and type that should be returned.
       @return Returns the value of the key or a <tt>defaultValue</tt> which is of the
-              same type as <tt>defaultValue</tt>.
+              same type as <tt>defaultValue</tt>.  This function has three coercion
+              behaviors which is not the same as Groovy:
+      <ol class="numbered">
+        <li>
+          If the <tt>defaultValue</tt> is an instance of <tt>String</tt> and the
+          retrieved key is an instance of <tt>Map</tt>, then <tt>defaultValue</tt> is
+          returned rather than converting it to a <tt>String</tt>.
+        </li>
+        <li>
+          If the <tt>defaultValue</tt> is an instance of <tt>String</tt> and the
+          retrieved key is an instance of <tt>List</tt>, then <tt>defaultValue</tt> is
+          returned rather than converting it to a <tt>String</tt>.
+        </li>
+        <li>
+          If the <tt>defaultValue</tt> is an instance of <tt>Boolean</tt>, the
+          retrieved key is an instance of <tt>String</tt> and has a value of
+          <tt>false</tt>, then <tt>Boolean false</tt> is returned.
+        </li>
+      </ol>
      */
     public static Object getObjectValue(Map object, String key, Object defaultValue) {
         if(key.indexOf('.') >= 0) {
