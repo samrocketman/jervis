@@ -820,7 +820,12 @@ env:
                     return defaultValue
                 }
                 else {
-                    return object.get(key).asType(defaultValue.getClass())
+                    if((defaultValue instanceof Boolean) && (object.get(key) == 'false')) {
+                        return false
+                    }
+                    else {
+                        return object.get(key).asType(defaultValue.getClass())
+                    }
                 }
             }
         }

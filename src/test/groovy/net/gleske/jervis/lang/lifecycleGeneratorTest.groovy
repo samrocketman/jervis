@@ -427,6 +427,11 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert 'default'.equals(generator.getObjectValue(example, 'key2.subkey1', 'default'))
         assert 2.equals(generator.getObjectValue(example, 'key1.subkey1', 2))
     }
+    @Test public void test_lifecycleGenerator_getObjectValue_false_bug() {
+        Map example = [key1: [subkey1: 'false']]
+        assert false == generator.getObjectValue(example, 'key1.subkey1', false)
+        assert false == generator.getObjectValue(example, 'key1.subkey1', true)
+    }
     @Test public void test_lifecycleGenerator_getObjectValue_type_bug() {
         Map example = [key1: [subkey1: 'string'],key2: ["a", "b"]]
         assert 'default'.equals(generator.getObjectValue(example, 'key1', 'default'))
