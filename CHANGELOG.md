@@ -1,3 +1,8 @@
+# jervis 0.12
+
+* Enhancement: YAML containing a string of `'false'` should evaluate to boolean
+  `false`.  [See issue #90][#90]
+
 # jervis 0.11
 
 * Enhancement: cleanup added to Toolchains Specification.  [See issue #61][#61]
@@ -106,5 +111,6 @@ not declare the type of matrix.  [See wiki for details][wiki-toolchains-spec].
 [#85]: https://github.com/samrocketman/jervis/issues/85
 [#87]: https://github.com/samrocketman/jervis/issues/87
 [#88]: https://github.com/samrocketman/jervis/issues/88
+[#90]: https://github.com/samrocketman/jervis/issues/90
 [ccs-plugin]: https://wiki.jenkins-ci.org/display/JENKINS/Collapsing+Console+Sections+Plugin
 [wiki-toolchains-spec]: https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file
