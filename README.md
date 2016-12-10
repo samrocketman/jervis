@@ -71,7 +71,8 @@ that have been overcome by Jenkins (formerly Hudson) and its community.
 The scaling issue is a main bullet. The solution for the issue is in a
 sub-bullet.
 
-* Developers are challenged with building often and even deploying often.
+* Developers are challenged with integrating work, building often, and even
+  deploying often.
   * Jenkins was invented.
 * Jenkins infrastructure is strained when too many slaves are in one master and
   too many jobs are queued up on a daily basis.  A single master struggles to
