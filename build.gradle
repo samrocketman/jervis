@@ -10,7 +10,7 @@ archivesBaseName = 'jervis'
 jar.baseName = 'jervis'
 version = '0.13-SNAPSHOT'
 
-ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.8'
+ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.9'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
 
@@ -129,7 +129,7 @@ task( console, dependsOn: "classes", type: JavaExec ) {
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 //generate gradlew with: gradle wrapper
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.11'
+    gradleVersion = '3.4.1'
 }
 
 //Maven Central uploads
