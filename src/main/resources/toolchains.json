@@ -69,28 +69,16 @@
         ]
     },
     "jdk": {
-        "default_ivalue": "openjdk7",
+        "default_ivalue": "openjdk8",
         "friendlyLabel": true,
-        "openjdk6": [
-            "export JAVA_HOME=\"${HOME}/java/openjdk6\"",
+        "openjdk8": [
+            "export JAVA_HOME=\"/usr/lib/jvm/java-8-openjdk-amd64\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
             "java -Xmx32m -version",
             "javac -J-Xmx32m -version"
         ],
-        "openjdk7": [
-            "export JAVA_HOME=\"/usr/lib/jvm/java-7-openjdk-amd64\"",
-            "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
-            "java -Xmx32m -version",
-            "javac -J-Xmx32m -version"
-        ],
-        "oraclejdk7": [
-            "export JAVA_HOME=\"${HOME}/java/oraclejdk7\"",
-            "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
-            "java -Xmx32m -version",
-            "javac -J-Xmx32m -version"
-        ],
-        "oraclejdk8": [
-            "export JAVA_HOME=\"${HOME}/java/oraclejdk8\"",
+        "openjdk9": [
+            "export JAVA_HOME=\"/usr/lib/jvm/java-9-openjdk-amd64\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
             "java -Xmx32m -version",
             "javac -J-Xmx32m -version"
