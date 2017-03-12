@@ -78,7 +78,7 @@
             "javac -J-Xmx32m -version"
         ],
         "openjdk7": [
-            "export JAVA_HOME=\"${HOME}/java/openjdk7\"",
+            "export JAVA_HOME=\"/usr/lib/jvm/java-7-openjdk-amd64\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
             "java -Xmx32m -version",
             "javac -J-Xmx32m -version"
