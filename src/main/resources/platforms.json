@@ -1,13 +1,13 @@
 {
     "defaults": {
         "platform": "docker",
-        "os": "ubuntu1404",
+        "os": "ubuntu1604",
         "stability": "stable",
         "sudo": "sudo"
     },
     "supported_platforms": {
         "docker": {
-            "ubuntu1404": {
+            "ubuntu1604": {
                 "language": [
                     "groovy",
                     "java",
