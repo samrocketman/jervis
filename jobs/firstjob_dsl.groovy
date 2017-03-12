@@ -141,6 +141,17 @@ def generate_project_for(def git_service, String JERVIS_BRANCH) {
     jervis_jobType("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-')) {
         displayName("${project_name} (${JERVIS_BRANCH} branch)")
         label(generator.getLabels())
+        if(generator.isMatrixBuild()) {
+            //workaround for matrix builds ref: https://github.com/jenkinsci/docker-plugin/issues/242
+            properties {
+                groovyLabelAssignmentProperty {
+                    secureGroovyScript {
+                        script("""return currentJob.getClass().getSimpleName().equals('MatrixProject') ? 'master' : '${generator.getLabels()}'""")
+                        sandbox(false)
+                    }
+                }
+            }
+        }
         //configure encrypted properties
         if(generator.plainlist.size() > 0) {
             configure { project ->
