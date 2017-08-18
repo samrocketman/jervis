@@ -22,13 +22,25 @@ import net.gleske.jervis.remotes.GitHub
 
 //script bindings
 scriptApproval = Jenkins.instance.getExtensionList('org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval')[0]
+system_creds = Jenkins.instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0]
 
 def git_service = new GitHub()
 //Pre-job setup based on the type of remote
 switch(git_service) {
     case GitHub:
         //authenticate
-        if(System.getenv('GITHUB_TOKEN')) {
+        String gh_token = system_creds.getCredentials().find {
+            it.class.simpleName == 'StringCredentialsImpl' && it.id == 'github-token'
+        }.with {
+            if(it) {
+                it.secret
+            }
+        }
+        if(gh_token) {
+            println 'Found github-token credentials ID.'
+            git_service.gh_token = gh_token
+        }
+        else if(System.getenv('GITHUB_TOKEN')) {
             println 'Found GITHUB_TOKEN environment variable.'
             git_service.gh_token = System.getenv('GITHUB_TOKEN')
         }
