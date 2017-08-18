@@ -20,6 +20,9 @@ import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.remotes.GitHub
 
+//script bindings
+scriptApproval = Jenkins.instance.getExtensionList('org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval')[0]
+
 def git_service = new GitHub()
 //Pre-job setup based on the type of remote
 switch(git_service) {
@@ -146,8 +149,11 @@ def generate_project_for(def git_service, String JERVIS_BRANCH) {
             properties {
                 groovyLabelAssignmentProperty {
                     secureGroovyScript {
-                        script("""return currentJob.getClass().getSimpleName().equals('MatrixProject') ? 'master' : '${generator.getLabels()}'""")
+                        String groovyscript = "return currentJob.getClass().getSimpleName().equals('MatrixProject') ? 'master' : '${generator.getLabels()}'"
+                        script(groovyscript)
                         sandbox(false)
+                        //workaround for https://issues.jenkins-ci.org/browse/JENKINS-46016
+                        scriptApproval.approveScript(scriptApproval.hash(groovyscript, 'groovy'))
                     }
                 }
             }
