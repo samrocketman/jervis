@@ -468,20 +468,20 @@ class lifecycleGeneratorTest extends GroovyTestCase {
     @Test public void test_lifecycleGenerator_getLabels() {
         String yaml = 'language: ruby'
         generator.loadYamlString(yaml)
-        assert 'language:ruby&&gemfile&&env&&rvm&&jdk'.equals(generator.getLabels())
+        assert 'language:ruby && gemfile && env && rvm && jdk'.equals(generator.getLabels())
         URL url = this.getClass().getResource('/good_platforms_simple.json');
         generator.loadPlatforms(url.getFile())
         generator.preloadYamlString(yaml)
         generator.loadYamlString(yaml)
-        assert 'stable&&docker&&ubuntu1404&&sudo&&language:ruby&&gemfile&&env&&rvm&&jdk'.equals(generator.getLabels())
+        assert 'stable && docker && ubuntu1404 && sudo && language:ruby && gemfile && env && rvm && jdk'.equals(generator.getLabels())
     }
     @Test public void test_lifecycleGenerator_getLabels_additional_labels() {
         String yaml = 'language: ruby\njenkins:\n  additional_labels: foo'
         generator.loadYamlString(yaml)
-        assert 'language:ruby&&gemfile&&env&&rvm&&jdk&&foo'.equals(generator.getLabels())
+        assert 'language:ruby && gemfile && env && rvm && jdk && foo'.equals(generator.getLabels())
         yaml = 'language: ruby\njenkins:\n  additional_labels:\n  - foo\n  - bar'
         generator.loadYamlString(yaml)
-        assert 'language:ruby&&gemfile&&env&&rvm&&jdk&&foo&&bar'.equals(generator.getLabels())
+        assert 'language:ruby && gemfile && env && rvm && jdk && foo && bar'.equals(generator.getLabels())
     }
     @Test public void test_lifecycleGenerator_isRestricted() {
         String yaml = 'language: ruby'

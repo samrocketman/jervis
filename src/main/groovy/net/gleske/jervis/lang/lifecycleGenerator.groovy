@@ -926,17 +926,17 @@ env:
       @return A <tt>String</tt> which is a groovy expression of Jenkins node labels.
      */
     public String getLabels() {
-        String labels = ["language:${yaml_language}", toolchain_obj.toolchains['toolchains'][yaml_language].join('&&')].join('&&')
+        String labels = ["language:${yaml_language}", toolchain_obj.toolchains['toolchains'][yaml_language].join(' && ')].join(' && ')
         if(platform_obj) {
-            labels = [this.label_stability, this.label_platform, this.label_os, this.label_sudo, labels].join('&&')
+            labels = [this.label_stability, this.label_platform, this.label_os, this.label_sudo, labels].join(' && ')
         }
         //build on additional labels
         def additional_labels = getObjectValue(jervis_yaml, 'jenkins.additional_labels', new Object())
         if(additional_labels instanceof String) {
-            labels += "&&${additional_labels}"
+            labels += " && ${additional_labels}"
         }
         else if(additional_labels instanceof List) {
-            labels += "&&" + additional_labels.findAll { it instanceof String }.join('&&')
+            labels += " && " + additional_labels.findAll { it instanceof String }.join(' && ')
         }
         return labels
     }
