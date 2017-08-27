@@ -72,13 +72,13 @@
         "default_ivalue": "openjdk8",
         "friendlyLabel": true,
         "openjdk8": [
-            "export JAVA_HOME=\"/usr/lib/jvm/java-8-openjdk-amd64\"",
+            "export JAVA_HOME=\"${HOME}/java/openjdk8\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
             "java -Xmx32m -version",
             "javac -J-Xmx32m -version"
         ],
         "openjdk9": [
-            "export JAVA_HOME=\"/usr/lib/jvm/java-9-openjdk-amd64\"",
+            "export JAVA_HOME=\"${HOME}/java/openjdk9\"",
             "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
             "java -Xmx32m -version",
             "javac -J-Xmx32m -version"
