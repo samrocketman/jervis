@@ -163,7 +163,7 @@ class toolchainValidatorTest extends GroovyTestCase {
         assert false == toolchains.validate_asBool()
     }
     @Test public void test_toolchainValidator_main_toolchains_json() {
-        URL url = this.getClass().getResource('/toolchains.json');
+        URL url = this.getClass().getResource('/toolchains-ubuntu1604-stable.json');
         toolchains.load_JSON(url.getFile())
         assert true == toolchains.validate()
         assert true == toolchains.validate_asBool()

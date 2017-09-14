@@ -361,9 +361,9 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert false == generator.isGenerateBranch('derp')
     }
     @Test public void test_lifecycleGenerator_main_toolchains_bash_syntax_check() {
-        URL url = this.getClass().getResource('/lifecycles.json');
+        URL url = this.getClass().getResource('/lifecycles-ubuntu1604-stable.json');
         generator.loadLifecycles(url.getFile())
-        url = this.getClass().getResource('/toolchains.json');
+        url = this.getClass().getResource('/toolchains-ubuntu1604-stable.json');
         generator.loadToolchains(url.getFile())
         List skip_keys = ['default_ivalue', 'secureSupport', 'friendlyLabel', 'comment', 'matrix']
         //cycle through all permutations of the toolchains file and check bash syntax
