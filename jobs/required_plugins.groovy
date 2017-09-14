@@ -28,18 +28,17 @@ void detect(Set required_plugins) {
     }
 }
 
+//require in the future: ghprb, groovy-postbuild
 Set required_plugins = [
     'bouncycastle-api',
     'cloudbees-folder',
     'cobertura',
     'covcomplplot',
     'credentials',
-    'ghprb',
     'git',
     'github',
     'groovy',
     'groovy-label-assignment',
-    'groovy-postbuild',
     'javadoc',
     'job-dsl',
     'junit',
