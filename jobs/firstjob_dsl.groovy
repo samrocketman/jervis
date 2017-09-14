@@ -85,12 +85,37 @@ listView(project.toString()) {
         buildButton()
     }
 }
+
+//monkey patch Thread to handle surfacing exceptions
+Thread.metaClass.ex = null
+Thread.metaClass.checkForException = { ->
+    if(ex) {
+        throw ex
+    }
+}
+
 //generate projects for one or more branches
 if(branch != null && branch.size() > 0) {
     generate_project_for(branch)
 }
 else {
+    List <Thread> threads = []
     git_service.branches("${project}").each { branch ->
-        generate_project_for(branch)
+        threads << Thread.start {
+            try {
+                //generating jobs fails with 'anonymous' user permissions without impersonate
+                Jenkins.instance.ACL.impersonate(hudson.security.ACL.SYSTEM)
+                generate_project_for(branch)
+            }
+            catch(Throwable t) {
+                //save the caught exception to be surfaced in the job result
+                ex = t
+            }
+        }
+    }
+    threads.each {
+        it.join()
+        //throws an exception from the thread
+        it.checkForException()
     }
 }
