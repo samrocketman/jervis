@@ -51,6 +51,8 @@ class securityIO {
       Path to the RSA private key.  This will be used by encryptiong and decryption.
       During key generation it is the location where the private key will be written.
       Default: <tt>/tmp/id_rsa.pem</tt>
+
+      @Deprecated This is deprecated and will be removed in the next version.
      */
     @Deprecated
     public String id_rsa_priv
@@ -59,6 +61,8 @@ class securityIO {
       Path to the RSA public key.  This will be used by encryptiong and decryption.
       During key generation it is the location where the public key will be written.
       Default: <tt>/tmp/id_rsa.pub.pem</tt>
+
+      @Deprecated This is deprecated and will be removed in the next version.
      */
     @Deprecated
     public String id_rsa_pub
@@ -66,18 +70,25 @@ class securityIO {
     /**
       The key size in which RSA keys will be generated.  It is highly recommended this be <tt>1024</tt> bits or higher in powers of two.
       Default: value of <tt>{@link #default_key_size}</tt>.
+
+      @Deprecated Setting this property will be removed in the next version.
+                  It is recommended to use <tt>{@link #getId_rsa_keysize()}</tt>
+                  to get the value of this property instead of accessing it
+                  directly.
      */
     public int id_rsa_keysize
 
     /**
       The default key size for <tt>{@link #id_rsa_keysize}</tt>.
       Default: <tt>2048</tt>
+
+      @Deprecated This is deprecated and will be removed in the next version.
      */
     @Deprecated
     public static int default_key_size = 2048
 
     /**
-      A decoded private public key pair used for encryption and decryption.  The key size can be determined from the modulus.  For example,
+      A decoded RSA key pair used for encryption and decryption.  The key size can be determined from the modulus.  For example,
 
 <pre><tt>println key_pair.private.modulus.bitLength()
 println key_pair.public.modulus.bitLength()</tt></pre>
@@ -88,6 +99,10 @@ println key_pair.public.modulus.bitLength()</tt></pre>
 
     /**
       Instantiates default values for <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, and <tt>{@link #id_rsa_keysize}</tt>.
+
+      @Deprecated Setting <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>,
+                  and <tt>{@link #id_rsa_keysize}</tt> is deprecated and will
+                  be removed in the next version.
      */
     def securityIO() {
         //Deprecated
@@ -97,6 +112,8 @@ println key_pair.public.modulus.bitLength()</tt></pre>
     /**
       Instantiates default values for <tt>{@link #id_rsa_priv}</tt> and <tt>{@link #id_rsa_pub}</tt> but
       <tt>{@link #id_rsa_keysize}</tt> is set using <tt>keysize</tt>.
+
+      @Deprecated This is deprecated and will be removed in the next version.
      */
     @Deprecated
     def securityIO(int keysize) {
@@ -107,11 +124,13 @@ println key_pair.public.modulus.bitLength()</tt></pre>
       Instantiates the default value for <tt>{@link #id_rsa_keysize}</tt> but sets <tt>{@link #id_rsa_priv}</tt> and <tt>{@link #id_rsa_pub}</tt> based on <tt>path</tt>.
       <tt>path</tt> sets the directory where the public and private key will be generated.
       Specifically values are set in the following manner:
-<pre><tt>
-id_rsa_priv = {@link #checkPath()}(path) + '/id_rsa.pem'
+<pre><tt>id_rsa_priv = {@link #checkPath()}(path) + '/id_rsa.pem'
 id_rsa_pub = checkPath(path) + '/id_rsa.pub.pem'
 id_rsa_keysize = {@link #default_key_size}</tt></pre>
+
+      @Deprecated This is deprecated and will be removed in the next version.
      */
+    @Deprecated
     def securityIO(String path) {
         set_vars(checkPath(path) + '/id_rsa.pem', checkPath(path) + '/id_rsa.pub.pem', default_key_size)
     }
@@ -121,10 +140,11 @@ id_rsa_keysize = {@link #default_key_size}</tt></pre>
       <tt>path</tt> sets the directory where the public and private key will be generated.
       <tt>keysize</tt> sets the value for <tt>id_rsa_keysize</tt>.
       Specifically values are set in the following manner:
-<pre><tt>
-id_rsa_priv = {@link #checkPath()}(path) + '/id_rsa.pem'
+<pre><tt>id_rsa_priv = {@link #checkPath()}(path) + '/id_rsa.pem'
 id_rsa_pub = checkPath(path) + '/id_rsa.pub.pem'
 id_rsa_keysize = keysize</tt></pre>
+
+      @Deprecated This is deprecated and will be removed in the next version.
      */
     @Deprecated
     def securityIO(String path, int keysize) {
@@ -134,12 +154,13 @@ id_rsa_keysize = keysize</tt></pre>
     /**
       Instantiates setting custom values for <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, and <tt>{@link #id_rsa_keysize}</tt>.
       Specifically values are set in the following manner:
-<pre><tt>
-id_rsa_priv = priv_key_file_path
+<pre><tt>id_rsa_priv = priv_key_file_path
 id_rsa_pub = pub_key_file_path
 id_rsa_keysize = keysize</tt></pre>
-    @Deprecated
+
+      @Deprecated This is deprecated and will be removed in the next version.
      */
+    @Deprecated
     def securityIO(String priv_key_file_path, String pub_key_file_path, int keysize) {
         set_vars(priv_key_file_path, pub_key_file_path, keysize)
     }
@@ -150,6 +171,8 @@ id_rsa_keysize = keysize</tt></pre>
       @param  path A full path or relative path on the filesystem.  It must be a directory path.
       @return      A <tt>path</tt> in the right format.
       @see #securityIO(java.lang.String)
+
+      @Deprecated This is deprecated and will be removed in the next version.
      */
     @Deprecated
     public String checkPath(String path) {
@@ -170,6 +193,8 @@ id_rsa_keysize = keysize</tt></pre>
       @param priv_key_file_path A file path where the private key will be written on the filesystem.
       @param pub_key_file_path  A file path where the public key will be written on the filesystem.
       @param keysize            The key size in bits of the key pair.
+
+      @Deprecated This is deprecated and will be removed in the next version.
      */
     @Deprecated
     private void set_vars(String priv_key_file_path, String pub_key_file_path, int keysize) {
@@ -181,7 +206,7 @@ id_rsa_keysize = keysize</tt></pre>
     /**
       Sets <tt>{@link #key_pair}</tt> by decoding the <tt>String</tt>.
 
-      @param pem An X.509 PEM encoded private key.
+      @param pem An X.509 PEM encoded RSA private key.
      */
     void setKey_pair(String pem) {
         PEMParser parser = new PEMParser(new StringReader(pem))
@@ -199,7 +224,11 @@ id_rsa_keysize = keysize</tt></pre>
     }
 
     /**
-      Gets they <tt>{@link #id_rsa_keysize}</tt> from the decoded private key.
+      Gets the <tt>{@link #id_rsa_keysize}</tt> from the decoded private key.
+
+      @returns Key size of the private key if <tt>{@link #key_pair}</tt> is
+               set.  Otherwise, returns the value of the variable
+               <tt>{@link #id_rsa_keysize}</tt>.
      */
     int getId_rsa_keysize() {
         if(key_pair) {
@@ -256,6 +285,7 @@ id_rsa_keysize = keysize</tt></pre>
       nor <tt>{@link #id_rsa_keysize}</tt>.
 
       Warning: This depends on openssl command line utility to be installed.
+      Use of this method is not recommended.
 
       For third party reference, this is essentially executing the following commands in a terminal.
 
@@ -265,6 +295,8 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       @param priv_key_file_path A file path where the private key will be written on the filesystem.
       @param pub_key_file_path  A file path where the public key will be written on the filesystem.
       @param keysize            The key size in bits of the key pair.
+
+      @Deprecated This is deprecated and will be removed in the next version.
      */
     @Deprecated
     public void generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize) throws KeyGenerationException {
@@ -287,6 +319,9 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       Generate an RSA key pair (private key and public key) using <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, and <tt>{@link #id_rsa_keysize}</tt>.
 
       Warning: This depends on openssl command line utility to be installed.
+      Use of this method is not recommended.
+
+      @Deprecated This is deprecated and will be removed in the next version.
      */
     @Deprecated
     public void generate_rsa_pair() {
