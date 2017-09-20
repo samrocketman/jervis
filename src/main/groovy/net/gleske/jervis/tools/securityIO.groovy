@@ -17,8 +17,8 @@ package net.gleske.jervis.tools
 
 import net.gleske.jervis.exceptions.DecryptException
 import net.gleske.jervis.exceptions.EncryptException
-import net.gleske.jervis.exceptions.KeyPairDecodeException
 import net.gleske.jervis.exceptions.KeyGenerationException
+import net.gleske.jervis.exceptions.KeyPairDecodeException
 
 import java.security.KeyPair
 import java.security.Security

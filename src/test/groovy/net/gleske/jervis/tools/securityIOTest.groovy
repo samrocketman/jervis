@@ -20,6 +20,7 @@ import java.nio.file.Path
 import net.gleske.jervis.exceptions.DecryptException
 import net.gleske.jervis.exceptions.EncryptException
 import net.gleske.jervis.exceptions.KeyGenerationException
+import net.gleske.jervis.exceptions.KeyPairDecodeException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -148,5 +149,20 @@ class securityIOTest extends GroovyTestCase {
         Map myobj = new HashMap()
         myobj.put('secure', 'somevalue')
         assert true == security.isSecureField(myobj)
+    }
+    @Test public void test_securityIO_load_key_pair() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa');
+        assert !security.key_pair
+        security.key_pair = url.content.text
+        assert security.key_pair
+        assert security.id_rsa_keysize == 1024
+        url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096');
+        security.key_pair = url.content.text
+        assert security.id_rsa_keysize == 4096
+    }
+    @Test public void test_securityIO_bad_key_pair() {
+        shouldFail(KeyPairDecodeException) {
+            security.key_pair = "bad RSA key"
+        }
     }
 }
