@@ -194,7 +194,7 @@ id_rsa_keysize = keysize</tt></pre>
         if(obj in PEMKeyPair) {
             key_pair = converter.getKeyPair(obj as PEMKeyPair)
         } else {
-            throw new KeyPairDecodeException("Could not decode KeyPair from pem String.  Unable to handle class ${obj.class}")
+            throw new KeyPairDecodeException("Could not decode KeyPair from pem String.  Unable to handle ${obj.class}")
         }
     }
 
