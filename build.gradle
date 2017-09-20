@@ -8,7 +8,7 @@ apply plugin: 'signing'
 group = 'net.gleske'
 archivesBaseName = 'jervis'
 jar.baseName = 'jervis'
-version = '0.13-SNAPSHOT'
+version = '1.0-SNAPSHOT'
 
 ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.12'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
@@ -57,10 +57,11 @@ repositories {
 }
 dependencies {
     compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    compile 'org.yaml:snakeyaml:1.18'
+    compile 'org.bouncycastle:bcpkix-jdk15on:1.57'
     compile 'org.ow2.asm:asm:5.2'
-    testCompile 'junit:junit:4.12'
+    compile 'org.yaml:snakeyaml:1.18'
     libs 'org.yaml:snakeyaml:1.18'
+    testCompile 'junit:junit:4.12'
 }
 
 task libs(type: Copy) {

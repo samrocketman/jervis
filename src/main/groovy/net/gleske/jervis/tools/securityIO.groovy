@@ -17,7 +17,15 @@ package net.gleske.jervis.tools
 
 import net.gleske.jervis.exceptions.DecryptException
 import net.gleske.jervis.exceptions.EncryptException
+import net.gleske.jervis.exceptions.KeyPairDecodeException
 import net.gleske.jervis.exceptions.KeyGenerationException
+
+import java.security.KeyPair
+import java.security.Security
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.openssl.PEMKeyPair
+import org.bouncycastle.openssl.PEMParser
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
 
 /**
    A class to provide cryptographic features to Jervis such as RSA encryption and base64 encoding.
@@ -44,6 +52,7 @@ class securityIO {
       During key generation it is the location where the private key will be written.
       Default: <tt>/tmp/id_rsa.pem</tt>
      */
+    @Deprecated
     public String id_rsa_priv
 
     /**
@@ -51,6 +60,7 @@ class securityIO {
       During key generation it is the location where the public key will be written.
       Default: <tt>/tmp/id_rsa.pub.pem</tt>
      */
+    @Deprecated
     public String id_rsa_pub
 
     /**
@@ -63,12 +73,24 @@ class securityIO {
       The default key size for <tt>{@link #id_rsa_keysize}</tt>.
       Default: <tt>2048</tt>
      */
+    @Deprecated
     public static int default_key_size = 2048
+
+    /**
+      A decoded private public key pair used for encryption and decryption.  The key size can be determined from the modulus.  For example,
+
+<pre><tt>println key_pair.private.modulus.bitLength()
+println key_pair.public.modulus.bitLength()</tt></pre>
+
+     */
+    public KeyPair key_pair
+
 
     /**
       Instantiates default values for <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, and <tt>{@link #id_rsa_keysize}</tt>.
      */
     def securityIO() {
+        //Deprecated
         set_vars('/tmp/id_rsa.pem', '/tmp/id_rsa.pub.pem', default_key_size)
     }
 
@@ -76,6 +98,7 @@ class securityIO {
       Instantiates default values for <tt>{@link #id_rsa_priv}</tt> and <tt>{@link #id_rsa_pub}</tt> but
       <tt>{@link #id_rsa_keysize}</tt> is set using <tt>keysize</tt>.
      */
+    @Deprecated
     def securityIO(int keysize) {
         set_vars('/tmp/id_rsa.pem', '/tmp/id_rsa.pub.pem', keysize)
     }
@@ -103,6 +126,7 @@ id_rsa_priv = {@link #checkPath()}(path) + '/id_rsa.pem'
 id_rsa_pub = checkPath(path) + '/id_rsa.pub.pem'
 id_rsa_keysize = keysize</tt></pre>
      */
+    @Deprecated
     def securityIO(String path, int keysize) {
         set_vars(checkPath(path) + '/id_rsa.pem', checkPath(path) + '/id_rsa.pub.pem', keysize)
     }
@@ -114,6 +138,7 @@ id_rsa_keysize = keysize</tt></pre>
 id_rsa_priv = priv_key_file_path
 id_rsa_pub = pub_key_file_path
 id_rsa_keysize = keysize</tt></pre>
+    @Deprecated
      */
     def securityIO(String priv_key_file_path, String pub_key_file_path, int keysize) {
         set_vars(priv_key_file_path, pub_key_file_path, keysize)
@@ -126,6 +151,7 @@ id_rsa_keysize = keysize</tt></pre>
       @return      A <tt>path</tt> in the right format.
       @see #securityIO(java.lang.String)
      */
+    @Deprecated
     public String checkPath(String path) {
         if(path.length() > 0 && path[-1] == '/') {
             if(path == '/') {
@@ -145,10 +171,43 @@ id_rsa_keysize = keysize</tt></pre>
       @param pub_key_file_path  A file path where the public key will be written on the filesystem.
       @param keysize            The key size in bits of the key pair.
      */
+    @Deprecated
     private void set_vars(String priv_key_file_path, String pub_key_file_path, int keysize) {
         id_rsa_priv = priv_key_file_path
         id_rsa_pub = pub_key_file_path
         id_rsa_keysize = keysize
+    }
+
+    /**
+      Sets <tt>{@link #key_pair}</tt> by decoding the <tt>String</tt>.
+
+      @param pem An X.509 PEM encoded private key.
+     */
+    void setKey_pair(String pem) {
+        PEMParser parser = new PEMParser(new StringReader(pem))
+        def obj = parser.readObject()
+        if(!obj) {
+            throw new KeyPairDecodeException("Could not decode KeyPair from pem String.  readObject returned null.")
+        }
+        Security.addProvider(new BouncyCastleProvider())
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC")
+        if(obj in PEMKeyPair) {
+            key_pair = converter.getKeyPair(obj as PEMKeyPair)
+        } else {
+            throw new KeyPairDecodeException("Could not decode KeyPair from pem String.  Unable to handle class ${obj.class}")
+        }
+    }
+
+    /**
+      Gets they <tt>{@link #id_rsa_keysize}</tt> from the decoded private key.
+     */
+    int getId_rsa_keysize() {
+        if(key_pair) {
+            key_pair.private.modulus.bitLength()
+        }
+        else {
+            id_rsa_keysize
+        }
     }
 
     /**
@@ -193,7 +252,10 @@ id_rsa_keysize = keysize</tt></pre>
 
     /**
       Generate an RSA key pair (private key and public key).
-      It does not take values from <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, nor <tt>{@link #id_rsa_keysize}</tt>.
+      It does not take values from <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>,
+      nor <tt>{@link #id_rsa_keysize}</tt>.
+
+      Warning: This depends on openssl command line utility to be installed.
 
       For third party reference, this is essentially executing the following commands in a terminal.
 
@@ -204,6 +266,7 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       @param pub_key_file_path  A file path where the public key will be written on the filesystem.
       @param keysize            The key size in bits of the key pair.
      */
+    @Deprecated
     public void generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize) throws KeyGenerationException {
         StringBuilder stderr = new StringBuilder()
         Process process = ['openssl', 'genrsa', '-out', priv_key_file_path, keysize.toString()].execute()
@@ -222,7 +285,10 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
 
     /**
       Generate an RSA key pair (private key and public key) using <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, and <tt>{@link #id_rsa_keysize}</tt>.
+
+      Warning: This depends on openssl command line utility to be installed.
      */
+    @Deprecated
     public void generate_rsa_pair() {
         generate_rsa_pair(id_rsa_priv, id_rsa_pub, id_rsa_keysize)
     }
