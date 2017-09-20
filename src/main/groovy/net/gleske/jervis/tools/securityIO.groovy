@@ -207,11 +207,13 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
     public void generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize) throws KeyGenerationException {
         StringBuilder stderr = new StringBuilder()
         Process process = ['openssl', 'genrsa', '-out', priv_key_file_path, keysize.toString()].execute()
+        process.waitFor()
         process.waitForProcessOutput(null, stderr)
         if(process.exitValue()) {
             throw new KeyGenerationException(stderr.toString())
         }
         process = ['openssl', 'rsa', '-in', priv_key_file_path, '-pubout', '-outform', 'pem', '-out', pub_key_file_path].execute()
+        process.waitFor()
         process.waitForProcessOutput(null, stderr)
         if(process.exitValue()) {
             throw new KeyGenerationException(stderr.toString())
@@ -243,6 +245,8 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
         Process proc2 = ['openssl', 'rsautl', '-encrypt', '-inkey', id_rsa_pub, '-pubin'].execute()
         Process proc3 = ['openssl','enc', '-base64', '-A'].execute()
         proc1 | proc2 | proc3
+        proc2.waitFor()
+        proc3.waitFor()
         proc2.waitForProcessOutput(null, stderr)
         proc3.waitForProcessOutput(stdout, null)
         if(proc2.exitValue()) {
@@ -270,6 +274,7 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
         Process proc2 = ['openssl', 'enc', '-base64', '-A', '-d'].execute()
         Process proc3 = ['openssl', 'rsautl', '-decrypt', '-inkey', id_rsa_priv].execute()
         proc1 | proc2 | proc3
+        proc3.waitFor()
         proc3.waitForProcessOutput(stdout, stderr)
         if(proc3.exitValue()) {
             throw new DecryptException(stderr.toString())
