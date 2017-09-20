@@ -214,7 +214,9 @@ id_rsa_keysize = keysize</tt></pre>
         if(!obj) {
             throw new KeyPairDecodeException("Could not decode KeyPair from pem String.  readObject returned null.")
         }
-        Security.addProvider(new BouncyCastleProvider())
+        if(!Security.getProvider('BC')) {
+            Security.addProvider(new BouncyCastleProvider())
+        }
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC")
         if(obj in PEMKeyPair) {
             key_pair = converter.getKeyPair(obj as PEMKeyPair)
