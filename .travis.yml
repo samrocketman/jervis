@@ -1,10 +1,12 @@
 language: groovy
+#Jenkins LTS core uses Groovy 2.4.8 as of 2017-09-17
 env:
   - GROOVY_VERSION="1.8.9"
   - GROOVY_VERSION="2.0.8"
   - GROOVY_VERSION="2.1.9"
   - GROOVY_VERSION="2.2.2"
   - GROOVY_VERSION="2.3.11"
+  - GROOVY_VERSION="2.4.8"
   - GROOVY_VERSION="2.4.12"
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
 install: ./assemble.sh
@@ -13,6 +15,7 @@ after_success:
   - ./coveralls.sh
 matrix:
   allow_failures:
+    - env: GROOVY_VERSION="1.8.9"
     - env: GROOVY_VERSION="2.0.8"
     - env: GROOVY_VERSION="2.1.9"
     - env: GROOVY_VERSION="2.2.2"
