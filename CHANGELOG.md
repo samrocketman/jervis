@@ -36,9 +36,20 @@ net.gleske.jervis.tools.securityIO.set_vars(String priv_key_file_path, String pu
 Features and bugfixes:
 
 - Feature: The YAML key `jenkins -> secrets` can now be a simple `Map` instead
-  of a list of maps.
-- Improvement: Encryption now occurs in the JVM runtime instead of forking an
-  `openssl` cli process.
+  of a list of maps.  Both of the following are supported:
+  ```yaml
+  jenkins:
+    secrets:
+      - key: super_secret
+        secret: <ciphertext>
+  ```
+  ```yaml
+  jenkins:
+    secrets:
+      super_secret: <ciphertext>
+  ```
+- Improvement: Encryption and decryption now occur in the JVM runtime instead of
+  forking an `openssl` cli process.
 - Bugfix: since switching to bouncycastle, unit tests no longer throw
   `closeWithWarning()` warnings.
 
