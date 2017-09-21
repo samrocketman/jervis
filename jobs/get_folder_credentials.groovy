@@ -30,14 +30,20 @@ getFolderRSAKeyCredentials = { String folder, String credentials_id ->
     }
     def credentials = Jenkins.instance.getJob(folder).properties.find { it.class.simpleName == 'FolderCredentialsProperty' }
     String found_credentials = ''
-    if(credentials) {
-        credentials.domainCredentials*.credentials*.each { c ->
-            if(c && c.class.simpleName == 'BasicSSHUserPrivateKey' && c.id == credentials_id) {
-                String priv_key = c.privateKey
-                Secret p = c.passphrase
-                found_credentials = new PEMEncodable(decode(priv_key, ((p)? p.plainText : null) as char[]).toPrivateKey()).encode()
+    try {
+        if(credentials) {
+            credentials.domainCredentials*.credentials*.each { c ->
+                if(c && c.class.simpleName == 'BasicSSHUserPrivateKey' && c.id == credentials_id) {
+                    String priv_key = c.privateKey
+                    Secret p = c.passphrase
+                    found_credentials = new PEMEncodable(decode(priv_key, ((p)? p.plainText : null) as char[]).toPrivateKey()).encode()
+                }
             }
         }
+    }
+    catch(Throwable t) {
+        println "An exception occurred when decrypting credential ${credentials_id} from folder ${folder}"
+        throw t
     }
     return found_credentials
 }
