@@ -69,31 +69,16 @@ generate_project_for = { String JERVIS_BRANCH ->
     //attempt to get the private key else return an empty string
     String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
     String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
-    //try decrypting secrets
-    if(credentials_id.size() > 0 && private_key_contents.size() == 0) {
+
+    if(credentials_id && !private_key_contents) {
         throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${credentials_id}")
     }
-    if(private_key_contents.size() > 0) {
+    if(private_key_contents) {
         println "Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}."
-        File priv_key = File.createTempFile('temp', '.txt')
-        //delete file if JVM is shut down
-        priv_key.deleteOnExit()
-        try {
-            priv_key.write(private_key_contents)
-            generator.setPrivateKeyPath(priv_key.getAbsolutePath())
-            generator.decryptSecrets()
-        }
-        catch(Throwable t) {
-            //clean up temp file
-            priv_key.delete()
-            //rethrow caught throwable
-            throw t
-        }
-        //done decrypting so clean up the private key
-        priv_key.delete()
-        //print a list of the keys attempting to be decrypted
+        generator.setPrivateKey(private_key_contents)
+        generator.decryptSecrets()
         println "Decrypted the following properties (indented):"
-        generator.plainlist*.get('key').each { println "    ${it}" }
+        println '    ' + generator.plainlist*.get('key').join('\n    ')
     }
     //end decrypting secrets
 
