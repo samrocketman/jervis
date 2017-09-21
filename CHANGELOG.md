@@ -9,8 +9,8 @@ Migrating from jervis 0.12:
   `jobs/**/*.groovy`.  `firstjob_dsl.groovy` is no longer the only script under
   the `jobs/` folder.  The DSL Scripts path must now specify
   `jobs/firstjob_dsl.groovy`.
-- It is recommended migrate `lifecycleGenerator.setPrivateKeyPath(str)` to
-  `lifecycleGenerator.setPrivateKey(new File(str).text)` because
+- It is recommended [migrate `lifecycleGenerator.setPrivateKeyPath(str)` to
+  `lifecycleGenerator.setPrivateKey(new File(str).text)`][mig-01-ex] because
   `setPrivateKeyPath()` is deprecated.
 - Instead of setting `securityIO.id_rsa_priv` with a file path, it is better to
   call `securityIO.setKey_pair()` because `id_rsa_priv` is deprecated.
@@ -172,4 +172,5 @@ not declare the type of matrix.  [See wiki for details][wiki-toolchains-spec].
 [bca-plugin]: https://wiki.jenkins.io/display/JENKINS/Bouncy+Castle+API+Plugin
 [ccs-plugin]: https://wiki.jenkins-ci.org/display/JENKINS/Collapsing+Console+Sections+Plugin
 [gla-plugin]: https://wiki.jenkins.io/display/JENKINS/Groovy+Label+Assignment+plugin
+[mig-01-ex]: https://github.com/samrocketman/jervis/commit/1d7ff1417c642d959f467c11eca7b16cb3e3ef3c
 [wiki-toolchains-spec]: https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file
