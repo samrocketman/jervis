@@ -22,6 +22,12 @@ import net.gleske.jervis.exceptions.KeyPairDecodeException
 
 import java.security.KeyPair
 import java.security.Security
+import org.bouncycastle.crypto.AsymmetricBlockCipher
+import org.bouncycastle.crypto.encodings.PKCS1Encoding
+import org.bouncycastle.crypto.engines.RSAEngine
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter
+import org.bouncycastle.crypto.util.PrivateKeyFactory
+import org.bouncycastle.crypto.util.PublicKeyFactory
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
@@ -95,7 +101,6 @@ println key_pair.public.modulus.bitLength()</tt></pre>
 
      */
     public KeyPair key_pair
-
 
     /**
       Instantiates default values for <tt>{@link #id_rsa_priv}</tt>, <tt>{@link #id_rsa_pub}</tt>, and <tt>{@link #id_rsa_keysize}</tt>.
@@ -248,7 +253,7 @@ id_rsa_keysize = keysize</tt></pre>
       @return         A decoded <tt>String</tt>.
      */
     public String decodeBase64String(String content) {
-        return new String(content.decodeBase64())
+        new String(content.trim().decodeBase64())
     }
 
     /**
@@ -258,7 +263,7 @@ id_rsa_keysize = keysize</tt></pre>
       @return         Decoded raw <tt>Bytes</tt>.
      */
     public byte[] decodeBase64Bytes(String content) {
-        return content.decodeBase64()
+        content.trim().decodeBase64()
     }
 
     /**
@@ -268,7 +273,7 @@ id_rsa_keysize = keysize</tt></pre>
       @return         Base64 encoded <tt>String</tt>
      */
     public String encodeBase64(String content) {
-        return content.bytes.encodeBase64().toString()
+        content.bytes.encodeBase64().toString()
     }
 
     /**
@@ -278,7 +283,7 @@ id_rsa_keysize = keysize</tt></pre>
       @return         Decoded raw <tt>Bytes</tt>.
      */
     public String encodeBase64(byte[] content) {
-        return content.encodeBase64().toString()
+        content.encodeBase64().toString()
     }
 
     /**
@@ -341,23 +346,16 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       @return A Base64 encoded cipher text or more generically: <tt>ciphertext = base64encode(RSAPublicKeyEncrypt(plaintext))</tt>
      */
     public String rsaEncrypt(String plaintext) throws EncryptException {
-        //build a list of processes to pipe
-        def stdout = new StringBuffer()
-        def stderr = new StringBuffer()
-        Process proc1 = ['echo', plaintext.trim()].execute()
-        Process proc2 = ['openssl', 'rsautl', '-encrypt', '-inkey', id_rsa_pub, '-pubin'].execute()
-        Process proc3 = ['openssl','enc', '-base64', '-A'].execute()
-        proc1 | proc2 | proc3
-        proc2.waitFor()
-        proc3.waitFor()
-        proc2.waitForProcessOutput(null, stderr)
-        proc3.waitForProcessOutput(stdout, null)
-        if(proc2.exitValue()) {
-            throw new EncryptException(stderr.toString())
+        if(!key_pair && !(new File(id_rsa_priv).exists())) {
+            throw new EncryptException("Private key does not exist so can't instantiate key_pair: ${id_rsa_priv}")
         }
-        else {
-            return stdout.toString().trim()
+        if(!key_pair) {
+            setKey_pair(new File(id_rsa_priv).text)
         }
+        AsymmetricBlockCipher encrypt = new PKCS1Encoding(new RSAEngine())
+        encrypt.init(true, PublicKeyFactory.createKey(key_pair.public.encoded) as AsymmetricKeyParameter)
+        byte[] ciphertext = encrypt.processBlock(plaintext.bytes, 0, plaintext.bytes.length)
+        encodeBase64(ciphertext)
     }
 
     /**
@@ -371,20 +369,16 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
       @return A plain text <tt>String</tt> or more generically: <tt>plaintext = RSAPrivateKeyDecrypt(base64decode(ciphertext))</tt>
      */
     public String rsaDecrypt(String ciphertext) throws DecryptException {
-        def stdout = new StringBuilder()
-        def stderr = new StringBuilder()
-        Process proc1 = ['echo', '-n', ciphertext.trim()].execute()
-        Process proc2 = ['openssl', 'enc', '-base64', '-A', '-d'].execute()
-        Process proc3 = ['openssl', 'rsautl', '-decrypt', '-inkey', id_rsa_priv].execute()
-        proc1 | proc2 | proc3
-        proc3.waitFor()
-        proc3.waitForProcessOutput(stdout, stderr)
-        if(proc3.exitValue()) {
-            throw new DecryptException(stderr.toString())
+        if(!key_pair && !(new File(id_rsa_priv).exists())) {
+            throw new DecryptException("Private key does not exist so can't instantiate key_pair: ${id_rsa_priv}")
         }
-        else {
-            return stdout.toString().trim()
+        if(!key_pair) {
+            setKey_pair(new File(id_rsa_priv).text)
         }
+        AsymmetricBlockCipher decrypt = new PKCS1Encoding(new RSAEngine())
+        decrypt.init(false, PrivateKeyFactory.createKey(key_pair.private.encoded) as AsymmetricKeyParameter)
+        byte[] messageBytes = decodeBase64Bytes(ciphertext)
+        (new String(decrypt.processBlock(messageBytes, 0, messageBytes.length))).trim()
     }
 
     /**
