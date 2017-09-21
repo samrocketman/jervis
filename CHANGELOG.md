@@ -49,8 +49,9 @@ Job DSL script changes in `jobs/` folder:
 - Load GitHub token from credentials plugin.
 - Reorganize Job DSL scripts into separate files.  This makes them more readable
   and composable by taking advantage of groovy bindings.
-- `jobs/get_folder_credentials.groovy` now makes use of bouncycastle library API
-  to decrypt private keys.  AES encryption is now supported in private keys.
+- `jobs/get_folder_credentials.groovy` now makes use of the [Bouncy Castle API
+  Plugin][bca-plugin] to decrypt private keys.  AES encryption is now supported
+  in private keys.
 - Some URLs now hyperlink.
 
 
@@ -168,6 +169,7 @@ not declare the type of matrix.  [See wiki for details][wiki-toolchains-spec].
 [#87]: https://github.com/samrocketman/jervis/issues/87
 [#88]: https://github.com/samrocketman/jervis/issues/88
 [#90]: https://github.com/samrocketman/jervis/issues/90
+[bca-plugin]: https://wiki.jenkins.io/display/JENKINS/Bouncy+Castle+API+Plugin
 [ccs-plugin]: https://wiki.jenkins-ci.org/display/JENKINS/Collapsing+Console+Sections+Plugin
-[wiki-toolchains-spec]: https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file
 [gla-plugin]: https://wiki.jenkins.io/display/JENKINS/Groovy+Label+Assignment+plugin
+[wiki-toolchains-spec]: https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file
