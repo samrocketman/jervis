@@ -15,6 +15,8 @@
    */
 package net.gleske.jervis.lang
 
+import java.util.logging.Level
+import java.util.logging.Logger
 import java.util.regex.Pattern
 import net.gleske.jervis.exceptions.JervisException
 import net.gleske.jervis.exceptions.PlatformValidationException
@@ -71,6 +73,8 @@ print 'Labels: '
 println generator.getLabels()</tt></pre>
  */
 class lifecycleGenerator {
+
+    private static final Logger logger = Logger.getLogger(lifecycleGenerator.class.getName());
 
     /**
       Contains the Jervis YAML loaded as an object.
@@ -1033,7 +1037,7 @@ env:
      */
     @Deprecated
     public void setPrivateKeyPath(String path) {
-        println 'WARNING: use of lifecycleGenerator.setPrivateKeyPath() is deprecated and will be removed in the next version.  Instead, use lifecycleGenerator.setPrivateKey(new File("/path/to/key").getText()).' + "\nAPI DOCUMENTATION: ${securityIO.deprecation_link}\nMIGRATION PATH: ${securityIO.release_notes}"
+         logger.log(Level.WARNING, 'Use of lifecycleGenerator.setPrivateKeyPath() is deprecated and will be removed in the next version of jervis.  Instead, use lifecycleGenerator.setPrivateKey(new File("/path/to/key").getText()).' + "\nAPI DOCUMENTATION: ${securityIO.deprecation_link}\nMIGRATION PATH: ${securityIO.release_notes}")
         //public key path and key size do not matter because we're only decrypting and not generating nor encrypting.
         secret_util = new securityIO(path, '', 2048)
     }
