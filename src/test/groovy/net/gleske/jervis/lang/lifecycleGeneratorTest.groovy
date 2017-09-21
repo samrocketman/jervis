@@ -530,23 +530,69 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert generator.secret_util instanceof securityIO
         assert generator.secret_util.key_pair
     }
-    @Test public void test_lifecycleGenerator_decryptSecrets() {
+    @Test public void test_lifecycleGenerator_decryptSecrets_list() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa');
         URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_test.yml')
-        File file = new File(file_url.getFile())
-        String yaml = file.text
-        generator.loadYamlString(yaml)
+        generator.loadYamlString(file_url.content.text)
         shouldFail(SecurityException) {
             generator.decryptSecrets()
         }
-        generator.setPrivateKeyPath(url.getPath())
-        assert generator.cipherlist.size() == 1
-        assert generator.plainlist.size() == 0
+        generator.setPrivateKeyPath(url.file)
+        assert generator.cipherlist
+        assert !generator.plainlist
         generator.decryptSecrets()
-        assert generator.plainlist.size() == 1
-        assert generator.plainlist[0]['key'].equals('JERVIS_SECRETS_TEST')
+        assert generator.plainlist
+        assert generator.plainlist[0]['key'] == 'JERVIS_SECRETS_TEST'
         //decrypted plain text
-        assert generator.plainlist[0]['secret'].equals('plaintext')
+        assert generator.plainlist[0]['secret'] == 'plaintext'
+    }
+    @Test public void test_lifecycleGenerator_decryptSecrets_map() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa');
+        URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_map_test.yml')
+        generator.loadYamlString(file_url.content.text)
+        shouldFail(SecurityException) {
+            generator.decryptSecrets()
+        }
+        generator.setPrivateKey(url.content.text)
+        assert generator.ciphermap
+        assert !generator.plainmap
+        generator.decryptSecrets()
+        assert generator.plainmap
+        assert 'JERVIS_SECRETS_TEST' in generator.plainmap
+        //decrypted plain text
+        assert generator.plainmap['JERVIS_SECRETS_TEST'] == 'plaintext'
+    }
+    @Test public void test_lifecycleGenerator_decryptSecrets_list_to_map() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa');
+        URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_test.yml')
+        generator.loadYamlString(file_url.content.text)
+        shouldFail(SecurityException) {
+            generator.decryptSecrets()
+        }
+        generator.setPrivateKey(url.content.text)
+        assert generator.ciphermap
+        assert !generator.plainmap
+        generator.decryptSecrets()
+        assert generator.plainmap
+        assert 'JERVIS_SECRETS_TEST' in generator.plainmap
+        //decrypted plain text
+        assert generator.plainmap['JERVIS_SECRETS_TEST'] == 'plaintext'
+    }
+    @Test public void test_lifecycleGenerator_decryptSecrets_map_to_list() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa');
+        URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_map_test.yml')
+        generator.loadYamlString(file_url.content.text)
+        shouldFail(SecurityException) {
+            generator.decryptSecrets()
+        }
+        generator.setPrivateKey(url.content.text)
+        assert generator.cipherlist
+        assert !generator.plainlist
+        generator.decryptSecrets()
+        assert generator.plainlist
+        assert generator.plainlist[0]['key'] == 'JERVIS_SECRETS_TEST'
+        //decrypted plain text
+        assert generator.plainlist[0]['secret'] == 'plaintext'
     }
     @Test public void test_lifecycleGenerator_null_env_key() {
         //this should not generate an exception

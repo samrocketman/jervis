@@ -171,9 +171,19 @@ class lifecycleGenerator {
     List cipherlist = [] as ArrayList
 
     /**
+      A map of secrets loaded from the YAML file.
+     */
+    Map ciphermap = [:] as HashMap
+
+    /**
       A list of decrypted values from the <tt>{@link #cipherlist}</tt>.
      */
     List plainlist = [] as ArrayList
+
+    /**
+      A list of decrypted values from the <tt>{@link #ciphermap}</tt>.
+     */
+    Map plainmap = [:] as HashMap
 
     /**
       A utility for decrypting RSA encrypted strings in YAML files.  This is an
@@ -345,8 +355,20 @@ class lifecycleGenerator {
         if(!lifecycle_obj.supportedLanguage(this.yaml_language) || !toolchain_obj.supportedLanguage(this.yaml_language)) {
             throw new UnsupportedLanguageException(this.yaml_language)
         }
-        //load encrypted properties
-        cipherlist = getObjectValue(jervis_yaml, 'jenkins.secrets', [] as ArrayList)
+        def cipherobj = getObjectValue(jervis_yaml, 'jenkins.secrets', new Object())
+        if(cipherobj instanceof List) {
+            //load encrypted properties
+            cipherlist = cipherobj
+            cipherlist.each { c ->
+                if(c instanceof Map && 'key' in c && 'secret' in c) {
+                    ciphermap[c['key']] = c['secret']
+                }
+            }
+        }
+        else if (cipherobj instanceof Map) {
+            ciphermap = cipherobj
+            cipherlist = ciphermap.collect { k, v -> [key: k, secret: v] }
+        }
         //avoid throwing a NullPointer exception if the user forgets to call obj.folder_listing to load a list of files.
         //just load an empty file list by default initially that can then be overridden.
         this.setFolder_listing([])
@@ -1017,16 +1039,12 @@ env:
      */
     public void decryptSecrets() throws SecurityException {
         if(!secret_util) {
-            throw new SecurityException("Call setPrivateKeyPath before loading secrets.")
+            throw new SecurityException("Call setPrivateKey before loading secrets.")
         }
-        cipherlist.each { item ->
-            if(('key' in item.keySet()) && ('secret' in item.keySet())) {
-                item['secret'] = secret_util.rsaDecrypt(item['secret'])
-                //now that we've decrypted go ahead and append it to plainlist
-                plainlist << item
-            }
-            //else skip unwanted keys
+        ciphermap.each { k, v ->
+            plainmap[k] = secret_util.rsaDecrypt(v)
         }
+        plainlist = plainmap.collect { k, v -> [key: k, secret: v] }
     }
 
     /**
