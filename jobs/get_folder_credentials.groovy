@@ -43,7 +43,11 @@ getFolderRSAKeyCredentials = { String folder, String credentials_id ->
         }
     }
     catch(Throwable t) {
-        println "An exception occurred when decrypting credential ${credentials_id} from folder ${HyperlinkNote.encodeTo('/' + Jenkins.instance.getItemByFullName(folder).url, folder)}."
+        message = 'An exception occurred when decrypting credential '
+        message += HyperlinkNote.encodeTo('/' + Jenkins.instance.getItemByFullName(folder).url + 'credentials/', credentials_id)
+        message += ' from folder '
+        message += HyperlinkNote.encodeTo('/' + Jenkins.instance.getItemByFullName(folder).url, folder) + '.'
+        println message
         throw t
     }
     return found_credentials
