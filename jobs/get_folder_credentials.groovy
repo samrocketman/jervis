@@ -18,6 +18,7 @@
    Gets a private key from a folder credentials ID.  If the private key is
    encrypted then it is automatically decrypted.
  */
+import hudson.console.HyperlinkNote
 import hudson.util.Secret
 import jenkins.bouncycastle.api.PEMEncodable
 import jenkins.model.Jenkins
@@ -42,7 +43,7 @@ getFolderRSAKeyCredentials = { String folder, String credentials_id ->
         }
     }
     catch(Throwable t) {
-        println "An exception occurred when decrypting credential ${credentials_id} from folder ${folder}"
+        println "An exception occurred when decrypting credential ${credentials_id} from folder ${HyperlinkNote.encodeTo('/' + Jenkins.instance.getItemByFullName(folder).url, folder)}."
         throw t
     }
     return found_credentials
