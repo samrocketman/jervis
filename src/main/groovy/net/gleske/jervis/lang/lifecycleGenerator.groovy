@@ -15,9 +15,6 @@
    */
 package net.gleske.jervis.lang
 
-import java.util.logging.Level
-import java.util.logging.Logger
-import java.util.regex.Pattern
 import net.gleske.jervis.exceptions.JervisException
 import net.gleske.jervis.exceptions.PlatformValidationException
 import net.gleske.jervis.exceptions.SecurityException
@@ -27,6 +24,10 @@ import net.gleske.jervis.lang.lifecycleValidator
 import net.gleske.jervis.lang.platformValidator
 import net.gleske.jervis.lang.toolchainValidator
 import net.gleske.jervis.tools.securityIO
+
+import java.util.logging.Level
+import java.util.logging.Logger
+import java.util.regex.Pattern
 import org.yaml.snakeyaml.Yaml
 
 /**
