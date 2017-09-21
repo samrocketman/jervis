@@ -5,7 +5,7 @@ changes.
 
 Migrating from jervis 0.12:
 
-- In the root `_jervis_generator` jobs, the typical DSL Scripts path is
+- In the root `_jervis_generator` job, the typical DSL Scripts path is
   `jobs/**/*.groovy`.  `firstjob_dsl.groovy` is no longer the only script under
   the `jobs/` folder.  The DSL Scripts path must now specify
   `jobs/firstjob_dsl.groovy`.
