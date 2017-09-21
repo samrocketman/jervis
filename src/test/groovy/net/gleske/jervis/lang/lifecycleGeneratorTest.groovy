@@ -523,6 +523,13 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.setPrivateKeyPath(url.getPath())
         assert generator.secret_util instanceof securityIO
     }
+    @Test public void test_lifecycleGenerator_setPrivateKey() {
+        assert generator.secret_util == null
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa');
+        generator.setPrivateKey(url.content.text)
+        assert generator.secret_util instanceof securityIO
+        assert generator.secret_util.key_pair
+    }
     @Test public void test_lifecycleGenerator_decryptSecrets() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa');
         URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_test.yml')

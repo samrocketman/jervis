@@ -1041,4 +1041,18 @@ env:
         //public key path and key size do not matter because we're only decrypting and not generating nor encrypting.
         secret_util = new securityIO(path, '', 2048)
     }
+
+    /**
+      Load an RSA private key in-memory rather than depending on a file
+      existing on disk.  This is required to decrypt secrets in a YAML file.
+      Call this function before <tt>{@link #decryptSecrets()}</tt> if expecting
+      encrypted YAML keys.
+
+      @param pem A <tt>String</tt> whose contents is an X.509 PEM encoded RSA
+                 private key.
+     */
+    public void setPrivateKey(String pem) {
+        secret_util = new securityIO()
+        secret_util.key_pair = pem
+    }
 }
