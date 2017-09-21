@@ -53,6 +53,9 @@ println security.rsaDecrypt(s)</tt></pre>
  */
 class securityIO {
 
+    private String deprecation_link = 'http://sam.gleske.net/jervis-api/1.0/net/gleske/jervis/tools/securityIO.html'
+    private String release_notes = 'https://github.com/samrocketman/jervis/blob/master/CHANGELOG.md#jervis-10'
+
     /**
       Path to the RSA private key.  This will be used by encryptiong and decryption.
       During key generation it is the location where the private key will be written.
@@ -181,6 +184,7 @@ id_rsa_keysize = keysize</tt></pre>
      */
     @Deprecated
     public String checkPath(String path) {
+        println 'WARNING: use of securityIO.checkPath() is deprecated and will be removed in the next version.' + "\nDOCUMENTATION: ${deprecation_link}\nMIGRATION PATH: ${release_notes}"
         if(path.length() > 0 && path[-1] == '/') {
             if(path == '/') {
                 path = ''
@@ -350,6 +354,7 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
             throw new EncryptException("Private key does not exist so can't instantiate key_pair: ${id_rsa_priv}")
         }
         if(!key_pair) {
+            println 'WARNING: use of id_rsa_priv and id_rsa_pub is deprecated and will be removed in the next version.  Instead use securityIO.setKey_pair(new File("/path/to/key").getText())' + "\nDOCUMENTATION: ${deprecation_link}\nMIGRATION PATH: ${release_notes}"
             setKey_pair(new File(id_rsa_priv).text)
         }
         AsymmetricBlockCipher encrypt = new PKCS1Encoding(new RSAEngine())
@@ -373,6 +378,7 @@ openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub</tt></pre>
             throw new DecryptException("Private key does not exist so can't instantiate key_pair: ${id_rsa_priv}")
         }
         if(!key_pair) {
+            println 'WARNING: use of id_rsa_priv and id_rsa_pub is deprecated and will be removed in the next version.  Instead use securityIO.setKey_pair(new File("/path/to/key").getText())' + "\nDOCUMENTATION: ${deprecation_link}\nMIGRATION PATH: ${release_notes}"
             setKey_pair(new File(id_rsa_priv).text)
         }
         AsymmetricBlockCipher decrypt = new PKCS1Encoding(new RSAEngine())
