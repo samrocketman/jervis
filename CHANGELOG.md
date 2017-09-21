@@ -15,18 +15,20 @@ Migrating from jervis 0.12:
 The following methods are now deprecated and should not be used.  They will be
 removed in the next release.
 
-- `net.gleske.jervis.lang.lifecycleGenerator.setPrivateKeyPath()`
-- `net.gleske.jervis.tools.securityIO.id_rsa_priv`
-- `net.gleske.jervis.tools.securityIO.id_rsa_pub`
-- `net.gleske.jervis.tools.securityIO.default_key_size`
-- `net.gleske.jervis.tools.securityIO.securityIO(int keysize)`
-- `net.gleske.jervis.tools.securityIO.securityIO(String path)`
-- `net.gleske.jervis.tools.securityIO.securityIO(String path, int keysize)`
-- `net.gleske.jervis.tools.securityIO.securityIO(String priv_key_file_path, String pub_key_file_path, int keysize)`
-- `net.gleske.jervis.tools.securityIO.checkPath(String path)`
-- `net.gleske.jervis.tools.securityIO.set_vars(String priv_key_file_path, String pub_key_file_path, int keysize)`
-- `net.gleske.jervis.tools.securityIO.generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize)`
-- `net.gleske.jervis.tools.securityIO.generate_rsa_pair()`
+```
+net.gleske.jervis.lang.lifecycleGenerator.setPrivateKeyPath()
+net.gleske.jervis.tools.securityIO.id_rsa_priv
+net.gleske.jervis.tools.securityIO.id_rsa_pub
+net.gleske.jervis.tools.securityIO.default_key_size
+net.gleske.jervis.tools.securityIO.securityIO(int keysize)
+net.gleske.jervis.tools.securityIO.securityIO(String path)
+net.gleske.jervis.tools.securityIO.securityIO(String path, int keysize)
+net.gleske.jervis.tools.securityIO.securityIO(String priv_key_file_path, String pub_key_file_path, int keysize)
+net.gleske.jervis.tools.securityIO.checkPath(String path)
+net.gleske.jervis.tools.securityIO.set_vars(String priv_key_file_path, String pub_key_file_path, int keysize)
+net.gleske.jervis.tools.securityIO.generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize)
+net.gleske.jervis.tools.securityIO.generate_rsa_pair()
+```
 
 Features and bugfixes:
 
