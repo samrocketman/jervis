@@ -10,24 +10,27 @@ Migrating from jervis 0.12:
   the `jobs/` folder.  The DSL Scripts path must now specify
   `jobs/firstjob_dsl.groovy`.
 - It is recommended migrate `lifecycleGenerator.setPrivateKeyPath(str)` to
-  `lifecycleGenerator.setPrivateKey(new File(str).text)`.
+  `lifecycleGenerator.setPrivateKey(new File(str).text)` because
+  `setPrivateKeyPath()` is deprecated.
+- Instead of setting `securityIO.id_rsa_priv` with a file path, it is better to
+  call `securityIO.setKey_pair()` because `id_rsa_priv` is deprecated.
 
 The following methods are now deprecated and should not be used.  They will be
 removed in the next release.
 
 ```
 net.gleske.jervis.lang.lifecycleGenerator.setPrivateKeyPath()
+net.gleske.jervis.tools.securityIO.checkPath(String path)
+net.gleske.jervis.tools.securityIO.default_key_size
+net.gleske.jervis.tools.securityIO.generate_rsa_pair()
+net.gleske.jervis.tools.securityIO.generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize)
 net.gleske.jervis.tools.securityIO.id_rsa_priv
 net.gleske.jervis.tools.securityIO.id_rsa_pub
-net.gleske.jervis.tools.securityIO.default_key_size
-net.gleske.jervis.tools.securityIO.securityIO(int keysize)
 net.gleske.jervis.tools.securityIO.securityIO(String path)
 net.gleske.jervis.tools.securityIO.securityIO(String path, int keysize)
 net.gleske.jervis.tools.securityIO.securityIO(String priv_key_file_path, String pub_key_file_path, int keysize)
-net.gleske.jervis.tools.securityIO.checkPath(String path)
+net.gleske.jervis.tools.securityIO.securityIO(int keysize)
 net.gleske.jervis.tools.securityIO.set_vars(String priv_key_file_path, String pub_key_file_path, int keysize)
-net.gleske.jervis.tools.securityIO.generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize)
-net.gleske.jervis.tools.securityIO.generate_rsa_pair()
 ```
 
 Features and bugfixes:
@@ -36,6 +39,8 @@ Features and bugfixes:
   of a list of maps.
 - Improvement: Encryption now occurs in the JVM runtime instead of forking an
   `openssl` cli process.
+- Bugfix: since switching to bouncycastle, unit tests no longer throw
+  `closeWithWarning()` warnings.
 
 Job DSL script changes in `jobs/` folder:
 
@@ -46,6 +51,7 @@ Job DSL script changes in `jobs/` folder:
   and composable by taking advantage of groovy bindings.
 - `jobs/get_folder_credentials.groovy` now makes use of bouncycastle library API
   to decrypt private keys.  AES encryption is now supported in private keys.
+- Some URLs now hyperlink.
 
 
 # jervis 0.12
