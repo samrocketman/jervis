@@ -12,7 +12,7 @@ If a variable has an undeclared type [it goes into the script
 binding][groovy-vars]. The binding is visible to all methods which means data is
 shared.
 
-[`evaluate()` is a built-in helper method][doc-eval] to allow the dynamic
+[`evaluate()` is a built-in helper method][eval] to allow the dynamic
 evaluation of Groovy expressions using parent scripts binding as the variable
 scope of the expression evaluated.  Therefore, bindings set inside of the
 evaluated Groovy expression propagate to the parent script.
@@ -44,5 +44,6 @@ assert factorial(4) == 24
 
 [closure-impl-it]: http://groovy-lang.org/closures.html#implicit-it
 [closure-params]: http://groovy-lang.org/closures.html#_normal_parameters
-[doc-eval]: http://docs.groovy-lang.org/2.4.7/html/gapi/groovy/lang/Script.html#evaluate(java.lang.String)
+[eval]: http://docs.groovy-lang.org/2.4.7/html/gapi/groovy/lang/Script.html#evaluate(java.lang.String)
 [groovy-vars]: http://groovy-lang.org/structure.html#_variables
+[jdp]: https://wiki.jenkins.io/display/JENKINS/Job+DSL+Plugin
