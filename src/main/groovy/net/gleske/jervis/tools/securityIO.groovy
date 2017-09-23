@@ -80,10 +80,6 @@ class securityIO {
       The key size in which RSA keys will be generated.  It is highly recommended this be <tt>1024</tt> bits or higher in powers of two.
       Default: value of <tt>{@link #default_key_size}</tt>.
 
-      @Deprecated Setting this property will be removed in the next version.
-                  It is recommended to use <tt>{@link #getId_rsa_keysize()}</tt>
-                  to get the value of this property instead of accessing it
-                  directly.
      */
     public int id_rsa_keysize
 
