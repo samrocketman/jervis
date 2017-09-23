@@ -53,8 +53,8 @@ println security.rsaDecrypt(s)</tt></pre>
  */
 class securityIO {
 
-    private static String deprecation_link = 'http://sam.gleske.net/jervis-api/1.0/net/gleske/jervis/tools/securityIO.html'
-    private static String release_notes = 'https://github.com/samrocketman/jervis/blob/master/CHANGELOG.md#jervis-10'
+    private static String deprecation_link = 'http://sam.gleske.net/jervis-api/0.13/net/gleske/jervis/tools/securityIO.html'
+    private static String release_notes = 'https://github.com/samrocketman/jervis/blob/master/CHANGELOG.md#jervis-013'
 
     /**
       Path to the RSA private key.  This will be used by encryptiong and decryption.

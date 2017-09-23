@@ -1,9 +1,6 @@
-# jervis 1.0
+# jervis 0.13
 
-The major version was bumped because there's potentially interface breaking
-changes.
-
-Migrating from jervis 0.12:
+Migrating Job DSL scripts from jervis 0.12 to future proof:
 
 - In the root `_jervis_generator` job, the typical DSL Scripts path is
   `jobs/**/*.groovy`.  `firstjob_dsl.groovy` is no longer the only script under
