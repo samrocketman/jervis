@@ -15,7 +15,7 @@
    */
 package net.gleske.jervis.lang
 
-import groovy.json.JsonSlurperClassic as JsonSlurper
+import org.yaml.snakeyaml.Yaml
 import net.gleske.jervis.exceptions.LifecycleBadValueInKeyException
 import net.gleske.jervis.exceptions.LifecycleInfiniteLoopException
 import net.gleske.jervis.exceptions.LifecycleMissingKeyException
@@ -79,7 +79,8 @@ class lifecycleValidator implements Serializable {
       @param json A <tt>String</tt> containing the contents of a lifecycles file.
      */
     public void load_JSONString(String json) {
-        lifecycles = new JsonSlurper().parseText(json)
+        def yaml = new Yaml()
+        lifecycles = yaml.load(json)?: [:]
         languages = lifecycles.keySet() as String[];
     }
 

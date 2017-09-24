@@ -15,7 +15,7 @@
    */
 package net.gleske.jervis.remotes
 
-import groovy.json.JsonSlurper
+import org.yaml.snakeyaml.Yaml
 import net.gleske.jervis.tools.securityIO
 
 /**
@@ -113,12 +113,12 @@ class GitHub implements JervisRemote {
       @return     A <tt>Map</tt> or <tt>List</tt> from the parsed JSON response.
     */
     public Object fetch(String path) {
-        def json = new JsonSlurper()
+        def yaml = new Yaml()
         if(this.gh_token) {
-            return json.parse(new URL(this.gh_api + path).newReader(requestProperties: ['Authorization': "token ${this.gh_token}".toString(), 'Accept': 'application/vnd.github.v3+json']))
+            return yaml.load(new URL(this.gh_api + path).newReader(requestProperties: ['Authorization': "token ${this.gh_token}".toString(), 'Accept': 'application/vnd.github.v3+json']))
         }
         else {
-            return json.parse(new URL(this.gh_api + path).newReader(requestProperties: ['Accept': 'application/vnd.github.v3+json']))
+            return yaml.load(new URL(this.gh_api + path).newReader(requestProperties: ['Accept': 'application/vnd.github.v3+json']))
         }
     }
 
