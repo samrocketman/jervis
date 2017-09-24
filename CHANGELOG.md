@@ -1,3 +1,8 @@
+# Next release
+
+- New Feature: `net.gleske.jervis.lang.*` is serializable so Jervis can now be
+  used in pipeline scripts.
+
 # jervis 0.13
 
 Migrating Job DSL scripts from jervis 0.12 to future proof:
