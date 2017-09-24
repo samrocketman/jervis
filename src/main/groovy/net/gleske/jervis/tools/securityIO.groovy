@@ -39,6 +39,7 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
    <h2>Sample usage</h2>
 
 <pre><tt>import net.gleske.jervis.tools.securityIO
+
 def security = new securityIO('/tmp',2048)
 security.generate_rsa_pair()
 println 'Private key path: ' + security.id_rsa_priv
@@ -49,7 +50,13 @@ println 'Length of encrypted output: ' + s.length()
 println 'Encrypted string:'
 println s
 println 'Decrypted string:'
-println security.rsaDecrypt(s)</tt></pre>
+println security.rsaDecrypt(s)
+println "${security.id_rsa_priv} file exists? ${new File(security.id_rsa_priv).exists()}"
+println "${security.id_rsa_pub} file exists? ${new File(security.id_rsa_pub).exists()}"
+new File(security.id_rsa_priv).delete()
+new File(security.id_rsa_pub).delete()
+println "${security.id_rsa_priv} file exists? ${new File(security.id_rsa_priv).exists()}"
+println "${security.id_rsa_pub} file exists? ${new File(security.id_rsa_pub).exists()}"</tt></pre>
  */
 class securityIO {
 

@@ -27,6 +27,7 @@ import net.gleske.jervis.tools.scmGit
 
   <h2>Sample usage</h2>
 <pre><tt>import net.gleske.jervis.tools.fileIO
+
 //mystring path is relative to the root of the git repository
 def mystring = 'readFile(/src/test/resources/sample_script.sh)'
 def x = new fileIO()
