@@ -33,10 +33,19 @@ import net.gleske.jervis.exceptions.PlatformValidationException
   method provided by the Job DSL plugin in Jenkins.</p>
 <pre><tt>import net.gleske.jervis.lang.platformValidator
 import net.gleske.jervis.tools.scmGit
+
 def git = new scmGit()
 def platforms = new platformValidator()
 platforms.load_JSON(git.getRoot() + '/src/main/resources/platforms.json')
-println 'Does the file validate? ' + platforms.validate()</tt></pre>
+println 'Does the file validate? ' + platforms.validate()
+//List supported platforms and operating systems
+platforms.platforms['supported_platforms'].sort { k, v -> k }.each { platform, os ->
+    println "Platform '${platform}' includes operating systems:"
+    os.sort { k, v -> k }.each { o, s ->
+        println "    ${o} (Supported languages: ${s['language'].sort().join(', ')})"
+    }
+}
+null</tt></pre>
  */
 class platformValidator implements Serializable {
 
