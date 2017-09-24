@@ -255,4 +255,9 @@ class platformValidatorTest extends GroovyTestCase {
         assert true == platforms.validate()
         assert true == platforms.validate_asBool()
     }
+    @Test public void test_platformValidator_serialization() {
+        URL url = this.getClass().getResource('/good_platforms_simple.json')
+        platforms.load_JSON(url.getFile())
+        new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(platforms)
+    }
 }

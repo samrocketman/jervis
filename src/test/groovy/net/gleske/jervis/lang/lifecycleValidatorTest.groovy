@@ -132,4 +132,9 @@ class lifecycleValidatorTest extends GroovyTestCase {
         lifecycles.load_JSON(url.getFile())
         assert true == lifecycles.validate()
     }
+    @Test public void test_lifecycleValidator_serialization() {
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        lifecycles.load_JSON(url.getFile())
+        new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(lifecycles)
+    }
 }

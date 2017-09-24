@@ -220,4 +220,9 @@ class toolchainValidatorTest extends GroovyTestCase {
         toolchains.validate()
         assert true == toolchains.validate_asBool()
     }
+    @Test public void test_toolchainValidator_serialization() {
+        URL url = this.getClass().getResource('/good_toolchains_simple.json');
+        toolchains.load_JSON(url.getFile())
+        new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(toolchains)
+    }
 }
