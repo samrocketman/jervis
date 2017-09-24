@@ -35,19 +35,16 @@ import net.gleske.jervis.exceptions.ToolchainBadValueInKeyException
 import net.gleske.jervis.tools.scmGit
 def git = new scmGit()
 def toolchains = new toolchainValidator()
-toolchains.load_JSON(git.getRoot() + '/src/main/resources/toolchains.json')
+toolchains.load_JSON(git.getRoot() + '/src/main/resources/toolchains-ubuntu1604-stable.json')
 println 'Does the file validate? ' + toolchains.validate()
-println 'Supported matrices include:'
-toolchains.languages.each {
-    String language = it
-    ArrayList supported = []
-    toolchains.toolchain_list.each {
-        if(toolchains.supportedMatrix(language, it)) {
-            supported << it
-        }
-    }
-    println "  ${language}: " + supported.join(', ')
-}</tt></pre>
+println 'Supported build matrices by language include:'
+toolchains.languages.each { language ->
+    print "    ${language}:\n        "
+    println toolchains.toolchain_list.findAll { tool ->
+        (tool == 'toolchains')? false : toolchains.supportedMatrix(language, tool)
+    }.join('\n        ')
+}
+null</tt></pre>
  */
 class toolchainValidator implements Serializable {
 
