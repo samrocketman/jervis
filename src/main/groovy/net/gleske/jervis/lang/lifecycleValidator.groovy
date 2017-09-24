@@ -45,7 +45,7 @@ lifecycles.languages.each { supported_languages << lifecycles.lifecycles[it]['fr
 Collections.sort(supported_languages)
 supported_languages.each{ println it }</tt></pre>
  */
-class lifecycleValidator {
+class lifecycleValidator implements Serializable {
 
     /**
       A <tt>{@link Map}</tt> of the parsed lifecycles file.

@@ -49,7 +49,7 @@ toolchains.languages.each {
     println "  ${language}: " + supported.join(', ')
 }</tt></pre>
  */
-class toolchainValidator {
+class toolchainValidator implements Serializable {
 
     /**
       A <tt>{@link Map}</tt> of the parsed toolchains file.

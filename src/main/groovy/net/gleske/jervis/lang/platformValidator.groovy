@@ -38,7 +38,7 @@ def platforms = new platformValidator()
 platforms.load_JSON(git.getRoot() + '/src/main/resources/platforms.json')
 println 'Does the file validate? ' + platforms.validate()</tt></pre>
  */
-class platformValidator {
+class platformValidator implements Serializable {
 
     /**
       A <tt>{@link Map}</tt> of the parsed platforms file.

@@ -73,7 +73,7 @@ println generator.generateAll()
 print 'Labels: '
 println generator.getLabels()</tt></pre>
  */
-class lifecycleGenerator {
+class lifecycleGenerator implements Serializable {
 
     private static final Logger logger = Logger.getLogger(lifecycleGenerator.class.getName());
 
