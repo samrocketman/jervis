@@ -1,7 +1,7 @@
 language: groovy
 #Jenkins LTS core uses Groovy 2.4.8 as of 2017-09-17
 env:
-  # Jenkins 1.x uses Groovy 1.8.9 (this was changed in Jenkins 2.x)
+  # Jenkins 1.x uses Groovy 1.8.9
   - GROOVY_VERSION="1.8.9"
   # Jenkins 2.0 onward uses Groovy 2.4.6
   - GROOVY_VERSION="2.4.6"
