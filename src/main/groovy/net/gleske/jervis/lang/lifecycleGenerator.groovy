@@ -36,18 +36,14 @@ import org.yaml.snakeyaml.Yaml
   <h2>Sample usage</h2>
 <pre><tt>import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.tools.scmGit
-def git = new scmGit()
-def generator = new lifecycleGenerator()
-generator.loadPlatforms(git.getRoot() + '/src/main/resources/platforms.json')
-generator.loadLifecycles(git.getRoot() + '/src/main/resources/lifecycles.json')
-generator.loadToolchains(git.getRoot() + '/src/main/resources/toolchains.json')
+
 String yaml = """
 language: ruby
 env:
  - hello=world three=four
  - hello=test three=five
 rvm: ["1.9.3", "2.1.0", "2.0.0"]
-jdk: oraclejdk8
+jdk: openjdk8
 matrix:
   exclude:
     - env: hello=world three=four
@@ -59,9 +55,16 @@ matrix:
       env: hello=test three=five
 jenkins:
     sudo: false
-    unstable: true
 """
+
+def git = new scmGit()
+def generator = new lifecycleGenerator()
+generator.loadPlatforms(git.getRoot() + '/src/main/resources/platforms.json')
 generator.preloadYamlString(yaml)
+//os_stability requires preloadYamlString() to be called
+def os_stability = "${generator.label_os}-${generator.label_stability}"
+generator.loadLifecycles("${git.getRoot()}/src/main/resources/lifecycles-${os_stability}.json")
+generator.loadToolchains("${git.getRoot()}/src/main/resources/toolchains-${os_stability}.json")
 generator.loadYamlString(yaml)
 generator.folder_listing = ['Gemfile.lock']
 println 'Exclude filter is...'
