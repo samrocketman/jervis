@@ -15,7 +15,7 @@
    */
 package net.gleske.jervis.lang
 
-import groovy.json.JsonSlurper
+import groovy.json.JsonSlurperClassic as JsonSlurper
 import net.gleske.jervis.exceptions.ToolchainMissingKeyException
 import net.gleske.jervis.exceptions.ToolchainValidationException
 import net.gleske.jervis.exceptions.ToolchainBadValueInKeyException
@@ -88,7 +88,7 @@ class toolchainValidator implements Serializable {
       @param json A <tt>String</tt> the contents of a toolchains file.
      */
     public void load_JSONString(String json) {
-        toolchains = new groovy.json.JsonSlurper().parseText(json)
+        toolchains = new JsonSlurper().parseText(json)
         toolchain_list = toolchains.keySet() as String[]
         if('toolchains' in toolchain_list) {
             languages = toolchains.toolchains.keySet() as String[]

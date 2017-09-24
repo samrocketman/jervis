@@ -15,7 +15,7 @@
    */
 package net.gleske.jervis.lang
 
-import groovy.json.JsonSlurper
+import groovy.json.JsonSlurperClassic as JsonSlurper
 import net.gleske.jervis.exceptions.PlatformBadValueInKeyException
 import net.gleske.jervis.exceptions.PlatformMissingKeyException
 import net.gleske.jervis.exceptions.PlatformValidationException
@@ -76,7 +76,7 @@ class platformValidator implements Serializable {
       @param json A <tt>String</tt> containing the contents of a platforms file.
      */
     public void load_JSONString(String json) {
-        platforms = new groovy.json.JsonSlurper().parseText(json)
+        platforms = new JsonSlurper().parseText(json)
     }
 
     /**
