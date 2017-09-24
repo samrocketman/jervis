@@ -26,6 +26,9 @@ import net.gleske.jervis.tools.scmGit
   file.
 
   <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
 <pre><tt>import net.gleske.jervis.tools.fileIO
 
 //mystring path is relative to the root of the git repository

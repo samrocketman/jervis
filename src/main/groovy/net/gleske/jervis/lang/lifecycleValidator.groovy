@@ -27,7 +27,10 @@ import net.gleske.jervis.exceptions.LifecycleValidationException
   and provides quick access to supported languages.
 
   <h2>Sample usage</h2>
-  <p>Please note, if you are writing Job DSL plugin groovy scripts you should not
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
+  <p><b>Please note</b>, if you are writing Job DSL plugin groovy scripts you should not
   use the <tt>scmGit</tt> class to access files in the repository where your DSL
   scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>

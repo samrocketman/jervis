@@ -37,6 +37,9 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
    A class to provide cryptographic features to Jervis such as RSA encryption and base64 encoding.
 
    <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
 
 <pre><tt>import net.gleske.jervis.tools.securityIO
 

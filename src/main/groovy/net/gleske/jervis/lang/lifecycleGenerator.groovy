@@ -34,6 +34,14 @@ import org.yaml.snakeyaml.Yaml
   Generates the build scripts from the Jervis YAML.
 
   <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
+  <p><b>Please note</b>, if you are writing Job DSL plugin groovy scripts you should not
+  use the <tt>scmGit</tt> class to access files in the repository where your DSL
+  scripts reside.  Instead, use the
+  <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
+  method provided by the Job DSL plugin in Jenkins.</p>
 <pre><tt>import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.tools.scmGit
 
@@ -330,7 +338,7 @@ class lifecycleGenerator implements Serializable {
 
     /**
       Load Jervis YAML to be interpreted.  This YAML will be used to generate the
-      build scripts and components of a Jenkins job.  Please note: you must call
+      build scripts and components of a Jenkins job.  <b>Please note</b>: you must call
       <tt>{@link #loadToolchains(java.lang.String)}</tt> and
       <tt>{@link #loadLifecycles(java.lang.String)}</tt> before calling this function.
       @param raw_yaml A <tt>String</tt> which contains Jervis YAML to be parsed.
@@ -931,7 +939,7 @@ env:
 
     /**
       Preload Jervis YAML for the purpose of loading lifecycles files for other
-      platforms and operating systems.  Please note: you must call
+      platforms and operating systems.  <b>Please note</b>: you must call
       <tt>{@link #loadPlatformsString(java.lang.String)}</tt> or
       <tt>{@link #loadPlatforms(java.lang.String)}</tt> before calling this function.
 
