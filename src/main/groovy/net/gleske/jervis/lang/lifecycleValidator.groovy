@@ -34,16 +34,15 @@ import net.gleske.jervis.exceptions.LifecycleValidationException
   method provided by the Job DSL plugin in Jenkins.</p>
 <pre><tt>import net.gleske.jervis.lang.lifecycleValidator
 import net.gleske.jervis.tools.scmGit
+
 def git = new scmGit()
 def lifecycles = new lifecycleValidator()
-lifecycles.load_JSON(git.getRoot() + '/src/main/resources/lifecycles.json')
+lifecycles.load_JSON(git.getRoot() + '/src/main/resources/lifecycles-ubuntu1604-stable.json')
 println 'Does the file validate? ' + lifecycles.validate()
-println 'Supported languages include:'
-//print out a sorted ArrayList of supported languages
-supported_languages = []
-lifecycles.languages.each { supported_languages << lifecycles.lifecycles[it]['friendlyName'] }
-Collections.sort(supported_languages)
-supported_languages.each{ println it }</tt></pre>
+print 'Supported languages include:\n    '
+println lifecycles.languages.collect {
+    lifecycles.lifecycles[it]['friendlyName']
+}.sort().join('\n    ')</tt></pre>
  */
 class lifecycleValidator implements Serializable {
 
