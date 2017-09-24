@@ -75,11 +75,7 @@ class toolchainValidator implements Serializable {
       @param file A <tt>String</tt> which is a path to a toolchains file.
      */
     public void load_JSON(String file) {
-        toolchains = new groovy.json.JsonSlurper().parse(new File(file).newReader())
-        toolchain_list = toolchains.keySet() as String[]
-        if('toolchains' in toolchain_list) {
-            languages = toolchains.toolchains.keySet() as String[]
-        }
+        load_JSONString(new File(file).text)
     }
 
     /**

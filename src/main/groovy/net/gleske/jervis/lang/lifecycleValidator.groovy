@@ -67,8 +67,7 @@ class lifecycleValidator implements Serializable {
       @param file A <tt>String</tt> which is a path to a lifecycles file.
      */
     public void load_JSON(String file) {
-        lifecycles = new groovy.json.JsonSlurper().parse(new File(file).newReader())
-        languages = lifecycles.keySet() as String[];
+        load_JSONString(new File(file).text)
     }
 
     /**

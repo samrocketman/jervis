@@ -65,7 +65,7 @@ class platformValidator implements Serializable {
       @param file A <tt>String</tt> which is a path to a platforms file.
      */
     public void load_JSON(String file) {
-        platforms = new groovy.json.JsonSlurper().parse(new File(file).newReader())
+        load_JSONString(new File(file).text)
     }
 
     /**
