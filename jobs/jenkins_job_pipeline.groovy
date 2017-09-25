@@ -28,37 +28,35 @@ if(missing_bindings) {
 
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.remotes.GitHub
+import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
 jenkinsJobPipeline = null
 jenkinsJobPipeline = { def jervis_jobType, lifecycleGenerator generator, String JERVIS_BRANCH ->
     //the generated Job DSL enclosure depends on the job type
     jervis_jobType("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-')) {
         displayName("${project_name} (${JERVIS_BRANCH} branch)")
-        label(generator.labels)
-
-        scm {
-            //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
-            //for more info about the git closure
-            git {
-                remote {
-                    url(git_service.getCloneUrl() + "${project}.git")
-                }
-                branch("refs/heads/${JERVIS_BRANCH}")
-                //configure git web browser based on the type of remote
-                switch(git_service) {
-                    case GitHub:
-                        configure { gitHub ->
-                            gitHub / browser(class: 'hudson.plugins.git.browser.GithubWeb') {
-                                url(git_service.getWebUrl() + "${project}")
-                            }
-                        }
-                }
-            }
-        }
 		definition {
-			cps {
-				script('buildViaJervis()')
-				sandbox()
+			cpsScm {
+                scm {
+                    //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
+                    //for more info about the git closure
+                    git {
+                        remote {
+                            url(git_service.getCloneUrl() + "${project}.git")
+                        }
+                        branch("refs/heads/${JERVIS_BRANCH}")
+                        //configure git web browser based on the type of remote
+                        switch(git_service) {
+                            case GitHub:
+                                configure { gitHub ->
+                                    gitHub / browser(class: 'hudson.plugins.git.browser.GithubWeb') {
+                                        url(git_service.getWebUrl() + "${project}")
+                                    }
+                                }
+                        }
+                    }
+                }
+				scriptPath(getObjectValue(generator.jervis_yaml, 'jenkins.pipeline_jenkinsfile', 'Jenkinsfile'))
 			}
 		}
     }

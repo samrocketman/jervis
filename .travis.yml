@@ -38,6 +38,7 @@ cache:
     - $HOME/.gradle/wrapper/
 jenkins:
   pipeline: true
+  pipeline_jenkinsfile: assets/Jenkinsfile
   collect:
     artifacts: build/libs/*.jar
     junit: build/test-results/*.xml
