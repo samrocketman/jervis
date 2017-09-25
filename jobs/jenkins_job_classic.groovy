@@ -25,6 +25,9 @@ if(missing_bindings) {
    Configures matrix or freestyle jobs for both main and pull request builds.
  */
 
+import net.gleske.jervis.lang.lifecycleGenerator
+import net.gleske.jervis.remotes.GitHub
+
 jenkinsJobClassic = null
 jenkinsJobClassic = { def jervis_jobType, lifecycleGenerator generator, boolean isPullRequestJob, String JERVIS_BRANCH ->
     //the generated Job DSL enclosure depends on the job type

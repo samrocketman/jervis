@@ -16,7 +16,7 @@
 
 //this code should be at the beginning of every script included which requires bindings
 String include_script_name = 'jobs/git_service.groovy'
-Set required_bindings = ['parent_job', 'project', 'project_folder', 'project_name', 'script_approval', 'git_service']
+Set required_bindings = ['parent_job', 'project', 'project_folder', 'project_name', 'script_approval', 'git_service', 'jenkinsJobClassic']
 Set missing_bindings = required_bindings - (binding.variables.keySet()*.toString() as Set)
 if(missing_bindings) {
     throw new Exception("${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}")
@@ -27,7 +27,6 @@ if(missing_bindings) {
  */
 
 import net.gleske.jervis.lang.lifecycleGenerator
-import net.gleske.jervis.remotes.GitHub
 import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
 jenkinsJob = null
