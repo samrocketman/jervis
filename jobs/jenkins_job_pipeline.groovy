@@ -22,6 +22,13 @@ if(missing_bindings) {
     throw new Exception("${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}")
 }
 
+/*
+   Configures a pipeline job designed to execute Jervis YAML.
+ */
+
+import net.gleske.jervis.lang.lifecycleGenerator
+import net.gleske.jervis.remotes.GitHub
+
 jenkinsJobPipeline = null
 jenkinsJobPipeline = { def jervis_jobType, lifecycleGenerator generator, String JERVIS_BRANCH ->
     //the generated Job DSL enclosure depends on the job type
