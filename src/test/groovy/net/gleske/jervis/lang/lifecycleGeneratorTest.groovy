@@ -712,4 +712,21 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadPlatforms(url.getFile())
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(generator)
     }
+
+    @Test public void test_lifecycleGenerator_matrix_fullName_by_friendly() {
+        generator.loadYamlString('language: ruby\nenv:\n  - foo=hello\n  - bar=world\n  - baz=goodbye')
+        //generator.generateToolchainSection()
+        assert true == generator.isMatrixBuild()
+        assert generator.matrix_fullName_by_friendly['env0'] == 'env:foo=hello'
+        assert generator.matrix_fullName_by_friendly['env1'] == 'env:bar=world'
+        assert generator.matrix_fullName_by_friendly['env2'] == 'env:baz=goodbye'
+        generator.loadYamlString('language: ruby\nenv:\n  matrix:\n    - foobar=foo\n    - foobar=bar')
+        assert true == generator.isMatrixBuild()
+        assert generator.matrix_fullName_by_friendly['env0'] == 'env:foobar=foo'
+        assert generator.matrix_fullName_by_friendly['env1'] == 'env:foobar=bar'
+        assert generator.matrix_fullName_by_friendly.get('env2', 'is empty') == 'is empty'
+        generator.loadYamlString('language: ruby')
+        assert false == generator.isMatrixBuild()
+        assert !generator.matrix_fullName_by_friendly
+    }
 }

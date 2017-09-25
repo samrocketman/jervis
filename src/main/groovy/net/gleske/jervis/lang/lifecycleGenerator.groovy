@@ -203,6 +203,20 @@ class lifecycleGenerator implements Serializable {
     def secret_util
 
     /**
+      A map of friendly key names for matrix steps which can be reference to
+      show a full key name as if the friendly name were not needed.  Basically,
+      it allows the unfriendly name to be accessible via the friendly name.
+     */
+    Map matrix_fullName_by_friendly = [:]
+
+    Map getMatrix_fullName_by_friendly() {
+        if(!matrix_fullName_by_friendly) {
+            generateToolchainSection()
+        }
+        matrix_fullName_by_friendly
+    }
+
+    /**
       This function sets the <tt>{@link #folder_listing}</tt> and based on the
       <tt>listing</tt> conditionally sets <tt>{@link #lifecycle_key}</tt>.  This uses
       the <tt>fileExistsCondition</tt> and <tt>fallbackKey</tt> from the lifecycles
@@ -421,6 +435,9 @@ class lifecycleGenerator implements Serializable {
                 toolchain_obj.toolchains["toolchains"][yaml_language] << key
             }
         }
+        //populate unfriendly names being accessible by friendly name
+        matrix_fullName_by_friendly = [:]
+        null
     }
 
     /**
@@ -600,6 +617,8 @@ env:
                     output += "  ${toolchain}:${tempchain})\n"
                 }
                 else {
+                    //allows the unfriendly name to be accessibly via friendly name
+                    matrix_fullName_by_friendly["${toolchain}${i}".toString()] = "${toolchain}:${tempchain}".toString()
                     output += "  ${toolchain}${i})\n"
                 }
                 if(tempchain in toolchain_keys) {
