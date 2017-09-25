@@ -23,6 +23,7 @@ ossrhPassword=secret
 - [ ] Update wiki documentation for release.
 - [ ] Update [CHANGELOG.md](CHANGELOG.md).
 - [ ] Update README maven and gradle examples to reflect latest version.
+- [ ] Update pipeline scripts to grab the next version.
 
 ### Perform release
 
@@ -34,6 +35,7 @@ ossrhPassword=secret
    ./gradlew clean check uploadArchives
    ```
 4. Increment plugin version to next snapshot: e.g. `0.3-SNAPSHOT`.  Commit.
+5. Upload jervis-api docs for the latest release.
 
 This will initially upload the artifact to a staging repository.  Once confident
 about the release visit [Maven Central Nexus][ossrh] and follow [instructions on
