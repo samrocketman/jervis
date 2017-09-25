@@ -36,7 +36,7 @@ jenkinsJob = { lifecycleGenerator generator, boolean isPullRequestJob, String JE
     println "Generating branch: ${JERVIS_BRANCH}"
     if(getObjectValue(generator.jervis_yaml, 'jenkins.pipeline', false) && generator.isMatrixBuild()) {
         jervis_jobType = { String name, Closure closure -> parent_job.pipelineJob(name, closure) }
-        jenkinsJobPipeline(jervis_jobType, generator, isPullRequestJob, JERVIS_BRANCH)
+        jenkinsJobPipeline(jervis_jobType, generator, JERVIS_BRANCH)
     }
     else {
         //use classic job type
