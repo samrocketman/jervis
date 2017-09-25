@@ -26,9 +26,9 @@ if(missing_bindings) {
    Configures matrix or freestyle jobs for both main and pull request builds.
  */
 
-import hudson.util.Secret
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.remotes.GitHub
+import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
 jenkinsJob = null
 jenkinsJob = { lifecycleGenerator generator, boolean isPullRequestJob, String JERVIS_BRANCH ->
@@ -41,107 +41,5 @@ jenkinsJob = { lifecycleGenerator generator, boolean isPullRequestJob, String JE
         jervis_jobType = { String name, Closure closure -> parent_job.freeStyleJob(name, closure) }
     }
     println "Generating branch: ${JERVIS_BRANCH}"
-    //the generated Job DSL enclosure depends on the job type
-    jervis_jobType("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-')) {
-        displayName("${project_name} (${JERVIS_BRANCH} branch)")
-        label(generator.getLabels())
-        if(generator.isMatrixBuild()) {
-            //workaround for matrix builds ref: https://github.com/jenkinsci/docker-plugin/issues/242
-            properties {
-                groovyLabelAssignmentProperty {
-                    secureGroovyScript {
-                        String groovyscript = "return currentJob.getClass().getSimpleName().equals('MatrixProject') ? 'master' : '${generator.getLabels()}'"
-                        script(groovyscript)
-                        sandbox(false)
-                        //workaround for https://issues.jenkins-ci.org/browse/JENKINS-46016
-                        script_approval.approveScript(script_approval.hash(groovyscript, 'groovy'))
-                    }
-                }
-            }
-        }
-        //configure encrypted properties
-        if(generator.plainlist.size() > 0) {
-            configure { project ->
-                project / 'buildWrappers' / 'com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper' / 'varPasswordPairs'() {
-                    generator.plainlist.each { pair ->
-                        'varPasswordPair'(var: pair['key'], password: Secret.fromString(pair['secret']).getEncryptedValue())
-                    }
-                }
-            }
-        }
-        scm {
-            //see https://github.com/jenkinsci/job-dsl-plugin/pull/108
-            //for more info about the git closure
-            git {
-                remote {
-                    url(git_service.getCloneUrl() + "${project}.git")
-                }
-                branch("refs/heads/${JERVIS_BRANCH}")
-                //configure git web browser based on the type of remote
-                switch(git_service) {
-                    case GitHub:
-                        configure { gitHub ->
-                            gitHub / browser(class: 'hudson.plugins.git.browser.GithubWeb') {
-                                url(git_service.getWebUrl() + "${project}")
-                            }
-                        }
-                }
-            }
-        }
-        steps {
-            shell([
-                parent_job.readFileFromWorkspace('assets/header.sh'),
-                "export JERVIS_LANG=\"${generator.yaml_language}\"",
-                "export JERVIS_DOMAIN=\"${git_service.getWebUrl().split('/')[2]}\"",
-                "export JERVIS_ORG=\"${project_folder}\"",
-                "export JERVIS_PROJECT=\"${project_name}\"",
-                "export JERVIS_BRANCH=\"${JERVIS_BRANCH}\"",
-                "export IS_PULL_REQUEST=\"${isPullRequestJob}\"",
-                generator.generateAll(),
-                parent_job.readFileFromWorkspace('assets/footer.sh')
-                ].join('\n'))
-        }
-        //if a matrix build then generate matrix bits
-        if(generator.isMatrixBuild()) {
-            axes {
-                generator.yaml_matrix_axes.each {
-                    text(it, generator.matrixGetAxisValue(it).split())
-                }
-            }
-            combinationFilter(generator.matrixExcludeFilter())
-        }
-        publishers {
-            String[] enabled_collections = generator.getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:]).keySet() as String[]
-            if('artifacts' in enabled_collections) {
-                //artifact lists as a single string or a list in YAML
-                def collect_artifacts = generator.getObjectValue(generator.jervis_yaml, 'jenkins.collect.artifacts', new Object())
-                collect_artifacts = (collect_artifacts instanceof List)? collect_artifacts.join(',') : collect_artifacts.toString()
-                if(collect_artifacts.size() > 1) {
-                    archiveArtifacts {
-                        fingerprint(true)
-                        onlyIfSuccessful(true)
-                        pattern(collect_artifacts)
-                    }
-                }
-            }
-            if('junit' in enabled_collections) {
-                String collect_junit = generator.getObjectValue(generator.jervis_yaml, 'jenkins.collect.junit', '')
-                if(collect_junit.size() > 0) {
-                    archiveJunit(collect_junit)
-                }
-            }
-            if('cobertura' in enabled_collections) {
-                String collect_cobertura = generator.getObjectValue(generator.jervis_yaml, 'jenkins.collect.cobertura', '')
-                if(collect_cobertura.size() > 0) {
-                    cobertura(collect_cobertura)
-                    covComplPlotPublisher {
-                        analyzer 'Cobertura'
-                        excludeGetterSetter false
-                        verbose false
-                        locateTopMost true
-                    }
-                }
-            }
-        }
-    }
+    jenkinsJobClassic(jervis_jobType, generator, isPullRequestJob, JERVIS_BRANCH)
 }
