@@ -1,1 +1,1 @@
-../assets/footer.sh
+#denotes the end of a section

@@ -1,1 +1,196 @@
-../src/main/resources/toolchains-ubuntu1604-stable.json
+{
+    "toolchains": {
+        "c": ["env", "compiler"],
+        "cpp": ["env", "compiler"],
+        "erlang": ["env", "otp_release"],
+        "go": ["env", "go_import_path", "go"],
+        "groovy": ["env", "jdk"],
+        "java": ["env", "jdk"],
+        "node_js": ["env", "node_js"],
+        "python": ["env", "python"],
+        "ruby": ["gemfile", "env", "rvm", "jdk"],
+        "shell": ["env"]
+    },
+    "compiler": {
+        "default_ivalue": "gcc",
+        "friendlyLabel": true,
+        "gcc": [
+            "export CXX=\"g++\"",
+            "export CC=\"gcc\""
+        ],
+        "clang": [
+            "export CXX=\"clang++\"",
+            "export CC=\"clang\""
+        ]
+    },
+    "env": {
+        "matrix": "advanced",
+        "*": [
+            "export ${jervis_toolchain_ivalue}"
+        ]
+    },
+    "gemfile": {
+        "default_ivalue": "${PWD}/Gemfile",
+        "*": [
+            "export BUNDLE_GEMFILE=\"${jervis_toolchain_ivalue}\""
+        ]
+    },
+    "go_import_path": {
+        "default_ivalue": "${JERVIS_DOMAIN}/${JERVIS_ORG}/${JERVIS_PROJECT}",
+        "*": [
+            "GO_IMPORT_PATH=\"${jervis_toolchain_ivalue}\"",
+            "#remove possible leading or trailing slashes",
+            "GO_IMPORT_PATH=${GO_IMPORT_PATH%/}",
+            "GO_IMPORT_PATH=${GO_IMPORT_PATH#/}",
+            "export GO_IMPORT_PATH"
+        ]
+    },
+    "go": {
+        "default_ivalue": "1.5",
+        "friendlyLabel": true,
+        "comment": "Uses gimme - https://github.com/travis-ci/gimme",
+        "cleanup": [
+            "cd \"${WORKSPACE}\"",
+            "rm -rf \"${GOPATH}\""
+        ],
+        "*": [
+            "export GOMAXPROCS=${GOMAXPROCS:-2}",
+            "eval \"$(gimme ${jervis_toolchain_ivalue})\"",
+            "export GOPATH=\"${HOME}/.gopath/${JERVIS_ORG}-${JERVIS_PROJECT}-${JERVIS_RANDOM}-${jervis_toolchain_ivalue}\"",
+            "export PATH=\"${GOPATH}/bin:${PATH}\"",
+            "mkdir -p \"${GOPATH}/src/${GO_IMPORT_PATH}\"",
+            "#remove the last directory at the end of the path so we can symlink",
+            "rmdir \"${GOPATH}/src/${GO_IMPORT_PATH}\"",
+            "ln -fs \"${PWD}\" \"${GOPATH}/src/${GO_IMPORT_PATH}\"",
+            "cd \"${GOPATH}/src/${GO_IMPORT_PATH}/\"",
+            "gimme version",
+            "go version",
+            "go env"
+        ]
+    },
+    "jdk": {
+        "default_ivalue": "openjdk8",
+        "friendlyLabel": true,
+        "openjdk8": [
+            "export JAVA_HOME=\"${HOME}/java/openjdk8\"",
+            "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
+            "java -Xmx32m -version",
+            "javac -J-Xmx32m -version"
+        ],
+        "openjdk9": [
+            "export JAVA_HOME=\"${HOME}/java/openjdk9\"",
+            "export PATH=\"${JAVA_HOME}/bin:${PATH}\"",
+            "java -Xmx32m -version",
+            "javac -J-Xmx32m -version"
+        ]
+    },
+    "node_js": {
+        "default_ivalue": "0.10",
+        "friendlyLabel": true,
+        "comment": "Uses nvm - https://github.com/creationix/nvm",
+        "*": [
+            "set +x",
+            "echo \"$ source \\\"${HOME}/.nvm/nvm.sh\\\"\"",
+            "source \"${HOME}/.nvm/nvm.sh\"",
+            "nvm install \"${jervis_toolchain_ivalue}\"",
+            "echo \"$ nvm --version\"",
+            "nvm --version",
+            "set -x",
+            "node --version",
+            "npm --version"
+        ]
+    },
+    "otp_release": {
+        "default_ivalue": "0.10",
+        "friendlyLabel": true,
+        "comment": "Uses kerl - https://github.com/yrashk/kerl",
+        "*": [
+            "set +x",
+            "echo \"$ source \\\"${HOME}/otp/${jervis_toolchain_ivalue}/activate\\\"\"",
+            "source \"${HOME}/otp/${jervis_toolchain_ivalue}/activate\"",
+            "set -x"
+        ]
+    },
+    "python": {
+        "default_ivalue": "2.7",
+        "friendlyLabel": true,
+        "2.6": [
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/python2.6/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/python2.6/bin/activate\"",
+            "set -x",
+            "python --version",
+            "pip --version"
+        ],
+        "2.7": [
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/python2.7/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/python2.7/bin/activate\"",
+            "set -x",
+            "python --version",
+            "pip --version"
+        ],
+        "3.2": [
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/python3.2/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/python3.2/bin/activate\"",
+            "set -x",
+            "python --version",
+            "pip --version"
+        ],
+        "3.3": [
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/python3.3/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/python3.3/bin/activate\"",
+            "set -x",
+            "python --version",
+            "pip --version"
+        ],
+        "3.4": [
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/python3.4/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/python3.4/bin/activate\"",
+            "set -x",
+            "python --version",
+            "pip --version"
+        ],
+        "pypy": [
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/pypy/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/pypy/bin/activate\"",
+            "set -x",
+            "python --version",
+            "pip --version"
+        ],
+        "pypy3": [
+            "set +x",
+            "echo \"$ source \\\"${HOME}/virtualenv/pypy3/bin/activate\\\"\"",
+            "source \"${HOME}/virtualenv/pypy3/bin/activate\"",
+            "set -x",
+            "python --version",
+            "pip --version"
+        ]
+    },
+    "rvm": {
+        "default_ivalue": "1.9.3",
+        "friendlyLabel": true,
+        "comment": "Uses rvm - https://rvm.io/",
+        "cleanup": [
+            "rvm gemset delete \"${JERVIS_GEMSET}\" --force"
+        ],
+        "*": [
+            "set +x",
+            "echo \"$ source \\\"${HOME}/.rvm/scripts/rvm\\\"\"",
+            "source \"${HOME}/.rvm/scripts/rvm\"",
+            "if ! rvm list | grep -q \"${jervis_toolchain_ivalue}\";then",
+            "  rvm install \"${jervis_toolchain_ivalue}\"",
+            "  rvm \"${jervis_toolchain_ivalue}\" do gem install bundler",
+            "fi",
+            "export JERVIS_GEMSET=\"${jervis_toolchain_ivalue}@${JERVIS_PROJECT}-${BUILD_NUMBER}\"",
+            "rvm use \"${JERVIS_GEMSET}\" --create",
+            "set -x",
+            "rvm current",
+            "ruby --version"
+        ]
+    }
+}
