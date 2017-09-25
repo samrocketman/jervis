@@ -2,6 +2,7 @@
 
 - New Feature: `net.gleske.jervis.lang.*` is serializable so Jervis can now be
   used in pipeline scripts.
+- New Feature: Pipelines supported for matrix builds.
 - Added an example pipeline library to `resources/` and `vars/`.
 
 # jervis 0.13
