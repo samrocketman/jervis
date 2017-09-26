@@ -227,6 +227,7 @@ def call() {
     List folder_listing = []
     Map tasks = [failFast: true]
     BRANCH_NAME = BRANCH_NAME?:env.GIT_BRANCH
+    env.IS_PULL_REQUEST = BRANCH_NAME.startsWith('PR-')
     currentBuild.rawBuild.parent.parent.sources[0].source.with {
         github_org = it.repoOwner
         github_repo = it.repository
@@ -237,8 +238,7 @@ def call() {
         "JERVIS_DOMAIN=${github_domain}",
         "JERVIS_ORG=${github_org}",
         "JERVIS_PROJECT=${github_repo}",
-        "JERVIS_BRANCH=${BRANCH_NAME}",
-        "IS_PULL_REQUEST=${BRANCH_NAME.startsWith('PR-')}"
+        "JERVIS_BRANCH=${BRANCH_NAME}"
     ]
     List secretEnvList = []
 
