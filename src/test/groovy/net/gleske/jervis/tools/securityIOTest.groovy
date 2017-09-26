@@ -151,12 +151,12 @@ class securityIOTest extends GroovyTestCase {
         assert true == security.isSecureField(myobj)
     }
     @Test public void test_securityIO_load_key_pair() {
-        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa');
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa')
         assert !security.key_pair
         security.key_pair = url.content.text
         assert security.key_pair
         assert security.id_rsa_keysize == 1024
-        url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096');
+        url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
         security.key_pair = url.content.text
         assert security.id_rsa_keysize == 4096
     }
@@ -170,5 +170,14 @@ class securityIOTest extends GroovyTestCase {
             URL url = this.getClass().getResource('/rsa_keys/unsupported_crt_pair');
             security.key_pair = url.content.text
         }
+    }
+    @Test public void test_securityIO_serialization() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa')
+        assert !security.key_pair
+        security.key_pair = url.content.text
+        assert security.key_pair
+        def ciphertext = security.rsaEncrypt('some text')
+        def plaintext = security.rsaDecrypt(ciphertext)
+        new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(security)
     }
 }

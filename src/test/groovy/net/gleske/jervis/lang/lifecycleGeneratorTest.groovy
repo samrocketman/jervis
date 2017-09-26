@@ -712,7 +712,6 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadPlatforms(url.getFile())
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(generator)
     }
-
     @Test public void test_lifecycleGenerator_matrix_fullName_by_friendly() {
         generator.loadYamlString('language: ruby\nenv:\n  - foo=hello\n  - bar=world\n  - baz=goodbye')
         //generator.generateToolchainSection()

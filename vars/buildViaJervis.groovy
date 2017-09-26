@@ -180,6 +180,9 @@ String printDecryptedProperties(lifecycleGenerator generator, String credentials
     ].join('\n') as String
 }
 
+/**
+  The main method of buildViaJervis()
+ */
 def call() {
     def generator = new lifecycleGenerator()
     String environment_string
@@ -256,9 +259,7 @@ def call() {
         script_footer = libraryResource "footer.sh"
         jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
         node('master') {
-            withEnvSecretWrapper(generator, jervisEnvList) {
-                environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
-            }
+            environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
         }
         withEnvSecretWrapper(generator, jervisEnvList) {
             echo "PRINT ENVIRONMENT"

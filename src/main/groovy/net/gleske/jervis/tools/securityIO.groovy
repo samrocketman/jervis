@@ -61,7 +61,7 @@ new File(security.id_rsa_pub).delete()
 println "${security.id_rsa_priv} file exists? ${new File(security.id_rsa_priv).exists()}"
 println "${security.id_rsa_pub} file exists? ${new File(security.id_rsa_pub).exists()}"</tt></pre>
  */
-class securityIO {
+class securityIO implements Serializable {
 
     private static String deprecation_link = 'http://sam.gleske.net/jervis-api/0.13/net/gleske/jervis/tools/securityIO.html'
     private static String release_notes = 'https://github.com/samrocketman/jervis/blob/master/CHANGELOG.md#jervis-013'
