@@ -11,6 +11,7 @@
        - passing artifacts to the rest of the pipeline via stash
  */
 
+import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
 import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
@@ -140,6 +141,45 @@ String getFolderRSAKeyCredentials(String folder, String credentials_id) {
     return found_credentials
 }
 
+/**
+  An environment wrapper which sets environment variables.  If available, also
+  sets and masks decrypted properties from .jervis.yml.
+ */
+@NonCPS
+def withEnvSecretWrapper(lifecycleGenerator generator, List envList, Closure body) {
+    List secretPairs = []
+    List secretEnv = []
+    generator.plainmap.each { k, v ->
+        secretPairs << [var: k, password: v]
+        secretEnv << "${k}=${v}"
+    }
+    if(secretPairs) {
+        wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: secretPairs]) {
+            withEnv(secretEnv + envList) {
+                body()
+            }
+        }
+    }
+    else {
+        withEnv(envList) {
+            body()
+        }
+    }
+}
+
+/**
+  Returns a string which can be printed.  It is the decrypted properties from a
+  .jervis.yml file.
+ */
+@NonCPS
+String printDecryptedProperties(lifecycleGenerator generator, String credentials_id) {
+    [
+        "Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}.",
+        'Decrypted the following properties (indented):',
+        '    ' + (generator.plainmap.keySet() as List).join('\n    ')
+    ].join('\n') as String
+}
+
 def call() {
     def generator = new lifecycleGenerator()
     String environment_string
@@ -190,9 +230,6 @@ def call() {
             else {
                 throw new FileNotFoundException('Cannot find .jervis.yml nor .travis.yml')
             }
-            withEnv(jervisEnvList) {
-                environment_string = sh(script: 'export LC_ALL=C;env | sort', returnStdout: true).split('\n').join('\n    ')
-            }
         }
         generator.preloadYamlString(jervis_yaml)
         os_stability = "${generator.label_os}-${generator.label_stability}"
@@ -202,17 +239,38 @@ def call() {
         generator.loadToolchainsString(toolchains_json)
         generator.loadYamlString(jervis_yaml)
         generator.folder_listing = folder_listing
+        //attempt to get the private key else return an empty string
+        String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
+        String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
+        if(credentials_id && !private_key_contents) {
+            throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${credentials_id}")
+        }
+        if(private_key_contents) {
+            generator.setPrivateKey(private_key_contents)
+            generator.decryptSecrets()
+            echo "DECRYPTED PROPERTIES"
+            echo printDecryptedProperties(generator, credentials_id)
+        }
+        //end decrypting secrets
         script_header = libraryResource "header.sh"
         script_footer = libraryResource "footer.sh"
         jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
-        echo "ENVIRONMENT:\n    ${environment_string}"
+        node('master') {
+            withEnvSecretWrapper(generator, jervisEnvList) {
+                environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
+            }
+        }
+        withEnvSecretWrapper(generator, jervisEnvList) {
+            echo "PRINT ENVIRONMENT"
+            echo "ENVIRONMENT:\n    ${environment_string}"
+        }
     }
 
     //prepare to run
     if(generator.isMatrixBuild()) {
         //a matrix build which should be executed in parallel
         getBuildableMatrixAxes(generator).each { matrix_axis ->
-            echo "Detected matrix axis: ${matrix_axis}"
+            //echo "Detected matrix axis: ${matrix_axis}"
             String stageIdentifier = matrix_axis.collect { k, v -> generator.matrix_fullName_by_friendly[v]?:v }.join('\n')
             String label = generator.labels
             List axisEnvList = matrix_axis.collect { k, v -> "${k}=${v}" }
