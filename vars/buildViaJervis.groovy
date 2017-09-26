@@ -104,18 +104,20 @@ Map convertMatrixAxis(lifecycleGenerator generator, Map matrix_axis) {
 
 def call() {
     def generator = new lifecycleGenerator()
+    String environment_string
     String jervis_yaml
-    String os_stability
     String lifecycles_json
-    String toolchains_json
+    String os_stability
     String platforms_json
-    String script_header
     String script_footer
+    String script_header
+    String toolchains_json
     List folder_listing = []
     Map tasks = [failFast: true]
     List jervisEnvList = [
-        "JERVIS_BRANCH=${env.GIT_BRANCH}"
+        "JERVIS_BRANCH=${BRANCH_NAME?:env.GIT_BRANCH}"
     ]
+    List secretEnvList = []
 
     def global_scm = scm
 
@@ -135,6 +137,7 @@ def call() {
             else {
                 throw new FileNotFoundException('Cannot find .jervis.yml nor .travis.yml')
             }
+            environment_string = sh(script: 'export LC_ALL=C;env | sort', returnStdout: true).split('\n').join('\n    ')
         }
         generator.preloadYamlString(jervis_yaml)
         os_stability = "${generator.label_os}-${generator.label_stability}"
@@ -147,6 +150,7 @@ def call() {
         script_header = libraryResource "header.sh"
         script_footer = libraryResource "footer.sh"
         jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
+        echo "ENVIRONMENT:\n    ${environment_string}"
     }
 
     //prepare to run
@@ -179,8 +183,8 @@ def call() {
                 }
             }
         }
+        parallel(tasks)
     }
-    parallel(tasks)
     Map collect_items = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
     List collectItemsList = getCollectItemsList(collect_items)
     if(collectItemsList) {
