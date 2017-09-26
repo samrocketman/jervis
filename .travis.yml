@@ -39,21 +39,20 @@ cache:
 jenkins:
   pipeline: true
   pipeline_jenkinsfile: assets/Jenkinsfile
-  #maybe?
   stash:
     - name: artifacts
-      path: build/libs/*.jar
+      includes: build/libs/*.jar
       matrix_axis:
         env: GROOVY_VERSION="2.4.12"
     - name: junit
-      path: build/test-results/*.xml
+      includes: build/test-results/*.xml
       matrix_axis:
         env: GROOVY_VERSION="2.4.12"
     - name: cobertura
-      path: build/reports/cobertura/coverage.xml
+      includes: build/reports/cobertura/coverage.xml
       matrix_axis:
         env: GROOVY_VERSION="2.4.12"
   collect:
     artifacts: build/libs/*.jar
-    junit: build/test-results/*.xml
     cobertura: build/reports/cobertura/coverage.xml
+    junit: build/test-results/*.xml

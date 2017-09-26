@@ -5,13 +5,14 @@
    TODO:
    - Secrets support
    - non-matrix support
-   - collecting artifact support
-   - publishing html support
-   - publishing junit test support
-   - passing artifacts to the rest of the pipeline via stash
+       - collecting artifact support
+       - publishing html support
+       - publishing junit test support
+       - passing artifacts to the rest of the pipeline via stash
  */
 
 import net.gleske.jervis.lang.lifecycleGenerator
+import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
 /**
   Returns a list of maps which are buildable matrices in a matrix build.  This
@@ -47,6 +48,46 @@ List getBuildableMatrixAxes(lifecycleGenerator generator) {
             true
         }
     }
+}
+
+/**
+  Returns a list of stashes from Jervis YAML to be stashed either serially or
+  in this matrix axis for matrix builds.
+ */
+
+@NonCPS
+Map getStashMap(List stashes, boolean isMatrix = false, Map matrix_axis = [:]) {
+    Map stash_map = [:]
+    stashes.each { s ->
+        if((s instanceof Map) &&
+                ('name' in s) &&
+                getObjectValue(s, 'name', '') &&
+                ('includes' in s) &&
+                getObjectValue(s, 'includes', '') &&
+                (!isMatrix || getObjectValue(s, 'matrix_axis', [:])) &&
+                (!isMatrix || (getObjectValue(s, 'matrix_axis', [:]) == matrix_axis))) {
+            stash_map[getObjectValue(s, 'name', '')] = [
+                'name': getObjectValue(s, 'name', ''),
+                'includes': getObjectValue(s, 'includes', ''),
+                'excludes': getObjectValue(s, 'excludes', ''),
+                'use_default_excludes': getObjectValue(s, 'use_default_excludes', 'true') == 'true',
+                'allow_empty': getObjectValue(s, 'allow_empty', 'false') == 'true',
+                'matrix_axis': getObjectValue(s, 'matrix_axis', [:])
+                ]
+        }
+    }
+    stash_map
+}
+
+/**
+  If given a list of items, compare it to supported items for collection.
+ */
+
+@NonCPS
+List getCollectItemsList(Map collect_items) {
+    Set supported_collections = ['cobertura', 'junit', 'artifacts'] as Set
+    Set known_items = collect_items.keySet() as Set
+    (supported_collections.intersect(known_items) as List).sort()
 }
 
 def call() {
@@ -104,6 +145,8 @@ def call() {
             String stageIdentifier = matrix_axis.collect { k, v -> generator.matrix_fullName_by_friendly[v]?:v }.join('\n')
             String label = generator.labels
             List axisEnvList = matrix_axis.collect { k, v -> "${k}=${v}" }
+            def stashes = getObjectValue(generator.jervis_yaml, 'jenkins.stash', new Object())
+            Map stashMap = getStashMap((stashes instanceof List)? stashes : [stashes], true, matrix_axis)
             tasks[stageIdentifier] = {
                 node(label) {
                     stage("Checkout SCM") {
@@ -117,10 +160,45 @@ def call() {
                                 script_footer
                             ].join('\n').toString())
                         }
+                        for(String name : stashMap.keySet()) {
+                            stash allowEmpty: stashMap[name]['allow_empty'], includes: stashMap[name]['includes'], name: name, useDefaultExcludes: stashMap[name]['use_default_excludes']
+                        }
                     }
                 }
             }
         }
     }
     parallel(tasks)
+    Map collect_items = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
+    List collectItemsList = getCollectItemsList(collect_items)
+    if(collectItemsList) {
+        stage("Publish results") {
+            node(generator.labels) {
+                for(String name : collectItemsList) {
+                    unstash name
+                }
+                if('artifacts' in collectItemsList) {
+                    archiveArtifacts collect_items['artifacts']
+                    fingerprint collect_items['artifacts']
+                }
+                if('cobertura' in collectItemsList) {
+                    step([
+                            $class: 'CoberturaPublisher',
+                            autoUpdateHealth: false,
+                            autoUpdateStability: false,
+                            coberturaReportFile: collect_items['cobertura'],
+                            failUnhealthy: false,
+                            failUnstable: false,
+                            maxNumberOfBuilds: 0,
+                            onlyStable: false,
+                            sourceEncoding: 'ASCII',
+                            zoomCoverageChart: false
+                    ])
+                }
+                if('junit' in collectItemsList) {
+                    junit collect_items['junit']
+                }
+            }
+        }
+    }
 }
