@@ -260,32 +260,30 @@ def call() {
             else {
                 throw new FileNotFoundException('Cannot find .jervis.yml nor .travis.yml')
             }
-        }
-        generator.preloadYamlString(jervis_yaml)
-        os_stability = "${generator.label_os}-${generator.label_stability}"
-        lifecycles_json = libraryResource "lifecycles-${os_stability}.json"
-        toolchains_json = libraryResource "toolchains-${os_stability}.json"
-        generator.loadLifecyclesString(lifecycles_json)
-        generator.loadToolchainsString(toolchains_json)
-        generator.loadYamlString(jervis_yaml)
-        generator.folder_listing = folder_listing
-        //attempt to get the private key else return an empty string
-        String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
-        String private_key_contents = getFolderRSAKeyCredentials(jenkins_folder, credentials_id)
-        if(credentials_id && !private_key_contents) {
-            throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${credentials_id}")
-        }
-        if(private_key_contents) {
-            generator.setPrivateKey(private_key_contents)
-            generator.decryptSecrets()
-            echo "DECRYPTED PROPERTIES"
-            echo printDecryptedProperties(generator, credentials_id)
-        }
-        //end decrypting secrets
-        script_header = libraryResource "header.sh"
-        script_footer = libraryResource "footer.sh"
-        jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
-        node('master') {
+            generator.preloadYamlString(jervis_yaml)
+            os_stability = "${generator.label_os}-${generator.label_stability}"
+            lifecycles_json = libraryResource "lifecycles-${os_stability}.json"
+            toolchains_json = libraryResource "toolchains-${os_stability}.json"
+            generator.loadLifecyclesString(lifecycles_json)
+            generator.loadToolchainsString(toolchains_json)
+            generator.loadYamlString(jervis_yaml)
+            generator.folder_listing = folder_listing
+            //attempt to get the private key else return an empty string
+            String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
+            String private_key_contents = getFolderRSAKeyCredentials(jenkins_folder, credentials_id)
+            if(credentials_id && !private_key_contents) {
+                throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${credentials_id}")
+            }
+            if(private_key_contents) {
+                generator.setPrivateKey(private_key_contents)
+                generator.decryptSecrets()
+                echo "DECRYPTED PROPERTIES"
+                echo printDecryptedProperties(generator, credentials_id)
+            }
+            //end decrypting secrets
+            script_header = libraryResource "header.sh"
+            script_footer = libraryResource "footer.sh"
+            jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
             withEnvSecretWrapper(generator, jervisEnvList) {
                 environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
                 echo "PRINT ENVIRONMENT"
@@ -334,7 +332,9 @@ def call() {
         def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', []))?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
         stashes = mergeCollectItemsWithStash((stashes instanceof List)? stashes : [stashes], collect_items)
         Map stashMap = getStashMap(stashes)
-        node(generator.labels) {
+    }
+    node(generator.labels) {
+        if(!generator.isMatrixBuild()) {
             stage("Checkout SCM") {
                 checkout global_scm
             }
@@ -351,12 +351,9 @@ def call() {
                 }
             }
         }
-    }
-
-    List collectItemsList = getCollectItemsList(collect_items)
-    if(collectItemsList) {
-        stage("Publish results") {
-            node(generator.labels) {
+        List collectItemsList = getCollectItemsList(collect_items)
+        if(collectItemsList) {
+            stage("Publish results") {
                 for(String name : collectItemsList) {
                     unstash name
                 }
@@ -384,4 +381,5 @@ def call() {
             }
         }
     }
+
 }
