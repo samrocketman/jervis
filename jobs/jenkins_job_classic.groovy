@@ -25,6 +25,7 @@ if(missing_bindings) {
    Configures matrix or freestyle jobs for both main and pull request builds.
  */
 
+import hudson.util.Secret
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.remotes.GitHub
 
