@@ -360,7 +360,7 @@ def call() {
                 for(String name : collectItemsList) {
                     unstash name
                 }
-                if('artifacts' in collectItemsList) {
+                if(('artifacts' in collectItemsList) && !env.IS_PULL_REQUEST) {
                     archiveArtifacts collect_items['artifacts']
                     fingerprint collect_items['artifacts']
                 }
