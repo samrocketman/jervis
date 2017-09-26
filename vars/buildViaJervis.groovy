@@ -154,6 +154,7 @@ List processSecretEnvs(lifecycleGenerator generator) {
         secretPairs << [var: k, password: v]
         secretEnv << "${k}=${v}"
     }
+    //return a list of lists
     [secretPairs, secretEnv]
 }
 
@@ -162,9 +163,9 @@ List processSecretEnvs(lifecycleGenerator generator) {
   sets and masks decrypted properties from .jervis.yml.
  */
 def withEnvSecretWrapper(lifecycleGenerator generator, List envList, Closure body) {
-    List secretPairs, secretEnv = processSecretEnvs(generator)
-    echo secretPairs
-    echo secretEnv
+    List result = processSecretEnvs(generator)
+    List secretPairs = result[0]
+    List secretEnv = result[1]
     if(secretPairs) {
         wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: secretPairs]) {
             withEnv(secretEnv + envList) {
@@ -273,11 +274,9 @@ def call() {
         node('master') {
             withEnvSecretWrapper(generator, jervisEnvList) {
                 environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
+                echo "PRINT ENVIRONMENT"
+                echo "ENVIRONMENT:\n    ${environment_string}"
             }
-        }
-        withEnvSecretWrapper(generator, jervisEnvList) {
-            echo "PRINT ENVIRONMENT"
-            echo "ENVIRONMENT:\n    ${environment_string}"
         }
     }
 
