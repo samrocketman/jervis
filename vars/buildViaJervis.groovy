@@ -1,15 +1,21 @@
+/*
+   Copyright 2014-2017 Sam Gleske - https://github.com/samrocketman/jervis
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+   */
+
 @Grab(group='net.gleske', module='jervis', version='0.13', transitive=false)
 @Grab(group='org.yaml', module='snakeyaml', version='1.18', transitive=false)
-
-/*
-   TODO:
-   - Secrets support
-   - non-matrix support
-       - collecting artifact support
-       - publishing html support
-       - publishing junit test support
-       - passing artifacts to the rest of the pipeline via stash
- */
 
 import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
@@ -194,6 +200,14 @@ String printDecryptedProperties(lifecycleGenerator generator, String credentials
 }
 
 /**
+  Automatically turn collect_items into valid stashes for non-matrix jobs.
+ */
+@NonCPS
+List mergeCollectItemsWithStash(List stashes, Map collect_items) {
+    stashes + collect_items.collect { k, v -> [name: k, includes: v] }
+}
+
+/**
   The main method of buildViaJervis()
  */
 def call() {
@@ -288,7 +302,7 @@ def call() {
             String stageIdentifier = matrix_axis.collect { k, v -> generator.matrix_fullName_by_friendly[v]?:v }.join('\n')
             String label = generator.labels
             List axisEnvList = matrix_axis.collect { k, v -> "${k}=${v}" }
-            def stashes = getObjectValue(generator.jervis_yaml, 'jenkins.stash', new Object())
+            def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', []))?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
             Map stashMap = getStashMap((stashes instanceof List)? stashes : [stashes], true, convertMatrixAxis(generator, matrix_axis))
             tasks[stageIdentifier] = {
                 node(label) {
@@ -296,7 +310,7 @@ def call() {
                         checkout global_scm
                     }
                     stage("Build axis ${stageIdentifier}") {
-                        withEnv(axisEnvList + jervisEnvList) {
+                        withEnvSecretWrapper(generator, axisEnvList + jervisEnvList) {
                             sh(script: [
                                 script_header,
                                 generator.generateAll(),
@@ -312,7 +326,33 @@ def call() {
         }
         parallel(tasks)
     }
+
     Map collect_items = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
+
+    if(!generator.isMatrixBuild()) {
+        //perform non-matrix build
+        def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', []))?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
+        stashes = mergeCollectItemsWithStash((stashes instanceof List)? stashes : [stashes], collect_items)
+        Map stashMap = getStashMap(stashes)
+        node(generator.labels) {
+            stage("Checkout SCM") {
+                checkout global_scm
+            }
+            stage("Build Project") {
+                withEnvSecretWrapper(generator, jervisEnvList) {
+                    sh(script: [
+                        script_header,
+                        generator.generateAll(),
+                        script_footer
+                    ].join('\n').toString())
+                }
+                for(String name : stashMap.keySet()) {
+                    stash allowEmpty: stashMap[name]['allow_empty'], includes: stashMap[name]['includes'], name: name, useDefaultExcludes: stashMap[name]['use_default_excludes']
+                }
+            }
+        }
+    }
+
     List collectItemsList = getCollectItemsList(collect_items)
     if(collectItemsList) {
         stage("Publish results") {
