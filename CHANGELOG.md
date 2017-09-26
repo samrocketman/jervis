@@ -1,5 +1,5 @@
 # Next release
-
+dummy
 - New Feature: `net.gleske.jervis.lang.*` is serializable so Jervis can now be
   used in pipeline scripts.
 - New Feature: Pipelines supported for matrix builds.
