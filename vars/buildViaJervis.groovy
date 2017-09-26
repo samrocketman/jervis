@@ -269,7 +269,9 @@ def call() {
         script_footer = libraryResource "footer.sh"
         jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
         node('master') {
-            environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
+            withEnvSecretWrapper(generator, jervisEnvList) {
+                environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
+            }
         }
         withEnvSecretWrapper(generator, jervisEnvList) {
             echo "PRINT ENVIRONMENT"
