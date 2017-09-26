@@ -142,17 +142,27 @@ String getFolderRSAKeyCredentials(String folder, String credentials_id) {
 }
 
 /**
-  An environment wrapper which sets environment variables.  If available, also
-  sets and masks decrypted properties from .jervis.yml.
+  Used by withEnvSecretWrapper() method.  Processes secret properties from
+  .jervis.yml into two lists of key value pairs.
  */
+
 @NonCPS
-def withEnvSecretWrapper(lifecycleGenerator generator, List envList, Closure body) {
+List processSecretEnvs(lifecycleGenerator generator) {
     List secretPairs = []
     List secretEnv = []
     generator.plainmap.each { k, v ->
         secretPairs << [var: k, password: v]
         secretEnv << "${k}=${v}"
     }
+    [secretPairs, secretEnv]
+}
+
+/**
+  An environment wrapper which sets environment variables.  If available, also
+  sets and masks decrypted properties from .jervis.yml.
+ */
+def withEnvSecretWrapper(lifecycleGenerator generator, List envList, Closure body) {
+    List secretPairs, secretEnv = processSecretEnvs(generator)
     if(secretPairs) {
         wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: secretPairs]) {
             withEnv(secretEnv + envList) {
