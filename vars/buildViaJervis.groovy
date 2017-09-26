@@ -163,6 +163,8 @@ List processSecretEnvs(lifecycleGenerator generator) {
  */
 def withEnvSecretWrapper(lifecycleGenerator generator, List envList, Closure body) {
     List secretPairs, secretEnv = processSecretEnvs(generator)
+    echo secretPairs
+    echo secretEnv
     if(secretPairs) {
         wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: secretPairs]) {
             withEnv(secretEnv + envList) {
