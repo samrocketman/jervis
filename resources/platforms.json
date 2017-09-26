@@ -12,7 +12,8 @@
                     "groovy",
                     "java",
                     "python",
-                    "ruby"
+                    "ruby",
+                    "shell"
                 ],
                 "toolchain": [
                     "env",
