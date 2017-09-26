@@ -325,16 +325,12 @@ def call() {
         parallel(tasks)
     }
 
-    Map collect_items = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
-
-    if(!generator.isMatrixBuild()) {
-        //perform non-matrix build
-        def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', []))?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
-        stashes = mergeCollectItemsWithStash((stashes instanceof List)? stashes : [stashes], collect_items)
-        Map stashMap = getStashMap(stashes)
-    }
     node(generator.labels) {
+        Map collect_items = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
         if(!generator.isMatrixBuild()) {
+            def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', []))?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
+            stashes = mergeCollectItemsWithStash((stashes instanceof List)? stashes : [stashes], collect_items)
+            Map stashMap = getStashMap(stashes)
             stage("Checkout SCM") {
                 checkout global_scm
             }
