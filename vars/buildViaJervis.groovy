@@ -14,6 +14,12 @@
 import net.gleske.jervis.lang.lifecycleGenerator
 import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
+import hudson.console.HyperlinkNote
+import hudson.util.Secret
+import jenkins.bouncycastle.api.PEMEncodable
+import jenkins.model.Jenkins
+import static jenkins.bouncycastle.api.PEMEncodable.decode
+
 /**
   Returns a list of maps which are buildable matrices in a matrix build.  This
   method takes into account that there are matrix exclusions and white lists in
@@ -102,9 +108,45 @@ Map convertMatrixAxis(lifecycleGenerator generator, Map matrix_axis) {
     new_axis
 }
 
+/**
+  Gets RSA credentials for a given folder.
+ */
+@NonCPS
+String getFolderRSAKeyCredentials(String folder, String credentials_id) {
+    if(!folder || !credentials_id) {
+        return ''
+    }
+    def credentials = Jenkins.instance.getJob(folder).properties.find { it.class.simpleName == 'FolderCredentialsProperty' }
+    String found_credentials = ''
+    try {
+        if(credentials) {
+            credentials.domainCredentials*.credentials*.each { c ->
+                if(c && c.class.simpleName == 'BasicSSHUserPrivateKey' && c.id == credentials_id) {
+                    String priv_key = c.privateKey
+                    Secret p = c.passphrase
+                    found_credentials = new PEMEncodable(decode(priv_key, ((p)? p.plainText : null) as char[]).toPrivateKey()).encode()
+                }
+            }
+        }
+    }
+    catch(Throwable t) {
+        message = 'An exception occurred when decrypting credential '
+        message += HyperlinkNote.encodeTo('/' + Jenkins.instance.getItemByFullName(folder).url + 'credentials/', credentials_id)
+        message += ' from folder '
+        message += HyperlinkNote.encodeTo('/' + Jenkins.instance.getItemByFullName(folder).url, folder) + '.'
+        println message
+        throw t
+    }
+    return found_credentials
+}
+
 def call() {
     def generator = new lifecycleGenerator()
     String environment_string
+    String github_domain
+    String github_org
+    String github_repo
+    String jenkins_folder
     String jervis_yaml
     String lifecycles_json
     String os_stability
@@ -114,8 +156,19 @@ def call() {
     String toolchains_json
     List folder_listing = []
     Map tasks = [failFast: true]
+    BRANCH_NAME = BRANCH_NAME?:env.GIT_BRANCH
+    currentBuild.rawBuild.parent.parent.sources[0].source.with {
+        github_org = it.repoOwner
+        github_repo = it.repository
+        github_domain = (it.apiUri)? it.apiUri.split('/')[2] : 'github.com'
+    }
+    jenkins_folder = currentBuild.rawBuild.parent.parent.fullName.split('/')[0]
     List jervisEnvList = [
-        "JERVIS_BRANCH=${BRANCH_NAME?:env.GIT_BRANCH}"
+        "JERVIS_DOMAIN=${github_domain}",
+        "JERVIS_ORG=${github_org}",
+        "JERVIS_PROJECT=${github_repo}",
+        "JERVIS_BRANCH=${BRANCH_NAME}",
+        "IS_PULL_REQUEST=${BRANCH_NAME.startsWith('PR-')}"
     ]
     List secretEnvList = []
 
