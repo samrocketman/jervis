@@ -190,7 +190,9 @@ def call() {
             else {
                 throw new FileNotFoundException('Cannot find .jervis.yml nor .travis.yml')
             }
-            environment_string = sh(script: 'export LC_ALL=C;env | sort', returnStdout: true).split('\n').join('\n    ')
+            withEnv(jervisEnvList) {
+                environment_string = sh(script: 'export LC_ALL=C;env | sort', returnStdout: true).split('\n').join('\n    ')
+            }
         }
         generator.preloadYamlString(jervis_yaml)
         os_stability = "${generator.label_os}-${generator.label_stability}"
