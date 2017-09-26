@@ -1,30 +1,10 @@
 language: groovy
-#Jenkins LTS core uses Groovy 2.4.8 as of 2017-09-17
-env:
-  # Jenkins 1.x uses Groovy 1.8.9
-  - GROOVY_VERSION="1.8.9"
-  # Jenkins 2.0 onward uses Groovy 2.4.6
-  #- GROOVY_VERSION="2.4.6"
-  # Jenkins 2.47 onward uses Groovy 2.4.8
-  #- GROOVY_VERSION="2.4.8"
-  # Jenkins 2.61 onward uses Groovy 2.4.11
-  #- GROOVY_VERSION="2.4.11"
-  # Latest Groovy 2.4.x stable
-  - GROOVY_VERSION="2.4.12"
-  # Latest Groovy 2.5.x prerelease (next Groovy release)
-  #- GROOVY_VERSION="2.5.0-beta-1"
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
 install: ./assemble.sh
-script: ./gradlew clean check cobertura Jar groovydoc
-after_success:
-  - ./coveralls.sh
-matrix:
-  allow_failures:
-    - env: GROOVY_VERSION="1.8.9"
-    - env: GROOVY_VERSION="2.4.6"
-    - env: GROOVY_VERSION="2.4.8"
-    - env: GROOVY_VERSION="2.4.12"
-    - env: GROOVY_VERSION="2.5.0-beta-1"
+script:
+  - ./gradlew clean check
+  - GROOVY_VERSION=1.8.9 ./gradlew clean cobertura
+  - ./gradlew jar
 branches:
   only:
     - master
@@ -39,20 +19,7 @@ cache:
 jenkins:
   pipeline: true
   pipeline_jenkinsfile: assets/Jenkinsfile
-  stash:
-    - name: artifacts
-      includes: build/libs/*.jar
-      matrix_axis:
-        env: GROOVY_VERSION="2.4.12"
-    - name: junit
-      includes: build/test-results/*.xml
-      matrix_axis:
-        env: GROOVY_VERSION="2.4.12"
-    - name: cobertura
-      includes: build/reports/cobertura/coverage.xml
-      matrix_axis:
-        env: GROOVY_VERSION="1.8.9"
   collect:
     artifacts: build/libs/*.jar
-    cobertura: build/reports/cobertura/coverage.xml
     junit: build/test-results/*.xml
+    cobertura: build/reports/cobertura/coverage.xml
