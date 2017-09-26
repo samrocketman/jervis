@@ -241,7 +241,7 @@ def call() {
         generator.folder_listing = folder_listing
         //attempt to get the private key else return an empty string
         String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
-        String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
+        String private_key_contents = getFolderRSAKeyCredentials(jenkins_folder, credentials_id)
         if(credentials_id && !private_key_contents) {
             throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${credentials_id}")
         }
