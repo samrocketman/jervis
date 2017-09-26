@@ -90,6 +90,18 @@ List getCollectItemsList(Map collect_items) {
     (supported_collections.intersect(known_items) as List).sort()
 }
 
+/**
+  Convert a matrix axis to use unfriendly names for stash comparison.
+ */
+@NonCPS
+Map convertMatrixAxis(lifecycleGenerator generator, Map matrix_axis) {
+    Map new_axis = [:]
+    matrix_axis.each { k, v ->
+        new_axis[k] = generator.matrix_fullName_by_friendly[v]?:v
+    }
+    new_axis
+}
+
 def call() {
     def generator = new lifecycleGenerator()
     String jervis_yaml
@@ -146,7 +158,7 @@ def call() {
             String label = generator.labels
             List axisEnvList = matrix_axis.collect { k, v -> "${k}=${v}" }
             def stashes = getObjectValue(generator.jervis_yaml, 'jenkins.stash', new Object())
-            Map stashMap = getStashMap((stashes instanceof List)? stashes : [stashes], true, matrix_axis)
+            Map stashMap = getStashMap((stashes instanceof List)? stashes : [stashes], true, convertMatrixAxis(generator, matrix_axis))
             tasks[stageIdentifier] = {
                 node(label) {
                     stage("Checkout SCM") {
