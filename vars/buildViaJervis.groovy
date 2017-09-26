@@ -97,7 +97,7 @@ List getCollectItemsList(Map collect_items) {
 Map convertMatrixAxis(lifecycleGenerator generator, Map matrix_axis) {
     Map new_axis = [:]
     matrix_axis.each { k, v ->
-        new_axis[k] = generator.matrix_fullName_by_friendly[v]?:v
+        new_axis[k] = (generator.matrix_fullName_by_friendly[v]?:v) - ~/^${k}:/
     }
     new_axis
 }
