@@ -15,7 +15,7 @@ env:
   #- GROOVY_VERSION="2.5.0-beta-1"
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
 install: ./assemble.sh
-script: ./gradlew cobertura
+script: ./gradlew clean check cobertura Jar groovydoc
 after_success:
   - ./coveralls.sh
 matrix:
