@@ -53,10 +53,11 @@ parent_job = this
 evaluate(readFileFromWorkspace('jobs/git_service.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/global_threadlock.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/get_folder_credentials.groovy').toString())
-evaluate(readFileFromWorkspace('jobs/jenkins_job_classic.groovy').toString())
-evaluate(readFileFromWorkspace('jobs/jenkins_job_pipeline.groovy').toString())
 
 //prepare bindings from other files (order matters due to bindings loaded from other scripts)
+evaluate(readFileFromWorkspace('jobs/jenkins_job_classic.groovy').toString())
+evaluate(readFileFromWorkspace('jobs/jenkins_job_pipeline.groovy').toString())
+evaluate(readFileFromWorkspace('jobs/jenkins_job_multibranch_pipeline.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/jenkins_job.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/generate_project_for.groovy').toString())
 
