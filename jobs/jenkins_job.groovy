@@ -31,8 +31,7 @@ import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
 jenkinsJob = null
 jenkinsJob = { lifecycleGenerator generator, boolean isPullRequestJob, String JERVIS_BRANCH ->
-    //boolean pipelineDefault = '.jervis.yml' in generator.folder_listing
-    boolean pipelineDefault = false
+    boolean pipelineDefault = '.jervis.yml' in generator.folder_listing
     //chooses job type based on Jervis YAML
     def jervis_jobType
     println "Generating branch: ${JERVIS_BRANCH}"
