@@ -6,12 +6,9 @@ pipeline {
     }
     stages {
         stage('Simulated deploy') {
-            when {
-                expression {
-                    ! env.IS_PULL_REQUEST
-                }
-            }
+            when { branch 'jervis_simple' }
             steps {
+                sh 'env | LC_ALL=C sort'
                 unstash 'artifacts'
                 unstash 'cobertura'
                 unstash 'junit'
