@@ -311,6 +311,9 @@ def call() {
                     }
                     stage("Build axis ${stageIdentifier}") {
                         withEnvSecretWrapper(generator, axisEnvList + jervisEnvList) {
+                            environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
+                            echo "PRINT ENVIRONMENT"
+                            echo "ENVIRONMENT:\n    ${environment_string}"
                             sh(script: [
                                 script_header,
                                 generator.generateAll(),
