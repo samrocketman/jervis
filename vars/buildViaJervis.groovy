@@ -227,8 +227,6 @@ def call() {
     List folder_listing = []
     Map tasks = [failFast: true]
     BRANCH_NAME = BRANCH_NAME?:env.GIT_BRANCH
-    String is_pull_request = BRANCH_NAME.startsWith('PR-')
-    env.IS_PULL_REQUEST = is_pull_request
     currentBuild.rawBuild.parent.parent.sources[0].source.with {
         github_org = it.repoOwner
         github_repo = it.repository
@@ -239,8 +237,7 @@ def call() {
         "JERVIS_DOMAIN=${github_domain}",
         "JERVIS_ORG=${github_org}",
         "JERVIS_PROJECT=${github_repo}",
-        "JERVIS_BRANCH=${BRANCH_NAME}",
-        "IS_PULL_REQUEST=${is_pull_request}"
+        "JERVIS_BRANCH=${BRANCH_NAME}"
     ]
     List secretEnvList = []
 
@@ -358,7 +355,7 @@ def call() {
                 for(String name : collectItemsList) {
                     unstash name
                 }
-                if(('artifacts' in collectItemsList) && !is_pull_request) {
+                if('artifacts' in collectItemsList) {
                     archiveArtifacts collect_items['artifacts']
                     fingerprint collect_items['artifacts']
                 }
