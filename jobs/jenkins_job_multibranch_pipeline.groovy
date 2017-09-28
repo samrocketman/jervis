@@ -16,7 +16,7 @@
 
 //this code should be at the beginning of every script included which requires bindings
 String include_script_name = 'jobs/jenkins_job_pipeline.groovy'
-Set required_bindings = ['parent_job', 'project', 'project_folder', 'project_name', 'script_approval', 'git_service']
+Set required_bindings = ['parent_job', 'project', 'project_folder', 'project_name', 'script_approval', 'git_service', 'job_description']
 Set missing_bindings = required_bindings - (binding.variables.keySet()*.toString() as Set)
 if(missing_bindings) {
     throw new Exception("${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}")
@@ -34,7 +34,8 @@ jenkinsJobMultibranchPipeline = null
 jenkinsJobMultibranchPipeline = { def jervis_jobType, lifecycleGenerator generator, String JERVIS_BRANCH ->
     //the generated Job DSL enclosure depends on the job type
     jervis_jobType("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-')) {
-        displayName("${project_name} (${JERVIS_BRANCH} branch)")
+        description(job_description)
+        displayName("${project_name}")
         branchSources {
             branchSource {
                 source {
@@ -48,16 +49,8 @@ jenkinsJobMultibranchPipeline = { def jervis_jobType, lifecycleGenerator generat
                         //additional behaviors
                         traits {
                             headWildcardFilter {
-                                includes "${JERVIS_BRANCH} PR-*"
+                                includes "${JERVIS_BRANCH}"
                                 excludes ''
-                            }
-                            refSpecsSCMSourceTrait {
-                                templates {
-                                    refSpecTemplate {
-                                        // A ref spec to fetch.
-                                        value '+refs/pull/*/head:refs/heads/PR-*'
-                                    }
-                                }
                             }
                         }
                     }
@@ -81,27 +74,12 @@ jenkinsJobMultibranchPipeline = { def jervis_jobType, lifecycleGenerator generat
         }
         configure {
             def traits = it.sources.data.'jenkins.branch.BranchSource'.source.traits
-            traits[0].children() << 'org.jenkinsci.plugins.github__branch__source.BranchDiscoveryTrait' { strategyId('3') }
-            traits[0].children() << 'org.jenkinsci.plugins.github__branch__source.OriginPullRequestDiscoveryTrait' { strategyId('1') }
-            traits[0].children() << 'org.jenkinsci.plugins.github__branch__source.ForkPullRequestDiscoveryTrait' {
+            traits[0].children().add 0, 'org.jenkinsci.plugins.github__branch__source.ForkPullRequestDiscoveryTrait' {
                 strategyId('1')
                 trust(class: 'org.jenkinsci.plugins.github_branch_source.ForkPullRequestDiscoveryTrait$TrustEveryone')
             }
+            traits[0].children().add 0, 'org.jenkinsci.plugins.github__branch__source.OriginPullRequestDiscoveryTrait' { strategyId('1') }
+            traits[0].children().add 0, 'org.jenkinsci.plugins.github__branch__source.BranchDiscoveryTrait' { strategyId('3') }
         }
-        /*
-        configure {
-            def github = it /
-                sources(class: 'jenkins.branch.MultiBranchProject$BranchSourceList') /
-                data /
-                'jenkins.branch.BranchSource' /
-                source(class: 'org.jenkinsci.plugins.github_branch_source.GitHubSCMSource')
-            traits << 'org.jenkinsci.plugins.github__branch__source.BranchDiscoveryTrait' { strategyId('3') }
-            traits << 'org.jenkinsci.plugins.github__branch__source.OriginPullRequestDiscoveryTrait' { strategyId('1') }
-            traits << 'org.jenkinsci.plugins.github__branch__source.ForkPullRequestDiscoveryTrait' {
-                strategyId('1')
-                trust(class: 'org.jenkinsci.plugins.github_branch_source.ForkPullRequestDiscoveryTrait$TrustEveryone')
-            }
-        }
-        */
     }
 }
