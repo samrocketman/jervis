@@ -29,8 +29,8 @@ if(missing_bindings) {
 
 import net.gleske.jervis.lang.lifecycleGenerator
 
-is_pipeline_branch = null
-is_pipeline_branch = { String JERVIS_BRANCH = '' ->
+is_pipeline = null
+is_pipeline = { String JERVIS_BRANCH = '' ->
     List<String> folder_listing = git_service.getFolderListing("${project}", '/', JERVIS_BRANCH)
     def generator = new lifecycleGenerator()
     String jervis_yaml

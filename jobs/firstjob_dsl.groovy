@@ -55,7 +55,7 @@ evaluate(readFileFromWorkspace('jobs/global_threadlock.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/get_folder_credentials.groovy').toString())
 
 //prepare bindings from other files (order matters due to bindings loaded from other scripts)
-evaluate(readFileFromWorkspace('jobs/is_pipeline_branch.groovy').toString())
+evaluate(readFileFromWorkspace('jobs/is_pipeline.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/jenkins_job_classic.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/jenkins_job_pipeline.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/jenkins_job_multibranch_pipeline.groovy').toString())
@@ -98,6 +98,7 @@ Thread.metaClass.checkForException = { ->
     }
 }
 
+//populate project description from GitHub
 job_description = git_service.fetch("repos/${project}")['description']
 
 //generate projects for one or more branches
