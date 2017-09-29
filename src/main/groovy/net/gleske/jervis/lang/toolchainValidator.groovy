@@ -183,7 +183,7 @@ class toolchainValidator implements Serializable {
         if(!this.supportedToolchain('toolchains')) {
             throw new ToolchainMissingKeyException('toolchains')
         }
-        //check for deprecated "advanced" env missing the matrix key in toolchains.json
+        //check for "advanced" env missing the matrix key in toolchains.json; now a requirement
         if(('env' in toolchains) && !('matrix' in toolchains['env'])) {
             throw new ToolchainMissingKeyException('env.matrix; env must be updated to include a "matrix: advanced" key.')
         }

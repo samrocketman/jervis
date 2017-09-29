@@ -1078,20 +1078,6 @@ env:
     }
 
     /**
-      Set the RSA private key path so secrets in a YAML file can be decrypted.  Call
-      this function before <tt>{@link #decryptSecrets()}</tt> if
-      expecting encrypted YAML keys.
-
-      @Deprecated This is deprecated and will be removed in the next version.
-     */
-    @Deprecated
-    public void setPrivateKeyPath(String path) {
-         logger.log(Level.WARNING, 'Use of lifecycleGenerator.setPrivateKeyPath() is deprecated and will be removed in the next version of jervis.  Instead, use lifecycleGenerator.setPrivateKey(new File("/path/to/key").getText()).' + "\nAPI DOCUMENTATION: ${securityIO.deprecation_link}\nMIGRATION PATH: ${securityIO.release_notes}")
-        //public key path and key size do not matter because we're only decrypting and not generating nor encrypting.
-        secret_util = new securityIO(path, '', 2048)
-    }
-
-    /**
       Load an RSA private key in-memory rather than depending on a file
       existing on disk.  This is required to decrypt secrets in a YAML file.
       Call this function before <tt>{@link #decryptSecrets()}</tt> if expecting
