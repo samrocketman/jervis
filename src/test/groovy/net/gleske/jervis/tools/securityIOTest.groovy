@@ -114,7 +114,7 @@ class securityIOTest extends GroovyTestCase {
         assert !security.key_pair
         security.key_pair = url.content.text
         assert security.key_pair
-        assert security.id_rsa_keysize == 1024
+        assert security.id_rsa_keysize == 2048
         url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
         security.key_pair = url.content.text
         assert security.id_rsa_keysize == 4096
@@ -145,7 +145,7 @@ class securityIOTest extends GroovyTestCase {
         }
     }
     @Test public void test_securityIO_fail_on_weak_keys() {
-        URL url = this.getClass().getResource('/rsa_keys/bad_id_rsa_1048')
+        URL url = this.getClass().getResource('/rsa_keys/bad_id_rsa_1024')
         assert !security.key_pair
         shouldFail(SecurityException) {
             security.key_pair = url.content.text
