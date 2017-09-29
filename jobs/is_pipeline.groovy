@@ -67,19 +67,20 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
     String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
 
     if(credentials_id && !private_key_contents) {
-        throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${credentials_id}")
+        throw new SecurityException("Branch: ${JERVIS_BRANCH}.  Could not find private key using Jenkins Credentials ID: ${credentials_id}")
     }
     if(private_key_contents) {
-        println "Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}."
+        println "Branch: ${JERVIS_BRANCH}.  Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}."
         generator.setPrivateKey(private_key_contents)
         generator.decryptSecrets()
-        println "Decrypted the following properties (indented):"
+        println "Branch: ${JERVIS_BRANCH}.  Decrypted the following properties (indented):"
         println '    ' + generator.plainlist*.get('key').join('\n    ')
     }
 
     //we've made it this far so it must be legit
     global_threadlock.withLock {
         if(!pipeline_jenkinsfile) {
+            println "Pipeline multibranch job has been detected."
             pipeline_jenkinsfile = generator.jenkinsfile
         }
         else {
