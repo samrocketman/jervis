@@ -32,10 +32,10 @@ import net.gleske.jervis.lang.lifecycleGenerator
 //generate Jenkins jobs
 generate_project_for = null
 generate_project_for = { String JERVIS_BRANCH ->
+    def generator = new lifecycleGenerator()
     if(!pipeline_jenkinsfile) {
         //not a pipeline so perform classic behavior
         def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
-        def generator = new lifecycleGenerator()
         String jervis_yaml
         if('.jervis.yml' in folder_listing) {
             jervis_yaml = git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH)
