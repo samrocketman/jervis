@@ -100,16 +100,16 @@ Thread.metaClass.checkForException = { ->
 
 //populate project description from GitHub
 job_description = git_service.fetch("repos/${project}")['description']
+branches = []
+pipeline_jenkinsfile = ''
 
 //generate projects for one or more branches
 if(branch) {
     generate_project_for(branch)
 }
 else {
-    List <Thread> threads = []
-    branches = []
-    pipeline_jenkinsfile = ''
     is_pipeline()
+    List <Thread> threads = []
     git_service.branches(project).each { branch ->
         threads << Thread.start {
             try {
