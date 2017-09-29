@@ -30,8 +30,7 @@ class securityIOTest extends GroovyTestCase {
     def security
     //set up before every test
     @Before protected void setUp() {
-        jervis_tmp = Files.createTempDirectory('Jervis_Testing_')
-        security = new securityIO(jervis_tmp.toString())
+        security = new securityIO()
     }
     //tear down after every test
     @After protected void tearDown() {
@@ -49,41 +48,12 @@ class securityIOTest extends GroovyTestCase {
     }
     @Test public void test_securityIO_init_default() {
         security = new securityIO()
-        assert '/tmp/id_rsa.pem' == security.id_rsa_priv
-        assert '/tmp/id_rsa.pub.pem' == security.id_rsa_pub
-        assert security.default_key_size == security.id_rsa_keysize
+        assert !security.key_pair
     }
-    @Test public void test_securityIO_init_key() {
-        security = new securityIO(4096)
-        assert '/tmp/id_rsa.pem' == security.id_rsa_priv
-        assert '/tmp/id_rsa.pub.pem' == security.id_rsa_pub
-        assert 4096 == security.id_rsa_keysize
-    }
-    @Test public void test_securityIO_init_path() {
-        security = new securityIO('/path')
-        assert '/path/id_rsa.pem' == security.id_rsa_priv
-        assert '/path/id_rsa.pub.pem' == security.id_rsa_pub
-        assert security.default_key_size == security.id_rsa_keysize
-    }
-    @Test public void test_securityIO_init_path_key() {
-        security = new securityIO('/path',2048)
-        assert '/path/id_rsa.pem' == security.id_rsa_priv
-        assert '/path/id_rsa.pub.pem' == security.id_rsa_pub
-        assert 2048 == security.id_rsa_keysize
-    }
-    @Test public void test_securityIO_init_priv_pub_key() {
-        security = new securityIO('/path/rsa.key','/path/rsa.pub', 192)
-        assert '/path/rsa.key' == security.id_rsa_priv
-        assert '/path/rsa.pub' == security.id_rsa_pub
-        assert 192 == security.id_rsa_keysize
-    }
-    @Test public void test_securityIO_checkPath() {
-        assert 'tmp' == security.checkPath('tmp')
-        assert 'tmp' == security.checkPath('tmp/')
-        assert '/tmp' == security.checkPath('/tmp')
-        assert '/tmp' == security.checkPath('/tmp/')
-        assert '' == security.checkPath('/')
-        assert '' == security.checkPath('')
+    @Test public void test_securityIO_init_private_pem() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        assert security.id_rsa_keysize == 2048
     }
     //test securityIO().decodeBase64()
     @Test public void test_securityIO_decodeBase64String() {
@@ -104,24 +74,12 @@ class securityIOTest extends GroovyTestCase {
     @Test public void test_securityIO_encodeBase64Bytes() {
         assert 'ZGF0YQ==' == security.encodeBase64('data'.bytes)
     }
-    @Test public void test_securityIO_generate_rsa_pair() {
-        security.generate_rsa_pair()
-        assert true == (new File(jervis_tmp.toString() + '/id_rsa.pem')).exists()
-        assert true == (new File(jervis_tmp.toString() + '/id_rsa.pub.pem')).exists()
-        shouldFail(KeyGenerationException) {
-            security.generate_rsa_pair(jervis_tmp.toString(), security.id_rsa_pub, security.id_rsa_keysize)
-        }
-        shouldFail(KeyGenerationException) {
-            security.generate_rsa_pair(security.id_rsa_priv, jervis_tmp.toString(), security.id_rsa_keysize)
-        }
-    }
     @Test public void test_securityIO_rsaEncrypt_rsaDecrypt() {
         String plaintext = 'secret message'
         String ciphertext
         String decodedtext
-        security.generate_rsa_pair()
-        assert (new File(security.id_rsa_priv)).text.size() > 0
-        assert (new File(security.id_rsa_pub)).text.size() > 0
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security.key_pair = url.content.text
         ciphertext = security.rsaEncrypt(plaintext)
         assert ciphertext.length() > 0
         decodedtext = security.rsaDecrypt(ciphertext)
@@ -151,7 +109,7 @@ class securityIOTest extends GroovyTestCase {
         assert true == security.isSecureField(myobj)
     }
     @Test public void test_securityIO_load_key_pair() {
-        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa')
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_1024')
         assert !security.key_pair
         security.key_pair = url.content.text
         assert security.key_pair
@@ -172,7 +130,7 @@ class securityIOTest extends GroovyTestCase {
         }
     }
     @Test public void test_securityIO_serialization() {
-        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa')
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_1024')
         assert !security.key_pair
         security.key_pair = url.content.text
         assert security.key_pair

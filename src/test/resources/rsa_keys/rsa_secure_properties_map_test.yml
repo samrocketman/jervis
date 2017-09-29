@@ -6,4 +6,4 @@ script:
 jenkins:
   secrets_id: "jervis-secrets-test"
   secrets:
-    JERVIS_SECRETS_TEST: Tye2N35iNoSe0ixZ0GnNHvjo4RvDLx2qq/NhFcq8tLVqOiVVX2HacdpijFdS1MkOQvk9sylNbcXNTW2yvXXFjyPLmTwxQPl9z7Eymfz37QsGy57TQURFikVIrOrrlw8f30Fizk23JnmI20fWgbv157o6CTWPC314jHE/Xy+kSF0=
+    JERVIS_SECRETS_TEST: 'g+hH/MqCUiwCC24Y/odA6GvIWKZ1sjIQi6V+ChGE1llRgmEQrIw5HFrzBf1W+4OAVPDvGayK3c+NmO0kEuLK/NAk5omDS+lInEJR8NvZaoze/4SWL/Jng39uZD0vPP4znzirYewY7qkIq8YNP3ccki8hmrBGdCAofTzw3eh5h78ZEFSL9gcGs9OIwqM0nWeOms9zZQmohSnOBLzhPLoWkqqBJtUp8W7EqR9ZdfzH042dS0eUIpdSnF+o1qqtfUdhpxSaBOjP9QXWpja0kihrhsu6LmxZHNKPCFNXDo2LU3AVsLREV/md0FmM7OxVR8pacwqpZ458dtUA2/pmki+EtQ=='

@@ -7,4 +7,4 @@ jenkins:
   secrets_id: "jervis-secrets-test"
   secrets:
     - key: "JERVIS_SECRETS_TEST"
-      secret: Tye2N35iNoSe0ixZ0GnNHvjo4RvDLx2qq/NhFcq8tLVqOiVVX2HacdpijFdS1MkOQvk9sylNbcXNTW2yvXXFjyPLmTwxQPl9z7Eymfz37QsGy57TQURFikVIrOrrlw8f30Fizk23JnmI20fWgbv157o6CTWPC314jHE/Xy+kSF0=
+      secret: 'lDjC1t95sDp05qM1MTL6hFRLFqIkr5aw5RUtuNu5VlIawg1edKPsv/B9p96QYSUeOI3cXpPpFHmSSArgMxp1x/hKHuYx0nqia7pwMGhEpJp5Qy1IKkV3d16LcGHUSuhlMn7ujSeCe18VNLPoECIUkCk+HAVEokyOQO8LgYOIPo/JdHpJQ4fqV4al6vYaozVPv4CEfh3+Bzr4NraxOG8yVIRGdz0VHnUBRXbezF6xZQE4hOq+DmqlFCmLSqRSlZDWE81z7L4tVZQCD6gex9TCLMKHZ5uOD2PeYkDBZpV0UpIkp34m6nTI1ZvwGR4JCGR3gNE936D9WP+LohFcz8ungw=='

@@ -197,11 +197,8 @@ println key_pair.public.modulus.bitLength()</tt></pre>
       @return A Base64 encoded cipher text or more generically: <tt>ciphertext = base64encode(RSAPublicKeyEncrypt(plaintext))</tt>
      */
     public String rsaEncrypt(String plaintext) throws EncryptException {
-        if(!key_pair && !(new File(id_rsa_priv).exists())) {
-            throw new EncryptException("Private key does not exist so can't instantiate key_pair: ${id_rsa_priv}")
-        }
         if(!key_pair) {
-            setKey_pair(new File(id_rsa_priv).text)
+            throw new EncryptException('key_pair is not set.')
         }
         AsymmetricBlockCipher encrypt = new PKCS1Encoding(new RSAEngine())
         encrypt.init(true, PublicKeyFactory.createKey(key_pair.public.encoded) as AsymmetricKeyParameter)
@@ -220,11 +217,8 @@ println key_pair.public.modulus.bitLength()</tt></pre>
       @return A plain text <tt>String</tt> or more generically: <tt>plaintext = RSAPrivateKeyDecrypt(base64decode(ciphertext))</tt>
      */
     public String rsaDecrypt(String ciphertext) throws DecryptException {
-        if(!key_pair && !(new File(id_rsa_priv).exists())) {
-            throw new DecryptException("Private key does not exist so can't instantiate key_pair: ${id_rsa_priv}")
-        }
         if(!key_pair) {
-            setKey_pair(new File(id_rsa_priv).text)
+            throw new DecryptException('key_pair is not set.')
         }
         AsymmetricBlockCipher decrypt = new PKCS1Encoding(new RSAEngine())
         decrypt.init(false, PrivateKeyFactory.createKey(key_pair.private.encoded) as AsymmetricKeyParameter)
