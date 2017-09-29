@@ -57,11 +57,14 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
     generator.loadYamlString(jervis_yaml)
     generator.folder_listing = folder_listing
 
-    if(!generator.isGenerateBranch(JERVIS_BRANCH) || !generator.isPipelineJob()) {
+    if(generator.isGenerateBranch(JERVIS_BRANCH) && !generator.isPipelineJob()) {
         //the job should not be generated for this branch
         //based on the branches section of .jervis.yml or the fact that it's not a pipeline multibranch job
-        if(!pipeline_jenkinsfile) {
+        if(pipeline_jenkinsfile) {
             println "Skipping branch: ${JERVIS_BRANCH}"
+        }
+        else {
+            println "Generating classic job since pipeline was not detected."
         }
         return
     }
