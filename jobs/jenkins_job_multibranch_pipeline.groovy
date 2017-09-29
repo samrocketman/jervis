@@ -16,7 +16,7 @@
 
 //this code should be at the beginning of every script included which requires bindings
 String include_script_name = 'jobs/jenkins_job_pipeline.groovy'
-Set required_bindings = ['parent_job', 'project', 'project_folder', 'project_name', 'script_approval', 'git_service', 'job_description']
+Set required_bindings = ['parent_job', 'project', 'project_folder', 'project_name', 'script_approval', 'git_service', 'job_description', 'pipeline_jenkinsfile']
 Set missing_bindings = required_bindings - (binding.variables.keySet()*.toString() as Set)
 if(missing_bindings) {
     throw new Exception("${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}")
@@ -65,7 +65,7 @@ jenkinsJobMultibranchPipeline = { def jervis_jobType, lifecycleGenerator generat
         configure {
             def factory = it / factory(class: 'org.jenkinsci.plugins.workflow.multibranch.WorkflowBranchProjectFactory')
             factory << owner(class: 'org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject', reference: '../..')
-            factory << scriptPath(getObjectValue(generator.jervis_yaml, 'jenkins.pipeline_jenkinsfile', 'Jenkinsfile'))
+            factory << scriptPath(pipeline_jenkinsfile?: generator.jenkinsfile)
         }
         configure {
             def folderConfig = it / 'properties' / 'org.jenkinsci.plugins.pipeline.modeldefinition.config.FolderConfig'

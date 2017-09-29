@@ -15,24 +15,23 @@
    */
 
 //this code should be at the beginning of every script included which requires bindings
-String include_script_name = 'jobs/generate_project_for.groovy'
-Set required_bindings = ['parent_job', 'git_service', 'project', 'project_folder', 'global_threadlock']
+String include_script_name = 'jobs/is_pipeline_branch.groovy'
+Set required_bindings = ['git_service', 'project', 'project_folder', 'global_threadlock']
 Set missing_bindings = required_bindings - (binding.variables.keySet()*.toString() as Set)
 if(missing_bindings) {
     throw new Exception("${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}")
 }
 
 /*
-   This will generate jobs for a given branch.
+   This will determine if a branch given branch (or default branch) is
+   compatible with Jenkins pipeline multibranch jobs.
  */
 
-import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
 
-//generate Jenkins jobs
-generate_project_for = null
-generate_project_for = { String JERVIS_BRANCH ->
-    def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
+is_pipeline_branch = null
+is_pipeline_branch = { String JERVIS_BRANCH = '' ->
+    List<String> folder_listing = git_service.getFolderListing("${project}", '/', JERVIS_BRANCH)
     def generator = new lifecycleGenerator()
     String jervis_yaml
     if('.jervis.yml' in folder_listing) {
@@ -46,10 +45,6 @@ generate_project_for = { String JERVIS_BRANCH ->
         println "Skipping branch: ${JERVIS_BRANCH}"
         return
     }
-    //try detecting no default language and setting to ruby
-    if(jervis_yaml.indexOf('language:') < 0) {
-        generator.yaml_language = 'ruby'
-    }
     generator.loadPlatformsString(parent_job.readFileFromWorkspace('resources/platforms.json').toString())
     generator.preloadYamlString(jervis_yaml)
     //could optionally read lifecycles and toolchains files by OS
@@ -58,15 +53,16 @@ generate_project_for = { String JERVIS_BRANCH ->
     generator.loadToolchainsString(parent_job.readFileFromWorkspace("resources/toolchains-${os_stability}.json").toString())
     generator.loadYamlString(jervis_yaml)
 
-    generator.folder_listing = folder_listing
-    if(!generator.isGenerateBranch(JERVIS_BRANCH)) {
+    if(!generator.isGenerateBranch(JERVIS_BRANCH) || !generator.isPipelineJob()) {
         //the job should not be generated for this branch
-        //based on the branches section of .jervis.yml
-        println "Skipping branch: ${JERVIS_BRANCH}"
+        //based on the branches section of .jervis.yml or the fact that it's not a pipeline multibranch job
+        if(!pipeline_jenkinsfile) {
+            println "Skipping branch: ${JERVIS_BRANCH}"
+        }
         return
     }
 
-    //attempt to get the private key else return an empty string
+    //attempt to get the private key else return an empty string (not used but detecting decryption failures before attempting to create the job)
     String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
     String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
 
@@ -80,10 +76,14 @@ generate_project_for = { String JERVIS_BRANCH ->
         println "Decrypted the following properties (indented):"
         println '    ' + generator.plainlist*.get('key').join('\n    ')
     }
-    //end decrypting secrets
 
-    //non-pull request job provided by jobs/main_job.groovy
+    //we've made it this far so it must be legit
     global_threadlock.withLock {
-        jenkinsJob generator, false, JERVIS_BRANCH
+        if(!pipeline_jenkinsfile) {
+            pipeline_jenkinsfile = generator.jenkinsfile
+        }
+        else {
+            branches << JERVIS_BRANCH
+        }
     }
 }

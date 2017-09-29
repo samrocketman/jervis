@@ -55,6 +55,7 @@ evaluate(readFileFromWorkspace('jobs/global_threadlock.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/get_folder_credentials.groovy').toString())
 
 //prepare bindings from other files (order matters due to bindings loaded from other scripts)
+evaluate(readFileFromWorkspace('jobs/is_pipeline_branch.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/jenkins_job_classic.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/jenkins_job_pipeline.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/jenkins_job_multibranch_pipeline.groovy').toString())
@@ -97,18 +98,28 @@ Thread.metaClass.checkForException = { ->
     }
 }
 
+job_description = git_service.fetch("repos/${project}")['description']
+
 //generate projects for one or more branches
-if(branch != null && branch.size() > 0) {
+if(branch) {
     generate_project_for(branch)
 }
 else {
     List <Thread> threads = []
-    git_service.branches("${project}").each { branch ->
+    branches = []
+    pipeline_jenkinsfile = ''
+    is_pipeline()
+    git_service.branches(project).each { branch ->
         threads << Thread.start {
             try {
-                //generating jobs fails with 'anonymous' user permissions without impersonate
-                Jenkins.instance.ACL.impersonate(hudson.security.ACL.SYSTEM)
-                generate_project_for(branch)
+                if(pipeline_jenkinsfile) {
+                    is_pipeline(branch)
+                }
+                else {
+                    //generating jobs fails with 'anonymous' user permissions without impersonate
+                    Jenkins.instance.ACL.impersonate(hudson.security.ACL.SYSTEM)
+                    generate_project_for(branch)
+                }
             }
             catch(Throwable t) {
                 //save the caught exception to be surfaced in the job result
@@ -120,5 +131,8 @@ else {
         it.join()
         //throws an exception from the thread
         it.checkForException()
+    }
+    if(pipeline_jenkinsfile) {
+        generate_project_for(branches.join(' '))
     }
 }
