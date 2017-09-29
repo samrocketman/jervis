@@ -46,12 +46,39 @@ interface JervisRemote {
     List branches(String project);
 
     /**
+      Get the contents of a file in a remote git project for a given reference.
+      Uses the default branch.  Most commonly the file requested will be the
+      Jervis YAML file.
+
+      @return A <tt>String</tt> which contains the contents of the file requested.
+     */
+    String getFile(String project, String file_path);
+
+    /**
       Get the contents of a file in a remote git project for a given reference.  Most
       commonly the file requested will be the Jervis YAML file.
 
       @return A <tt>String</tt> which contains the contents of the file requested.
      */
     String getFile(String project, String file_path, String ref);
+
+    /**
+      List the contents of the root directory of the default branch.  This will
+      typically be used to list the contents of the root directory for the
+      reference so that build scripts can be generated from the list.
+
+      @return A list of files in the requested file path.
+     */
+    ArrayList getFolderListing(String project);
+
+    /**
+      List a the contents of a folder path in a project of the default branch.
+      This will typically be used to list the contents of the root directory
+      for the reference so that build scripts can be generated from the list.
+
+      @return A list of files in the requested file path.
+     */
+    ArrayList getFolderListing(String project, String dir_path);
 
     /**
       Get list a file path in a project for the given reference.  This will typically

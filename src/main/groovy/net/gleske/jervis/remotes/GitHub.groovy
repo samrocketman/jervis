@@ -167,10 +167,10 @@ class GitHub implements JervisRemote {
 
       @param   project    A GitHub project including the org.  e.g. <tt>"samrocketman/jervis"</tt>
       @param   file_path  A path to a file relative to the root of the Git repository.  e.g. <tt>".travis.yml"</tt>
-      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>"master"</tt>.  This option is optional.
+      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>"master"</tt>.  This option is optional.  If not specified the default branch is selected.
       @returns            A <tt>String</tt> which contains the contents of the file requested.
     */
-    public String getFile(String project, String file_path, String ref = "") {
+    public String getFile(String project, String file_path, String ref = '') {
         String path
         if(ref) {
             path = "repos/${project}/contents/${file_path}?ref=${java.net.URLEncoder.encode(ref)}"
@@ -187,16 +187,23 @@ class GitHub implements JervisRemote {
       Get the directory listing of a path from a project.  This is meant to be a standard function for Jervis to interact with remotes.  All remotes are required to have this function.
 
       @param   project    A GitHub project including the org.  e.g. <tt>samrocketman/jervis</tt>
-      @param   dir_path   A path to a directory relative to the root of the Git repository.  e.g. <tt>/</tt>
-      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>master</tt>
+      @param   dir_path   A path to a directory relative to the root of the Git repository.  This is optional.  By default is <tt>/</tt> (the repository root).
+      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>master</tt>.  This option is optional.
       @returns            An <tt>ArrayList</tt> which contains the contents of the file requested.
     */
-    public ArrayList getFolderListing(String project, String dir_path, String ref) {
+    public ArrayList getFolderListing(String project, String dir_path = '/', String ref = '') {
         if(dir_path.length() > 0 && dir_path[0] != '/') {
             dir_path = '/' + dir_path
         }
+        String path
+        if(ref) {
+            path = "repos/${project}/contents${dir_path}?ref=${java.net.URLEncoder.encode(ref)}"
+        }
+        else {
+            path = "repos/${project}/contents${dir_path}"
+        }
         ArrayList listing = []
-        def response = this.fetch("repos/${project}/contents${dir_path}?ref=${java.net.URLEncoder.encode(ref)}")
+        def response = this.fetch(path)
         response.each {
             listing << it.name
         }
