@@ -55,6 +55,7 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
     generator.loadLifecyclesString(parent_job.readFileFromWorkspace("resources/lifecycles-${os_stability}.json").toString())
     generator.loadToolchainsString(parent_job.readFileFromWorkspace("resources/toolchains-${os_stability}.json").toString())
     generator.loadYamlString(jervis_yaml)
+    generator.folder_listing = folder_listing
 
     if(!generator.isGenerateBranch(JERVIS_BRANCH) || !generator.isPipelineJob()) {
         //the job should not be generated for this branch
