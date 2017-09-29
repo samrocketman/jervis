@@ -1095,8 +1095,19 @@ env:
       Determine if this instance is compatible with pipeline multibranch jobs.
 
       @return Returns <tt>true</tt> if this instance is compatible with pipeline multibranch jobs.
+      @see #getJenkinsfile()
      */
     public boolean isPipelineJob() {
         getObjectValue(jervis_yaml, 'jenkins.pipeline_jenkinsfile', '') || 'Jenkinsfile' in folder_listing
+    }
+
+    /**
+      Get the <tt>Jenkinsfile</tt> for a pipeline.
+
+      @return Returns the path to the <tt>Jenkinsfile</tt> the pipeline multibranch job will use.
+      @see #isPipelineJob()
+     */
+    public String getJenkinsfile() {
+        getObjectValue(jervis_yaml, 'jenkins.pipeline_jenkinsfile', '')?: 'Jenkinsfile'
     }
 }

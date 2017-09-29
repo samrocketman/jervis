@@ -730,4 +730,10 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.folder_listing = ['Jenkinsfile']
         assert true == generator.isPipelineJob()
     }
+    @Test public void test_lifecycleGenerator_getJenkinsfile() {
+        generator.loadYamlString('language: ruby')
+        assert 'Jenkinsfile' == generator.getJenkinsfile()
+        generator.loadYamlString('language: ruby\njenkins:\n  pipeline_jenkinsfile: path/Jenkinsfile')
+        assert 'path/Jenkinsfile' == generator.getJenkinsfile()
+    }
 }
