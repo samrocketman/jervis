@@ -1090,4 +1090,13 @@ env:
         secret_util = new securityIO()
         secret_util.key_pair = pem
     }
+
+    /**
+      Determine if this instance is compatible with pipeline multibranch jobs.
+
+      @return Returns <tt>true</tt> if this instance is compatible with pipeline multibranch jobs.
+     */
+    public boolean isPipelineJob() {
+        getObjectValue(jervis_yaml, 'jenkins.pipeline', "false") == "true" || 'Jenkinsfile' in folder_listing
+    }
 }
