@@ -75,26 +75,26 @@ task cleanLibs(type: Delete) {
 clean.dependsOn cleanLibs
 
 test {
-  // show standard out and standard error of the test JVM(s) on the console
-  testLogging.showStandardStreams = true
+    // show standard out and standard error of the test JVM(s) on the console
+    testLogging.showStandardStreams = true
 
-  // set heap size for the test JVM(s)
-  minHeapSize = '128m'
-  maxHeapSize = '512m'
+    // set heap size for the test JVM(s)
+    minHeapSize = '128m'
+    maxHeapSize = '512m'
 
-  //MaxPermSize was removed from Java 1.8
-  // set JVM arguments for the test JVM(s)
-  //jvmArgs '-XX:MaxPermSize=256m'
+    //MaxPermSize was removed from Java 1.8
+    // set JVM arguments for the test JVM(s)
+    //jvmArgs '-XX:MaxPermSize=256m'
 
-  // listen to events in the test execution lifecycle
-  beforeTest { descriptor ->
-     logger.lifecycle('Running test: ' + descriptor)
-  }
+    // listen to events in the test execution lifecycle
+    beforeTest { descriptor ->
+       logger.lifecycle('Running test: ' + descriptor)
+    }
 
-  // listen to standard out and standard error of the test JVM(s)
-  onOutput { descriptor, event ->
-     logger.lifecycle('Test: ' + descriptor + ' produced standard out/err: ' + event.message )
-  }
+    // listen to standard out and standard error of the test JVM(s)
+    onOutput { descriptor, event ->
+       logger.lifecycle('Test: ' + descriptor + ' produced standard out/err: ' + event.message )
+    }
 }
 
 //http://jdpgrailsdev.github.io/blog/2014/04/29/gradle_cobertura.html
@@ -125,12 +125,6 @@ test.finalizedBy(project.tasks.cobertura)
 task( console, dependsOn: "classes", type: JavaExec ) {
     main = "groovy.ui.Console"
     classpath = sourceSets.main.runtimeClasspath
-}
-
-//http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
-//generate gradlew with: gradle wrapper
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.4.1'
 }
 
 //Maven Central uploads
@@ -209,4 +203,18 @@ gradle.taskGraph.whenReady { graph ->
     if (graph.hasTask(':cobertura')) {
         compileGroovy.groovyOptions.optimizationOptions.all = false
     }
+}
+
+sourceSets {
+    test {
+        resources {
+            srcDir 'resources'
+        }
+    }
+}
+
+//http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
+//generate gradlew with: gradle wrapper
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.4.1'
 }
