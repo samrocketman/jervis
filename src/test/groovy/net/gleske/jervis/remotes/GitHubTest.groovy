@@ -177,6 +177,9 @@ class GitHubTest extends GroovyTestCase {
     @Test public void test_GitHub_getFile() {
         assert 'language: groovy\n' == mygh.getFile('samrocketman/jervis','.travis.yml','master')
     }
+    @Test public void test_GitHub_getFile_default() {
+        assert 'language: groovy\n' == mygh.getFile('samrocketman/jervis','.travis.yml')
+    }
     @Test public void test_GitHub_getFolderListing() {
         assert ['.gitignore', '.travis.yml', 'LICENSE', 'README.md', 'build.gradle', 'src'] == mygh.getFolderListing('samrocketman/jervis','/','master')
         assert ['main', 'resources', 'test'] == mygh.getFolderListing('samrocketman/jervis','src','master')

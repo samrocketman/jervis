@@ -167,11 +167,18 @@ class GitHub implements JervisRemote {
 
       @param   project    A GitHub project including the org.  e.g. <tt>"samrocketman/jervis"</tt>
       @param   file_path  A path to a file relative to the root of the Git repository.  e.g. <tt>".travis.yml"</tt>
-      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>"master"</tt>
+      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>"master"</tt>.  This option is optional.
       @returns            A <tt>String</tt> which contains the contents of the file requested.
     */
-    public String getFile(String project, String file_path, String ref) {
-        def response = this.fetch("repos/${project}/contents/${file_path}?ref=${java.net.URLEncoder.encode(ref)}")
+    public String getFile(String project, String file_path, String ref = "") {
+        String path
+        if(ref) {
+            path = "repos/${project}/contents/${file_path}?ref=${java.net.URLEncoder.encode(ref)}"
+        }
+        else {
+            path = "repos/${project}/contents/${file_path}"
+        }
+        def response = this.fetch(path)
         def security = new securityIO()
         return security.decodeBase64String(response['content'])
     }
