@@ -21,6 +21,7 @@ import net.gleske.jervis.exceptions.DecryptException
 import net.gleske.jervis.exceptions.EncryptException
 import net.gleske.jervis.exceptions.KeyGenerationException
 import net.gleske.jervis.exceptions.KeyPairDecodeException
+import net.gleske.jervis.exceptions.SecurityException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -137,5 +138,10 @@ class securityIOTest extends GroovyTestCase {
         def ciphertext = security.rsaEncrypt('some text')
         def plaintext = security.rsaDecrypt(ciphertext)
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(security)
+    }
+    @Test public void test_securityIO_setId_rsa_keysize() {
+        shouldFail(SecurityException) {
+            security.id_rsa_keysize = 1024
+        }
     }
 }
