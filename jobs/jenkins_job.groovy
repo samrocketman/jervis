@@ -35,7 +35,7 @@ jenkinsJob = { lifecycleGenerator generator, boolean isPullRequestJob, String JE
     //chooses job type based on Jervis YAML
     def jervis_jobType
     println "Generating branch: ${JERVIS_BRANCH}"
-    if(getObjectValue(generator.jervis_yaml, 'jenkins.pipeline', pipelineDefault)) {
+    if(pipeline_jenkinsfile) {
         //pipeline job instead of multi-branch
         //jervis_jobType = { String name, Closure closure -> parent_job.pipelineJob(name, closure) }
         //jenkinsJobPipeline(jervis_jobType, generator, JERVIS_BRANCH)
