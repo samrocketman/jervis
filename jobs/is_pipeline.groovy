@@ -31,6 +31,9 @@ import net.gleske.jervis.lang.lifecycleGenerator
 
 is_pipeline = null
 is_pipeline = { String JERVIS_BRANCH = '' ->
+    if(!pipeline_jenkinsfile) {
+        println "Detecting from default branch if Jenkins job should be pipeline or classic."
+    }
     List<String> folder_listing = git_service.getFolderListing("${project}", '/', JERVIS_BRANCH)
     def generator = new lifecycleGenerator()
     String jervis_yaml
