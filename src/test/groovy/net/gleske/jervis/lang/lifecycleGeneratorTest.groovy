@@ -723,7 +723,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert !generator.matrix_fullName_by_friendly
     }
     @Test public void test_lifecycleGenerator_isPipelineJob() {
-        generator.loadYamlString('language: ruby\njenkins:\n  pipeline: true')
+        generator.loadYamlString('language: ruby\njenkins:\n  pipeline_jenkinsfile: path/Jenkinsfile')
         assert true == generator.isPipelineJob()
         generator.loadYamlString('language: ruby')
         assert false == generator.isPipelineJob()

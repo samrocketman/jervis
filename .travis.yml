@@ -37,7 +37,6 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 jenkins:
-  pipeline: true
   pipeline_jenkinsfile: assets/Jenkinsfile
   stash:
     - name: artifacts

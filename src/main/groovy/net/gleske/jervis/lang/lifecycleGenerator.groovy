@@ -1097,6 +1097,6 @@ env:
       @return Returns <tt>true</tt> if this instance is compatible with pipeline multibranch jobs.
      */
     public boolean isPipelineJob() {
-        getObjectValue(jervis_yaml, 'jenkins.pipeline', "false") == "true" || 'Jenkinsfile' in folder_listing
+        getObjectValue(jervis_yaml, 'jenkins.pipeline_jenkinsfile', '') || 'Jenkinsfile' in folder_listing
     }
 }
