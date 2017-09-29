@@ -110,7 +110,7 @@ class securityIOTest extends GroovyTestCase {
         assert true == security.isSecureField(myobj)
     }
     @Test public void test_securityIO_load_key_pair() {
-        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_1024')
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         assert !security.key_pair
         security.key_pair = url.content.text
         assert security.key_pair
@@ -131,7 +131,7 @@ class securityIOTest extends GroovyTestCase {
         }
     }
     @Test public void test_securityIO_serialization() {
-        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_1024')
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         assert !security.key_pair
         security.key_pair = url.content.text
         assert security.key_pair
@@ -142,6 +142,13 @@ class securityIOTest extends GroovyTestCase {
     @Test public void test_securityIO_setId_rsa_keysize() {
         shouldFail(SecurityException) {
             security.id_rsa_keysize = 1024
+        }
+    }
+    @Test public void test_securityIO_fail_on_weak_keys() {
+        URL url = this.getClass().getResource('/rsa_keys/bad_id_rsa_1048')
+        assert !security.key_pair
+        shouldFail(SecurityException) {
+            security.key_pair = url.content.text
         }
     }
 }

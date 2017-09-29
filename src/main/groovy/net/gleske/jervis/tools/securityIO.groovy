@@ -117,6 +117,14 @@ println key_pair.public.modulus.bitLength()</tt></pre>
         }
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC")
         if(obj in PEMKeyPair) {
+            if(converter.getKeyPair(obj as PEMKeyPair).private.modulus.bitLength() < 2048) {
+                String message = 'Private keys smaller than 2048 are not allowed.'
+                message += '  Generate a new key pair 2048 bits or larger.\n\n'
+                message += 'Decrypt your old values using:\n\n    '
+                message += 'echo \'ciphertext\' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey path/to/id_rsa'
+                message += '\n\nSee "Enforcing stronger RSA keys" section of the wiki article.'
+                throw new KeyPairDecodeException(message)
+            }
             key_pair = converter.getKeyPair(obj as PEMKeyPair)
         } else {
             throw new KeyPairDecodeException("Could not decode KeyPair from pem String.  Unable to handle ${obj.class}")

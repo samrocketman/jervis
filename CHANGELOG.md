@@ -1,26 +1,50 @@
 # Next release
 
-- New Feature: `net.gleske.jervis.lang.*` is serializable so Jervis can now be
-  used in pipeline scripts.
-- New Feature: Pipelines supported for matrix builds.
-- Added an example pipeline library to `resources/` and `vars/`.
+Warning: the major was bumped because of API breaking changes.  Be sure to fully
+test this release before rolling it out to production in your own Job DSL
+scripts.
 
-The following deprecated methods were removed.
+- **Security Notice:** Private keys smaller than 2048 are no longer allowed.
+  Generate a new key pair 2048 bits or larger.  Decrypt your old values using
+  the following method.
 
-```
-net.gleske.jervis.lang.lifecycleGenerator.setPrivateKeyPath()
-net.gleske.jervis.tools.securityIO.checkPath(String path)
-net.gleske.jervis.tools.securityIO.default_key_size
-net.gleske.jervis.tools.securityIO.generate_rsa_pair()
-net.gleske.jervis.tools.securityIO.generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize)
-net.gleske.jervis.tools.securityIO.id_rsa_priv
-net.gleske.jervis.tools.securityIO.id_rsa_pub
-net.gleske.jervis.tools.securityIO.securityIO(String path)
-net.gleske.jervis.tools.securityIO.securityIO(String path, int keysize)
-net.gleske.jervis.tools.securityIO.securityIO(String priv_key_file_path, String pub_key_file_path, int keysize)
-net.gleske.jervis.tools.securityIO.securityIO(int keysize)
-net.gleske.jervis.tools.securityIO.set_vars(String priv_key_file_path, String pub_key_file_path, int keysize)
-```
+  ```
+  echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey path/to/id_rsa
+  ```
+
+- The following deprecated methods were removed.  See Jervis 0.13 release notes
+  for a migration path.
+
+  ```
+  net.gleske.jervis.lang.lifecycleGenerator.setPrivateKeyPath()
+  net.gleske.jervis.tools.securityIO.checkPath(String path)
+  net.gleske.jervis.tools.securityIO.default_key_size
+  net.gleske.jervis.tools.securityIO.generate_rsa_pair()
+  net.gleske.jervis.tools.securityIO.generate_rsa_pair(String priv_key_file_path, String pub_key_file_path, int keysize)
+  net.gleske.jervis.tools.securityIO.id_rsa_priv
+  net.gleske.jervis.tools.securityIO.id_rsa_pub
+  net.gleske.jervis.tools.securityIO.securityIO(String path)
+  net.gleske.jervis.tools.securityIO.securityIO(String path, int keysize)
+  net.gleske.jervis.tools.securityIO.securityIO(String priv_key_file_path, String pub_key_file_path, int keysize)
+  net.gleske.jervis.tools.securityIO.securityIO(int keysize)
+  net.gleske.jervis.tools.securityIO.set_vars(String priv_key_file_path, String pub_key_file_path, int keysize)
+  ```
+
+- New Feature: Pipelines are now fully supported.  Jobs will automatically start
+  using pipelines if there's a `Jenkinsfile` in the root of the repository or if
+  the following is set in `.jervis.yml`.
+
+  ```
+  jenkins:
+    pipeline: true
+  ```
+
+- New Feature: `net.gleske.jervis.lang.*` and
+  `net.gleske.jervis.tools.securityIO` is serializable so Jervis can now be used
+  in pipeline scripts.
+
+- Added an example global pipeline library to `resources/` and `vars/`.
+
 
 # jervis 0.13
 
