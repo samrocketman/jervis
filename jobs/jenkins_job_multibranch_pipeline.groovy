@@ -29,9 +29,9 @@ if(missing_bindings) {
 jenkinsJobMultibranchPipeline = null
 jenkinsJobMultibranchPipeline = { def jervis_jobType, String JERVIS_BRANCH ->
     //the generated Job DSL enclosure depends on the job type
-    jervis_jobType("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-')) {
+    jervis_jobType(project) {
         description(job_description)
-        displayName("${project_name}")
+        //displayName(project_name)
         branchSources {
             branchSource {
                 source {
