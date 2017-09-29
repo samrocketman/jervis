@@ -113,12 +113,12 @@ else {
     git_service.branches(project).each { branch ->
         threads << Thread.start {
             try {
+                //generating jobs fails with 'anonymous' user permissions without impersonate
+                Jenkins.instance.ACL.impersonate(hudson.security.ACL.SYSTEM)
                 if(pipeline_jenkinsfile) {
                     is_pipeline(branch)
                 }
                 else {
-                    //generating jobs fails with 'anonymous' user permissions without impersonate
-                    Jenkins.instance.ACL.impersonate(hudson.security.ACL.SYSTEM)
                     generate_project_for(branch)
                 }
             }
