@@ -32,56 +32,58 @@ import net.gleske.jervis.lang.lifecycleGenerator
 //generate Jenkins jobs
 generate_project_for = null
 generate_project_for = { String JERVIS_BRANCH ->
-    def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
-    def generator = new lifecycleGenerator()
-    String jervis_yaml
-    if('.jervis.yml' in folder_listing) {
-        jervis_yaml = git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH)
-    }
-    else if('.travis.yml' in folder_listing) {
-        jervis_yaml = git_service.getFile(project, '.travis.yml', JERVIS_BRANCH)
-    }
-    else {
-        //skip creating the job for this branch
-        println "Skipping branch: ${JERVIS_BRANCH}"
-        return
-    }
-    //try detecting no default language and setting to ruby
-    if(jervis_yaml.indexOf('language:') < 0) {
-        generator.yaml_language = 'ruby'
-    }
-    generator.loadPlatformsString(parent_job.readFileFromWorkspace('resources/platforms.json').toString())
-    generator.preloadYamlString(jervis_yaml)
-    //could optionally read lifecycles and toolchains files by OS
-    def os_stability = "${generator.label_os}-${generator.label_stability}"
-    generator.loadLifecyclesString(parent_job.readFileFromWorkspace("resources/lifecycles-${os_stability}.json").toString())
-    generator.loadToolchainsString(parent_job.readFileFromWorkspace("resources/toolchains-${os_stability}.json").toString())
-    generator.loadYamlString(jervis_yaml)
+    if(!pipeline_jenkinsfile) {
+        //not a pipeline so perform classic behavior
+        def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
+        def generator = new lifecycleGenerator()
+        String jervis_yaml
+        if('.jervis.yml' in folder_listing) {
+            jervis_yaml = git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH)
+        }
+        else if('.travis.yml' in folder_listing) {
+            jervis_yaml = git_service.getFile(project, '.travis.yml', JERVIS_BRANCH)
+        }
+        else {
+            //skip creating the job for this branch
+            println "Skipping branch: ${JERVIS_BRANCH}"
+            return
+        }
+        //try detecting no default language and setting to ruby
+        if(jervis_yaml.indexOf('language:') < 0) {
+            generator.yaml_language = 'ruby'
+        }
+        generator.loadPlatformsString(parent_job.readFileFromWorkspace('resources/platforms.json').toString())
+        generator.preloadYamlString(jervis_yaml)
+        //could optionally read lifecycles and toolchains files by OS
+        def os_stability = "${generator.label_os}-${generator.label_stability}"
+        generator.loadLifecyclesString(parent_job.readFileFromWorkspace("resources/lifecycles-${os_stability}.json").toString())
+        generator.loadToolchainsString(parent_job.readFileFromWorkspace("resources/toolchains-${os_stability}.json").toString())
+        generator.loadYamlString(jervis_yaml)
 
-    generator.folder_listing = folder_listing
-    if(!generator.isGenerateBranch(JERVIS_BRANCH)) {
-        //the job should not be generated for this branch
-        //based on the branches section of .jervis.yml
-        println "Skipping branch: ${JERVIS_BRANCH}"
-        return
-    }
+        generator.folder_listing = folder_listing
+        if(!generator.isGenerateBranch(JERVIS_BRANCH)) {
+            //the job should not be generated for this branch
+            //based on the branches section of .jervis.yml
+            println "Skipping branch: ${JERVIS_BRANCH}"
+            return
+        }
 
-    //attempt to get the private key else return an empty string
-    String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
-    String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
+        //attempt to get the private key else return an empty string
+        String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
+        String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
 
-    if(credentials_id && !private_key_contents) {
-        throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${credentials_id}")
+        if(credentials_id && !private_key_contents) {
+            throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${credentials_id}")
+        }
+        if(private_key_contents) {
+            println "Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}."
+            generator.setPrivateKey(private_key_contents)
+            generator.decryptSecrets()
+            println "Decrypted the following properties (indented):"
+            println '    ' + generator.plainlist*.get('key').join('\n    ')
+        }
+        //end decrypting secrets
     }
-    if(private_key_contents) {
-        println "Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}."
-        generator.setPrivateKey(private_key_contents)
-        generator.decryptSecrets()
-        println "Decrypted the following properties (indented):"
-        println '    ' + generator.plainlist*.get('key').join('\n    ')
-    }
-    //end decrypting secrets
-
     //non-pull request job provided by jobs/main_job.groovy
     global_threadlock.withLock {
         jenkinsJob generator, false, JERVIS_BRANCH

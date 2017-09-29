@@ -26,12 +26,8 @@ if(missing_bindings) {
    Configures a pipeline job designed to execute Jervis YAML.
  */
 
-import net.gleske.jervis.lang.lifecycleGenerator
-import net.gleske.jervis.remotes.GitHub
-import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
-
 jenkinsJobMultibranchPipeline = null
-jenkinsJobMultibranchPipeline = { def jervis_jobType, lifecycleGenerator generator, String JERVIS_BRANCH ->
+jenkinsJobMultibranchPipeline = { def jervis_jobType, String JERVIS_BRANCH ->
     //the generated Job DSL enclosure depends on the job type
     jervis_jobType("${project_folder}/" + "${project_name}-${JERVIS_BRANCH}".replaceAll('/','-')) {
         description(job_description)
@@ -65,7 +61,7 @@ jenkinsJobMultibranchPipeline = { def jervis_jobType, lifecycleGenerator generat
         configure {
             def factory = it / factory(class: 'org.jenkinsci.plugins.workflow.multibranch.WorkflowBranchProjectFactory')
             factory << owner(class: 'org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject', reference: '../..')
-            factory << scriptPath(pipeline_jenkinsfile?: generator.jenkinsfile)
+            factory << scriptPath(pipeline_jenkinsfile)
         }
         configure {
             def folderConfig = it / 'properties' / 'org.jenkinsci.plugins.pipeline.modeldefinition.config.FolderConfig'

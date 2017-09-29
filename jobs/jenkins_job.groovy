@@ -40,7 +40,7 @@ jenkinsJob = { lifecycleGenerator generator, boolean isPullRequestJob, String JE
         //jervis_jobType = { String name, Closure closure -> parent_job.pipelineJob(name, closure) }
         //jenkinsJobPipeline(jervis_jobType, generator, JERVIS_BRANCH)
         jervis_jobType = { String name, Closure closure -> parent_job.multibranchPipelineJob(name, closure) }
-        jenkinsJobMultibranchPipeline(jervis_jobType, generator, JERVIS_BRANCH)
+        jenkinsJobMultibranchPipeline(jervis_jobType, JERVIS_BRANCH)
     }
     else {
         println "Generating branch: ${JERVIS_BRANCH}"
