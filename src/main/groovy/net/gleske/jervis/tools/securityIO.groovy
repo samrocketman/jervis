@@ -57,7 +57,7 @@ println s
 println 'Decrypted string:'
 println security.rsaDecrypt(s)
 new File('/tmp/id_rsa').delete()
-new File('/tmp/id_rsa.pub').delete()
+new File('/tmp/id_rsa.pub').delete()</tt></pre>
  */
 class securityIO implements Serializable {
 
