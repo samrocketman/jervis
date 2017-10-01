@@ -20,7 +20,7 @@ import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 /**
   Generates the pipeline scripts from the Jervis YAML.
  */
-class pipelineGenerator {
+class pipelineGenerator implements Serializable {
 
     /**
       A lifecycle generator which has already been instantiated and processed
