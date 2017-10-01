@@ -158,6 +158,8 @@ def call() {
             generator.loadToolchainsString(toolchains_json)
             generator.loadYamlString(jervis_yaml)
             generator.folder_listing = folder_listing
+            pipeline_generator = new pipelineGenerator(generator)
+            pipeline_generator.supported_collections = ['cobertura', 'junit', 'artifacts']
             //attempt to get the private key else return an empty string
             String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
             String private_key_contents = getFolderRSAKeyCredentials(jenkins_folder, credentials_id)
@@ -179,8 +181,6 @@ def call() {
                 echo "PRINT ENVIRONMENT"
                 echo "ENVIRONMENT:\n    ${environment_string}"
             }
-            pipeline_generator = new pipelineGenerator(generator)
-            pipeline_generator.supported_collections = ['cobertura', 'junit', 'artifacts']
         }
     }
 
