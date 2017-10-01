@@ -267,6 +267,7 @@ def call() {
                             break
                         case 'junit':
                             junit item
+                            break
                     }
                 }
             }
