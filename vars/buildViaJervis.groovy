@@ -19,6 +19,7 @@
 
 import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
+import net.gleske.jervis.lang.pipelineGenerator
 import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
 import hudson.console.HyperlinkNote
@@ -26,94 +27,6 @@ import hudson.util.Secret
 import jenkins.bouncycastle.api.PEMEncodable
 import jenkins.model.Jenkins
 import static jenkins.bouncycastle.api.PEMEncodable.decode
-
-/**
-  Returns a list of maps which are buildable matrices in a matrix build.  This
-  method takes into account that there are matrix exclusions and white lists in
-  the YAML configuration.
- */
-@NonCPS
-List getBuildableMatrixAxes(lifecycleGenerator generator) {
-    List matrix_axis_maps = generator.yaml_matrix_axes.collect { axis ->
-        generator.matrixGetAxisValue(axis).split().collect {
-            ["${axis}": it]
-        }
-    }
-    if(generator.yaml_matrix_axes.size() < 2) {
-        matrix_axis_maps = matrix_axis_maps[0]
-    }
-    else {
-        //creates a list of lists which contain maps to be summed into one list of maps with every possible matrix combination
-        matrix_axis_maps = matrix_axis_maps.combinations()*.sum()
-    }
-    //return all maps (or some maps allowed via filter)
-    matrix_axis_maps.findAll {
-        if(generator.matrixExcludeFilter()) {
-            Binding binding = new Binding()
-            it.each { k, v ->
-                binding.setVariable(k, v)
-            }
-            //filter out the combinations (returns a boolean true or false)
-            new GroovyShell(binding).evaluate(generator.matrixExcludeFilter())
-        }
-        else {
-            //if there's no matrix exclude filter then include everything
-            true
-        }
-    }
-}
-
-/**
-  Returns a list of stashes from Jervis YAML to be stashed either serially or
-  in this matrix axis for matrix builds.
- */
-
-@NonCPS
-Map getStashMap(List stashes, boolean isMatrix = false, Map matrix_axis = [:]) {
-    Map stash_map = [:]
-    stashes.each { s ->
-        if((s instanceof Map) &&
-                ('name' in s) &&
-                getObjectValue(s, 'name', '') &&
-                ('includes' in s) &&
-                getObjectValue(s, 'includes', '') &&
-                (!isMatrix || getObjectValue(s, 'matrix_axis', [:])) &&
-                (!isMatrix || (getObjectValue(s, 'matrix_axis', [:]) == matrix_axis))) {
-            stash_map[getObjectValue(s, 'name', '')] = [
-                'name': getObjectValue(s, 'name', ''),
-                'includes': getObjectValue(s, 'includes', ''),
-                'excludes': getObjectValue(s, 'excludes', ''),
-                'use_default_excludes': getObjectValue(s, 'use_default_excludes', 'true') == 'true',
-                'allow_empty': getObjectValue(s, 'allow_empty', 'false') == 'true',
-                'matrix_axis': getObjectValue(s, 'matrix_axis', [:])
-                ]
-        }
-    }
-    stash_map
-}
-
-/**
-  If given a list of items, compare it to supported items for collection.
- */
-
-@NonCPS
-List getCollectItemsList(Map collect_items) {
-    Set supported_collections = ['cobertura', 'junit', 'artifacts'] as Set
-    Set known_items = collect_items.keySet() as Set
-    (supported_collections.intersect(known_items) as List).sort()
-}
-
-/**
-  Convert a matrix axis to use unfriendly names for stash comparison.
- */
-@NonCPS
-Map convertMatrixAxis(lifecycleGenerator generator, Map matrix_axis) {
-    Map new_axis = [:]
-    matrix_axis.each { k, v ->
-        new_axis[k] = (generator.matrix_fullName_by_friendly[v]?:v) - ~/^${k}:/
-    }
-    new_axis
-}
 
 /**
   Gets RSA credentials for a given folder.
@@ -147,31 +60,15 @@ String getFolderRSAKeyCredentials(String folder, String credentials_id) {
     return found_credentials
 }
 
-/**
-  Used by withEnvSecretWrapper() method.  Processes secret properties from
-  .jervis.yml into two lists of key value pairs.
- */
-
-@NonCPS
-List processSecretEnvs(lifecycleGenerator generator) {
-    List secretPairs = []
-    List secretEnv = []
-    generator.plainmap.each { k, v ->
-        secretPairs << [var: k, password: v]
-        secretEnv << "${k}=${v}"
-    }
-    //return a list of lists
-    [secretPairs, secretEnv]
-}
 
 /**
   An environment wrapper which sets environment variables.  If available, also
   sets and masks decrypted properties from .jervis.yml.
  */
-def withEnvSecretWrapper(lifecycleGenerator generator, List envList, Closure body) {
-    List result = processSecretEnvs(generator)
-    List secretPairs = result[0]
-    List secretEnv = result[1]
+def withEnvSecretWrapper(pipelineGenerator generator, List envList, Closure body) {
+    List spe = pipeline_generator.secretPairsEnv
+    List secretPairs = spe[0]
+    List secretEnv = spe[1]
     if(secretPairs) {
         wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: secretPairs]) {
             withEnv(secretEnv + envList) {
@@ -200,18 +97,11 @@ String printDecryptedProperties(lifecycleGenerator generator, String credentials
 }
 
 /**
-  Automatically turn collect_items into valid stashes for non-matrix jobs.
- */
-@NonCPS
-List mergeCollectItemsWithStash(List stashes, Map collect_items) {
-    stashes + collect_items.collect { k, v -> [name: k, includes: v] }
-}
-
-/**
   The main method of buildViaJervis()
  */
 def call() {
     def generator = new lifecycleGenerator()
+    def pipeline_generator
     String environment_string
     String github_domain
     String github_org
@@ -242,7 +132,6 @@ def call() {
         "JERVIS_BRANCH=${BRANCH_NAME}",
         "IS_PR_BUILD=${is_pull_request}"
     ]
-    List secretEnvList = []
 
     def global_scm = scm
 
@@ -286,31 +175,32 @@ def call() {
             script_header = libraryResource "header.sh"
             script_footer = libraryResource "footer.sh"
             jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
-            withEnvSecretWrapper(generator, jervisEnvList) {
+            withEnvSecretWrapper(pipeline_generator, jervisEnvList) {
                 environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
                 echo "PRINT ENVIRONMENT"
                 echo "ENVIRONMENT:\n    ${environment_string}"
             }
+            pipeline_generator = new pipelineGenerator(generator)
+            pipeline_generator.supported_collections = ['cobertura', 'junit', 'artifacts']
         }
     }
 
     //prepare to run
     if(generator.isMatrixBuild()) {
         //a matrix build which should be executed in parallel
-        getBuildableMatrixAxes(generator).each { matrix_axis ->
+        pipeline_generator.buildableMatrixAxes.each { matrix_axis ->
             //echo "Detected matrix axis: ${matrix_axis}"
             String stageIdentifier = matrix_axis.collect { k, v -> generator.matrix_fullName_by_friendly[v]?:v }.join('\n')
             String label = generator.labels
             List axisEnvList = matrix_axis.collect { k, v -> "${k}=${v}" }
-            def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', []))?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
-            Map stashMap = getStashMap((stashes instanceof List)? stashes : [stashes], true, convertMatrixAxis(generator, matrix_axis))
+            Map stashMap = pipeline_generator.getStashMap(matrix_axis)
             tasks[stageIdentifier] = {
                 node(label) {
                     stage("Checkout SCM") {
                         checkout global_scm
                     }
                     stage("Build axis ${stageIdentifier}") {
-                        withEnvSecretWrapper(generator, axisEnvList + jervisEnvList) {
+                        withEnvSecretWrapper(pipeline_generator, axisEnvList + jervisEnvList) {
                             environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
                             echo "PRINT ENVIRONMENT"
                             echo "ENVIRONMENT:\n    ${environment_string}"
@@ -331,16 +221,13 @@ def call() {
     }
 
     node(generator.labels) {
-        Map collect_items = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
         if(!generator.isMatrixBuild()) {
-            def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', []))?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
-            stashes = mergeCollectItemsWithStash((stashes instanceof List)? stashes : [stashes], collect_items)
-            Map stashMap = getStashMap(stashes)
+            Map stashMap = pipeline_generator.stashMap
             stage("Checkout SCM") {
                 checkout global_scm
             }
             stage("Build Project") {
-                withEnvSecretWrapper(generator, jervisEnvList) {
+                withEnvSecretWrapper(pipeline_generator, jervisEnvList) {
                     sh(script: [
                         script_header,
                         generator.generateAll(),
@@ -352,32 +239,36 @@ def call() {
                 }
             }
         }
-        List collectItemsList = getCollectItemsList(collect_items)
-        if(collectItemsList) {
+        List publishableItems = pipeline_generator.publishableItems
+        if(publishableItems) {
             stage("Publish results") {
-                for(String name : collectItemsList) {
+                for(String name : publishableItems) {
                     unstash name
                 }
-                if('artifacts' in collectItemsList) {
-                    archiveArtifacts collect_items['artifacts']
-                    fingerprint collect_items['artifacts']
-                }
-                if('cobertura' in collectItemsList) {
-                    step([
-                            $class: 'CoberturaPublisher',
-                            autoUpdateHealth: false,
-                            autoUpdateStability: false,
-                            coberturaReportFile: collect_items['cobertura'],
-                            failUnhealthy: false,
-                            failUnstable: false,
-                            maxNumberOfBuilds: 0,
-                            onlyStable: false,
-                            sourceEncoding: 'ASCII',
-                            zoomCoverageChart: false
-                    ])
-                }
-                if('junit' in collectItemsList) {
-                    junit collect_items['junit']
+                for(String publishable : publishableItems) {
+                    String item = pipeline_generator.getPublishableItem(publishable)
+                    switch(publishable) {
+                        case 'artifacts':
+                            archiveArtifacts item
+                            fingerprint item
+                            break
+                        case 'cobertura':
+                            step([
+                                    $class: 'CoberturaPublisher',
+                                    autoUpdateHealth: false,
+                                    autoUpdateStability: false,
+                                    coberturaReportFile: item,
+                                    failUnhealthy: false,
+                                    failUnstable: false,
+                                    maxNumberOfBuilds: 0,
+                                    onlyStable: false,
+                                    sourceEncoding: 'ASCII',
+                                    zoomCoverageChart: false
+                            ])
+                            break
+                        case 'junit':
+                            junit item
+                    }
                 }
             }
         }
