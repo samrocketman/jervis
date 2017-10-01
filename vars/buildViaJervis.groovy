@@ -66,7 +66,7 @@ String getFolderRSAKeyCredentials(String folder, String credentials_id) {
   sets and masks decrypted properties from .jervis.yml.
  */
 def withEnvSecretWrapper(pipelineGenerator generator, List envList, Closure body) {
-    List spe = pipeline_generator.secretPairsEnv
+    List spe = generator.secretPairsEnv
     List secretPairs = spe[0]
     List secretEnv = spe[1]
     if(secretPairs) {
