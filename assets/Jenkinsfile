@@ -10,7 +10,6 @@ pipeline {
             steps {
                 sh 'env | LC_ALL=C sort'
                 unstash 'artifacts'
-                unstash 'cobertura'
                 unstash 'junit'
                 sh 'find . -type f'
             }
