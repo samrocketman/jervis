@@ -116,7 +116,7 @@ def call() {
     String toolchains_json
     List folder_listing = []
     BRANCH_NAME = BRANCH_NAME?:env.GIT_BRANCH
-    boolean is_pull_request = env.CHANGE_ID?:false
+    boolean is_pull_request = (env.CHANGE_ID?:false) as Boolean
     env.IS_PR_BUILD = "${is_pull_request}" as String
     currentBuild.rawBuild.parent.parent.sources[0].source.with {
         github_org = it.repoOwner
