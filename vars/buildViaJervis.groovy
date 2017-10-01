@@ -249,8 +249,7 @@ def call() {
                     String item = pipeline_generator.getPublishableItem(publishable)
                     switch(publishable) {
                         case 'artifacts':
-                            archiveArtifacts item
-                            fingerprint item
+                            archiveArtifacts artifacts: item, fingerprint: true
                             break
                         case 'cobertura':
                             step([
