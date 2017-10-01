@@ -25,8 +25,6 @@ import net.gleske.jervis.lang.platformValidator
 import net.gleske.jervis.lang.toolchainValidator
 import net.gleske.jervis.tools.securityIO
 
-import java.util.logging.Level
-import java.util.logging.Logger
 import java.util.regex.Pattern
 import org.yaml.snakeyaml.Yaml
 
@@ -85,8 +83,6 @@ print 'Labels: '
 println generator.getLabels()</tt></pre>
  */
 class lifecycleGenerator implements Serializable {
-
-    private static final Logger logger = Logger.getLogger(lifecycleGenerator.class.getName());
 
     /**
       Contains the Jervis YAML loaded as an object.

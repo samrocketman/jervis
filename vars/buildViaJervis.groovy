@@ -115,7 +115,6 @@ def call() {
     String script_header
     String toolchains_json
     List folder_listing = []
-    Map tasks = [failFast: true]
     BRANCH_NAME = BRANCH_NAME?:env.GIT_BRANCH
     boolean is_pull_request = env.CHANGE_ID?:false
     env.IS_PR_BUILD = "${is_pull_request}" as String
@@ -188,6 +187,7 @@ def call() {
     //prepare to run
     if(generator.isMatrixBuild()) {
         //a matrix build which should be executed in parallel
+        Map tasks = [failFast: true]
         pipeline_generator.buildableMatrixAxes.each { matrix_axis ->
             //echo "Detected matrix axis: ${matrix_axis}"
             String stageIdentifier = matrix_axis.collect { k, v -> generator.matrix_fullName_by_friendly[v]?:v }.join('\n')
