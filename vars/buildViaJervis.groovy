@@ -246,7 +246,7 @@ def call() {
                     unstash name
                 }
                 for(String publishable : publishableItems) {
-                    String item = pipeline_generator.getPublishableItem(publishable)
+                    String item = pipeline_generator.getPublishable(publishable)
                     switch(publishable) {
                         case 'artifacts':
                             archiveArtifacts artifacts: item, fingerprint: true
