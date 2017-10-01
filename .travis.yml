@@ -1,5 +1,4 @@
 language: groovy
-#Jenkins LTS core uses Groovy 2.4.8 as of 2017-09-17
 env:
   # Jenkins 1.x uses Groovy 1.8.9
   - GROOVY_VERSION="1.8.9"
@@ -12,7 +11,7 @@ env:
   # Latest Groovy 2.4.x stable
   - GROOVY_VERSION="2.4.12"
   # Latest Groovy 2.5.x prerelease (next Groovy release)
-  #- GROOVY_VERSION="2.5.0-beta-1"
+  - GROOVY_VERSION="2.5.0-beta-1"
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
 install: ./assemble.sh
 script: ./gradlew clean check cobertura Jar groovydoc
