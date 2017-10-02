@@ -116,11 +116,10 @@ class pipelineGenerator implements Serializable {
                     (!isMatrix || getObjectValue(s, 'matrix_axis', [:])) &&
                     (!isMatrix || (getObjectValue(s, 'matrix_axis', [:]) == convertMatrixAxis(matrix_axis)))) {
                 stash_map[getObjectValue(s, 'name', '')] = [
-                    'name': getObjectValue(s, 'name', ''),
                     'includes': getObjectValue(s, 'includes', ''),
                     'excludes': getObjectValue(s, 'excludes', ''),
-                    'use_default_excludes': getObjectValue(s, 'use_default_excludes', 'true') == 'true',
-                    'allow_empty': getObjectValue(s, 'allow_empty', 'false') == 'true',
+                    'use_default_excludes': getObjectValue(s, 'use_default_excludes', true),
+                    'allow_empty': getObjectValue(s, 'allow_empty', false),
                     'matrix_axis': getObjectValue(s, 'matrix_axis', [:])
                     ]
             }
