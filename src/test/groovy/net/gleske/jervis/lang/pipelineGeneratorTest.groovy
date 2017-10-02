@@ -42,4 +42,98 @@ class pipelineGeneratorTest extends GroovyTestCase {
         def pipeline = new pipelineGenerator(generator)
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(pipeline)
     }
+    @Test public void test_pipelineGenerator_getSecretPairsEnv() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
+        URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_map_test.yml')
+        generator.loadYamlString(file_url.content.text)
+        generator.setPrivateKey(url.content.text)
+        generator.decryptSecrets()
+        def pipeline_generator = new pipelineGenerator(generator)
+        List<List> results = pipeline_generator.getSecretPairsEnv()
+        assert results[0] instanceof List<Map>
+        assert results[1] instanceof List<String>
+        assert results[0]  == [[var: 'JERVIS_SECRETS_TEST', password: 'plaintext']]
+        assert results[1] == ['JERVIS_SECRETS_TEST=plaintext']
+    }
+    @Test public void test_pipelineGenerator_supported_collections() {
+        generator.loadYamlString('language: ruby\njenkins:\n  collect:\n    foo: path/to/foo\n    artifacts: "**/*.gem"')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'artifacts']
+        assert pipeline_generator.supported_collections == ['foo', 'artifacts'].toSet()
+    }
+    @Test public void test_pipelineGenerator_getPublishableItems() {
+        generator.loadYamlString('language: ruby\njenkins:\n  collect:\n    foo: path/to/foo\n    artifacts: "**/*.gem"')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'artifacts']
+        assert pipeline_generator.getPublishableItems() == ['artifacts', 'foo']
+        pipeline_generator.supported_collections = ['foo']
+        assert pipeline_generator.getPublishableItems() == ['foo']
+    }
+    @Test public void test_pipelineGenerator_getBuildableMatrixAxes_matrix() {
+        generator.loadYamlString('language: java\nenv: ["world=hello", "world=goodby"]\njdk:\n  - openjdk6\n  - openjdk7')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'artifacts']
+        assert pipeline_generator.getBuildableMatrixAxes() == [[env:'env0', jdk:'jdk0'], [env:'env1', jdk:'jdk0'], [env:'env0', jdk:'jdk1'], [env:'env1', jdk:'jdk1']]
+    }
+    @Test public void test_pipelineGenerator_getBuildableMatrixAxes_nonmatrix() {
+        generator.loadYamlString('language: java\nenv: "world=hello"\njdk:\n  - openjdk6')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'artifacts']
+        assert pipeline_generator.getBuildableMatrixAxes() == []
+    }
+    @Test public void test_pipelineGenerator_getStashMap() {
+        //empty stash
+        generator.loadYamlString('language: java\njenkins:\n  stash:\n    - name: hello')
+        def pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap() == [:]
+        //single stash with defaults
+        generator.loadYamlString('language: java\njenkins:\n  stash:\n    - name: hello\n      includes: world')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap() == [hello:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[:]]]
+        //set excludes away from default
+        generator.loadYamlString('language: java\njenkins:\n  stash:\n    - name: hello\n      includes: world\n      excludes: goodbye')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap() == [hello:[includes:'world', excludes:'goodbye', use_default_excludes:true, allow_empty:false, matrix_axis:[:]]]
+        //set use_default_excludes away from default
+        generator.loadYamlString('language: java\njenkins:\n  stash:\n    - name: hello\n      includes: world\n      use_default_excludes: false')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap() == [hello:[includes:'world', excludes:'', use_default_excludes:false, allow_empty:false, matrix_axis:[:]]]
+        //set allow_empty away from default
+        generator.loadYamlString('language: java\njenkins:\n  stash:\n    - name: hello\n      includes: world\n      allow_empty: true')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap() == [hello:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:true, matrix_axis:[:]]]
+        //set matrix_axis away from default
+        generator.loadYamlString('language: java\njdk: [openjdk6, openjdk7]\njenkins:\n  stash:\n    - name: hello\n      includes: world\n      matrix_axis: [jdk: openjdk6]')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap([jdk: 'openjdk6']) == [hello:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[jdk: 'openjdk6']]]
+    }
+    @Test public void test_pipelineGenerator_getStashMap_nonmatrix() {
+        //automatically infer stashes from nonmatrix
+        generator.loadYamlString('language: java\njenkins:\n  collect:\n    foo: hello\n    artifacts: world\n    baz: goodbye')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'artifacts']
+        assert pipeline_generator.getStashMap() == [foo:[includes:'hello', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[:]], artifacts:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[:]], baz:[includes:'goodbye', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[:]]]
+    }
+    @Test public void test_pipelineGenerator_getStashMap_matrix() {
+        //set matrix_axis away from default
+        generator.loadYamlString('language: java\njdk: [openjdk6, openjdk7]\njenkins:\n  stash:\n    - name: hello\n      includes: world\n      matrix_axis:\n        jdk: openjdk6')
+        def pipeline_generator = new pipelineGenerator(generator)
+        //for this matrix
+        assert pipeline_generator.getStashMap([jdk: 'openjdk6']) == [hello:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[jdk: 'openjdk6']]]
+        //not for this matrix
+        assert pipeline_generator.getStashMap([jdk: 'openjdk7']) == [:]
+        //alternate for this matrix
+        assert pipeline_generator.getStashMap([jdk: 'jdk0']) == [hello:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[jdk: 'openjdk6']]]
+        //friendlyLabel for this matrix
+        generator = new lifecycleGenerator()
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        generator.loadLifecycles(url.getFile())
+        url = this.getClass().getResource('/good_toolchains_friendly.json');
+        generator.loadToolchains(url.getFile())
+        generator.loadYamlString('language: java\njdk: [openjdk6, openjdk7]\njenkins:\n  stash:\n    - name: hello\n      includes: world\n      matrix_axis:\n        jdk: openjdk6')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap([jdk: 'openjdk6']) == [hello:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[jdk: 'openjdk6']]]
+        assert pipeline_generator.getStashMap([jdk: 'jdk:openjdk6']) == [hello:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[jdk: 'openjdk6']]]
+        assert pipeline_generator.getStashMap([jdk: 'jdk0']) == [:]
+    }
 }

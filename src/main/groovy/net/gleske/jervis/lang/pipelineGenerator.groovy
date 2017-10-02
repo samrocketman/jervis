@@ -70,8 +70,11 @@ class pipelineGenerator implements Serializable {
      */
     List getBuildableMatrixAxes() {
         List matrix_axis_maps = generator.yaml_matrix_axes.collect { axis ->
+            //the following map hack is so the key is not an instance of GStringImpl
             generator.matrixGetAxisValue(axis).split().collect {
-                ["${axis}": it]
+                def m = [:]
+                m[axis] = it
+                m
             }
         }
         if(generator.yaml_matrix_axes.size() < 2) {
