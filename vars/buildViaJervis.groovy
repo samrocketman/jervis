@@ -20,6 +20,7 @@
 import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.lang.pipelineGenerator
+import net.gleske.jervis.remotes.GitHub
 import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
 import hudson.console.HyperlinkNote
@@ -27,6 +28,46 @@ import hudson.util.Secret
 import jenkins.bouncycastle.api.PEMEncodable
 import jenkins.model.Jenkins
 import static jenkins.bouncycastle.api.PEMEncodable.decode
+
+/**
+  Gets GitHub API token from the global credential store.
+ */
+
+@NonCPS
+String getGitHubAPIToken() {
+    Jenkins.instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getCredentials().find {
+        it.class.simpleName == 'StringCredentialsImpl' && it.id == 'github-token'
+    }.with {
+        if(it) {
+            it.secret
+        }
+    } as String
+}
+
+/**
+  Reads GitHub API and returns the .jervis.yml file via API instead of a
+  workspace checkout.
+
+  @return A list where the first item is jervis_yaml and the second item is a
+          list of files in the root of the repository.
+ */
+@NonCPS
+List getJervisMetaData(String project, String JERVIS_BRANCH) {
+    String jervis_yaml
+    def git_service = new GitHub()
+    git_service.gh_token = getGitHubAPIToken()
+    def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
+    if('.jervis.yml' in folder_listing) {
+        jervis_yaml = git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH)
+    }
+    else if('.travis.yml' in folder_listing) {
+        jervis_yaml = git_service.getFile(project, '.travis.yml', JERVIS_BRANCH)
+    }
+    else {
+        throw new FileNotFoundException('Cannot find .jervis.yml nor .travis.yml')
+    }
+    [jervis_yaml, folder_listing]
+}
 
 /**
   Gets RSA credentials for a given folder.
@@ -137,51 +178,34 @@ def call() {
     stage('Process Jervis YAML') {
         platforms_json = libraryResource 'platforms.json'
         generator.loadPlatformsString(platforms_json)
-        node('master') {
-            checkout global_scm
-            folder_listing = sh(returnStdout: true, script: 'ls -a -1').trim().split('\n') as List
-            echo "Folder list: ${folder_listing}"
-            if('.jervis.yml' in folder_listing) {
-                jervis_yaml = readFile '.jervis.yml'
-            }
-            else if('.travis.yml' in folder_listing) {
-                jervis_yaml = readFile '.travis.yml'
-            }
-            else {
-                throw new FileNotFoundException('Cannot find .jervis.yml nor .travis.yml')
-            }
-            generator.preloadYamlString(jervis_yaml)
-            os_stability = "${generator.label_os}-${generator.label_stability}"
-            lifecycles_json = libraryResource "lifecycles-${os_stability}.json"
-            toolchains_json = libraryResource "toolchains-${os_stability}.json"
-            generator.loadLifecyclesString(lifecycles_json)
-            generator.loadToolchainsString(toolchains_json)
-            generator.loadYamlString(jervis_yaml)
-            generator.folder_listing = folder_listing
-            pipeline_generator = new pipelineGenerator(generator)
-            pipeline_generator.supported_collections = ['cobertura', 'junit', 'artifacts']
-            //attempt to get the private key else return an empty string
-            String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
-            String private_key_contents = getFolderRSAKeyCredentials(jenkins_folder, credentials_id)
-            if(credentials_id && !private_key_contents) {
-                throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${credentials_id}")
-            }
-            if(private_key_contents) {
-                generator.setPrivateKey(private_key_contents)
-                generator.decryptSecrets()
-                echo "DECRYPTED PROPERTIES"
-                echo printDecryptedProperties(generator, credentials_id)
-            }
-            //end decrypting secrets
-            script_header = libraryResource "header.sh"
-            script_footer = libraryResource "footer.sh"
-            jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
-            withEnvSecretWrapper(pipeline_generator, jervisEnvList) {
-                environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
-                echo "PRINT ENVIRONMENT"
-                echo "ENVIRONMENT:\n    ${environment_string}"
-            }
+        List jervis_metadata = getJervisMetaData("${github_org}/${github_repo}".toString(), BRANCH_NAME)
+        jervis_yaml = jervis_metadata[0]
+        folder_listing = jervis_metadata[1]
+        generator.preloadYamlString(jervis_yaml)
+        os_stability = "${generator.label_os}-${generator.label_stability}"
+        lifecycles_json = libraryResource "lifecycles-${os_stability}.json"
+        toolchains_json = libraryResource "toolchains-${os_stability}.json"
+        generator.loadLifecyclesString(lifecycles_json)
+        generator.loadToolchainsString(toolchains_json)
+        generator.loadYamlString(jervis_yaml)
+        generator.folder_listing = folder_listing
+        pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['cobertura', 'junit', 'artifacts']
+        //attempt to get the private key else return an empty string
+        String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
+        String private_key_contents = getFolderRSAKeyCredentials(jenkins_folder, credentials_id)
+        if(credentials_id && !private_key_contents) {
+            throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${credentials_id}")
         }
+        if(private_key_contents) {
+            generator.setPrivateKey(private_key_contents)
+            generator.decryptSecrets()
+            echo "DECRYPTED PROPERTIES\n${printDecryptedProperties(generator, credentials_id)}"
+        }
+        //end decrypting secrets
+        script_header = libraryResource "header.sh"
+        script_footer = libraryResource "footer.sh"
+        jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
     }
 
     //prepare to run
@@ -189,7 +213,6 @@ def call() {
         //a matrix build which should be executed in parallel
         Map tasks = [failFast: true]
         pipeline_generator.buildableMatrixAxes.each { matrix_axis ->
-            //echo "Detected matrix axis: ${matrix_axis}"
             String stageIdentifier = matrix_axis.collect { k, v -> generator.matrix_fullName_by_friendly[v]?:v }.join('\n')
             String label = generator.labels
             List axisEnvList = matrix_axis.collect { k, v -> "${k}=${v}" }
@@ -202,7 +225,6 @@ def call() {
                     stage("Build axis ${stageIdentifier}") {
                         withEnvSecretWrapper(pipeline_generator, axisEnvList + jervisEnvList) {
                             environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
-                            echo "PRINT ENVIRONMENT"
                             echo "ENVIRONMENT:\n    ${environment_string}"
                             sh(script: [
                                 script_header,
@@ -228,6 +250,8 @@ def call() {
             }
             stage("Build Project") {
                 withEnvSecretWrapper(pipeline_generator, jervisEnvList) {
+                    environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
+                    echo "ENVIRONMENT:\n    ${environment_string}"
                     sh(script: [
                         script_header,
                         generator.generateAll(),
