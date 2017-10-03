@@ -69,11 +69,25 @@ class pipelineGeneratorTest extends GroovyTestCase {
         pipeline_generator.supported_collections = ['foo']
         assert pipeline_generator.getPublishableItems() == ['foo']
     }
+    @Test public void test_pipelineGenerator_getPublishable() {
+        generator.loadYamlString('language: ruby\njenkins:\n  collect:\n    foo: path/to/foo\n    artifacts: "**/*.gem"')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'artifacts']
+        assert pipeline_generator.getPublishable('foo') == 'path/to/foo'
+        assert pipeline_generator.getPublishable('artifacts') == '**/*.gem'
+    }
     @Test public void test_pipelineGenerator_getBuildableMatrixAxes_matrix() {
         generator.loadYamlString('language: java\nenv: ["world=hello", "world=goodby"]\njdk:\n  - openjdk6\n  - openjdk7')
         def pipeline_generator = new pipelineGenerator(generator)
-        pipeline_generator.supported_collections = ['foo', 'artifacts']
         assert pipeline_generator.getBuildableMatrixAxes() == [[env:'env0', jdk:'jdk0'], [env:'env1', jdk:'jdk0'], [env:'env0', jdk:'jdk1'], [env:'env1', jdk:'jdk1']]
+        //account for matrix include axes
+        generator.loadYamlString('language: java\nenv: ["world=hello", "world=goodbye"]\njdk:\n  - openjdk6\n  - openjdk7\nmatrix:\n  include:\n    - {env: "world=hello", jdk: openjdk6}\n    - {env: "world=goodbye", jdk: openjdk7}')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getBuildableMatrixAxes() == [[env:'env0', jdk:'jdk0'], [env:'env1', jdk:'jdk1']]
+        //account for inverse matrix exclude axes
+        generator.loadYamlString('language: java\nenv: ["world=hello", "world=goodbye"]\njdk:\n  - openjdk6\n  - openjdk7\nmatrix:\n  exclude:\n    - {env: "world=hello", jdk: openjdk6}\n    - {env: "world=goodbye", jdk: openjdk7}')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getBuildableMatrixAxes() ==  [[env:'env1', jdk:'jdk0'], [env:'env0', jdk:'jdk1']]
     }
     @Test public void test_pipelineGenerator_getBuildableMatrixAxes_nonmatrix() {
         generator.loadYamlString('language: java\nenv: "world=hello"\njdk:\n  - openjdk6')
@@ -135,5 +149,23 @@ class pipelineGeneratorTest extends GroovyTestCase {
         assert pipeline_generator.getStashMap([jdk: 'openjdk6']) == [hello:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[jdk: 'openjdk6']]]
         assert pipeline_generator.getStashMap([jdk: 'jdk:openjdk6']) == [hello:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[jdk: 'openjdk6']]]
         assert pipeline_generator.getStashMap([jdk: 'jdk0']) == [:]
+    }
+    @Test public void test_pipelineGenerator_getStashMap_test_for_failure() {
+        //not a map
+        generator.loadYamlString('language: java\njenkins:\n  stash:\n    - hello')
+        def pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap() == [:]
+        //name defined but empty
+        generator.loadYamlString('language: java\njenkins:\n  stash:\n    - name: ""\n      includes: world')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap() == [:]
+        //includes defined but empty
+        generator.loadYamlString('language: java\njenkins:\n  stash:\n    - name: hello\n      includes: ""')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap() == [:]
+        //is a matrix build but no matrix is defined
+        generator.loadYamlString('language: java\njdk: [openjdk6, openjdk7]\njenkins:\n  stash:\n    - name: hello\n      includes: world\n      matrix_axis: {}')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap() == [:]
     }
 }
