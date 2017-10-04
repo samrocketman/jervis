@@ -149,6 +149,12 @@ class pipelineGeneratorTest extends GroovyTestCase {
         assert pipeline_generator.getStashMap([jdk: 'openjdk6']) == [hello:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[jdk: 'openjdk6']]]
         assert pipeline_generator.getStashMap([jdk: 'jdk:openjdk6']) == [hello:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[jdk: 'openjdk6']]]
         assert pipeline_generator.getStashMap([jdk: 'jdk0']) == [:]
+        generator.loadYamlString('language: java\njdk: [openjdk6, openjdk7]\njenkins:\n  stash:\n    - name: hello\n      includes: world\n      matrix_axis:\n        jdk: openjdk6\n  collect:\n    hello: goodbye_world')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap([jdk: 'openjdk6']) == [hello:[includes:'goodbye_world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[jdk: 'openjdk6']]]
+        generator.loadYamlString('language: java\njdk: [openjdk6, openjdk7]\njenkins:\n  stash:\n    - name: hello\n      matrix_axis:\n        jdk: openjdk6\n  collect:\n    hello: happy_days')
+        pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getStashMap([jdk: 'openjdk6']) == [hello:[includes:'happy_days', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[jdk: 'openjdk6']]]
     }
     @Test public void test_pipelineGenerator_getStashMap_test_for_failure() {
         //not a map

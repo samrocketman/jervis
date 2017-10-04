@@ -150,6 +150,11 @@ class pipelineGenerator implements Serializable {
         stashes.each { s ->
             if((s instanceof Map) &&
                     ('name' in s) &&
+                    getObjectValue(collect_items, s['name'], '')) {
+                s['includes'] = getObjectValue(collect_items, s['name'], '')
+            }
+            if((s instanceof Map) &&
+                    ('name' in s) &&
                     getObjectValue(s, 'name', '') &&
                     ('includes' in s) &&
                     getObjectValue(s, 'includes', '') &&
