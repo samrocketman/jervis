@@ -167,6 +167,9 @@ class toolchainValidatorTest extends GroovyTestCase {
         toolchains.load_JSON(url.getFile())
         assert true == toolchains.validate()
         assert true == toolchains.validate_asBool()
+        (toolchains.toolchains.keySet() as List).each {
+            assert it instanceof String
+        }
     }
     @Test public void test_toolchainValidator_isFriendlyLabel() {
         URL url = this.getClass().getResource('/good_toolchains_friendly.json');
