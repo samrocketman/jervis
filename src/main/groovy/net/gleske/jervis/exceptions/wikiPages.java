@@ -44,9 +44,13 @@ package net.gleske.jervis.exceptions;
 
   <h2>Sample usage</h2>
 
-  When overriding the URLs you must override the getter method using meta
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
+
+  <p>When overriding the URLs you must override the getter method using meta
   programming.  The following is an example of overriding the
-  <tt>{@link #lifecycles_spec}</tt>.
+  <tt>{@link #lifecycles_spec}</tt>.</p>
 
 <pre><tt>import net.gleske.jervis.exceptions.wikiPages
 wikiPages.metaClass.static.getLifecycles_spec = {->'https://wiki.example.com/lifecycle_explanation.html'}

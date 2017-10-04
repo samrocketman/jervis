@@ -19,6 +19,9 @@ package net.gleske.jervis.exceptions;
   A type of <tt>{@link net.gleske.jervis.exceptions.LifecycleValidationException}</tt> which is thrown when there is a bad value in a lifecycles file key.
 
   <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
 <pre><tt>import net.gleske.jervis.exceptions.LifecycleBadValueInKeyException
 throw new LifecycleBadValueInKeyException('ruby.rake1.fileExistsCondition')</tt></pre><br>
  */

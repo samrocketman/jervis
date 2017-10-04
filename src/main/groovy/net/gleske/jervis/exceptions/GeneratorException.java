@@ -19,6 +19,9 @@ package net.gleske.jervis.exceptions;
   A group of exceptions that are thrown when undesireable script generation conditions occur.
 
   <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
 <pre><tt>import net.gleske.jervis.exceptions.GeneratorException
 throw new GeneratorException('some text')</tt></pre><br>
  */
