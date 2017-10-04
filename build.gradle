@@ -21,6 +21,7 @@ ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
 //sourceCompatibility = 1.6
 
 apply from: 'file:gradle/groovydoc.gradle'
+apply from: 'file:gradle/jervis.gradle'
 
 println "Using Groovy ${groovyVersion}"
 println "Using Gradle ${GradleVersion.current().getVersion()}"
@@ -37,11 +38,6 @@ buildscript {
     }
 }
 
-//Add due to deprecated Grab support
-//https://github.com/samrocketman/jervis/issues/60
-configurations {
-    libs
-}
 
 configurations.all {
     resolutionStrategy {
@@ -60,19 +56,8 @@ dependencies {
     compile 'org.bouncycastle:bcpkix-jdk15on:1.58'
     compile 'org.ow2.asm:asm:5.2'
     compile 'org.yaml:snakeyaml:1.18'
-    libs 'org.yaml:snakeyaml:1.18'
     testCompile 'junit:junit:4.12'
 }
-
-task libs(type: Copy) {
-    into 'lib'
-    from configurations.libs
-}
-
-task cleanLibs(type: Delete) {
-    delete 'lib'
-}
-clean.dependsOn cleanLibs
 
 test {
     // show standard out and standard error of the test JVM(s) on the console
@@ -205,13 +190,6 @@ gradle.taskGraph.whenReady { graph ->
     }
 }
 
-sourceSets {
-    test {
-        resources {
-            srcDir 'resources'
-        }
-    }
-}
 
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 //generate gradlew with: gradle wrapper

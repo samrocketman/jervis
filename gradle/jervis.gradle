@@ -1,0 +1,27 @@
+//Add due to deprecated Grab support
+//https://github.com/samrocketman/jervis/issues/60
+configurations {
+    libs
+}
+dependencies {
+    libs 'org.yaml:snakeyaml:1.18'
+}
+
+task libs(type: Copy) {
+    into 'lib'
+    from configurations.libs
+}
+
+task cleanLibs(type: Delete) {
+    delete 'lib'
+}
+clean.dependsOn cleanLibs
+
+//include the resources directory at the root of this repository
+sourceSets {
+    test {
+        resources {
+            srcDir 'resources'
+        }
+    }
+}
