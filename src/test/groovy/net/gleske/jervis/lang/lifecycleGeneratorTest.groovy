@@ -360,45 +360,6 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert true == generator.isGenerateBranch('development')
         assert false == generator.isGenerateBranch('derp')
     }
-    @Test public void test_lifecycleGenerator_main_toolchains_bash_syntax_check() {
-        URL url = this.getClass().getResource('/lifecycles-ubuntu1604-stable.json');
-        generator.loadLifecycles(url.getFile())
-        url = this.getClass().getResource('/toolchains-ubuntu1604-stable.json');
-        generator.loadToolchains(url.getFile())
-        List skip_keys = ['default_ivalue', 'secureSupport', 'friendlyLabel', 'comment', 'matrix']
-        //cycle through all permutations of the toolchains file and check bash syntax
-        generator.toolchain_obj.languages.each {
-            String language = it
-            generator.toolchain_obj.toolchains['toolchains'][language].each {
-                String toolchain = it
-                (generator.toolchain_obj.toolchains[toolchain].keySet() as String[]).each {
-                    String toolchain_value = it
-                    if(!(toolchain_value in skip_keys)) {
-                        //load the yaml permutations
-                        String sample_yaml
-                        if('*' == it) {
-                            sample_yaml = "language: ${language}\n${toolchain}:\n  - hello"
-                        }
-                        else {
-                            sample_yaml = "language: ${language}\n${toolchain}:\n  - \"${toolchain_value}\""
-                        }
-                        generator.loadYamlString(sample_yaml)
-                        //do the syntax checking
-                        def stdout = new StringBuilder()
-                        def stderr = new StringBuilder()
-                        def proc1 = ['echo', generator.generateToolchainSection()].execute()
-                        def proc2 = ['bash', '-n'].execute()
-                        proc1 | proc2
-                        proc2.waitForProcessOutput(stdout, stderr)
-                        if(proc2.exitValue()) {
-                            //syntax check failed so alert which section of the toolchains.json file failed.
-                            throw new JervisException("Toolchains bash syntax error when testing: ${language} > ${toolchain} > ${toolchain_value}\n\nYAML sample:\n${sample_yaml}\n\nBash error:\n" + stderr.toString())
-                        }
-                    }
-                }
-            }
-        }
-    }
     @Test public void test_lifecycleGenerator_setLabal_stability() {
         generator.label_stability = 'derp'
         assert 'stable'.equals(generator.label_stability)
