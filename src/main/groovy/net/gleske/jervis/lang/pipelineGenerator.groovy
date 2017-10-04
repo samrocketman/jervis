@@ -18,7 +18,46 @@ package net.gleske.jervis.lang
 import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
 /**
-  Generates the pipeline scripts from the Jervis YAML.
+  This class offers helper forunctions for using Jervis in the context of a
+  Jenkins <a href="https://jenkins.io/doc/book/pipeline/shared-libraries/" target=_blank>pipeline global shared library</a>.
+
+  <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
+
+<pre><tt>import net.gleske.jervis.lang.lifecycleGenerator
+import net.gleske.jervis.lang.pipelineGenerator
+
+def generator = new lifecycleGenerator()
+generator.loadLifecyclesString(new File('resources/lifecycles-ubuntu1604-stable.json').text)
+generator.loadToolchainsString(new File('resources/toolchains-ubuntu1604-stable.json').text)
+
+generator.loadYamlString('''
+language: groovy
+env: ["GROOVY_VERSION=1.8.9", "GROOVY_VERSION=2.4.12"]
+jdk:
+  - openjdk8
+  - openjdk9
+jenkins:
+  stash:
+    - name: artifacts
+      allow_empty: true
+      includes: build/lib/*.jar
+      matrix_axis:
+        env: GROOVY_VERSION=2.4.12
+        jdk: openjdk8
+  collect:
+    artifacts: build/lib/*.jar
+'''.trim())
+def pipeline_generator = new pipelineGenerator(generator)
+pipeline_generator.supported_collections = ['artifacts']
+pipeline_generator.getBuildableMatrixAxes().each { axis ->
+    if(pipeline_generator.getStashMap(axis)) {
+        println "stash ${axis}  --->  ${pipeline_generator.getStashMap(axis)}"
+    }
+}
+println "Buildable matrices: " + pipeline_generator.getBuildableMatrixAxes().size()</tt></pre>
  */
 class pipelineGenerator implements Serializable {
 
