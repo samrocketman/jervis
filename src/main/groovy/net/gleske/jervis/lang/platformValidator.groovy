@@ -29,17 +29,15 @@ import net.gleske.jervis.exceptions.PlatformValidationException
   <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
   to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
   with the classpath set up.</p>
-  <p><b>Please note</b>, if you are writing Job DSL plugin groovy scripts you should not
-  use the <tt>scmGit</tt> class to access files in the repository where your DSL
-  scripts reside.  Instead, use the
+  <p><b>Please note</b>, if you are writing Job DSL plugin groovy scripts you
+  should not use the relative file paths to access files in the repository
+  where your DSL scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
 <pre><tt>import net.gleske.jervis.lang.platformValidator
-import net.gleske.jervis.tools.scmGit
 
-def git = new scmGit()
 def platforms = new platformValidator()
-platforms.load_JSON(git.getRoot() + '/src/main/resources/platforms.json')
+platforms.load_JSON('resources/platforms.json')
 println 'Does the file validate? ' + platforms.validate()
 //List supported platforms and operating systems
 platforms.platforms['supported_platforms'].sort { k, v -> k }.each { platform, os ->

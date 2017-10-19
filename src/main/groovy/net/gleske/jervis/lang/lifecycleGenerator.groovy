@@ -35,13 +35,12 @@ import org.yaml.snakeyaml.Yaml
   <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
   to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
   with the classpath set up.</p>
-  <p><b>Please note</b>, if you are writing Job DSL plugin groovy scripts you should not
-  use the <tt>scmGit</tt> class to access files in the repository where your DSL
-  scripts reside.  Instead, use the
+  <p><b>Please note</b>, if you are writing Job DSL plugin groovy scripts you
+  should not use the relative file paths to access files in the repository
+  where your DSL scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
 <pre><tt>import net.gleske.jervis.lang.lifecycleGenerator
-import net.gleske.jervis.tools.scmGit
 
 String yaml = """
 language: ruby
@@ -63,14 +62,13 @@ jenkins:
     sudo: false
 """
 
-def git = new scmGit()
 def generator = new lifecycleGenerator()
-generator.loadPlatforms(git.getRoot() + '/src/main/resources/platforms.json')
+generator.loadPlatforms('resources/platforms.json')
 generator.preloadYamlString(yaml)
 //os_stability requires preloadYamlString() to be called
 def os_stability = "${generator.label_os}-${generator.label_stability}"
-generator.loadLifecycles("${git.getRoot()}/src/main/resources/lifecycles-${os_stability}.json")
-generator.loadToolchains("${git.getRoot()}/src/main/resources/toolchains-${os_stability}.json")
+generator.loadLifecycles("resources/lifecycles-${os_stability}.json")
+generator.loadToolchains("resources/toolchains-${os_stability}.json")
 generator.loadYamlString(yaml)
 generator.folder_listing = ['Gemfile.lock']
 println 'Exclude filter is...'
