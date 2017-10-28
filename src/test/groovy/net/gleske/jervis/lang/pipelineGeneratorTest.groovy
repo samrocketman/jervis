@@ -76,6 +76,36 @@ class pipelineGeneratorTest extends GroovyTestCase {
         assert pipeline_generator.getPublishable('foo') == 'path/to/foo'
         assert pipeline_generator.getPublishable('artifacts') == '**/*.gem'
     }
+    @Test public void test_pipelineGenerator_getPublishable_EmptyList() {
+        generator.loadYamlString('language: ruby\njenkins:\n  collect:\n    foo: path/to/foo\n    artifacts: []')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['artifacts']
+        assert pipeline_generator.getPublishable('artifacts') == ''
+    }
+    @Test public void test_pipelineGenerator_getPublishable_EmptyMap() {
+        generator.loadYamlString('language: ruby\njenkins:\n  collect:\n    foo: path/to/foo\n    artifacts: {}')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['artifacts']
+        assert pipeline_generator.getPublishable('artifacts') == ''
+    }
+    @Test public void test_pipelineGenerator_getPublishable_List() {
+        generator.loadYamlString('language: ruby\njenkins:\n  collect:\n    foo: path/to/foo\n    artifacts:\n      - "**/*.gem"\n      - "**/*.rpm"')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['artifacts']
+        assert pipeline_generator.getPublishable('artifacts') == '**/*.gem,**/*.rpm'
+    }
+    @Test public void test_pipelineGenerator_getPublishable_Map() {
+        generator.loadYamlString('language: ruby\njenkins:\n  collect:\n    foo: path/to/foo\n    artifacts:\n      path: "**/*.gem"')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['artifacts']
+        assert pipeline_generator.getPublishable('artifacts') == '**/*.gem'
+    }
+    @Test public void test_pipelineGenerator_getPublishable_MapList() {
+        generator.loadYamlString('language: ruby\njenkins:\n  collect:\n    foo: path/to/foo\n    artifacts:\n      path:\n        - "**/*.gem"\n        - "**/*.rpm"')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['artifacts']
+        assert pipeline_generator.getPublishable('artifacts') == '**/*.gem,**/*.rpm'
+    }
     @Test public void test_pipelineGenerator_getBuildableMatrixAxes_matrix() {
         generator.loadYamlString('language: java\nenv: ["world=hello", "world=goodby"]\njdk:\n  - openjdk6\n  - openjdk7')
         def pipeline_generator = new pipelineGenerator(generator)

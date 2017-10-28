@@ -91,7 +91,7 @@ class pipelineGenerator implements Serializable {
      */
     def pipelineGenerator(lifecycleGenerator generator) {
         this.generator = generator
-        this.collect_items = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
+        processCollectItems()
         def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', []))?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
         this.stashes = (stashes instanceof List)? stashes : [stashes]
         if(!generator.isMatrixBuild()) {
@@ -100,6 +100,30 @@ class pipelineGenerator implements Serializable {
                 [name: k, includes: v]
             }
         }
+    }
+
+    /**
+      Process each value from a Jenkins collect items map so that it supports multiple types.
+     */
+    private String processCollectValue(def v) {
+		if(v in List) {
+			v.join(',')
+		}
+		else if(v in Map) {
+			processCollectValue((v['path'])?: '')
+		}
+		else {
+			v
+		}
+    }
+
+    /**
+      Processes jenkins.collect items from Jervis YAML.
+     */
+    void processCollectItems() {
+        this.collect_items = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:]).collect { k, v ->
+            [(k): processCollectValue(v)]
+        }.sum()
     }
 
     /**
