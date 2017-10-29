@@ -265,15 +265,21 @@ def call() {
         }
         List publishableItems = pipeline_generator.publishableItems
         if(publishableItems) {
+            pipeline_generator.collect_settings_defaults = [artifacts: [allowEmptyArchive: false, caseSensitive: true, defaultExcludes: true, excludes: '']]
+            pipeline_generator.collect_settings_filesets = [artifacts: ['excludes']]
             stage("Publish results") {
                 for(String name : publishableItems) {
                     unstash name
                 }
                 for(String publishable : publishableItems) {
-                    String item = pipeline_generator.getPublishable(publishable)
+                    def item = pipeline_generator.getPublishable(publishable)
                     switch(publishable) {
                         case 'artifacts':
-                            archiveArtifacts artifacts: item, fingerprint: true
+                            archiveArtifacts artifacts: item['path'], fingerprint: true,
+                                             excludes: item['excludes'],
+                                             allowEmptyArchive: item['allowEmptyArchive'],
+                                             defaultExcludes: item['defaultExcludes'],
+                                             caseSensitive: item['caseSensitive']
                             break
                         case 'cobertura':
                             step([
