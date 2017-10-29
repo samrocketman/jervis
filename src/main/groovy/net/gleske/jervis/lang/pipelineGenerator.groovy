@@ -92,15 +92,9 @@ class pipelineGenerator implements Serializable {
      */
     def pipelineGenerator(lifecycleGenerator generator) {
         this.generator = generator
-        processCollectItems()
         def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', []))?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
         this.stashes = (stashes instanceof List)? stashes : [stashes]
-        if(!generator.isMatrixBuild()) {
-            //append the items to collect to the end of the list of stashes (overrides prior entries)
-            this.stashes += this.collect_items.collect { k, v ->
-                [name: k, includes: v]
-            }
-        }
+        processCollectItems()
     }
 
     /**
@@ -130,6 +124,13 @@ class pipelineGenerator implements Serializable {
                 throw new PipelineGeneratorException("Infinite loop error in YAML key: jenkins.collect.${k}\n\nAre you using YAML anchors and aliases and accidentally circled a loop?")
             }
         }.sum()
+
+        if(!generator.isMatrixBuild()) {
+            //append the items to collect to the end of the list of stashes (overrides prior entries)
+            this.stashes += this.collect_items.collect { k, v ->
+                [name: k, includes: v]
+            }
+        }
     }
 
     /**
