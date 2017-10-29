@@ -154,7 +154,7 @@ class pipelineGenerator implements Serializable {
     /**
       Processes <tt>jenkins.collect</tt> items from Jervis YAML.
      */
-    void processCollectItems() {
+    private void processCollectItems() {
         Map tmp = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
         if(tmp) {
             this.collect_items = tmp.collect { k, v ->
