@@ -216,12 +216,12 @@ class pipelineGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: java')
         def pipeline_generator = new pipelineGenerator(generator)
         pipeline_generator.collect_settings_defaults = [
-			'': ['planet': 'venus'],
-			a: 'hello',
-			b: ['planet': 'earth'],
-			c: ['planet': 'mars'],
-			d: [:]
-		]
+            '': ['planet': 'venus'],
+            a: 'hello',
+            b: ['planet': 'earth'],
+            c: ['planet': 'mars'],
+            d: [:]
+        ]
         assert [b: [planet: 'earth'], c: [planet: 'mars']] == pipeline_generator.collect_settings_defaults
     }
     @Test public void test_pipelineGenerator_collect_settings_defaults_appending() {

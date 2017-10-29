@@ -128,15 +128,15 @@ class pipelineGenerator implements Serializable {
       Process each value from a Jenkins collect items map so that it supports multiple types.
      */
     private String processCollectValue(def v) {
-		if(v in List) {
-			v.join(',')
-		}
-		else if(v in Map) {
-			processCollectValue((v['path'])?: '')
-		}
-		else {
-			v
-		}
+        if(v in List) {
+            v.join(',')
+        }
+        else if(v in Map) {
+            processCollectValue((v['path'])?: '')
+        }
+        else {
+            v
+        }
     }
 
     /**
