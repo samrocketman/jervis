@@ -1,12 +1,15 @@
-# Next release
+# jervis 1.0
 
-Warning: the major was bumped because of API breaking changes.  Be sure to fully
+#### Warnings
+
+The major version was bumped because of API breaking changes.  Be sure to fully
 test this release before rolling it out to production in your own Job DSL
 scripts.
 
 - **Security Notice:** Private keys smaller than 2048 are no longer allowed.
-  Generate a new key pair 2048 bits or larger.  Decrypt your old values using
-  the following method.
+  Generate a new key pair 2048 bits or larger.  An exception will now be thrown
+  when users attempt to use private keys smaller than 2048 bits to encrypt
+  repository secrets.  Decrypt your old values using the following method.
 
   ```
   echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey path/to/id_rsa
@@ -30,21 +33,53 @@ scripts.
   net.gleske.jervis.tools.securityIO.set_vars(String priv_key_file_path, String pub_key_file_path, int keysize)
   ```
 
-- New Feature: Pipelines are now fully supported.  Jobs will automatically start
+#### New features:
+
+- Jenkins Pipelines are now fully supported.  Jobs will automatically start
   using pipelines if there's a `Jenkinsfile` in the root of the repository or if
   the following is set in `.jervis.yml`.
 
-  ```
+  ```yaml
   jenkins:
     pipeline_jenkinsfile: 'path/to/Jenkinsfile'
   ```
 
-- New Feature: `net.gleske.jervis.lang.*` and
-  `net.gleske.jervis.tools.securityIO` is serializable so Jervis can now be used
-  in pipeline scripts.
+  [See issue #98][#98]
 
-- Added an example global pipeline library to `resources/` and `vars/`.
+- What is supported in Pipelines?
+  - Non-matrix building.
+  - Matrix building.
+  - New YAML spec for stashing artifacts (even in matrix building).
+    `jenkins.stash` is the new YAML spec.  [See issue #100][#100]
+  - New YAML spec for publishing artifacts.  Items to be collected for
+    publishing are automatically added to stashes in non-matrix builds.  Admins
+    can define simple collections or expose more advanced options to users for
+    customizing the publisher.  `jenkins.collect` is the new YAML spec.  [See
+    also #97][#97]
 
+#### Job DSL scripts changes in the `jobs/` folder:
+
+- Job DSL scripts have been broken apart into more reusable parts.  This uses an
+  advanced feature of Groovy known as the binding.  See
+  [`jobs/README.md`](jobs/README.md) for details.
+- JSON files for platforms, lifecycles, and toolchains have been moved to the
+  `resources/` directory and are now shared with Jenkins pipelines.
+- Unit tests for JSON files in the `resources` directory have been moved to a
+  separate file: [`src/test/groovy/jervisConfigsTest.groovy`][config-tests].
+  This allows admins to easily copy existing tests for use in their own Job DSL
+  script libraries.
+- New `pipelineGenerator` class is available for use in scripts.
+
+#### Pipeline DSL scripts changes in the `vars` folder:
+
+- Added an example pipeline global shared library to `resources/` and `vars/`.
+- New `pipelineGenerator` class is available for use in scripts.
+
+#### Other notes for this release:
+
+- Freestyle jobs and Pipeline jobs are supported together as a transition in
+  this release.  In a future release, Freestyle job support will be dropped
+  completely.
 
 # jervis 0.13
 
@@ -212,6 +247,7 @@ not declare the type of matrix.  [See wiki for details][wiki-toolchains-spec].
 - Fully generated `groovydoc`.
 - At least 80% test coverage.
 
+[#100]: https://github.com/samrocketman/jervis/issues/100
 [#61]: https://github.com/samrocketman/jervis/issues/61
 [#64]: https://github.com/samrocketman/jervis/issues/64
 [#68]: https://github.com/samrocketman/jervis/issues/68
@@ -225,8 +261,11 @@ not declare the type of matrix.  [See wiki for details][wiki-toolchains-spec].
 [#87]: https://github.com/samrocketman/jervis/issues/87
 [#88]: https://github.com/samrocketman/jervis/issues/88
 [#90]: https://github.com/samrocketman/jervis/issues/90
+[#97]: https://github.com/samrocketman/jervis/issues/97
+[#98]: https://github.com/samrocketman/jervis/issues/98
 [bca-plugin]: https://wiki.jenkins.io/display/JENKINS/Bouncy+Castle+API+Plugin
 [ccs-plugin]: https://wiki.jenkins-ci.org/display/JENKINS/Collapsing+Console+Sections+Plugin
+[config-tests]: src/test/groovy/jervisConfigsTest.groovy
 [gla-plugin]: https://wiki.jenkins.io/display/JENKINS/Groovy+Label+Assignment+plugin
 [mig-01-ex]: https://github.com/samrocketman/jervis/commit/1d7ff1417c642d959f467c11eca7b16cb3e3ef3c
 [wiki-toolchains-spec]: https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file
