@@ -6,14 +6,22 @@ The major version was bumped because of API breaking changes.  Be sure to fully
 test this release before rolling it out to production in your own Job DSL
 scripts.
 
-- **Security Notice:** Private keys smaller than 2048 are no longer allowed.
-  Generate a new key pair 2048 bits or larger.  An exception will now be thrown
-  when users attempt to use private keys smaller than 2048 bits to encrypt
-  repository secrets.  Decrypt your old values using the following method.
+- **Security Notice:** Private keys smaller than 2048 are no longer allowed for
+  securing repository secrets.  Affected users will be required to generate a
+  new key pair 2048 bits or larger.  An exception will now be thrown when users
+  attempt to use private keys smaller than 2048 bits to encrypt repository
+  secrets.  Users can decrypt their old encrypted secrets using the following
+  method.
 
   ```
   echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey path/to/id_rsa
   ```
+
+  **Note:** it is better for users to rotate their secrets entirely because
+  their data was protected using a known broken RSA algorthm.  Data encrypted
+  with this weaker algorithm should not be considered secure and will still be
+  accessible in git history.  It is safer to assume the encrypted data was
+  compromised.
 
 - The following deprecated methods were removed.  See Jervis 0.13 release notes
   for a migration path.
