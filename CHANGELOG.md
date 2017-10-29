@@ -36,7 +36,7 @@ scripts.
 
   ```
   jenkins:
-    pipeline: true
+    pipeline_jenkinsfile: 'path/to/Jenkinsfile'
   ```
 
 - New Feature: `net.gleske.jervis.lang.*` and
