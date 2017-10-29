@@ -98,6 +98,11 @@ class pipelineGenerator implements Serializable {
     Map default_collect_settings = [:]
 
     /**
+      This holds the user defined jenkins.collect item maps so we don't have to reference them.
+     */
+    private Map user_defined_collect_settings = [:]
+
+    /**
       Instantiates this class with a <tt>{@link lifecycleGenerator}</tt> which
       is used for helper functions when creating a pipeline job designed to
       support Jervis.
@@ -138,14 +143,20 @@ class pipelineGenerator implements Serializable {
       Processes <tt>jenkins.collect</tt> items from Jervis YAML.
      */
     void processCollectItems() {
-        this.collect_items = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:]).collect { k, v ->
-            try {
-                [(k): processCollectValue(v)]
-            }
-            catch(StackOverflowError e) {
-                throw new PipelineGeneratorException("Infinite loop error in YAML key: jenkins.collect.${k}\n\nAre you using YAML anchors and aliases and accidentally circled a loop?")
-            }
-        }.sum()
+        Map tmp = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
+        if(tmp) {
+            this.collect_items = tmp.collect { k, v ->
+                try {
+                    if(v in Map) {
+                        user_defined_collect_settings[k] = v
+                    }
+                    [(k): processCollectValue(v)]
+                }
+                catch(StackOverflowError e) {
+                    throw new PipelineGeneratorException("Infinite loop error in YAML key: jenkins.collect.${k}\n\nAre you using YAML anchors and aliases and accidentally circled a loop?")
+                }
+            }.sum().findAll { k, v -> k && v }
+        }
 
         if(!generator.isMatrixBuild()) {
             //append the items to collect to the end of the list of stashes (overrides prior entries)
@@ -162,7 +173,6 @@ class pipelineGenerator implements Serializable {
      */
     List getBuildableMatrixAxes() {
         List matrix_axis_maps = generator.yaml_matrix_axes.collect { axis ->
-            //the following map hack is so the key is not an instance of GStringImpl
             generator.matrixGetAxisValue(axis).split().collect {
                 [(axis): it]
             }
@@ -273,14 +283,33 @@ class pipelineGenerator implements Serializable {
      */
     List getPublishableItems() {
         Set known_items = collect_items.keySet() as Set
+        if(!supported_collections) {
+            throw new PipelineGeneratorException('Calling getPublishableItems() without setting supported_collections.  This issue can only be resolved by an admin of the pipeline shared library.')
+        }
         (supported_collections.intersect(known_items) as List).sort()
     }
 
     /**
       Get a publishable item from the list of publishable items.  The end
       result could be a String or a Map.
+
+      @param item A key from <tt>jenkins.collect</tt> in user defined YAML.
+
+      @return Returns a <tt>{@link Map}</tt> or a <tt>{@link String}</tt> of
+              settings for the publishable item from <tt>jenkins.collect</tt>
+              YAML key.
      */
     def getPublishable(String item) {
-        collect_items[item]
+        String path = (collect_items[item])?: ''
+        if(item in default_collect_settings) {
+            Map settings = default_collect_settings.collect { k, v ->
+                [(k): getObjectValue((user_defined_collect_settings[item])?: [:], k, v)]
+            }.sum()
+            settings << ['path': path]
+            return settings
+        }
+        else {
+            return path
+        }
     }
 }

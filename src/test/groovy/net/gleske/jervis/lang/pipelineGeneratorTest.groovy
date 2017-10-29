@@ -231,4 +231,17 @@ class pipelineGeneratorTest extends GroovyTestCase {
         pipeline_generator.default_collect_settings = [b: ['planet': 'mars']]
         assert [a: [planet: 'earth'], b: [planet: 'mars']] == pipeline_generator.default_collect_settings
     }
+    @Test public void test_pipelineGenerator_getPublishableItems_without_supported_collections() {
+        generator.loadYamlString('language: java\njenkins:\n  collect:\n    artifacts: hello')
+        def pipeline_generator = new pipelineGenerator(generator)
+        shouldFail(PipelineGeneratorException) {
+            pipeline_generator.publishableItems
+        }
+    }
+    @Test public void test_pipelineGenerator_getPublishableItems_should_filter_empty_collections() {
+        generator.loadYamlString('language: java\njenkins:\n  collect:\n    artifacts: ""')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['artifacts']
+        assert [] == pipeline_generator.getPublishableItems()
+    }
 }
