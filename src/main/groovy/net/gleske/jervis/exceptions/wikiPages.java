@@ -135,4 +135,9 @@ public class wikiPages {
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories" target="_blank">secure secrets in repositories wiki page</a>.
      */
     public static String secure_secrets = "https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories";
+
+    /**
+      A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Pipeline-support" target="_blank">pipeline support wiki page</a>.
+     */
+    public static String pipeline_support = "https://github.com/samrocketman/jervis/wiki/Pipeline-support";
 }

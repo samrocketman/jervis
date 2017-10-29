@@ -15,6 +15,7 @@
    */
 package net.gleske.jervis.lang
 //the lifecycleGeneratorTest() class automatically sees the lifecycleGenerator() class because they're in the same package
+import net.gleske.jervis.exceptions.PipelineGeneratorException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -75,6 +76,13 @@ class pipelineGeneratorTest extends GroovyTestCase {
         pipeline_generator.supported_collections = ['foo', 'artifacts']
         assert pipeline_generator.getPublishable('foo') == 'path/to/foo'
         assert pipeline_generator.getPublishable('artifacts') == '**/*.gem'
+    }
+    @Test public void test_pipelineGenerator_getPublishable_infinite_loop() {
+        //detects an inifinite loop when using yaml anchors and keys
+        generator.loadYamlString('language: ruby\njenkins:\n  collect:\n    artifacts: &key\n      path: *key')
+        shouldFail(PipelineGeneratorException) {
+            new pipelineGenerator(generator)
+        }
     }
     @Test public void test_pipelineGenerator_getPublishable_EmptyList() {
         generator.loadYamlString('language: ruby\njenkins:\n  collect:\n    foo: path/to/foo\n    artifacts: []')

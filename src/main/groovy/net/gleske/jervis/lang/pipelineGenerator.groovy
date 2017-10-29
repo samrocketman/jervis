@@ -15,6 +15,7 @@
    */
 package net.gleske.jervis.lang
 
+import net.gleske.jervis.exceptions.PipelineGeneratorException
 import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
 /**
@@ -122,7 +123,12 @@ class pipelineGenerator implements Serializable {
      */
     void processCollectItems() {
         this.collect_items = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:]).collect { k, v ->
-            [(k): processCollectValue(v)]
+            try {
+                [(k): processCollectValue(v)]
+            }
+            catch(StackOverflowError e) {
+                throw new PipelineGeneratorException("Infinite loop error in YAML key: jenkins.collect.${k}\n\nAre you using YAML anchors and aliases and accidentally circled a loop?")
+            }
         }.sum()
     }
 
