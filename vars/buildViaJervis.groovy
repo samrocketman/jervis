@@ -15,7 +15,7 @@
    */
 
 @Grab(group='net.gleske', module='jervis', version='0.13', transitive=false)
-@Grab(group='org.yaml', module='snakeyaml', version='1.19', transitive=false)
+@Grab(group='org.yaml', module='snakeyaml', version='1.18', transitive=false)
 
 import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
