@@ -118,9 +118,9 @@ class pipelineGenerator implements Serializable {
       This method merges <tt>Map m</tt> with the existing map <tt>{@link #default_collect_settings}</tt>.
      */
     void setDefault_collect_settings(Map m) {
-        Map a = m.findAll { k, v -> k && v instanceof Map && v }
-        if(a) {
-            this.default_collect_settings << a
+        Map tmp = m.findAll { k, v -> k && v instanceof Map && v }
+        if(tmp) {
+            this.default_collect_settings << tmp
         }
     }
 
@@ -302,11 +302,11 @@ class pipelineGenerator implements Serializable {
     def getPublishable(String item) {
         String path = (collect_items[item])?: ''
         if(item in default_collect_settings) {
-            Map settings = default_collect_settings.collect { k, v ->
+            Map tmp = default_collect_settings[item].collect { k, v ->
                 [(k): getObjectValue((user_defined_collect_settings[item])?: [:], k, v)]
             }.sum()
-            settings << ['path': path]
-            return settings
+            tmp << ['path': path]
+            return tmp
         }
         else {
             return path

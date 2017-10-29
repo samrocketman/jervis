@@ -244,4 +244,34 @@ class pipelineGeneratorTest extends GroovyTestCase {
         pipeline_generator.supported_collections = ['artifacts']
         assert [] == pipeline_generator.getPublishableItems()
     }
+    @Test public void test_pipelineGenerator_getPublishable_from_default_collect_settings() {
+        generator.loadYamlString('language: java\njenkins:\n  collect:\n    artifacts:\n      - hello\n      - world')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['artifacts']
+        assert 'hello,world' == pipeline_generator.getPublishable('artifacts')
+        pipeline_generator.default_collect_settings = [artifacts: [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true]]
+        assert [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true, path: 'hello,world'] == pipeline_generator.getPublishable('artifacts')
+    }
+    @Test public void test_pipelineGenerator_getPublishable_from_default_collect_settings_customized() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    artifacts:
+            |      path:
+            |        - hello
+            |        - world
+            |      allowEmptyArchive: false
+            |      caseSensitive: true
+            |      defaultExcludes: true
+            |      excludes: 'mars'
+            |      onlyIfSuccessful: false
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['artifacts']
+        assert 'hello,world' == pipeline_generator.getPublishable('artifacts')
+        pipeline_generator.default_collect_settings = [artifacts: [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true]]
+        assert [allowEmptyArchive: false, caseSensitive: true, defaultExcludes: true, excludes: 'mars', onlyIfSuccessful: false, path: 'hello,world'] == pipeline_generator.getPublishable('artifacts')
+    }
 }
