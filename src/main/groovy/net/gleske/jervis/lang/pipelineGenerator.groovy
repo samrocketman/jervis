@@ -86,6 +86,18 @@ class pipelineGenerator implements Serializable {
     private List<Map> stashes
 
     /**
+      This is a <tt>Map</tt> of default settings for the YAML key
+      <tt>jenkins.collect</tt>.  Key names in this map are similar to the keys
+      in <tt>jenkins.collect</tt> if specifying default settings for a
+      <tt>jenkins.collect</tt> item.  By a collect item being set with defaults
+      we are stating that the settings should be defined by the user and if not
+      the default value from this map is selected.  This allows providing more
+      advanced options to users but allowing sane defaults to be defined if a
+      user chooses not to define more advanced options in YAML.
+     */
+    Map default_collect_settings = [:]
+
+    /**
       Instantiates this class with a <tt>{@link lifecycleGenerator}</tt> which
       is used for helper functions when creating a pipeline job designed to
       support Jervis.
@@ -95,6 +107,16 @@ class pipelineGenerator implements Serializable {
         def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', []))?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
         this.stashes = (stashes instanceof List)? stashes : [stashes]
         processCollectItems()
+    }
+
+    /**
+      This method merges <tt>Map m</tt> with the existing map <tt>{@link #default_collect_settings}</tt>.
+     */
+    void setDefault_collect_settings(Map m) {
+        Map a = m.findAll { k, v -> k && v instanceof Map && v }
+        if(a) {
+            this.default_collect_settings << a
+        }
     }
 
     /**
@@ -113,7 +135,7 @@ class pipelineGenerator implements Serializable {
     }
 
     /**
-      Processes jenkins.collect items from Jervis YAML.
+      Processes <tt>jenkins.collect</tt> items from Jervis YAML.
      */
     void processCollectItems() {
         this.collect_items = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:]).collect { k, v ->

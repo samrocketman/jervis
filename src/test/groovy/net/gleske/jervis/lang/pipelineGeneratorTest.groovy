@@ -212,4 +212,23 @@ class pipelineGeneratorTest extends GroovyTestCase {
         pipeline_generator = new pipelineGenerator(generator)
         assert pipeline_generator.getStashMap() == [:]
     }
+    @Test public void test_pipelineGenerator_default_collect_settings_filtering() {
+        generator.loadYamlString('language: java')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.default_collect_settings = [
+			'': ['planet': 'venus'],
+			a: 'hello',
+			b: ['planet': 'earth'],
+			c: ['planet': 'mars'],
+			d: [:]
+		]
+        assert [b: [planet: 'earth'], c: [planet: 'mars']] == pipeline_generator.default_collect_settings
+    }
+    @Test public void test_pipelineGenerator_default_collect_settings_appending() {
+        generator.loadYamlString('language: java')
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.default_collect_settings = [a: ['planet': 'earth']]
+        pipeline_generator.default_collect_settings = [b: ['planet': 'mars']]
+        assert [a: [planet: 'earth'], b: [planet: 'mars']] == pipeline_generator.default_collect_settings
+    }
 }
