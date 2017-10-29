@@ -95,7 +95,7 @@ class pipelineGenerator implements Serializable {
       advanced options to users but allowing sane defaults to be defined if a
       user chooses not to define more advanced options in YAML.
      */
-    Map default_collect_settings = [:]
+    Map collect_settings_defaults = [:]
 
     /**
       This holds the user defined jenkins.collect item maps so we don't have to reference them.
@@ -115,12 +115,12 @@ class pipelineGenerator implements Serializable {
     }
 
     /**
-      This method merges <tt>Map m</tt> with the existing map <tt>{@link #default_collect_settings}</tt>.
+      This method merges <tt>Map m</tt> with the existing map <tt>{@link #collect_settings_defaults}</tt>.
      */
-    void setDefault_collect_settings(Map m) {
+    void setCollect_settings_defaults(Map m) {
         Map tmp = m.findAll { k, v -> k && v instanceof Map && v }
         if(tmp) {
-            this.default_collect_settings << tmp
+            this.collect_settings_defaults << tmp
         }
     }
 
@@ -301,8 +301,8 @@ class pipelineGenerator implements Serializable {
      */
     def getPublishable(String item) {
         String path = (collect_items[item])?: ''
-        if(item in default_collect_settings) {
-            Map tmp = default_collect_settings[item].collect { k, v ->
+        if(item in collect_settings_defaults) {
+            Map tmp = collect_settings_defaults[item].collect { k, v ->
                 [(k): getObjectValue((user_defined_collect_settings[item])?: [:], k, v)]
             }.sum()
             tmp << ['path': path]

@@ -212,24 +212,24 @@ class pipelineGeneratorTest extends GroovyTestCase {
         pipeline_generator = new pipelineGenerator(generator)
         assert pipeline_generator.getStashMap() == [:]
     }
-    @Test public void test_pipelineGenerator_default_collect_settings_filtering() {
+    @Test public void test_pipelineGenerator_collect_settings_defaults_filtering() {
         generator.loadYamlString('language: java')
         def pipeline_generator = new pipelineGenerator(generator)
-        pipeline_generator.default_collect_settings = [
+        pipeline_generator.collect_settings_defaults = [
 			'': ['planet': 'venus'],
 			a: 'hello',
 			b: ['planet': 'earth'],
 			c: ['planet': 'mars'],
 			d: [:]
 		]
-        assert [b: [planet: 'earth'], c: [planet: 'mars']] == pipeline_generator.default_collect_settings
+        assert [b: [planet: 'earth'], c: [planet: 'mars']] == pipeline_generator.collect_settings_defaults
     }
-    @Test public void test_pipelineGenerator_default_collect_settings_appending() {
+    @Test public void test_pipelineGenerator_collect_settings_defaults_appending() {
         generator.loadYamlString('language: java')
         def pipeline_generator = new pipelineGenerator(generator)
-        pipeline_generator.default_collect_settings = [a: ['planet': 'earth']]
-        pipeline_generator.default_collect_settings = [b: ['planet': 'mars']]
-        assert [a: [planet: 'earth'], b: [planet: 'mars']] == pipeline_generator.default_collect_settings
+        pipeline_generator.collect_settings_defaults = [a: ['planet': 'earth']]
+        pipeline_generator.collect_settings_defaults = [b: ['planet': 'mars']]
+        assert [a: [planet: 'earth'], b: [planet: 'mars']] == pipeline_generator.collect_settings_defaults
     }
     @Test public void test_pipelineGenerator_getPublishableItems_without_supported_collections() {
         generator.loadYamlString('language: java\njenkins:\n  collect:\n    artifacts: hello')
@@ -244,15 +244,15 @@ class pipelineGeneratorTest extends GroovyTestCase {
         pipeline_generator.supported_collections = ['artifacts']
         assert [] == pipeline_generator.getPublishableItems()
     }
-    @Test public void test_pipelineGenerator_getPublishable_from_default_collect_settings() {
+    @Test public void test_pipelineGenerator_getPublishable_from_collect_settings_defaults() {
         generator.loadYamlString('language: java\njenkins:\n  collect:\n    artifacts:\n      - hello\n      - world')
         def pipeline_generator = new pipelineGenerator(generator)
         pipeline_generator.supported_collections = ['artifacts']
         assert 'hello,world' == pipeline_generator.getPublishable('artifacts')
-        pipeline_generator.default_collect_settings = [artifacts: [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true]]
+        pipeline_generator.collect_settings_defaults = [artifacts: [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true]]
         assert [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true, path: 'hello,world'] == pipeline_generator.getPublishable('artifacts')
     }
-    @Test public void test_pipelineGenerator_getPublishable_from_default_collect_settings_customized() {
+    @Test public void test_pipelineGenerator_getPublishable_from_collect_settings_defaults_customized() {
         String yaml = '''
             |language: java
             |jenkins:
@@ -271,7 +271,7 @@ class pipelineGeneratorTest extends GroovyTestCase {
         def pipeline_generator = new pipelineGenerator(generator)
         pipeline_generator.supported_collections = ['artifacts']
         assert 'hello,world' == pipeline_generator.getPublishable('artifacts')
-        pipeline_generator.default_collect_settings = [artifacts: [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true]]
+        pipeline_generator.collect_settings_defaults = [artifacts: [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true]]
         assert [allowEmptyArchive: false, caseSensitive: true, defaultExcludes: true, excludes: 'mars', onlyIfSuccessful: false, path: 'hello,world'] == pipeline_generator.getPublishable('artifacts')
     }
 }
