@@ -98,6 +98,13 @@ class pipelineGenerator implements Serializable {
     Map collect_settings_defaults = [:]
 
     /**
+      Some settings defined in <tt>{@link #collect_settings_defaults}</tt> support
+      <a href="http://ant.apache.org/manual/Types/fileset.html" target=_blank>Ant filesets</a>
+      and this <tt>Map</tt> adds support for those settings.
+     */
+    Map collect_settings_filesets = [:]
+
+    /**
       This holds the user defined jenkins.collect item maps so we don't have to reference them.
      */
     private Map user_defined_collect_settings = [:]
@@ -127,12 +134,17 @@ class pipelineGenerator implements Serializable {
     /**
       Process each value from a Jenkins collect items map so that it supports multiple types.
      */
-    private String processCollectValue(def v) {
+    private String processCollectValue(def v, String k) {
         if(v in List) {
             v.join(',')
         }
         else if(v in Map) {
-            processCollectValue((v['path'])?: '')
+            try {
+                processCollectValue((v['path'])?: '', k)
+            }
+            catch(StackOverflowError e) {
+                throw new PipelineGeneratorException("Infinite loop error in YAML key: jenkins.collect.${k}\n\nAre you using YAML anchors and aliases and accidentally circled a loop?")
+            }
         }
         else {
             v
@@ -146,15 +158,10 @@ class pipelineGenerator implements Serializable {
         Map tmp = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
         if(tmp) {
             this.collect_items = tmp.collect { k, v ->
-                try {
-                    if(v in Map) {
-                        user_defined_collect_settings[k] = v
-                    }
-                    [(k): processCollectValue(v)]
+                if(v in Map) {
+                    user_defined_collect_settings[k] = v
                 }
-                catch(StackOverflowError e) {
-                    throw new PipelineGeneratorException("Infinite loop error in YAML key: jenkins.collect.${k}\n\nAre you using YAML anchors and aliases and accidentally circled a loop?")
-                }
+                [(k): processCollectValue(v, k)]
             }.sum().findAll { k, v -> k && v }
         }
 
@@ -303,7 +310,14 @@ class pipelineGenerator implements Serializable {
         String path = (collect_items[item])?: ''
         if(item in collect_settings_defaults) {
             Map tmp = collect_settings_defaults[item].collect { k, v ->
-                [(k): getObjectValue((user_defined_collect_settings[item])?: [:], k, v)]
+                def setting = getObjectValue((user_defined_collect_settings[item])?: [:], k, v)
+                if(item in collect_settings_filesets && k in collect_settings_filesets[item]) {
+                    setting = processCollectValue(getObjectValue((user_defined_collect_settings[item])?: [:], k, new Object()), k)
+                    if(!setting) {
+                        setting = v
+                    }
+                }
+                [(k): setting]
             }.sum()
             tmp << ['path': path]
             return tmp

@@ -274,4 +274,25 @@ class pipelineGeneratorTest extends GroovyTestCase {
         pipeline_generator.collect_settings_defaults = [artifacts: [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true]]
         assert [allowEmptyArchive: false, caseSensitive: true, defaultExcludes: true, excludes: 'mars', onlyIfSuccessful: false, path: 'hello,world'] == pipeline_generator.getPublishable('artifacts')
     }
+    @Test public void test_pipelineGenerator_getPublishable_from_collect_settings_defaults_filesets() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    artifacts:
+            |      path:
+            |        - hello
+            |        - world
+            |      excludes:
+            |        - hello
+            |        - mars
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['artifacts']
+        assert 'hello,world' == pipeline_generator.getPublishable('artifacts')
+        pipeline_generator.collect_settings_defaults = [artifacts: [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true]]
+        pipeline_generator.collect_settings_filesets = [artifacts: ['excludes']]
+        assert [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: 'hello,mars', onlyIfSuccessful: true, path: 'hello,world'] == pipeline_generator.getPublishable('artifacts')
+    }
 }
