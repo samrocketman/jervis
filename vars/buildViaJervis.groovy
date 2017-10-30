@@ -14,7 +14,7 @@
    limitations under the License.
    */
 
-@Grab(group='net.gleske', module='jervis', version='0.13', transitive=false)
+@Grab(group='net.gleske', module='jervis', version='1.0', transitive=false)
 @Grab(group='org.yaml', module='snakeyaml', version='1.19', transitive=false)
 
 import net.gleske.jervis.exceptions.SecurityException
