@@ -8,23 +8,18 @@ scripts.
 
 - **Security Notice:** Private keys smaller than 2048 are no longer allowed for
   securing repository secrets.  Affected users will be required to generate a
-  new key pair 2048 bits or larger.  An exception will now be thrown when users
-  attempt to use private keys smaller than 2048 bits to encrypt repository
-  secrets.  Users can decrypt their old encrypted secrets using the following
-  method.
-
-  ```
-  echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey path/to/id_rsa
-  ```
-
-  **Note:** it is better for users to rotate their secrets entirely because
-  their data was protected using a known broken RSA algorthm.  Data encrypted
-  with this weaker algorithm should not be considered secure and will still be
-  accessible in git history.  It is safer to assume the encrypted data was
-  compromised.
-
-- The following deprecated methods were removed.  See Jervis 0.13 release notes
-  for a migration path.
+  new key pair 2048 bits or larger.  A `KeyPairDecodeException` will now be
+  thrown when users attempt to use private keys smaller than 2048 bits to
+  encrypt repository secrets.  Users **should** rotate their secrets, rather
+  than migrate, because their data was encrypted using a known broken RSA
+  algorithm.  Data encrypted with this weaker algorithm is not considered secure
+  and will still be accessible in git history.  Even if the git history is
+  "modified" it may still exist in cloned copies.  It is safer to assume the
+  encrypted data was compromised.  Learn more by reading about [enforcing
+  stronger RSA keys in th wiki][wiki-stronger-rsa].
+- The following deprecated methods were removed from Jervis and will no longer
+  be available to Job DSL scripts.  See Jervis 0.13 release notes for a
+  migration path.
 
   ```
   net.gleske.jervis.lang.lifecycleGenerator.setPrivateKeyPath()
@@ -276,4 +271,5 @@ not declare the type of matrix.  [See wiki for details][wiki-toolchains-spec].
 [config-tests]: src/test/groovy/jervisConfigsTest.groovy
 [gla-plugin]: https://wiki.jenkins.io/display/JENKINS/Groovy+Label+Assignment+plugin
 [mig-01-ex]: https://github.com/samrocketman/jervis/commit/1d7ff1417c642d959f467c11eca7b16cb3e3ef3c
+[wiki-stronger-rsa]: https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories#enforcing-stronger-rsa-keys
 [wiki-toolchains-spec]: https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file
