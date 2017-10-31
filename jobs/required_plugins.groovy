@@ -33,7 +33,6 @@ Set required_plugins = [
     'bouncycastle-api',
     'cloudbees-folder',
     'cobertura',
-    'covcomplplot',
     'credentials',
     'git',
     'github',
