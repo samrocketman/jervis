@@ -16,7 +16,7 @@ scripts.
   and will still be accessible in git history.  Even if the git history is
   "modified" it may still exist in cloned copies.  It is safer to assume the
   encrypted data was compromised.  Learn more by reading about [enforcing
-  stronger RSA keys in th wiki][wiki-stronger-rsa].
+  stronger RSA keys in the wiki][wiki-stronger-rsa].
 - The following deprecated methods were removed from Jervis and will no longer
   be available to Job DSL scripts.  See Jervis 0.13 release notes for a
   migration path.
