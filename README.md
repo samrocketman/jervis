@@ -207,9 +207,9 @@ See also [RELEASE.md](RELEASE.md).
 [jervis-wiki-languages]: https://github.com/samrocketman/jervis/wiki/Supported-Languages
 [jervis-wiki-overview]: https://github.com/samrocketman/jervis/wiki/Build-overview
 [jervis-wiki]: https://github.com/samrocketman/jervis/wiki
-[json-lifecycles]: src/main/resources/lifecycles.json
-[json-platforms]: src/main/resources/platforms.json
-[json-toolchains]: src/main/resources/toolchains.json
+[json-lifecycles]: resources/lifecycles-ubuntu1604-stable.json
+[json-platforms]: resources/platforms.json
+[json-toolchains]: resources/toolchains-ubuntu1604-stable.json
 [maven-badge]: https://github.com/jirutka/maven-badges
 [maven-release]: http://search.maven.org/#search|ga|1|g:"net.gleske"%20a:"jervis"
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
