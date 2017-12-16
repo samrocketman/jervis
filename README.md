@@ -44,6 +44,8 @@ The documentation can be found in `build/docs/groovydoc`.
   Plugin][jenkins-plugin-docker].
 * Jervis configuration files: [`lifecycles.json`][json-lifecycles],
   [`toolchains.json`][json-toolchains], and [`platforms.json`][json-platforms].
+* Shared pipeline library: [`vars/`](vars) and [`resources/`](resources)
+  directories.
 
 # More about Jervis
 
