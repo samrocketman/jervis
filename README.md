@@ -7,13 +7,14 @@
 
 * *Project status:* [released to maven central][maven-release].
 * *Currently Targeted platforms:*
-  * *Jenkins server host:* Linux and Mac OS X
+  * *Jenkins server host:* Linux and Mac OS X (Windows compatible)
   * *Jobs on clients:* Linux only (Multi-platform capable)
 
 ##### What is Jervis?
 
 * What is Jervis? A library for [Job DSL plugin][jenkins-plugin-job-dsl]
-  scripts.  It is used to augment the automation of generating Jenkins jobs.
+  scripts and [shared Jenkins pipeline libraries][pipeline].  It is used to
+  augment the automation of generating Jenkins jobs.
 * What is Jervis not? Jervis is not a Jenkins plugin.
 
 # Documentation
@@ -213,6 +214,7 @@ See also [RELEASE.md](RELEASE.md).
 [maven-badge]: https://github.com/jirutka/maven-badges
 [maven-release]: http://search.maven.org/#search|ga|1|g:"net.gleske"%20a:"jervis"
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
+[pipeline]: https://jenkins.io/doc/book/pipeline/shared-libraries/
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=master
 [status-coverage]: https://coveralls.io/repos/github/samrocketman/jervis/badge.svg?branch=master
 [status-release]: https://maven-badges.herokuapp.com/maven-central/net.gleske/jervis/badge.svg
