@@ -1,15 +1,16 @@
 # About Jervis
 
-* What is Jervis?  A library for [Job DSL plugin][jenkins-plugin-job-dsl]
-  scripts.
+* What is Jervis? A library for [Job DSL plugin][jenkins-plugin-job-dsl]
+  scripts and [shared Jenkins pipeline libraries][pipeline].  It is used to
+  augment the automation of generating Jenkins jobs.
 * What is Jervis not?  Jervis is not a Jenkins plugin.
 * See an [example Job DSL script using Jervis][dsl-example].
 
 Jervis uses Travis-like job generation using the [Job DSL
-plugin][jenkins-plugin-job-dsl] and groovy scripts.  It reads the `.jervis.yml`
-file of a project and generates a job in Jenkins based on it.  If `.jervis.yml`
-doesn't exist then it will fall back to using the [`.travis.yml`][travis-yaml]
-file.
+plugin][jenkins-plugin-job-dsl], [shared Jenkins pipeline libraries][pipeline],
+and groovy scripts.  It reads the `.jervis.yml` file of a project and generates
+a job in Jenkins based on it.  If `.jervis.yml` doesn't exist then it will fall
+back to using the [`.travis.yml`][travis-yaml] file.
 
 For development planning and other documentation see the [Jervis
 wiki][jervis-wiki] and [developer api documentation][jervis-api].  If you wish
@@ -93,6 +94,7 @@ to the [Jervis API developer documentation][jervis-api].
 [jervis-wiki-langs]: https://github.com/samrocketman/jervis/wiki/Supported-Languages
 [jervis-wiki-tools]: https://github.com/samrocketman/jervis/wiki/Supported-Tools
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
+[pipeline]: https://jenkins.io/doc/book/pipeline/shared-libraries/
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=master
 [status-coverage]: https://coveralls.io/repos/samrocketman/jervis/badge.svg?branch=master
 [status-versioneye]: https://www.versioneye.com/user/projects/54f2a1cc4f3108959a0007f1/badge.svg?style=flat
