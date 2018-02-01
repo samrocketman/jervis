@@ -9,7 +9,7 @@ env:
   # Jenkins 2.61 onward uses Groovy 2.4.11
   #- GROOVY_VERSION="2.4.11"
   # Latest Groovy 2.4.x stable
-  - GROOVY_VERSION="2.4.12"
+  - GROOVY_VERSION="2.4.13"
   # Latest Groovy 2.5.x prerelease (next Groovy release)
   - GROOVY_VERSION="2.5.0-beta-1"
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
@@ -22,7 +22,6 @@ matrix:
     - env: GROOVY_VERSION="1.8.9"
     - env: GROOVY_VERSION="2.4.6"
     - env: GROOVY_VERSION="2.4.8"
-    - env: GROOVY_VERSION="2.4.12"
     - env: GROOVY_VERSION="2.5.0-beta-1"
 branches:
   only:
