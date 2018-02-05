@@ -37,7 +37,6 @@ Set required_plugins = [
     'git',
     'github',
     'groovy',
-    'groovy-label-assignment',
     'javadoc',
     'job-dsl',
     'junit',
