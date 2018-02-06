@@ -1,11 +1,10 @@
-# Jervis
+# Jervis: Jenkins as a service
 
 [![Maven Central Release][status-release]][maven-badge]
 [![Build Status][status-build]][jervis-travis]
 [![Coverage Status][status-coverage]][jervis-coveralls]
 [![Dependency Status][status-versioneye]][jervis-versioneye]
 
-* Jervis: Jenkins as a service
 * *Project status:* [released to maven central][maven-release].
 * *Currently Targeted platforms:*
   * *Jenkins server host:* Linux and Mac OS X (Windows compatible)
