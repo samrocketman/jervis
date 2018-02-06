@@ -5,6 +5,7 @@
 [![Coverage Status][status-coverage]][jervis-coveralls]
 [![Dependency Status][status-versioneye]][jervis-versioneye]
 
+* Jervis: Jenkins as a service
 * *Project status:* [released to maven central][maven-release].
 * *Currently Targeted platforms:*
   * *Jenkins server host:* Linux and Mac OS X (Windows compatible)
