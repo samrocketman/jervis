@@ -44,7 +44,7 @@ jenkinsJobMultibranchPipeline = { def jervis_jobType, String JERVIS_BRANCH ->
 
                         //additional behaviors
                         traits {
-                            headWildcardFilter {
+                            headWildcardFilterWithPR {
                                 includes "${JERVIS_BRANCH}"
                                 excludes ''
                             }

@@ -15,7 +15,7 @@
    */
 
 //this code should be at the beginning of every script included which requires bindings
-String include_script_name = 'jobs/is_pipeline_branch.groovy'
+String include_script_name = 'jobs/is_pipeline.groovy'
 Set required_bindings = ['git_service', 'project', 'project_folder', 'global_threadlock']
 Set missing_bindings = required_bindings - (binding.variables.keySet()*.toString() as Set)
 if(missing_bindings) {
