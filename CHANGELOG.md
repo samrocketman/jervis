@@ -1,3 +1,19 @@
+# jervis 1.1
+
+#### Warnings
+
+Job DSL Scripts: Freestyle will no longer be updated.  Only pipeline jobs are
+supported.  This will not overwrite freestyle jobs.  It will simply not touch
+them.  The following migration path is recommended:
+
+- If you wish to preserve build history, then just disable all freestyle and
+  matrix project jobs from running.  Run [disable-freestyle-jobs][fs-migrate-1].
+- Permanently delete all disabled freestyle and matrix project jobs can be done
+  after disabling them.  Review what was disabled before running
+  [delete-freestyle-jobs][fs-migrate-2] Script Console script.
+
+
+
 # jervis 1.0 - Oct 30th, 2017
 
 #### Warnings
@@ -273,3 +289,5 @@ not declare the type of matrix.  [See wiki for details][wiki-toolchains-spec].
 [mig-01-ex]: https://github.com/samrocketman/jervis/commit/1d7ff1417c642d959f467c11eca7b16cb3e3ef3c
 [wiki-stronger-rsa]: https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories#enforcing-stronger-rsa-keys
 [wiki-toolchains-spec]: https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file
+[fs-migrate-1]: https://github.com/samrocketman/jenkins-script-console-scripts/blob/master/disable-freestyle-jobs.groovy
+[fs-migrate-2]: https://github.com/samrocketman/jenkins-script-console-scripts/blob/master/delete-freestyle-jobs.groovy
