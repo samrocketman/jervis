@@ -6,22 +6,9 @@
 language: groovy
 
 #build library
-#gradle doesn't have a retry for assembling dependencies so here's one in bash
-install: ./assemble.sh
-script: ./gradlew clean check cobertura Jar groovydoc
+script: ./gradlew clean check Jar
 
-env:
-  # Groovy 1.8.9 for cobertura
-  - GROOVY_VERSION="1.8.9"
-  # Latest Groovy 2.4.x stable
-  - GROOVY_VERSION="2.4.15"
-  # Next Groovy 2.5.x release
-  - GROOVY_VERSION="2.5.1"
-
-matrix:
-  allow_failures:
-    - env: GROOVY_VERSION="2.5.1"
-
+#whitelist git branches to build
 branches:
   only:
     - master
@@ -29,42 +16,6 @@ branches:
 
 jenkins:
   pipeline_jenkinsfile: assets/Jenkinsfile
-  stash:
-    - name: artifacts
-      matrix_axis:
-        env: GROOVY_VERSION="2.4.15"
-    - name: html
-      matrix_axis:
-        env: GROOVY_VERSION="2.4.15"
-    - name: junit
-      matrix_axis:
-        env: GROOVY_VERSION="2.4.15"
-    - name: cobertura
-      matrix_axis:
-        env: GROOVY_VERSION="1.8.9"
   collect:
     artifacts: build/libs/*.jar
-    cobertura: build/reports/cobertura/coverage.xml
     junit: build/test-results/*.xml
-    html:
-      path: build/docs/groovydoc
-      reportName: 'Groovy Dev Docs'
-
-########################
-# Travis CI Options Only
-########################
-#Travis CI also uses some options in the Jenkins section above.
-#None of the following options are interpreted by Jenkins.
-
-after_success:
-  - ./coveralls.sh
-
-#https://docs.travis-ci.com/user/languages/groovy#caching
-before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-
-cache:
-  directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-
