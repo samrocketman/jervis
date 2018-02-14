@@ -302,8 +302,8 @@ def call() {
                 }
             }
         }
-    }
-    if(generator.isPipelineJob()) {
-        load generator.jenkinsfile
+        if(generator.isPipelineJob()) {
+            load generator.jenkinsfile
+        }
     }
 }
