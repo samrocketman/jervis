@@ -1,5 +1,4 @@
 #!groovy
-buildViaJervis()
 pipeline {
     agent {
         label 'ubuntu1604'
