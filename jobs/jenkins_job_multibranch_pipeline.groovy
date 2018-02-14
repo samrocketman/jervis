@@ -59,8 +59,10 @@ jenkinsJobMultibranchPipeline = { def jervis_jobType, String JERVIS_BRANCH ->
             }
         }
         configure {
-            def factory = it / factory(class: 'org.jenkinsci.plugins.pipeline.multibranch.defaults.PipelineBranchDefaultsProjectFactory')
-            factory << owner(class: 'org.jenkinsci.plugins.pipeline.multibranch.defaults.PipelineMultiBranchDefaultsProject', reference: '../..')
+            //overwrite default factory with the pipeline multibranch defaults plugin "Global Jenkinsfile"
+            Node factoryNode = it / factory
+            factoryNode.attributes().put 'class', 'org.jenkinsci.plugins.pipeline.multibranch.defaults.PipelineBranchDefaultsProjectFactory'
+            (factoryNode / 'owner').attributes().put 'class', 'org.jenkinsci.plugins.pipeline.multibranch.defaults.PipelineMultiBranchDefaultsProject'
         }
         configure {
             def folderConfig = it / 'properties' / 'org.jenkinsci.plugins.pipeline.modeldefinition.config.FolderConfig'
