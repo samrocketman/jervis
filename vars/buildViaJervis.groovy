@@ -303,6 +303,11 @@ def call() {
             }
         }
         if(generator.isPipelineJob()) {
+            if(generator.isMatrixBuild()) {
+                stage("Checkout Jenkinsfile") {
+                    checkout global_scm
+                }
+            }
             load generator.jenkinsfile
         }
     }
