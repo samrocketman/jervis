@@ -1,39 +1,32 @@
+#######################
+# Jenkins Build Options
+#######################
+# User guide for this file: https://github.com/samrocketman/jervis/wiki/User-Guide
+
 language: groovy
-env:
-  # Jenkins 1.x uses Groovy 1.8.9
-  - GROOVY_VERSION="1.8.9"
-  # Jenkins 2.0 onward uses Groovy 2.4.6
-  #- GROOVY_VERSION="2.4.6"
-  # Jenkins 2.47 onward uses Groovy 2.4.8
-  #- GROOVY_VERSION="2.4.8"
-  # Jenkins 2.61 onward uses Groovy 2.4.11
-  #- GROOVY_VERSION="2.4.11"
-  # Latest Groovy 2.4.x stable
-  - GROOVY_VERSION="2.4.13"
-  # Latest Groovy 2.5.x prerelease (next Groovy release)
-  - GROOVY_VERSION="2.5.0-beta-1"
+
+#build library
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
 install: ./assemble.sh
 script: ./gradlew clean check cobertura Jar groovydoc
-after_success:
-  - ./coveralls.sh
+
+env:
+  # Groovy 1.8.9 for cobertura
+  - GROOVY_VERSION="1.8.9"
+  # Latest Groovy 2.4.x stable
+  - GROOVY_VERSION="2.4.13"
+  # Next Groovy 2.5.x release
+  - GROOVY_VERSION="2.5.0-beta-1"
+
 matrix:
   allow_failures:
-    - env: GROOVY_VERSION="1.8.9"
-    - env: GROOVY_VERSION="2.4.6"
-    - env: GROOVY_VERSION="2.4.8"
     - env: GROOVY_VERSION="2.5.0-beta-1"
+
 branches:
   only:
     - master
     - jervis_simple
-#https://docs.travis-ci.com/user/languages/groovy#caching
-before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-cache:
-  directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+
 jenkins:
   pipeline_jenkinsfile: assets/Jenkinsfile
   stash:
@@ -53,3 +46,22 @@ jenkins:
     artifacts: build/libs/*.jar
     cobertura: build/reports/cobertura/coverage.xml
     junit: build/test-results/*.xml
+
+########################
+# Travis CI Options Only
+########################
+#Travis CI also uses some options in the Jenkins section above.
+#None of the following options are interpreted by Jenkins.
+
+after_success:
+  - ./coveralls.sh
+
+#https://docs.travis-ci.com/user/languages/groovy#caching
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
