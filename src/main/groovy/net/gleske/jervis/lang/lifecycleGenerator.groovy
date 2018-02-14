@@ -1102,6 +1102,6 @@ env:
       @see #isPipelineJob()
      */
     public String getJenkinsfile() {
-        getObjectValue(jervis_yaml, 'jenkins.pipeline_jenkinsfile', '')?: 'Jenkinsfile'
+        getObjectValue(jervis_yaml, 'jenkins.pipeline_jenkinsfile', 'Jenkinsfile')
     }
 }
