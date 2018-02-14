@@ -59,9 +59,8 @@ jenkinsJobMultibranchPipeline = { def jervis_jobType, String JERVIS_BRANCH ->
             }
         }
         configure {
-            def factory = it / factory(class: 'org.jenkinsci.plugins.workflow.multibranch.WorkflowBranchProjectFactory')
-            factory << owner(class: 'org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject', reference: '../..')
-            factory << scriptPath(pipeline_jenkinsfile)
+            def factory = it / factory(class: 'org.jenkinsci.plugins.pipeline.multibranch.defaults.PipelineBranchDefaultsProjectFactory')
+            factory << owner(class: 'org.jenkinsci.plugins.pipeline.multibranch.defaults.PipelineMultiBranchDefaultsProject', reference: '../..')
         }
         configure {
             def folderConfig = it / 'properties' / 'org.jenkinsci.plugins.pipeline.modeldefinition.config.FolderConfig'
