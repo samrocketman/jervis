@@ -61,6 +61,7 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
     generator.loadYamlString(jervis_yaml)
     generator.folder_listing = folder_listing
 
+    /*
     if(generator.isGenerateBranch(JERVIS_BRANCH) && !generator.isPipelineJob()) {
         //the job should not be generated for this branch
         //based on the branches section of .jervis.yml or the fact that it's not a pipeline multibranch job
@@ -72,6 +73,7 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
         }
         return
     }
+    */
 
     //attempt to get the private key else return an empty string (not used but detecting decryption failures before attempting to create the job)
     String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
