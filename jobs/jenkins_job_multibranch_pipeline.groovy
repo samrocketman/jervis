@@ -32,6 +32,7 @@ jenkinsJobMultibranchPipeline = { String JERVIS_BRANCH ->
                 source {
                     github {
                         //github
+                        id "owner-${project_folder}:repo-${project_name}"
                         credentialsId 'github-user-and-token'
                         repoOwner project_folder
                         repository project_name
