@@ -48,6 +48,10 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
         println "Skipping branch: ${JERVIS_BRANCH}"
         return
     }
+    if(jervis_yaml.indexOf('language:') < 0) {
+        //travis ci defaults to ruby when no language is specified
+        generator.yaml_language = 'ruby'
+    }
     generator.loadPlatformsString(parent_job.readFileFromWorkspace('resources/platforms.json').toString())
     generator.preloadYamlString(jervis_yaml)
     //could optionally read lifecycles and toolchains files by OS
