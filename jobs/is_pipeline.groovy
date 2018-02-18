@@ -22,6 +22,7 @@ require_bindings('jobs/is_pipeline.groovy', ['git_service', 'project', 'project_
    compatible with Jenkins pipeline multibranch jobs.
  */
 
+import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
 
 is_pipeline = null

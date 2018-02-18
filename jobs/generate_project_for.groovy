@@ -21,7 +21,6 @@ require_bindings('jobs/generate_project_for.groovy', ['parent_job', 'git_service
    This will generate jobs for a given branch.
  */
 
-import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
 
 //generate Jenkins jobs
