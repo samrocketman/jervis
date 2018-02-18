@@ -23,7 +23,7 @@ if(missing_bindings || !project || project.split('/').size() != 2) {
        |${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}
        |
        |Job parameter "project" must be specified correctly!  Its value is a
-       |GitHub project in the form of ${namespace}/${project}.  For example,
+       |GitHub project in the form of namespace/project.  For example,
        |the value for the jenkinsci organization jenkins project would be
        |set as "jenkinsci/jenkins".""".stripMargin().trim().toString()
     throw new Exception(message)
