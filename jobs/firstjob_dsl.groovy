@@ -108,7 +108,8 @@ if(binding.hasVariable('branch') && branch) {
     generate_project_for(branch)
 }
 else {
-    is_pipeline()
+    //is_pipeline()
+    pipeline_jenkinsfile = 'Jenkinsfile'
     List <Thread> threads = []
     git_service.branches(project).each { branch ->
         threads << Thread.start {
