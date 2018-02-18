@@ -16,7 +16,7 @@
 
 //this code should be at the beginning of every script included which requires bindings
 String include_script_name = 'jobs/firstjob_dsl.groovy'
-Set required_bindings = ['project', 'branch']
+Set required_bindings = ['project']
 Set missing_bindings = required_bindings - (binding.variables.keySet()*.toString() as Set)
 if(missing_bindings || !project || project.split('/').size() != 2) {
     String message = """
