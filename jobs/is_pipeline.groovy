@@ -15,12 +15,7 @@
    */
 
 //this code should be at the beginning of every script included which requires bindings
-String include_script_name = 'jobs/is_pipeline.groovy'
-Set required_bindings = ['git_service', 'project', 'project_folder', 'global_threadlock']
-Set missing_bindings = required_bindings - (binding.variables.keySet()*.toString() as Set)
-if(missing_bindings) {
-    throw new Exception("${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}")
-}
+require_bindings('jobs/is_pipeline.groovy', ['git_service', 'project', 'project_folder', 'global_threadlock'])
 
 /*
    This will determine if a branch given branch (or default branch) is

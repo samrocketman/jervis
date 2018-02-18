@@ -14,20 +14,10 @@
    limitations under the License.
    */
 
+//this should only be at the top of firstjob_dsl.groovy
+evaluate(readFileFromWorkspace('jobs/require_bindings.groovy').toString())
 //this code should be at the beginning of every script included which requires bindings
-String include_script_name = 'jobs/firstjob_dsl.groovy'
-Set required_bindings = ['project']
-Set missing_bindings = required_bindings - (binding.variables.keySet()*.toString() as Set)
-if(missing_bindings || !project || project.split('/').size() != 2) {
-    String message = """
-       |${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}
-       |
-       |Job parameter "project" must be specified correctly!  Its value is a
-       |GitHub project in the form of namespace/project.  For example,
-       |the value for the jenkinsci organization jenkins project would be
-       |set as "jenkinsci/jenkins".""".stripMargin().trim().toString()
-    throw new Exception(message)
-}
+require_bindings('jobs/firstjob_dsl.groovy', ['project'])
 
 /*
    The main entrypoint where Job DSL plugin runs to generate jobs.  Your Job

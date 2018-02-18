@@ -15,12 +15,7 @@
    */
 
 //this code should be at the beginning of every script included which requires bindings
-String include_script_name = 'jobs/git_service.groovy'
-Set required_bindings = ['git_service', 'system_creds']
-Set missing_bindings = required_bindings - (binding.variables.keySet()*.toString() as Set)
-if(missing_bindings) {
-    throw new Exception("${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}")
-}
+require_bindings('jobs/git_service.groovy', ['git_service', 'system_creds'])
 
 /*
    Configures the git_service binding using system_creds binding.

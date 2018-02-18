@@ -15,12 +15,7 @@
    */
 
 //this code should be at the beginning of every script included which requires bindings
-String include_script_name = 'jobs/generate_project_for.groovy'
-Set required_bindings = ['parent_job', 'git_service', 'project', 'project_folder', 'global_threadlock']
-Set missing_bindings = required_bindings - (binding.variables.keySet()*.toString() as Set)
-if(missing_bindings) {
-    throw new Exception("${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}")
-}
+require_bindings('jobs/generate_project_for.groovy', ['parent_job', 'git_service', 'project', 'project_folder', 'global_threadlock'])
 
 /*
    This will generate jobs for a given branch.

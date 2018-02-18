@@ -15,12 +15,7 @@
    */
 
 //this code should be at the beginning of every script included which requires bindings
-String include_script_name = 'jobs/jenkins_job_multibranch_pipeline.groovy'
-Set required_bindings = ['parent_job', 'project', 'project_folder', 'project_name', 'script_approval', 'git_service']
-Set missing_bindings = required_bindings - (binding.variables.keySet()*.toString() as Set)
-if(missing_bindings) {
-    throw new Exception("${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}")
-}
+require_bindings('jobs/jenkins_job_multibranch_pipeline.groovy', ['parent_job', 'project', 'project_folder', 'project_name', 'script_approval', 'git_service'])
 
 /*
    Configures a pipeline job designed to execute Jervis YAML.
