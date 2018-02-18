@@ -56,10 +56,7 @@ evaluate(readFileFromWorkspace('jobs/get_folder_credentials.groovy').toString())
 
 //prepare bindings from other files (order matters due to bindings loaded from other scripts)
 evaluate(readFileFromWorkspace('jobs/is_pipeline.groovy').toString())
-evaluate(readFileFromWorkspace('jobs/jenkins_job_classic.groovy').toString())
-evaluate(readFileFromWorkspace('jobs/jenkins_job_pipeline.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/jenkins_job_multibranch_pipeline.groovy').toString())
-evaluate(readFileFromWorkspace('jobs/jenkins_job.groovy').toString())
 evaluate(readFileFromWorkspace('jobs/generate_project_for.groovy').toString())
 
 println 'Generating jobs for ' + git_service.toString() + " project ${project}."
@@ -102,6 +99,7 @@ Thread.metaClass.checkForException = { ->
 job_description = git_service.fetch("repos/${project}")['description']
 branches = []
 pipeline_jenkinsfile = ''
+default_generator = null
 
 //generate projects for one or more branches
 if(binding.hasVariable('branch') && branch) {

@@ -27,9 +27,9 @@ if(missing_bindings) {
  */
 
 jenkinsJobMultibranchPipeline = null
-jenkinsJobMultibranchPipeline = { def jervis_jobType, String JERVIS_BRANCH ->
-    //the generated Job DSL enclosure depends on the job type
-    jervis_jobType(project) {
+jenkinsJobMultibranchPipeline = { String JERVIS_BRANCH ->
+    //uses groovy bindings to properly reference the Job DSL; in this case parent_job
+    parent_job.multibranchPipelineJob(project) {
         description(job_description)
         //displayName(project_name)
         branchSources {

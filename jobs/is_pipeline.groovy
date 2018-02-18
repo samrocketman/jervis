@@ -31,9 +31,6 @@ import net.gleske.jervis.lang.lifecycleGenerator
 
 is_pipeline = null
 is_pipeline = { String JERVIS_BRANCH = '' ->
-    if(!pipeline_jenkinsfile) {
-        println "Detecting from default branch if Jenkins job should be pipeline or classic."
-    }
     List<String> folder_listing = git_service.getFolderListing("${project}", '/', JERVIS_BRANCH)
     def generator = new lifecycleGenerator()
     String jervis_yaml
@@ -61,43 +58,29 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
     generator.loadYamlString(jervis_yaml)
     generator.folder_listing = folder_listing
 
-    /*
-    if(generator.isGenerateBranch(JERVIS_BRANCH) && !generator.isPipelineJob()) {
-        //the job should not be generated for this branch
-        //based on the branches section of .jervis.yml or the fact that it's not a pipeline multibranch job
-        if(pipeline_jenkinsfile) {
-            println "Skipping branch: ${JERVIS_BRANCH}"
-        }
-        else {
-            println "Generating classic job since pipeline was not detected."
-        }
-        return
-    }
-    */
+    if(default_generator) {
+        //attempt to get the private key else return an empty string
+        //force detecting decryption failures before attempting to create the job
+        String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
+        String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
 
-    //attempt to get the private key else return an empty string (not used but detecting decryption failures before attempting to create the job)
-    String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
-    String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
-
-    if(credentials_id && !private_key_contents) {
-        throw new SecurityException("Branch: ${JERVIS_BRANCH}.  Could not find private key using Jenkins Credentials ID: ${credentials_id}")
+        if(credentials_id && !private_key_contents) {
+            throw new SecurityException("Branch: ${JERVIS_BRANCH}.  Could not find private key using Jenkins Credentials ID: ${credentials_id}")
+        }
+        if(private_key_contents) {
+            println "Branch: ${JERVIS_BRANCH}.  Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}."
+            generator.setPrivateKey(private_key_contents)
+            generator.decryptSecrets()
+            println "Branch: ${JERVIS_BRANCH}.  Decrypted the following properties (indented):"
+            println '    ' + generator.plainlist*.get('key').join('\n    ')
+        }
     }
-    if(private_key_contents) {
-        println "Branch: ${JERVIS_BRANCH}.  Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}."
-        generator.setPrivateKey(private_key_contents)
-        generator.decryptSecrets()
-        println "Branch: ${JERVIS_BRANCH}.  Decrypted the following properties (indented):"
-        println '    ' + generator.plainlist*.get('key').join('\n    ')
+    else {
+        default_generator = generator
     }
 
     //we've made it this far so it must be legit
     global_threadlock.withLock {
-        if(!pipeline_jenkinsfile) {
-            println "Pipeline multibranch job has been detected."
-            pipeline_jenkinsfile = generator.jenkinsfile
-        }
-        else {
-            branches << JERVIS_BRANCH
-        }
+        branches << JERVIS_BRANCH
     }
 }
