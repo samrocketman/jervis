@@ -37,6 +37,7 @@ if(missing_bindings || !project || project.split('/').size() != 2) {
 
 import jenkins.model.Jenkins
 import net.gleske.jervis.remotes.GitHub
+import net.gleske.jervis.exceptions.JervisException
 
 //ensure all prerequisite plugins are installed
 evaluate(readFileFromWorkspace('jobs/required_plugins.groovy').toString())
@@ -98,41 +99,30 @@ Thread.metaClass.checkForException = { ->
 //populate project description from GitHub
 job_description = git_service.fetch("repos/${project}")['description']
 branches = []
-pipeline_jenkinsfile = ''
 default_generator = null
 
-//generate projects for one or more branches
 if(binding.hasVariable('branch') && branch) {
-    generate_project_for(branch)
+    throw new JervisException('Specifying a branch is no longer supported.  If you see this, then your admin should remove it from the calling job.')
 }
-else {
-    //is_pipeline()
-    pipeline_jenkinsfile = 'Jenkinsfile'
-    List <Thread> threads = []
-    git_service.branches(project).each { branch ->
-        threads << Thread.start {
-            try {
-                //generating jobs fails with 'anonymous' user permissions without impersonate
-                Jenkins.instance.ACL.impersonate(hudson.security.ACL.SYSTEM)
-                if(pipeline_jenkinsfile) {
-                    is_pipeline(branch)
-                }
-                else {
-                    generate_project_for(branch)
-                }
-            }
-            catch(Throwable t) {
-                //save the caught exception to be surfaced in the job result
-                ex = t
-            }
+
+//iterate through all branches in parallel to discover
+List <Thread> threads = []
+git_service.branches(project).each { branch ->
+    threads << Thread.start {
+        try {
+            //generating jobs fails with 'anonymous' user permissions without impersonate
+            Jenkins.instance.ACL.impersonate(hudson.security.ACL.SYSTEM)
+            is_pipeline(branch)
+        }
+        catch(Throwable t) {
+            //save the caught exception to be surfaced in the job result
+            ex = t
         }
     }
-    threads.each {
-        it.join()
-        //throws an exception from the thread
-        it.checkForException()
-    }
-    if(pipeline_jenkinsfile) {
-        generate_project_for(branches.join(' '))
-    }
 }
+threads.each {
+    it.join()
+    //throws an exception from the thread
+    it.checkForException()
+}
+generate_project_for(branches.join(' '))
