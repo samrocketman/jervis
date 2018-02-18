@@ -104,7 +104,7 @@ branches = []
 pipeline_jenkinsfile = ''
 
 //generate projects for one or more branches
-if(branch) {
+if(binding.hasVariable('branch') && branch) {
     generate_project_for(branch)
 }
 else {
