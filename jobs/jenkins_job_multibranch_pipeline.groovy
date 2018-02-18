@@ -51,6 +51,13 @@ jenkinsJobMultibranchPipeline = { def jervis_jobType, String JERVIS_BRANCH ->
                         }
                     }
                 }
+                strategy {
+                    defaultBranchPropertyStrategy {
+                        props {
+                            noTriggerBranchProperty()
+                        }
+                    }
+                }
             }
         }
         orphanedItemStrategy {
