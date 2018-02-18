@@ -19,12 +19,13 @@
    Any missing plugins will fail everything and warn the admin they need to install plugins
  */
 import jenkins.model.Jenkins
+import net.gleske.jervis.exceptions.JervisException
 
 void detect(Set required_plugins) {
     Set installed_plugins = (Jenkins.instance.pluginManager.plugins*.shortName).toSet()
     Set missing_plugins = required_plugins - installed_plugins
     if(missing_plugins) {
-        throw new Exception("ERROR: Action required by Admin.  Jenkins is missing required plugins: ${missing_plugins.join(', ')}")
+        throw new JervisException("ERROR: Action required by Admin.  Jenkins is missing required plugins: ${missing_plugins.join(', ')}")
     }
 }
 

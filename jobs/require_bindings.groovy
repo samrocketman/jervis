@@ -18,11 +18,13 @@
    A helper script which forces required bindings to be called out when using other scripts.
  */
 
+import net.gleske.jervis.exceptions.JervisException
+
 require_bindings = null
 require_bindings = { String include_script_name, List bindings_list ->
     Set required_bindings = bindings_list.toSet()
     Set missing_bindings = required_bindings - (binding.variables.keySet()*.toString() as Set)
     if(missing_bindings) {
-        throw new Exception("${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}")
+        throw new JervisException("${include_script_name} is missing required bindings from calling script: ${missing_bindings.join(', ')}")
     }
 }
