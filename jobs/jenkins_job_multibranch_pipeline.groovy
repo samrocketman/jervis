@@ -44,6 +44,11 @@ jenkinsJobMultibranchPipeline = { String JERVIS_BRANCH ->
                                 includes "${JERVIS_BRANCH}"
                                 excludes ''
                             }
+                            if(default_generator.filter_type == 'only' && default_generator.hasRegexFilter()) {
+                                headRegexFilterWithPR {
+                                    regex default_generator.getBranchRegexString()
+                                }
+                            }
                         }
                     }
                 }

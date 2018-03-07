@@ -77,6 +77,8 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
 
     //we've made it this far so it must be legit
     global_threadlock.withLock {
-        branches << JERVIS_BRANCH
+        if(!default_generator.isFilteredByRegex(JERVIS_BRANCH)) {
+            branches << JERVIS_BRANCH
+        }
     }
 }
