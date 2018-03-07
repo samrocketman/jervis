@@ -103,6 +103,14 @@ class lifecycleGenerator implements Serializable {
     Boolean matrix_build = false
 
     /**
+      Defines the kind of branch filtering which is in effect.  Possible
+      values: empty string, <tt>only</tt>, <tt>except</tt>.  <tt>only</tt> is
+      used for whitelist filtering and <tt>except</tt> is used for blacklist
+      filtering.
+      */
+    String filter_type = ''
+
+    /**
       A quick access variable for matrix build axes.
      */
     List yaml_matrix_axes
@@ -434,15 +442,24 @@ class lifecycleGenerator implements Serializable {
         //populate branch filtering keys removing extra information
         if(jervis_yaml['branches'] instanceof List) {
             jervis_yaml['branches'] = ['only': jervis_yaml['branches']]
+            filter_type = 'only'
         }
         if(jervis_yaml['branches'] instanceof Map) {
             if(('only' in jervis_yaml['branches']) || ('except' in jervis_yaml['branches'])) {
                 if('only' in jervis_yaml['branches']) {
                     jervis_yaml['branches'] = ['only': jervis_yaml['branches']['only']]
+                    filter_type = 'only'
                 }
                 else {
                     jervis_yaml['branches'] = ['except': jervis_yaml['branches']['except']]
+                    filter_type = 'except'
                 }
+            }
+        }
+        if(filter_type) {
+            if(!(jervis_yaml['branches'][filter_type] in List)) {
+                //invalid filter so disable filtering (allow by default)
+                filter_type = ''
             }
         }
         null
@@ -797,56 +814,72 @@ env:
     }
 
     /**
+      Get a list of static branch names which is used for branch filtering.
+      This is a simple literal list of Strings.
+
+      @return A <tt>List</tt> of literal branch names meant to be filtered.
+      */
+    public List getFilteredBranchesList() {
+        if(!filter_type) {
+            return []
+        }
+        jervis_yaml['branches'][filter_type].findAll {
+            String i=it.toString()
+            (i[0] != '/' && i[-1] != '/' && i.size() > 0) || (i == '/' )
+        }.collect {
+            it.toString()
+        }
+    }
+
+    /**
+      This method makes it easy to detect if regular expressions are defined
+      for branch filtering.
+
+      @return <tt>true</tt> if a regex filter for branch filtering is available.
+      */
+    public Boolean hasRegexFilter() {
+        getBranchRegexString() as Boolean
+    }
+
+    /**
+      Get the regular expression which is used for branch filtering.
+
+      @return <tt>String</tt> which is compatible with
+              <tt>{@link java.util.regex.Pattern}</tt>.  If no filters are
+              found or the loaded Jervis YAML does not filter, then an empty
+              String is returned.
+     */
+    public String getBranchRegexString() {
+        if(!filter_type) {
+            return ''
+        }
+        jervis_yaml['branches'][filter_type].findAll {
+            String i=it.toString()
+            i[0] == '/' && i[-1] == '/' && i.size() > 2
+        }.collect {
+            it[1..-2]
+        }.join('|')
+    }
+
+    /**
       Is this a branch which will generate a job?
       @param branch A branch to check if the job should be generated.
       @return       Returns <tt>true</tt> if the job should be generated or <tt>false</tt> if it should not.
      */
     public Boolean isGenerateBranch(String branch) {
-        Boolean result=true
-        if(('branches' in jervis_yaml)) {
-            if(jervis_yaml['branches'] instanceof Map) {
-                if('only' in jervis_yaml['branches']) {
-                    //set a new default result
-                    result=false
-                    jervis_yaml['branches']['only'].each {
-                        if(result) {
-                            //skip to the end because a result has been found
-                            return
-                        }
-                        if(it[0] == '/' && it[-1] == '/') {
-                            //regular expression detected
-                            Pattern pattern = Pattern.compile(it[1..-2])
-                            if(pattern.matcher(branch).matches()) {
-                                result = true
-                            }
-                        }
-                        else if(it == branch) {
-                            result = true
-                        }
-                    }
-                }
-                else if('except' in jervis_yaml['branches']) {
-                    //result is true by default
-                    jervis_yaml['branches']['except'].each {
-                        if(!result) {
-                            //skip to the end because a result has been found
-                            return
-                        }
-                        if(it[0] == '/' && it[-1] == '/') {
-                            //regular expression detected
-                            Pattern pattern = Pattern.compile(it[1..-2])
-                            if(pattern.matcher(branch).matches()) {
-                                result = false
-                            }
-                        }
-                        else if(it == branch) {
-                            result = false
-                        }
-                    }
-                }
-            }
+        if(!filter_type) {
+            return true
         }
-        return result
+        Boolean regex_match
+        if(hasRegexFilter()) {
+            Pattern pattern = Pattern.compile(getBranchRegexString())
+            regex_match = pattern.matcher(branch).matches()
+        }
+
+        Boolean branch_match = (branch in getFilteredBranchesList())
+        Boolean generate_branch = regex_match || branch_match
+        //inverse if filter_type is 'except'
+        (filter_type == 'only')? generate_branch : !generate_branch
     }
 
     /**

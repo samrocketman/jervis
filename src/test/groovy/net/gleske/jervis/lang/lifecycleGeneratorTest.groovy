@@ -359,6 +359,57 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert true == generator.isGenerateBranch('many')
         assert true == generator.isGenerateBranch('development')
         assert false == generator.isGenerateBranch('derp')
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - 3')
+        assert true == generator.isGenerateBranch('3')
+    }
+    @Test public void test_lifecycleGenerator_isGenerateBranch_invalid_type() {
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    master: "test"')
+        //invalid type defaults to no filter
+        assert true == generator.isGenerateBranch('master')
+        //string
+        generator.loadYamlString('language: ruby\nbranches:\n  only: "master"')
+        assert true == generator.isGenerateBranch('hello')
+        //numbers
+        generator.loadYamlString('language: ruby\nbranches:\n  only: 3')
+        assert true == generator.isGenerateBranch('hello')
+        generator.loadYamlString('language: ruby\nbranches:\n  only: 3.3')
+        assert true == generator.isGenerateBranch('hello')
+    }
+    @Test public void test_lifecycleGenerator_getBranchRegexString() {
+        generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - development\n    - /^ma.*$/')
+        assert '^ma.*$' == generator.getBranchRegexString()
+        generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - /.*-pre$/\n    - /^ma.*$/')
+        assert '.*-pre$|^ma.*$' == generator.getBranchRegexString()
+    }
+    @Test public void test_lifecycleGenerator_filter_type_only() {
+        generator.loadYamlString('language: ruby\nbranches:\n  - development\n  - /^ma.*$/')
+        assert 'only' == generator.filter_type
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - development\n    - /^ma.*$/')
+        assert 'only' == generator.filter_type
+    }
+    @Test public void test_lifecycleGenerator_hasRegexFilter() {
+        generator.loadYamlString('language: ruby\n')
+        assert false == generator.hasRegexFilter()
+        generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - /.*-pre$/\n    - /^ma.*$/')
+        assert true == generator.hasRegexFilter()
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - /.*-pre$/\n    - /^ma.*$/')
+        assert true == generator.hasRegexFilter()
+    }
+    @Test public void test_lifecycleGenerator_filter_type_except() {
+        generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - development\n    - /^ma.*$/')
+        assert 'except' == generator.filter_type
+    }
+    @Test public void test_lifecycleGenerator_getFilteredBranchesList_nofilters() {
+        generator.loadYamlString('language: ruby\n')
+        assert [] == generator.getFilteredBranchesList()
+    }
+    @Test public void test_lifecycleGenerator_getFilteredBranchesList() {
+        generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - development\n    - /^ma.*$/')
+        assert ['development'] == generator.getFilteredBranchesList()
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - development\n    - /^ma.*$/')
+        assert ['development'] == generator.getFilteredBranchesList()
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - /\n    - /^ma.*$/')
+        assert ['/'] == generator.getFilteredBranchesList()
     }
     @Test public void test_lifecycleGenerator_setLabal_stability() {
         generator.label_stability = 'derp'
