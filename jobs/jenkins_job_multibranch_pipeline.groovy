@@ -40,13 +40,15 @@ jenkinsJobMultibranchPipeline = { String JERVIS_BRANCH ->
 
                         //additional behaviors
                         traits {
-                            headWildcardFilterWithPR {
-                                includes "${JERVIS_BRANCH}"
-                                excludes ''
-                            }
                             if(default_generator.filter_type == 'only' && default_generator.hasRegexFilter()) {
                                 headRegexFilterWithPR {
-                                    regex default_generator.getBranchRegexString()
+                                    regex default_generator.getFullBranchRegexString(JERVIS_BRANCH.split(' ') as List)
+                                }
+                            }
+                            else {
+                                headWildcardFilterWithPR {
+                                    includes "${JERVIS_BRANCH}"
+                                    excludes ''
                                 }
                             }
                         }

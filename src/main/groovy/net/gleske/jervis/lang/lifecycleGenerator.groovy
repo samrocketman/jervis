@@ -876,6 +876,28 @@ env:
     }
 
     /**
+      Get the regular expression for all whitelisted branches.  This is the
+      combination of which is the combination of
+      <tt>{@link #getBranchRegexString()}</tt> and <tt>branches</tt> into one
+      regex to cover all cases.
+
+      @param branches A list of branches.
+      @return         A <tt>String</tt> which is a
+                      <tt>{@link java.util.regex.Pattern}</tt>.  The
+                      combination of internal regex filters with the branches.
+      */
+    public String getFullBranchRegexString(List branches) {
+        String regex
+        if(hasRegexFilter()) {
+            regex = [getBranchRegexString(), branches.collect { Pattern.quote(it.toString()) }].flatten().join('|')
+        }
+        else {
+            regex = branches.collect { Pattern.quote(it.toString()) }.join('|')
+        }
+        (regex)?: '.*'
+    }
+
+    /**
       Is this a branch which will generate a job?
       @param branch A branch to check if the job should be generated.
       @return       Returns <tt>true</tt> if the job should be generated or <tt>false</tt> if it should not.

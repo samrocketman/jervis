@@ -381,6 +381,16 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - /.*-pre$/\n    - /^ma.*$/')
         assert '.*-pre$|^ma.*$' == generator.getBranchRegexString()
     }
+    @Test public void test_lifecycleGenerator_getFullBranchRegexString() {
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - /.*-pre$/\n    - /^ma.*$/\n    - development')
+        assert '.*-pre$|^ma.*$|\\Qdevelopment\\E' == generator.getFullBranchRegexString(generator.getFilteredBranchesList())
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - master\n    - development')
+        assert '\\Qmaster\\E|\\Qdevelopment\\E' == generator.getFullBranchRegexString(generator.getFilteredBranchesList())
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - development')
+        assert '\\Qdevelopment\\E' == generator.getFullBranchRegexString(generator.getFilteredBranchesList())
+        generator.loadYamlString('language: ruby\n')
+        assert '.*' == generator.getFullBranchRegexString(generator.getFilteredBranchesList())
+    }
     @Test public void test_lifecycleGenerator_filter_type_only() {
         generator.loadYamlString('language: ruby\nbranches:\n  - development\n  - /^ma.*$/')
         assert 'only' == generator.filter_type
