@@ -387,6 +387,13 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - development\n    - /^ma.*$/')
         assert 'only' == generator.filter_type
     }
+    @Test public void test_lifecycleGenerator_filter_type_reset() {
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - master')
+        assert 'only' == generator.filter_type
+        //loading YAML into an aleady loaded generator object should clear the filter_type (this is testing for a bug)
+        generator.loadYamlString('language: ruby\n')
+        assert '' == generator.filter_type
+    }
     @Test public void test_lifecycleGenerator_hasRegexFilter() {
         generator.loadYamlString('language: ruby\n')
         assert false == generator.hasRegexFilter()
@@ -410,6 +417,20 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert ['development'] == generator.getFilteredBranchesList()
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - /\n    - /^ma.*$/')
         assert ['/'] == generator.getFilteredBranchesList()
+    }
+    @Test public void test_lifecycleGenerator_isFilteredByRegex() {
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - master')
+        assert false == generator.isFilteredByRegex('master')
+        generator.loadYamlString('language: ruby\n')
+        assert false == generator.isFilteredByRegex('master')
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - development\n    - /^ma.*$/')
+        assert true == generator.isFilteredByRegex('many')
+        assert true == generator.isFilteredByRegex('master')
+        assert false == generator.isFilteredByRegex('development')
+        generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - development\n    - /^ma.*$/')
+        assert true == generator.isFilteredByRegex('many')
+        assert true == generator.isFilteredByRegex('master')
+        assert false == generator.isFilteredByRegex('development')
     }
     @Test public void test_lifecycleGenerator_setLabal_stability() {
         generator.label_stability = 'derp'

@@ -440,6 +440,7 @@ class lifecycleGenerator implements Serializable {
         //populate unfriendly names being accessible by friendly name
         matrix_fullName_by_friendly = [:]
         //populate branch filtering keys removing extra information
+        filter_type = ''
         if(jervis_yaml['branches'] instanceof List) {
             jervis_yaml['branches'] = ['only': jervis_yaml['branches']]
             filter_type = 'only'
@@ -839,6 +840,19 @@ env:
       */
     public Boolean hasRegexFilter() {
         getBranchRegexString() as Boolean
+    }
+
+    /**
+      Detect if this branch is already covered by a regex filter.
+
+      @param  branch The name of a branch to be compared with the regex.
+      @return        <tt>true</tt> if a regex filter matches the <tt>branch</tt>.
+      */
+    public Boolean isFilteredByRegex(String branch) {
+        if(!hasRegexFilter()) {
+            return false
+        }
+        Pattern.compile(getBranchRegexString()).matcher(branch).matches()
     }
 
     /**
