@@ -431,6 +431,20 @@ class lifecycleGenerator implements Serializable {
         }
         //populate unfriendly names being accessible by friendly name
         matrix_fullName_by_friendly = [:]
+        //populate branch filtering keys removing extra information
+        if(jervis_yaml['branches'] instanceof List) {
+            jervis_yaml['branches'] = ['only': jervis_yaml['branches']]
+        }
+        if(jervis_yaml['branches'] instanceof Map) {
+            if(('only' in jervis_yaml['branches']) || ('except' in jervis_yaml['branches'])) {
+                if('only' in jervis_yaml['branches']) {
+                    jervis_yaml['branches'] = ['only': jervis_yaml['branches']['only']]
+                }
+                else {
+                    jervis_yaml['branches'] = ['except': jervis_yaml['branches']['except']]
+                }
+            }
+        }
         null
     }
 
@@ -790,10 +804,6 @@ env:
     public Boolean isGenerateBranch(String branch) {
         Boolean result=true
         if(('branches' in jervis_yaml)) {
-            if(jervis_yaml['branches'] instanceof List) {
-                List tmp = jervis_yaml['branches']
-                jervis_yaml['branches'] = ['only': tmp]
-            }
             if(jervis_yaml['branches'] instanceof Map) {
                 if('only' in jervis_yaml['branches']) {
                     //set a new default result
