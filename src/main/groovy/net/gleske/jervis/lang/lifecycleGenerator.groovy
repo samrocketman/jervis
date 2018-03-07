@@ -884,14 +884,7 @@ env:
         if(!filter_type) {
             return true
         }
-        Boolean regex_match
-        if(hasRegexFilter()) {
-            Pattern pattern = Pattern.compile(getBranchRegexString())
-            regex_match = pattern.matcher(branch).matches()
-        }
-
-        Boolean branch_match = (branch in getFilteredBranchesList())
-        Boolean generate_branch = regex_match || branch_match
+        Boolean generate_branch = isFilteredByRegex(branch) || (branch in getFilteredBranchesList())
         //inverse if filter_type is 'except'
         (filter_type == 'only')? generate_branch : !generate_branch
     }
