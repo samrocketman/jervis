@@ -40,7 +40,7 @@ jenkinsJobMultibranchPipeline = { String JERVIS_BRANCH ->
 
                         //additional behaviors
                         traits {
-                            if(default_generator.filter_type == 'only' && default_generator.hasRegexFilter()) {
+                            if(default_generator && default_generator.filter_type == 'only' && default_generator.hasRegexFilter()) {
                                 headRegexFilterWithPR {
                                     regex default_generator.getFullBranchRegexString(JERVIS_BRANCH.split(' ') as List)
                                 }

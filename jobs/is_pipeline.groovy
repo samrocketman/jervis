@@ -54,30 +54,30 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
     generator.loadYamlString(jervis_yaml)
     generator.folder_listing = folder_listing
 
-    if(default_generator) {
-        //attempt to get the private key else return an empty string
-        //force detecting decryption failures before attempting to create the job
-        String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
-        String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
+    //attempt to get the private key else return an empty string
+    //force detecting decryption failures before attempting to create the job
+    String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
+    String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
 
-        if(credentials_id && !private_key_contents) {
-            throw new SecurityException("Branch: ${JERVIS_BRANCH}.  Could not find private key using Jenkins Credentials ID: ${credentials_id}")
-        }
-        if(private_key_contents) {
-            println "Branch: ${JERVIS_BRANCH}.  Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}."
-            generator.setPrivateKey(private_key_contents)
-            generator.decryptSecrets()
-            println "Branch: ${JERVIS_BRANCH}.  Decrypted the following properties (indented):"
-            println '    ' + generator.plainlist*.get('key').join('\n    ')
-        }
+    if(credentials_id && !private_key_contents) {
+        throw new SecurityException("Branch: ${JERVIS_BRANCH}.  Could not find private key using Jenkins Credentials ID: ${credentials_id}")
     }
-    else {
+    if(private_key_contents) {
+        println "Branch: ${JERVIS_BRANCH?:'default branch in GitHub (typically master but not always)'}.  Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}."
+        generator.setPrivateKey(private_key_contents)
+        generator.decryptSecrets()
+        println "Branch: ${JERVIS_BRANCH}.  Decrypted the following properties (indented):"
+        println '    ' + generator.plainlist*.get('key').join('\n    ')
+    }
+
+    if(!JERVIS_BRANCH) {
+        //default branch is being referenced so save it for referencing later
         default_generator = generator
     }
 
     //we've made it this far so it must be legit
     global_threadlock.withLock {
-        if(!default_generator.isFilteredByRegex(JERVIS_BRANCH)) {
+        if(!default_generator || (default_generator && !default_generator.isFilteredByRegex(JERVIS_BRANCH))) {
             branches << JERVIS_BRANCH
         }
     }

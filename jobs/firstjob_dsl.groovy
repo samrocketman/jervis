@@ -95,6 +95,8 @@ if(binding.hasVariable('branch') && branch) {
     throw new JervisException('Specifying a branch is no longer supported.  If you see this, then your admin should remove it from the calling job.')
 }
 
+//populate the default branch with Jervis YAML first
+is_pipeline()
 //iterate through all branches in parallel to discover
 List <Thread> threads = []
 git_service.branches(project).each { branch ->
