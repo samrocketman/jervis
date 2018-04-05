@@ -282,7 +282,24 @@ def call() {
         }
         List publishableItems = pipeline_generator.publishableItems
         if(publishableItems) {
-            pipeline_generator.collect_settings_defaults = [artifacts: [allowEmptyArchive: false, caseSensitive: true, defaultExcludes: true, excludes: '']]
+            pipeline_generator.collect_settings_defaults = [
+                artifacts: [
+                    allowEmptyArchive: false,
+                    caseSensitive: true,
+                    defaultExcludes: true,
+                    excludes: ''
+                ],
+                cobertura: [
+                    autoUpdateHealth: false,
+                    autoUpdateStability: false,
+                    failUnhealthy: false,
+                    failUnstable: false,
+                    maxNumberOfBuilds: 0,
+                    onlyStable: false,
+                    sourceEncoding: 'ASCII',
+                    zoomCoverageChart: false
+                ]
+            ]
             pipeline_generator.collect_settings_filesets = [artifacts: ['excludes']]
             stage("Publish results") {
                 for(String name : publishableItems) {
@@ -301,15 +318,15 @@ def call() {
                         case 'cobertura':
                             step([
                                     $class: 'CoberturaPublisher',
-                                    autoUpdateHealth: false,
-                                    autoUpdateStability: false,
-                                    coberturaReportFile: item,
-                                    failUnhealthy: false,
-                                    failUnstable: false,
-                                    maxNumberOfBuilds: 0,
-                                    onlyStable: false,
-                                    sourceEncoding: 'ASCII',
-                                    zoomCoverageChart: false
+                                    autoUpdateHealth: item['autoUpdateHealth'],
+                                    autoUpdateStability: item['autoUpdateStability'],
+                                    coberturaReportFile: item['path'],
+                                    failUnhealthy: item['failUnhealthy'],
+                                    failUnstable: item['failUnstable'],
+                                    maxNumberOfBuilds: item['maxNumberOfBuilds'],
+                                    onlyStable: item['onlyStable'],
+                                    sourceEncoding: item['sourceEncoding'],
+                                    zoomCoverageChart: item['zoomCoverageChart']
                             ])
                             break
                         case 'junit':
