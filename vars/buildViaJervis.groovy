@@ -250,11 +250,10 @@ def call() {
                             }
                         }
                         if(failed_stage) {
-                            currentBuild.result = 'UNSTABLE'
+                            //currentBuild.result = 'UNSTABLE'
+                            result = 'FAIL'
                         }
                     }
-                    //reset the build result
-                    currentBuild.result = 'SUCCESS'
                 }
             }
         }
