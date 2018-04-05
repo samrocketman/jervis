@@ -319,6 +319,9 @@ def call() {
                 }
             }
         }
+        if(currentBuild.result == 'FAILURE') {
+            error 'This build has failed.  No user-defined pipelines will be run.'
+        }
         if(generator.isPipelineJob()) {
             if(generator.isMatrixBuild()) {
                 stage("Checkout Jenkinsfile") {
