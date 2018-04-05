@@ -12,7 +12,10 @@ them.  The following migration path is recommended:
   after disabling them.  Review what was disabled before running
   [delete-freestyle-jobs][fs-migrate-2] Script Console script.
 
+#### Bug fixes:
 
+- Fixes critical bug where users who do not define collecting any artifacts in
+  YAML will cause their job to fail to build.
 
 # jervis 1.0 - Oct 30th, 2017
 
