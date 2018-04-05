@@ -314,4 +314,11 @@ class pipelineGeneratorTest extends GroovyTestCase {
         pipeline_generator.collect_settings_filesets = [artifacts: ['excludes']]
         assert [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: 'mars', onlyIfSuccessful: true, path: 'hello,world'] == pipeline_generator.getPublishable('artifacts')
     }
+    @Test public void test_pipelineGenerator_getPublishable_bug_undefined_collect() {
+        String yaml = 'language: java'
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['artifacts']
+        assert [] == pipeline_generator.publishableItems
+    }
 }

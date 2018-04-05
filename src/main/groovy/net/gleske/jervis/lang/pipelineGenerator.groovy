@@ -78,7 +78,7 @@ class pipelineGenerator implements Serializable {
     /**
       A list of items to collect from the build.
      */
-    private Map collect_items
+    private Map collect_items = [:]
 
     /**
       A list of stash maps collected from the Jervis YAML.
