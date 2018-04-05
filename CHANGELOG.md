@@ -17,6 +17,11 @@ them.  The following migration path is recommended:
 - Fixes critical bug where users who do not define collecting any artifacts in
   YAML will cause their job to fail to build.
 
+#### Pipeline DSL scripts changes in the `vars` folder:
+
+- Feature: failed unit tests are now properly exposed.
+- Feature: Cobertura report collection can now be customized for enforcement.
+
 # jervis 1.0 - Oct 30th, 2017
 
 #### Warnings
