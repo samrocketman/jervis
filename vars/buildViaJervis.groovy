@@ -223,6 +223,7 @@ def call() {
                         checkout global_scm
                     }
                     stage("Build axis ${stageIdentifier}") {
+                        Boolean failed_stage = false
                         withEnvSecretWrapper(pipeline_generator, axisEnvList + jervisEnvList) {
                             environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
                             echo "ENVIRONMENT:\n    ${environment_string}"
@@ -234,14 +235,26 @@ def call() {
                                 ].join('\n').toString())
                             }
                             catch(e) {
-                                currentBuild.result = 'FAILED'
-                                currentBuild.result = 'SUCCESS'
+                                failed_stage = true
                             }
                         }
                         for(String name : stashMap.keySet()) {
-                            stash allowEmpty: stashMap[name]['allow_empty'], includes: stashMap[name]['includes'], name: name, useDefaultExcludes: stashMap[name]['use_default_excludes']
+                            try {
+                                stash allowEmpty: stashMap[name]['allow_empty'], includes: stashMap[name]['includes'], name: name, useDefaultExcludes: stashMap[name]['use_default_excludes']
+                            }
+                            catch(e) {
+                                if(!failed_stage) {
+                                    //rethrow proper exception if this stage hasn't failed
+                                    throw e
+                                }
+                            }
+                        }
+                        if(failed_stage) {
+                            currentBuild.result = 'UNSTABLE'
                         }
                     }
+                    //reset the build result
+                    currentBuild.result = 'SUCCESS'
                 }
             }
         }
