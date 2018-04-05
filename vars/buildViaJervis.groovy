@@ -226,11 +226,17 @@ def call() {
                         withEnvSecretWrapper(pipeline_generator, axisEnvList + jervisEnvList) {
                             environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
                             echo "ENVIRONMENT:\n    ${environment_string}"
-                            sh(script: [
-                                script_header,
-                                generator.generateAll(),
-                                script_footer
-                            ].join('\n').toString())
+                            try {
+                                sh(script: [
+                                    script_header,
+                                    generator.generateAll(),
+                                    script_footer
+                                ].join('\n').toString())
+                            }
+                            catch(e) {
+                                currentBuild.result = 'FAILED'
+                                currentBuild.result = 'SUCCESS'
+                            }
                         }
                         for(String name : stashMap.keySet()) {
                             stash allowEmpty: stashMap[name]['allow_empty'], includes: stashMap[name]['includes'], name: name, useDefaultExcludes: stashMap[name]['use_default_excludes']
