@@ -60,24 +60,6 @@ if(!Jenkins.instance.getItem(project_folder)) {
 
 println "Creating project ${project}"
 
-listView(project.toString()) {
-    description(git_service.toString() + ' Project ' + git_service.getWebUrl() + "${project}")
-    filterBuildQueue()
-    filterExecutors()
-    jobs {
-        regex('^' + "${project_name}".replaceAll('/','-') + '.*')
-    }
-    columns {
-        status()
-        weather()
-        name()
-        lastSuccess()
-        lastFailure()
-        lastDuration()
-        buildButton()
-    }
-}
-
 //monkey patch Thread to handle surfacing exceptions
 Thread.metaClass.ex = null
 Thread.metaClass.checkForException = { ->

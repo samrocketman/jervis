@@ -17,6 +17,11 @@ them.  The following migration path is recommended:
 - Fixes critical bug where users who do not define collecting any artifacts in
   YAML will cause their job to fail to build.
 
+#### Job DSL scripts changes in the `jobs/` folder:
+
+ - Since pipelines are now fully supported the configuring views for jobs no
+   longer make sense.  Configuring views has been removed.
+
 #### Pipeline DSL scripts changes in the `vars` folder:
 
 - Feature: failed unit tests are now properly exposed.
