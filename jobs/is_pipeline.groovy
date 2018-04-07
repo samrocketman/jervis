@@ -73,8 +73,8 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
     if(!JERVIS_BRANCH) {
         //default branch is being referenced so save it for referencing later
         default_generator = generator
+        return
     }
-
     //we've made it this far so it must be legit
     global_threadlock.withLock {
         if(!default_generator || (default_generator && !default_generator.isFilteredByRegex(JERVIS_BRANCH))) {
