@@ -21,6 +21,8 @@ them.  The following migration path is recommended:
 
 - Feature: failed unit tests are now properly exposed.
 - Feature: Cobertura report collection can now be customized for enforcement.
+- Bugfix: Pull request builds no longer worked after upgrading plugins.  This is
+  now fixed.
 
 # jervis 1.0 - Oct 30th, 2017
 
