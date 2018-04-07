@@ -29,6 +29,7 @@ import jenkins.bouncycastle.api.PEMEncodable
 import jenkins.model.Jenkins
 import static jenkins.bouncycastle.api.PEMEncodable.decode
 
+
 /**
   Gets GitHub API token from the global credential store.
  */
@@ -43,6 +44,7 @@ String getGitHubAPIToken() {
         }
     } as String
 }
+
 
 /**
   Reads GitHub API and returns the .jervis.yml file via API instead of a
@@ -68,6 +70,7 @@ List getJervisMetaData(String project, String JERVIS_BRANCH) {
     }
     [jervis_yaml, folder_listing]
 }
+
 
 /**
   Gets RSA credentials for a given folder.
@@ -124,6 +127,7 @@ def withEnvSecretWrapper(pipelineGenerator generator, List envList, Closure body
     }
 }
 
+
 /**
   Returns a string which can be printed.  It is the decrypted properties from a
   .jervis.yml file.
@@ -136,6 +140,7 @@ String printDecryptedProperties(lifecycleGenerator generator, String credentials
         '    ' + (generator.plainmap.keySet() as List).join('\n    ')
     ].join('\n') as String
 }
+
 
 /**
   The main method of buildViaJervis()
@@ -156,13 +161,17 @@ def call() {
     String script_header
     String toolchains_json
     List folder_listing = []
-    BRANCH_NAME = BRANCH_NAME?:env.GIT_BRANCH
+    BRANCH_NAME = env.CHANGE_BRANCH?:env.BRANCH_NAME
     boolean is_pull_request = (env.CHANGE_ID?:false) as Boolean
     env.IS_PR_BUILD = "${is_pull_request}" as String
     currentBuild.rawBuild.parent.parent.sources[0].source.with {
         github_org = it.repoOwner
         github_repo = it.repository
         github_domain = (it.apiUri)? it.apiUri.split('/')[2] : 'github.com'
+    }
+    //fix pull request branch name.  Otherwise shows up as PR-* as the branch name.
+    if(is_pull_request) {
+        env.BRANCH_NAME = env.CHANGE_BRANCH
     }
     jenkins_folder = currentBuild.rawBuild.parent.parent.fullName.split('/')[0]
     List jervisEnvList = [
