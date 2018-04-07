@@ -54,6 +54,7 @@ jenkinsJobMultibranchPipeline = { String JERVIS_BRANCH ->
                         }
                     }
                 }
+                /* prevented webhooks from building
                 strategy {
                     defaultBranchPropertyStrategy {
                         props {
@@ -61,6 +62,7 @@ jenkinsJobMultibranchPipeline = { String JERVIS_BRANCH ->
                         }
                     }
                 }
+                */
             }
         }
         orphanedItemStrategy {
@@ -88,11 +90,13 @@ jenkinsJobMultibranchPipeline = { String JERVIS_BRANCH ->
             traits[0].children().add 0, 'org.jenkinsci.plugins.github__branch__source.OriginPullRequestDiscoveryTrait' { strategyId('1') }
             traits[0].children().add 0, 'org.jenkinsci.plugins.github__branch__source.BranchDiscoveryTrait' { strategyId('3') }
         }
+        /* not necessary but leaving for now
         configure {
             it / triggers / 'com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger' {
                 spec('H H * * *')
                 interval('86400000')
             }
         }
+        */
     }
 }
