@@ -19,8 +19,8 @@ them.  The following migration path is recommended:
 
 #### Job DSL scripts changes in the `jobs/` folder:
 
- - Since pipelines are now fully supported the configuring views for jobs no
-   longer make sense.  Configuring views has been removed.
+- Since pipelines are now fully supported the configuring views for jobs no
+  longer make sense.  Configuring views has been removed.
 - Bugfix branch filters not working.
 
 #### Pipeline DSL scripts changes in the `vars` folder:
