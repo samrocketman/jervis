@@ -291,6 +291,7 @@ def call() {
         }
         List publishableItems = pipeline_generator.publishableItems
         if(publishableItems) {
+            //admin defining default settings for publishers they support
             pipeline_generator.collect_settings_defaults = [
                 artifacts: [
                     allowEmptyArchive: false,
@@ -318,7 +319,18 @@ def call() {
                     keepLongStdio: false
                 ]
             ]
+            //admin supporting optional list or string for filesets in default settings
             pipeline_generator.collect_settings_filesets = [artifacts: ['excludes']]
+            //admin requiring regex validation of specific jenkins.collect setinggs
+            //if a user fails the input validation it falls back to the default option
+            String cobertura_targets_regex = '([0-9]*\\.?[0-9]*,? *){3}[^,]$'
+            pipeline_generator.collect_settings_validation = [
+                cobertura: [
+                    methodCoverageTargets: cobertura_targets_regex,
+                    lineCoverageTargets: cobertura_targets_regex,
+                    conditionalCoverageTargets: cobertura_targets_regex
+                ]
+            ]
             stage("Publish results") {
                 for(String name : publishableItems) {
                     unstash name

@@ -14,7 +14,7 @@
    limitations under the License.
    */
 package net.gleske.jervis.lang
-//the lifecycleGeneratorTest() class automatically sees the lifecycleGenerator() class because they're in the same package
+//the pipelineGeneratorTest() class automatically sees the pipelineGenerator() class because they're in the same package
 import net.gleske.jervis.exceptions.PipelineGeneratorException
 import org.junit.After
 import org.junit.Before
@@ -320,5 +320,160 @@ class pipelineGeneratorTest extends GroovyTestCase {
         def pipeline_generator = new pipelineGenerator(generator)
         pipeline_generator.supported_collections = ['artifacts']
         assert [] == pipeline_generator.publishableItems
+    }
+    @Test public void test_pipelineGenerator_getPublishable_with_collect_settings_validation1() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    fake:
+            |      path: some/path
+            |      validateme: Only capitalization ending with a period.
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_defaults = [
+            fake: [
+                validateme: 'Some bad input was given.'
+            ]
+        ]
+        //define the validator to validate jenkins.collect.fake.validateme setting
+        pipeline_generator.collect_settings_validation = [
+            fake: [
+                validateme: '^[A-Z][ a-z]+\\.$'
+            ]
+        ]
+        assert 'Only capitalization ending with a period.' == pipeline_generator.getPublishable('fake')['validateme']
+    }
+    @Test public void test_pipelineGenerator_getPublishable_with_collect_settings_validation2() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    fake:
+            |      path: some/path
+            |      validateme: 0123abcdef
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_defaults = [
+            fake: [
+                validateme: 'Some bad input was given.'
+            ]
+        ]
+        //define the validator to validate jenkins.collect.fake.validateme setting
+        pipeline_generator.collect_settings_validation = [
+            fake: [
+                validateme: ['^[A-Z][ a-z]+\\.$', '^[a-f0-9]+$']
+            ]
+        ]
+        //validate a hex value as an option in addition to capitalized sentences
+        assert '0123abcdef' == pipeline_generator.getPublishable('fake')['validateme']
+    }
+    @Test public void test_pipelineGenerator_getPublishable_with_collect_settings_validation_user_failure() {
+        //should return a default if a user fails validation
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    fake:
+            |      path: some/path
+            |      validateme: hello world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_defaults = [
+            fake: [
+                validateme: 'Some bad input was given.'
+            ]
+        ]
+        //define the validator to validate jenkins.collect.fake.validateme setting
+        pipeline_generator.collect_settings_validation = [
+            fake: [
+                validateme: '^[A-Z][ a-z]+\\.$'
+            ]
+        ]
+        assert 'Some bad input was given.' == pipeline_generator.getPublishable('fake')['validateme']
+    }
+    @Test public void test_pipelineGenerator_getPublishable_with_collect_settings_validation_admin_failure1() {
+        //throw a hard exception because admin failing is irrecoverable
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    fake:
+            |      path: some/path
+            |      validateme: 0123abcdef
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_defaults = [
+            fake: [
+                validateme: 'Some bad input was given.'
+            ]
+        ]
+        //admin defined invalid type
+        pipeline_generator.collect_settings_validation = [
+            fake: [
+                validateme: 3
+            ]
+        ]
+        shouldFail(PipelineGeneratorException) {
+            pipeline_generator.getPublishable('fake')
+        }
+    }
+    @Test public void test_pipelineGenerator_getPublishable_with_collect_settings_validation_admin_failure2() {
+        //throw a hard exception because admin failing is irrecoverable
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    fake:
+            |      path: some/path
+            |      validateme: 0123abcdef
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_defaults = [
+            fake: [
+                validateme: 'Some bad input was given.'
+            ]
+        ]
+        //admin defined invalid type
+        pipeline_generator.collect_settings_validation = [
+            fake: [
+                validateme: ['hello', 3]
+            ]
+        ]
+        shouldFail(PipelineGeneratorException) {
+            pipeline_generator.getPublishable('fake')
+        }
+    }
+    @Test public void test_pipelineGenerator_getPublishable_with_collect_settings_validation_admin_failure3() {
+        //throw a hard exception because admin failing is irrecoverable
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    fake:
+            |      path: some/path
+            |      validateme: 36
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_defaults = [
+            fake: [
+                validateme: 45
+            ]
+        ]
+        pipeline_generator.collect_settings_validation = [
+            fake: [
+                validateme: 'oops, cannot validate an int with a string'
+            ]
+        ]
+        //atempted to run string validation on an int (an admin error)
+        shouldFail(PipelineGeneratorException) {
+            pipeline_generator.getPublishable('fake')
+        }
     }
 }

@@ -15,6 +15,7 @@
    */
 package net.gleske.jervis.lang
 
+import java.util.regex.Pattern
 import net.gleske.jervis.exceptions.PipelineGeneratorException
 import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
@@ -98,11 +99,23 @@ class pipelineGenerator implements Serializable {
     Map collect_settings_defaults = [:]
 
     /**
+      This is a <tt>Map</tt> of validation for settings defined in the YAML key
+      <tt>jenkins.collect</tt>.  Sometimes, when specifying plugins validation
+      of values is required.  Validation of values can take the form of a list
+      of acceptable regex patterns or a single regex pattern to validate what
+      the user defined.  Some settings, an admin may desire, to limit user
+      input if it's a String value.  Validation can only be defined for
+      Strings.
+     */
+    Map collect_settings_validation = [:]
+
+    /**
       Some settings defined in <tt>{@link #collect_settings_defaults}</tt> support
       <a href="http://ant.apache.org/manual/Types/fileset.html" target=_blank>Ant filesets</a>
       and this <tt>Map</tt> adds support for those settings.
      */
     Map collect_settings_filesets = [:]
+
 
     /**
       This holds the user defined jenkins.collect item maps so we don't have to reference them.
@@ -297,6 +310,38 @@ class pipelineGenerator implements Serializable {
     }
 
     /**
+      Check to see if user input is valid when a customized collction is defined.
+
+      @param item The "jenkins &gt; collect" YAML key to check; e.g.
+                  <tt>artifact</tt>.
+      @param setting The setting of the collected item to validate against.
+      @param input   User input defined by an end user in their Jervis YAML.
+      @return        Returns <tt>true</tt> if an admin hasn't defined any
+                     validation.  Returns <tt>true</tt> if an admin defined a
+                     validation method and the user passed validation.  Returns
+                     <tt>false</tt> if the admin defined input validation and
+                     the user input failed to pass it.
+      */
+    private boolean isCollectUserInputValid(String item, String setting, def input) {
+        if((item in collect_settings_validation) && (setting in collect_settings_validation[item])) {
+            def validator = collect_settings_validation[item][setting]
+            if((!(validator in  String) && !(validator in List)) ||
+                    ((validator in List) && (false in validator.collect { it in String }))) {
+                throw new PipelineGeneratorException("Global shared pipeline library Admin did not properly define collect_settings_validation for key ${item}.${setting}.  It must be a String or List of Strings.  This is an invalid configuration in the global shared pipeline library in collect_settings_validation.")
+            }
+            if(!(input in String)) {
+                throw new PipelineGeneratorException("Global pipeline library Admin has not properly matched validation for key ${item}.${setting}.  Admin is attempting to validate a type that isn't a String.  This is an invalid configuration in the global shared pipeline library in collect_settings_validation.")
+            }
+            //Admin has properly defined settings so let's proceed with validating the value provided by the user.
+            String regex = (validator in List)? validator.join('|') : validator
+            Pattern.compile(regex).matcher(input).matches()
+        }
+        else {
+            true
+        }
+    }
+
+    /**
       Get a publishable item from the list of publishable items.  The end
       result could be a String or a Map.
 
@@ -316,6 +361,10 @@ class pipelineGenerator implements Serializable {
                     if(!setting) {
                         setting = v
                     }
+                }
+                //check if user input matches admin required format (if any)
+                if(!isCollectUserInputValid(item, k, setting)) {
+                    setting = v
                 }
                 [(k): setting]
             }.sum()

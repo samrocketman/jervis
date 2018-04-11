@@ -12,6 +12,13 @@ them.  The following migration path is recommended:
   after disabling them.  Review what was disabled before running
   [delete-freestyle-jobs][fs-migrate-2] Script Console script.
 
+#### New features:
+
+- Admins can now define user input validation (or fall back to a default) on
+  `jenkins.collect` publishers.  For more complicated string input for settings
+  which requires a specific format.  This is to optionally protect users from
+  accidentally defining an incorrect setting and breaking their builds.
+
 #### Bug fixes:
 
 - Fixes critical bug where users who do not define collecting any artifacts in
