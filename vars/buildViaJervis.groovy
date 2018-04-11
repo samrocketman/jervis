@@ -307,6 +307,11 @@ def call() {
                     onlyStable: false,
                     sourceEncoding: 'ASCII',
                     zoomCoverageChart: false
+                ],
+                junit: [
+                    allowEmptyResults: false,
+                    healthScaleFactor: 1.0,
+                    keepLongStdio: false
                 ]
             ]
             pipeline_generator.collect_settings_filesets = [artifacts: ['excludes']]
@@ -339,7 +344,11 @@ def call() {
                             ])
                             break
                         case 'junit':
-                            junit item
+                            junit allowEmptyResults: item['allowEmptyResults'],
+                                  healthScaleFactor: item['healthScaleFactor'],
+                                  keepLongStdio: item['keepLongStdio'],
+                                  testResults: item['path']
+
                             break
                     }
                 }

@@ -34,6 +34,7 @@ them.  The following migration path is recommended:
 
 - Feature: failed unit tests are now properly exposed.
 - Feature: Cobertura report collection can now be customized for enforcement.
+- Feature: JUnit report collection can now be fully customized.
 - Bugfix: Pull request builds no longer worked after upgrading plugins.  This is
   now fixed.
 
