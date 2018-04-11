@@ -22,8 +22,15 @@ them.  The following migration path is recommended:
 - Since pipelines are now fully supported the configuring views for jobs no
   longer make sense.  Configuring views has been removed.
 - Bugfix branch filters not working.
+- `Jenkinsfile` is no longer referenced in the repository.  It is loaded by
+  Jervis pipeline DSL scripts.  Jenkins jobs now load a default `Jenkinsfile`
+  provided by the plugins [Multibranch: Pipeline with defaults][mpwd] and
+  [Config File Provider][cfp].
 
-#### Pipeline DSL scripts changes in the `vars` folder:
+[mpwd]: https://plugins.jenkins.io/pipeline-multibranch-defaults
+[cfp]: https://plugins.jenkins.io/config-file-provider
+
+#### Pipeline DSL scripts changes in the `vars/` folder:
 
 - Feature: failed unit tests are now properly exposed.
 - Feature: Cobertura report collection can now be customized for enforcement.
@@ -105,7 +112,7 @@ scripts.
   script libraries.
 - New `pipelineGenerator` class is available for use in scripts.
 
-#### Pipeline DSL scripts changes in the `vars` folder:
+#### Pipeline DSL scripts changes in the `vars/` folder:
 
 - Added an example pipeline global shared library to `resources/` and `vars/`.
 - New `pipelineGenerator` class is available for use in scripts.
