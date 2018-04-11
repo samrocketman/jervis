@@ -301,12 +301,16 @@ def call() {
                 cobertura: [
                     autoUpdateHealth: false,
                     autoUpdateStability: false,
+                    failNoReports: false,
                     failUnhealthy: false,
                     failUnstable: false,
                     maxNumberOfBuilds: 0,
                     onlyStable: false,
                     sourceEncoding: 'ASCII',
-                    zoomCoverageChart: false
+                    zoomCoverageChart: false,
+                    methodCoverageTargets: '80, 0, 0',
+                    lineCoverageTargets: '80, 0, 0',
+                    conditionalCoverageTargets: '70, 0, 0'
                 ],
                 junit: [
                     allowEmptyResults: false,
@@ -330,18 +334,19 @@ def call() {
                                              caseSensitive: item['caseSensitive']
                             break
                         case 'cobertura':
-                            step([
-                                    $class: 'CoberturaPublisher',
+                            cobertura coberturaReportFile: item['path'],
                                     autoUpdateHealth: item['autoUpdateHealth'],
                                     autoUpdateStability: item['autoUpdateStability'],
-                                    coberturaReportFile: item['path'],
+                                    failNoReports: item['failNoReports'],
                                     failUnhealthy: item['failUnhealthy'],
                                     failUnstable: item['failUnstable'],
                                     maxNumberOfBuilds: item['maxNumberOfBuilds'],
                                     onlyStable: item['onlyStable'],
                                     sourceEncoding: item['sourceEncoding'],
-                                    zoomCoverageChart: item['zoomCoverageChart']
-                            ])
+                                    zoomCoverageChart: item['zoomCoverageChart'],
+                                    methodCoverageTargets: item['methodCoverageTargets'],
+                                    lineCoverageTargets: item['lineCoverageTargets'],
+                                    conditionalCoverageTargets: item['conditionalCoverageTargets']
                             break
                         case 'junit':
                             junit allowEmptyResults: item['allowEmptyResults'],
