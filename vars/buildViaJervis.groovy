@@ -313,22 +313,43 @@ def call() {
                     lineCoverageTargets: '80, 0, 0',
                     conditionalCoverageTargets: '70, 0, 0'
                 ],
+                html: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    includes: '**/*',
+                    keepAll: false,
+                    reportFiles: 'index.html',
+                    reportName: 'HTML Report',
+                    reportTitles: ''
+                ],
                 junit: [
                     allowEmptyResults: false,
                     healthScaleFactor: 1.0,
                     keepLongStdio: false
                 ]
             ]
+            //admin requiring stashes for HTML publisher to be formed a compatible way.
+            pipeline_generator.stashmap_preprocessor = [
+                html: { Map settings ->
+                    settings['includes']?.tokenize(',').collect {
+                        "${settings['path']  -~ '/$' -~ '^/'}/${it}"
+                    }.join(',').toString()
+                }
+            ]
             //admin supporting optional list or string for filesets in default settings
-            pipeline_generator.collect_settings_filesets = [artifacts: ['excludes']]
+            pipeline_generator.collect_settings_filesets = [artifacts: ['excludes'], html: ['includes']]
             //admin requiring regex validation of specific jenkins.collect setinggs
             //if a user fails the input validation it falls back to the default option
+            //if an invalid path is specified for HTML publisher then do not attempt to collect
             String cobertura_targets_regex = '([0-9]*\\.?[0-9]*,? *){3}[^,]$'
             pipeline_generator.collect_settings_validation = [
                 cobertura: [
                     methodCoverageTargets: cobertura_targets_regex,
                     lineCoverageTargets: cobertura_targets_regex,
                     conditionalCoverageTargets: cobertura_targets_regex
+                ],
+                html: [
+                    path: '''^[^,\\:*?"'<>|]+$'''
                 ]
             ]
             stage("Publish results") {
@@ -359,6 +380,16 @@ def call() {
                                     methodCoverageTargets: item['methodCoverageTargets'],
                                     lineCoverageTargets: item['lineCoverageTargets'],
                                     conditionalCoverageTargets: item['conditionalCoverageTargets']
+                            break
+                        case 'html':
+                            publishHTML allowMissing: item['allowMissing'],
+                                        alwaysLinkToLastBuild: item['alwaysLinkToLastBuild'],
+                                        includes: item['includes'],
+                                        keepAll: item['keepAll'],
+                                        reportDir: item['path'],
+                                        reportFiles: item['reportFiles'],
+                                        reportName: item['reportName'],
+                                        reportTitles: item['reportTitles']
                             break
                         case 'junit':
                             junit allowEmptyResults: item['allowEmptyResults'],
