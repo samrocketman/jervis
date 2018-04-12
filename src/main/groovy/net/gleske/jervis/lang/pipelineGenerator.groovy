@@ -141,7 +141,7 @@ generator.loadYamlString(yaml)
 def pipeline_generator = new pipelineGenerator(generator)
 pipeline_generator.supported_collections = ['html']
 pipeline_generator.collect_settings_filesets = [html: ['includes']]
-pipeline_generator.collect_settings_defaults = [html: [includes: '**/*']]
+pipeline_generator.collect_settings_defaults = [html: [includes: 'foo']]
 pipeline_generator.collect_settings_validation = [html: [path: '''^[^,\\:*?"'<>|]+$''']]
 pipeline_generator.stashmap_preprocessor = [
     html: { Map settings ->
@@ -151,9 +151,8 @@ pipeline_generator.stashmap_preprocessor = [
     }
 ]
 
-pipeline_generator.stashMap['html']['includes']
-//should return "build/docs/groovydoc/**/*"</tt></pre>
-
+//should return "build/docs/groovydoc/foo"
+pipeline_generator.stashMap['html']['includes']</tt></pre>
      */
     Map stashmap_preprocessor = [:]
 
