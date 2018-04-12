@@ -476,4 +476,21 @@ class pipelineGeneratorTest extends GroovyTestCase {
             pipeline_generator.getPublishable('fake')
         }
     }
+    @Test public void test_pipelineGenerator_getPublishable_bug_invalid_default_fileset() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    fake: some/path
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_filesets = [fake: ['anotherpath']]
+        pipeline_generator.collect_settings_defaults = [
+            fake: [
+                anotherpath: '**/*'
+            ]
+        ]
+        assert '**/*' == pipeline_generator.getPublishable('fake')['anotherpath']
+    }
 }

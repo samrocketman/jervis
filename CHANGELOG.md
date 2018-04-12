@@ -23,6 +23,9 @@ them.  The following migration path is recommended:
 
 - Fixes critical bug where users who do not define collecting any artifacts in
   YAML will cause their job to fail to build.
+- Fixes critical bug where admins who define default settings as a fileset and a
+  user does not customize it, causes an invalid value to be set as the default
+  instead of the proper default.
 
 #### Job DSL scripts changes in the `jobs/` folder:
 
