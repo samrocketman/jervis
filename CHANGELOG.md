@@ -18,6 +18,10 @@ them.  The following migration path is recommended:
   `jenkins.collect` publishers.  For more complicated string input for settings
   which requires a specific format.  This is to optionally protect users from
   accidentally defining an incorrect setting and breaking their builds.
+  Validation also works on the default user field which means if a user does not
+  pass validation, then their publisher is simply skipped.
+- Admins can preprocess stashmaps for publishers so that more complex stashing
+  can occur if a plugin for publishing results requires it.
 
 #### Bug fixes:
 
