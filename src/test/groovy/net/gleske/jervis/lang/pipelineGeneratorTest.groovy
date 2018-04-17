@@ -611,8 +611,10 @@ class pipelineGeneratorTest extends GroovyTestCase {
         '''.stripMargin().trim()
         generator.loadYamlString(yaml)
         def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['html']
         pipeline_generator.collect_settings_validation = [html: [path: '''^[^,\\:*?"'<>|]+$''']]
         assert 'foo/bar' == pipeline_generator.getPublishable('html')
+        assert ['html'] == pipeline_generator.publishableItems
     }
     @Test public void test_pipelineGenerator_getPublishable_validate_basic_path_fail() {
         String yaml = '''
@@ -625,9 +627,11 @@ class pipelineGeneratorTest extends GroovyTestCase {
         '''.stripMargin().trim()
         generator.loadYamlString(yaml)
         def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['html']
         pipeline_generator.collect_settings_validation = [html: [path: '''^[^,\\:*?"'<>|]+$''']]
         assert '' == pipeline_generator.getPublishable('html')
         assert [:] == pipeline_generator.stashMap
+        assert [] == pipeline_generator.publishableItems
     }
     @Test public void test_pipelineGenerator_getPublishable_validate_complex_path_success() {
         String yaml = '''
@@ -643,8 +647,10 @@ class pipelineGeneratorTest extends GroovyTestCase {
                 anotherpath: '**/*'
             ]
         ]
+        pipeline_generator.supported_collections = ['html']
         pipeline_generator.collect_settings_validation = [html: [path: '''^[^,\\:*?"'<>|]+$''']]
         assert 'foo/bar' == pipeline_generator.getPublishable('html')['path']
+        assert ['html'] == pipeline_generator.publishableItems
     }
     @Test public void test_pipelineGenerator_getPublishable_validate_complex_path_fail() {
         String yaml = '''
@@ -663,7 +669,9 @@ class pipelineGeneratorTest extends GroovyTestCase {
             ]
         ]
         pipeline_generator.collect_settings_validation = [html: [path: '''^[^,\\:*?"'<>|]+$''']]
+        pipeline_generator.supported_collections = ['html']
         assert [:] == pipeline_generator.getPublishable('html')
         assert [:] == pipeline_generator.stashMap
+        assert [] == pipeline_generator.publishableItems
     }
 }

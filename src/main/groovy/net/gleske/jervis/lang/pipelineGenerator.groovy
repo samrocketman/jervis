@@ -382,8 +382,7 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
         if(!supported_collections) {
             throw new PipelineGeneratorException('Calling getPublishableItems() without setting supported_collections.  This issue can only be resolved by an admin of the pipeline shared library.')
         }
-        (supported_collections.intersect(known_items) as List).sort()
-        //(supported_collections.intersect(known_items) as List).findAll { getPubishable(it) as Boolean }.sort()
+        (supported_collections.intersect(known_items) as List).findAll { getPublishable(it) as Boolean }.sort()
     }
 
     /**
