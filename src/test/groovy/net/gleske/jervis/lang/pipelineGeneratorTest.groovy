@@ -629,4 +629,41 @@ class pipelineGeneratorTest extends GroovyTestCase {
         assert '' == pipeline_generator.getPublishable('html')
         assert [:] == pipeline_generator.stashMap
     }
+    @Test public void test_pipelineGenerator_getPublishable_validate_complex_path_success() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    html: 'foo/bar'
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_defaults = [
+            html: [
+                anotherpath: '**/*'
+            ]
+        ]
+        pipeline_generator.collect_settings_validation = [html: [path: '''^[^,\\:*?"'<>|]+$''']]
+        assert 'foo/bar' == pipeline_generator.getPublishable('html')['path']
+    }
+    @Test public void test_pipelineGenerator_getPublishable_validate_complex_path_fail() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    html:
+            |      - 'foo'
+            |      - 'bar'
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_defaults = [
+            html: [
+                anotherpath: '**/*'
+            ]
+        ]
+        pipeline_generator.collect_settings_validation = [html: [path: '''^[^,\\:*?"'<>|]+$''']]
+        assert [:] == pipeline_generator.getPublishable('html')
+        assert [:] == pipeline_generator.stashMap
+    }
 }
