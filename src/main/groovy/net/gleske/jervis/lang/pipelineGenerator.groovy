@@ -241,20 +241,6 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
             //append the items to collect to the end of the list of stashes (overrides prior entries)
             this.stashes += this.collect_items.collect { k, v ->
                 [name: k, includes: v]
-                /*
-                if((k in stashmap_preprocessor) && (getPublishable(k) in Map)) {
-                    if(!(value in String)) {
-                        throw new PipelineGeneratorException("stashmap_preprocessor for collect item '${k}' must return a String but does not.  This issue can only be resolved by an admin of the pipeline shared library.")
-                    }
-                    println "value is ${value}"
-                    return [
-                        name: k,
-                        includes: value,
-                    ]
-                }
-                else {
-                    return [name: k, includes: v]
-                }*/
             }
         }
     }
@@ -316,21 +302,21 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
                     getObjectValue(s, 'includes', '') &&
                     (!isMatrix || getObjectValue(s, 'matrix_axis', [:])) &&
                     (!isMatrix || (getObjectValue(s, 'matrix_axis', [:]) == convertMatrixAxis(matrix_axis)))) {
-                    String name = getObjectValue(s, 'name', '')
-                    String includes = getObjectValue(s, 'includes', '')
-                    if((name in stashmap_preprocessor) && (getPublishable(name) in Map)) {
-                        def result
-                        try {
-                            result = stashmap_preprocessor[name](getPublishable(name))
-                        }
-                        catch(Exception e) {
-                            throw new PipelineGeneratorException("stashmap_preprocessor for collect item '${name}' must return a String but does not.  This issue can only be resolved by an admin of the pipeline shared library.\nSTART Preprocessor Exception:\n${e.toString()}\n    ${e.getStackTrace()*.toString().join('\n    ')}\n\nEND Preprocessor Exception")
-                        }
-                        if(!(result in String)) {
-                            throw new PipelineGeneratorException("stashmap_preprocessor for collect item '${name}' must return a String but does not.  This issue can only be resolved by an admin of the pipeline shared library.")
-                        }
-                        includes = result
+                String name = getObjectValue(s, 'name', '')
+                String includes = getObjectValue(s, 'includes', '')
+                if((name in stashmap_preprocessor) && (getPublishable(name) in Map)) {
+                    def result
+                    try {
+                        result = stashmap_preprocessor[name](getPublishable(name))
                     }
+                    catch(Exception e) {
+                        throw new PipelineGeneratorException("stashmap_preprocessor for collect item '${name}' must return a String but does not.  This issue can only be resolved by an admin of the pipeline shared library.\nSTART Preprocessor Exception:\n${e.toString()}\n    ${e.getStackTrace()*.toString().join('\n    ')}\n\nEND Preprocessor Exception")
+                    }
+                    if(!(result in String)) {
+                        throw new PipelineGeneratorException("stashmap_preprocessor for collect item '${name}' must return a String but does not.  This issue can only be resolved by an admin of the pipeline shared library.")
+                    }
+                    includes = result
+                }
                 stash_map[name] = [
                     'includes': includes,
                     'excludes': getObjectValue(s, 'excludes', ''),
