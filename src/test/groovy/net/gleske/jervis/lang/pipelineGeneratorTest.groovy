@@ -552,4 +552,29 @@ class pipelineGeneratorTest extends GroovyTestCase {
         assert '**/*' == pipeline_generator.getPublishable('fake')['anotherpath']
         assert '' == pipeline_generator.getPublishable('boo')
     }
+    @Test public void test_pipelineGenerator_getPublishable_stashmap_preprocessor_invalid_return() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    fake: some/path
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_defaults = [
+            fake: [
+                anotherpath: '**/*'
+            ]
+        ]
+        //return invalid
+        pipeline_generator.stashmap_preprocessor = [
+            fake: { Map settings ->
+                true
+            }
+        ]
+        //when preprocessor returns a non-String result,
+        shouldFail(PipelineGeneratorException) {
+            pipeline_generator.stashMap
+        }
+    }
 }
