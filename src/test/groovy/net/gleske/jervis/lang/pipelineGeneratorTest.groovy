@@ -577,4 +577,29 @@ class pipelineGeneratorTest extends GroovyTestCase {
             pipeline_generator.stashMap
         }
     }
+    @Test public void test_pipelineGenerator_getPublishable_stashmap_preprocessor_exception() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    fake: some/path
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_defaults = [
+            fake: [
+                anotherpath: '**/*'
+            ]
+        ]
+        //return invalid
+        pipeline_generator.stashmap_preprocessor = [
+            fake: { Map settings ->
+                throw new Exception('oops, admin wrote buggy code')
+            }
+        ]
+        //when preprocessor throws an exception,
+        shouldFail(PipelineGeneratorException) {
+            pipeline_generator.stashMap
+        }
+    }
 }
