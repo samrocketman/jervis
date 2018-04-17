@@ -493,7 +493,7 @@ class pipelineGeneratorTest extends GroovyTestCase {
         ]
         assert '**/*' == pipeline_generator.getPublishable('fake')['anotherpath']
     }
-    @Test public void test_pipelineGenerator_getPublishable_stashmap_preprocessor_badargs() {
+    @Test public void test_pipelineGenerator_stashmap_preprocessor_badargs() {
         String yaml = '''
             |language: java
             |jenkins:
@@ -528,7 +528,7 @@ class pipelineGeneratorTest extends GroovyTestCase {
         assert 'some/path' == pipeline_generator.stashMap['fake']['includes']
         assert '' == pipeline_generator.getPublishable('boo')
     }
-    @Test public void test_pipelineGenerator_getPublishable_stashmap_preprocessor_badargs2() {
+    @Test public void test_pipelineGenerator_stashmap_preprocessor_badargs2() {
         String yaml = '''
             |language: java
             |jenkins:
@@ -552,7 +552,7 @@ class pipelineGeneratorTest extends GroovyTestCase {
         assert '**/*' == pipeline_generator.getPublishable('fake')['anotherpath']
         assert '' == pipeline_generator.getPublishable('boo')
     }
-    @Test public void test_pipelineGenerator_getPublishable_stashmap_preprocessor_invalid_return() {
+    @Test public void test_pipelineGenerator_stashmap_preprocessor_invalid_return() {
         String yaml = '''
             |language: java
             |jenkins:
@@ -577,7 +577,7 @@ class pipelineGeneratorTest extends GroovyTestCase {
             pipeline_generator.stashMap
         }
     }
-    @Test public void test_pipelineGenerator_getPublishable_stashmap_preprocessor_exception() {
+    @Test public void test_pipelineGenerator_stashmap_preprocessor_exception() {
         String yaml = '''
             |language: java
             |jenkins:
@@ -601,5 +601,19 @@ class pipelineGeneratorTest extends GroovyTestCase {
         shouldFail(PipelineGeneratorException) {
             pipeline_generator.stashMap
         }
+    }
+    @Test public void test_pipelineGenerator_getPublishable_validate_path_success() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    html:
+            |      - 'foo'
+            |      - 'bar'
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_validation = [html: [path: '''^[^,\\:*?"'<>|]+$''']]
+        assert '' == pipeline_generator.getPublishable('html')
     }
 }

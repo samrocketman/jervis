@@ -449,7 +449,7 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
             return isCollectUserInputValid(item, 'path', path)? tmp : [:]
         }
         else {
-            return path
+            return isCollectUserInputValid(item, 'path', path)? path : ''
         }
     }
 }
