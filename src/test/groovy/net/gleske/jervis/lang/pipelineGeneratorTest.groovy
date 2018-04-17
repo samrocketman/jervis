@@ -493,4 +493,63 @@ class pipelineGeneratorTest extends GroovyTestCase {
         ]
         assert '**/*' == pipeline_generator.getPublishable('fake')['anotherpath']
     }
+    @Test public void test_pipelineGenerator_getPublishable_stashmap_preprocessor_badargs() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    fake: some/path
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.stashmap_preprocessor = [
+            baz: { ->
+                'delet dis'
+            },
+            fake: { Map settings ->
+                'keep dis'
+            },
+            bar: { Map settings, String extra ->
+                'delet dis'
+            },
+            boz: { String wrong ->
+                'delet dis'
+            },
+            boo: { Map another ->
+                'also keep dis'
+            }
+        ]
+        assert !('baz' in pipeline_generator.stashmap_preprocessor)
+        assert !('bar' in pipeline_generator.stashmap_preprocessor)
+        assert !('boz' in pipeline_generator.stashmap_preprocessor)
+        assert ('fake' in pipeline_generator.stashmap_preprocessor)
+        assert ('boo' in pipeline_generator.stashmap_preprocessor)
+        assert 'some/path' == pipeline_generator.getPublishable('fake')
+        assert 'some/path' == pipeline_generator.stashMap['fake']['includes']
+        assert '' == pipeline_generator.getPublishable('boo')
+    }
+    @Test public void test_pipelineGenerator_getPublishable_stashmap_preprocessor_badargs2() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    fake: some/path
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.collect_settings_defaults = [
+            fake: [
+                anotherpath: '**/*'
+            ]
+        ]
+        pipeline_generator.stashmap_preprocessor = [
+            fake: { Map settings ->
+                'keep dis'
+            }
+        ]
+        assert 'some/path' == pipeline_generator.getPublishable('fake')['path']
+        assert 'keep dis' == pipeline_generator.stashMap['fake']['includes']
+        assert '**/*' == pipeline_generator.getPublishable('fake')['anotherpath']
+        assert '' == pipeline_generator.getPublishable('boo')
+    }
 }
