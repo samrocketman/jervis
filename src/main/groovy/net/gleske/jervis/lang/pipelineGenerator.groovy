@@ -436,9 +436,6 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
                     if(k in (user_defined_collect_settings[item]?: [:])) {
                         setting = processCollectValue(getObjectValue((user_defined_collect_settings[item])?: [:], k, new Object()), k)
                     }
-                    if(!setting) {
-                        setting = v
-                    }
                 }
                 //check if user input matches admin required format (if any)
                 if(!isCollectUserInputValid(item, k, setting)) {
