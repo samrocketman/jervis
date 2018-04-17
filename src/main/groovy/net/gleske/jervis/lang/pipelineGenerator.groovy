@@ -317,13 +317,15 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
                     }
                     includes = result
                 }
-                stash_map[name] = [
-                    'includes': includes,
-                    'excludes': getObjectValue(s, 'excludes', ''),
-                    'use_default_excludes': getObjectValue(s, 'use_default_excludes', true),
-                    'allow_empty': getObjectValue(s, 'allow_empty', false),
-                    'matrix_axis': getObjectValue(s, 'matrix_axis', [:])
+                if(isCollectUserInputValid(name, 'path', includes)) {
+                    stash_map[name] = [
+                        'includes': includes,
+                        'excludes': getObjectValue(s, 'excludes', ''),
+                        'use_default_excludes': getObjectValue(s, 'use_default_excludes', true),
+                        'allow_empty': getObjectValue(s, 'allow_empty', false),
+                        'matrix_axis': getObjectValue(s, 'matrix_axis', [:])
                     ]
+                }
             }
         }
         stash_map
