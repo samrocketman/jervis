@@ -16,11 +16,11 @@ env:
   # Latest Groovy 2.4.x stable
   - GROOVY_VERSION="2.4.13"
   # Next Groovy 2.5.x release
-  - GROOVY_VERSION="2.5.0-beta-1"
+  - GROOVY_VERSION="2.5.0-rc-1"
 
 matrix:
   allow_failures:
-    - env: GROOVY_VERSION="2.5.0-beta-1"
+    - env: GROOVY_VERSION="2.5.0-rc-1"
 
 branches:
   only:
