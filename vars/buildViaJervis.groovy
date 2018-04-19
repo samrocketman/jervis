@@ -156,7 +156,12 @@ String printDecryptedProperties(lifecycleGenerator generator, String credentials
 /**
   Process default publishable items provided by this script.
  */
-def processDefaultPublishable(def item, String publishable) {
+def processDefaultPublishable(def item, String publishable, boolean is_pull_request) {
+    if(is_pull_request && ('skip_on_pr' in item) && (item['skip_on_pr'] in Boolean) && item['skip_on_pr']) {
+        echo "Skip publishing ${publishable} for pull request."
+        //skip because we shouldn't publish on a pull request
+        return
+    }
     switch(publishable) {
         case 'artifacts':
             archiveArtifacts artifacts: item['path'], fingerprint: true,
@@ -196,6 +201,18 @@ def processDefaultPublishable(def item, String publishable) {
                   keepLongStdio: item['keepLongStdio'],
                   testResults: item['path']
             break
+    }
+}
+
+/**
+  Gets a library resource.  Either from another library or this one.
+ */
+String loadCustomResource(String resource) {
+    if(hasGlobalVar('adminLibraryResource')) {
+        adminLibraryResource(resource)
+    }
+    else {
+        libraryResource resource
     }
 }
 
@@ -255,18 +272,17 @@ def call() {
 
     stage('Process Jervis YAML') {
         if(hasGlobalVar('adminPreYaml')) {
-            echo 'Processing adminPreYaml'
             adminPreYaml build_meta
         }
-        platforms_json = libraryResource 'platforms.json'
+        platforms_json = loadCustomResource 'platforms.json'
         generator.loadPlatformsString(platforms_json)
         List jervis_metadata = getJervisMetaData("${github_org}/${github_repo}".toString(), BRANCH_NAME)
         jervis_yaml = jervis_metadata[0]
         folder_listing = jervis_metadata[1]
         generator.preloadYamlString(jervis_yaml)
         os_stability = "${generator.label_os}-${generator.label_stability}"
-        lifecycles_json = libraryResource "lifecycles-${os_stability}.json"
-        toolchains_json = libraryResource "toolchains-${os_stability}.json"
+        lifecycles_json = loadCustomResource "lifecycles-${os_stability}.json"
+        toolchains_json = loadCustomResource "toolchains-${os_stability}.json"
         generator.loadLifecyclesString(lifecycles_json)
         generator.loadToolchainsString(toolchains_json)
         generator.loadYamlString(jervis_yaml)
@@ -288,13 +304,12 @@ def call() {
             echo "DECRYPTED PROPERTIES\n${printDecryptedProperties(generator, credentials_id)}"
         }
         //end decrypting secrets
-        script_header = libraryResource "header.sh"
-        script_footer = libraryResource "footer.sh"
+        script_header = loadCustomResource "header.sh"
+        script_footer = loadCustomResource "footer.sh"
         jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
         build_meta['generator'] = generator
         build_meta['pipeline_generator'] = pipeline_generator
         if(hasGlobalVar('adminPostYaml')) {
-            echo 'Processing adminPostYaml'
             adminPostYaml build_meta
         }
     }
@@ -373,75 +388,77 @@ def call() {
         }
         List publishableItems = pipeline_generator.publishableItems
         if(publishableItems) {
-            //admin defining default settings for publishers they support
-            pipeline_generator.collect_settings_defaults = [
-                artifacts: [
-                    allowEmptyArchive: false,
-                    caseSensitive: true,
-                    defaultExcludes: true,
-                    excludes: ''
-                ],
-                cobertura: [
-                    autoUpdateHealth: false,
-                    autoUpdateStability: false,
-                    failNoReports: false,
-                    failUnhealthy: false,
-                    failUnstable: false,
-                    maxNumberOfBuilds: 0,
-                    onlyStable: false,
-                    sourceEncoding: 'ASCII',
-                    zoomCoverageChart: false,
-                    methodCoverageTargets: '80, 0, 0',
-                    lineCoverageTargets: '80, 0, 0',
-                    conditionalCoverageTargets: '70, 0, 0'
-                ],
-                html: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: false,
-                    includes: '**/*',
-                    keepAll: false,
-                    reportFiles: 'index.html',
-                    reportName: 'HTML Report',
-                    reportTitles: ''
-                ],
-                junit: [
-                    allowEmptyResults: false,
-                    healthScaleFactor: 1.0,
-                    keepLongStdio: false
-                ]
-            ]
-            //admin requiring stashes for HTML publisher to be formed a compatible way.
-            pipeline_generator.stashmap_preprocessor = [
-                html: { Map settings ->
-                    settings['includes']?.tokenize(',').collect {
-                        "${settings['path']  -~ '/$' -~ '^/'}/${it}"
-                    }.join(',').toString()
-                }
-            ]
-            //admin supporting optional list or string for filesets in default settings
-            pipeline_generator.collect_settings_filesets = [artifacts: ['excludes'], html: ['includes']]
-            //admin requiring regex validation of specific jenkins.collect setinggs
-            //if a user fails the input validation it falls back to the default option
-            //if an invalid path is specified for HTML publisher then do not attempt to collect
-            String cobertura_targets_regex = '([0-9]*\\.?[0-9]*,? *){3}[^,]$'
-            pipeline_generator.collect_settings_validation = [
-                cobertura: [
-                    methodCoverageTargets: cobertura_targets_regex,
-                    lineCoverageTargets: cobertura_targets_regex,
-                    conditionalCoverageTargets: cobertura_targets_regex
-                ],
-                html: [
-                    path: '''^[^,\\:*?"'<>|]+$'''
-                ]
-            ]
             stage("Publish results") {
+                //admin defining default settings for publishers they support
+                pipeline_generator.collect_settings_defaults = [
+                    artifacts: [
+                        allowEmptyArchive: false,
+                        caseSensitive: true,
+                        defaultExcludes: true,
+                        excludes: '',
+                        skip_on_pr: true
+                    ],
+                    cobertura: [
+                        autoUpdateHealth: false,
+                        autoUpdateStability: false,
+                        failNoReports: false,
+                        failUnhealthy: false,
+                        failUnstable: false,
+                        maxNumberOfBuilds: 0,
+                        onlyStable: false,
+                        sourceEncoding: 'ASCII',
+                        zoomCoverageChart: false,
+                        methodCoverageTargets: '80, 0, 0',
+                        lineCoverageTargets: '80, 0, 0',
+                        conditionalCoverageTargets: '70, 0, 0'
+                    ],
+                    html: [
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        includes: '**/*',
+                        keepAll: false,
+                        reportFiles: 'index.html',
+                        reportName: 'HTML Report',
+                        reportTitles: ''
+                    ],
+                    junit: [
+                        allowEmptyResults: false,
+                        healthScaleFactor: 1.0,
+                        keepLongStdio: false
+                    ]
+                ]
+                //admin requiring stashes for HTML publisher to be formed a compatible way.
+                pipeline_generator.stashmap_preprocessor = [
+                    html: { Map settings ->
+                        settings['includes']?.tokenize(',').collect {
+                            "${settings['path']  -~ '/$' -~ '^/'}/${it}"
+                        }.join(',').toString()
+                    }
+                ]
+                //admin supporting optional list or string for filesets in default settings
+                pipeline_generator.collect_settings_filesets = [artifacts: ['excludes'], html: ['includes']]
+                //admin requiring regex validation of specific jenkins.collect setinggs
+                //if a user fails the input validation it falls back to the default option
+                //if an invalid path is specified for HTML publisher then do not attempt to collect
+                String cobertura_targets_regex = '([0-9]*\\.?[0-9]*,? *){3}[^,]$'
+                pipeline_generator.collect_settings_validation = [
+                    cobertura: [
+                        methodCoverageTargets: cobertura_targets_regex,
+                        lineCoverageTargets: cobertura_targets_regex,
+                        conditionalCoverageTargets: cobertura_targets_regex
+                    ],
+                    html: [
+                        path: '''^[^,\\:*?"'<>|]+$'''
+                    ]
+                ]
+                //unstash and setup
                 for(String name : publishableItems) {
                     unstash name
                 }
                 for(String publishable : publishableItems) {
                     try {
-                        def item = pipeline_generator.getPublishable(publishable)
-                        processDefaultPublishable(pipeline_generator, publishable)
+                        processDefaultPublishable(pipeline_generator.getPublishable(publishable), publishable, is_pull_request)
+                    }
                     catch(e) {
                         currentBuild.result = 'FAILURE'
                     }
@@ -452,7 +469,10 @@ def call() {
             error 'This build has failed.  No user-defined pipelines will be run.'
         }
         boolean allow_user_pipelines = true
-        if(generator.isPipelineJob()) {
+        if(hasGlobalVar('adminAllowUserPipelinesBoolean')) {
+            allow_user_pipelines = adminAllowUserPipelinesBoolean() as boolean
+        }
+        if(generator.isPipelineJob() && allow_user_pipelines) {
             if(generator.isMatrixBuild()) {
                 stage("Checkout Jenkinsfile") {
                     checkout global_scm
