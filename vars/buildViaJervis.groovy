@@ -23,11 +23,23 @@ import net.gleske.jervis.lang.pipelineGenerator
 import net.gleske.jervis.remotes.GitHub
 import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
+import hudson.ExtensionList
 import hudson.console.HyperlinkNote
 import hudson.util.Secret
 import jenkins.bouncycastle.api.PEMEncodable
 import jenkins.model.Jenkins
+import org.jenkinsci.plugins.workflow.libs.LibraryAdder
 import static jenkins.bouncycastle.api.PEMEncodable.decode
+
+/**
+  Check if a global library provides a var.  Useful for providing optional
+  functionality provided by other global libraries (only if they are defined).
+ */
+
+@NonCPS
+boolean hasGlobalVar(String var) {
+    var in  ExtensionList.lookup(LibraryAdder.GlobalVars.class)[0].forRun(currentBuild.rawBuild)*.name
+}
 
 
 /**
@@ -141,6 +153,52 @@ String printDecryptedProperties(lifecycleGenerator generator, String credentials
     ].join('\n') as String
 }
 
+/**
+  Process default publishable items provided by this script.
+ */
+def processDefaultPublishable(def item, String publishable) {
+    switch(publishable) {
+        case 'artifacts':
+            archiveArtifacts artifacts: item['path'], fingerprint: true,
+                             excludes: item['excludes'],
+                             allowEmptyArchive: item['allowEmptyArchive'],
+                             defaultExcludes: item['defaultExcludes'],
+                             caseSensitive: item['caseSensitive']
+            break
+        case 'cobertura':
+            cobertura coberturaReportFile: item['path'],
+                      autoUpdateHealth: item['autoUpdateHealth'],
+                      autoUpdateStability: item['autoUpdateStability'],
+                      failNoReports: item['failNoReports'],
+                      failUnhealthy: item['failUnhealthy'],
+                      failUnstable: item['failUnstable'],
+                      maxNumberOfBuilds: item['maxNumberOfBuilds'],
+                      onlyStable: item['onlyStable'],
+                      sourceEncoding: item['sourceEncoding'],
+                      zoomCoverageChart: item['zoomCoverageChart'],
+                      methodCoverageTargets: item['methodCoverageTargets'],
+                      lineCoverageTargets: item['lineCoverageTargets'],
+                      conditionalCoverageTargets: item['conditionalCoverageTargets']
+            break
+        case 'html':
+            publishHTML allowMissing: item['allowMissing'],
+                        alwaysLinkToLastBuild: item['alwaysLinkToLastBuild'],
+                        includes: item['includes'],
+                        keepAll: item['keepAll'],
+                        reportDir: item['path'],
+                        reportFiles: item['reportFiles'],
+                        reportName: item['reportName'],
+                        reportTitles: item['reportTitles']
+            break
+        case 'junit':
+            junit allowEmptyResults: item['allowEmptyResults'],
+                  healthScaleFactor: item['healthScaleFactor'],
+                  keepLongStdio: item['keepLongStdio'],
+                  testResults: item['path']
+            break
+    }
+}
+
 
 /**
   The main method of buildViaJervis()
@@ -160,6 +218,7 @@ def call() {
     String script_footer
     String script_header
     String toolchains_json
+    Map build_meta = [:]
     List folder_listing = []
     BRANCH_NAME = env.CHANGE_BRANCH?:env.BRANCH_NAME
     boolean is_pull_request = (env.CHANGE_ID?:false) as Boolean
@@ -184,7 +243,21 @@ def call() {
 
     def global_scm = scm
 
+    //build metadata to pass on to user defined methods
+    build_meta = [
+        BRANCH_NAME: BRANCH_NAME,
+        env: env,
+        github_domain: github_domain,
+        github_org: github_org,
+        github_repo: github_repo,
+        jenkins_folder: jenkins_folder
+    ]
+
     stage('Process Jervis YAML') {
+        if(hasGlobalVar('adminPreYaml')) {
+            echo 'Processing adminPreYaml'
+            adminPreYaml build_meta
+        }
         platforms_json = libraryResource 'platforms.json'
         generator.loadPlatformsString(platforms_json)
         List jervis_metadata = getJervisMetaData("${github_org}/${github_repo}".toString(), BRANCH_NAME)
@@ -209,12 +282,21 @@ def call() {
         if(private_key_contents) {
             generator.setPrivateKey(private_key_contents)
             generator.decryptSecrets()
+            if(hasGlobalVar('adminSecretsMap')) {
+                generator.plainmap = (adminSecretsMap() as Map) + generator.plainmap
+            }
             echo "DECRYPTED PROPERTIES\n${printDecryptedProperties(generator, credentials_id)}"
         }
         //end decrypting secrets
         script_header = libraryResource "header.sh"
         script_footer = libraryResource "footer.sh"
         jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
+        build_meta['generator'] = generator
+        build_meta['pipeline_generator'] = pipeline_generator
+        if(hasGlobalVar('adminPostYaml')) {
+            echo 'Processing adminPostYaml'
+            adminPostYaml build_meta
+        }
     }
 
     //prepare to run
@@ -357,47 +439,11 @@ def call() {
                     unstash name
                 }
                 for(String publishable : publishableItems) {
-                    def item = pipeline_generator.getPublishable(publishable)
-                    switch(publishable) {
-                        case 'artifacts':
-                            archiveArtifacts artifacts: item['path'], fingerprint: true,
-                                             excludes: item['excludes'],
-                                             allowEmptyArchive: item['allowEmptyArchive'],
-                                             defaultExcludes: item['defaultExcludes'],
-                                             caseSensitive: item['caseSensitive']
-                            break
-                        case 'cobertura':
-                            cobertura coberturaReportFile: item['path'],
-                                    autoUpdateHealth: item['autoUpdateHealth'],
-                                    autoUpdateStability: item['autoUpdateStability'],
-                                    failNoReports: item['failNoReports'],
-                                    failUnhealthy: item['failUnhealthy'],
-                                    failUnstable: item['failUnstable'],
-                                    maxNumberOfBuilds: item['maxNumberOfBuilds'],
-                                    onlyStable: item['onlyStable'],
-                                    sourceEncoding: item['sourceEncoding'],
-                                    zoomCoverageChart: item['zoomCoverageChart'],
-                                    methodCoverageTargets: item['methodCoverageTargets'],
-                                    lineCoverageTargets: item['lineCoverageTargets'],
-                                    conditionalCoverageTargets: item['conditionalCoverageTargets']
-                            break
-                        case 'html':
-                            publishHTML allowMissing: item['allowMissing'],
-                                        alwaysLinkToLastBuild: item['alwaysLinkToLastBuild'],
-                                        includes: item['includes'],
-                                        keepAll: item['keepAll'],
-                                        reportDir: item['path'],
-                                        reportFiles: item['reportFiles'],
-                                        reportName: item['reportName'],
-                                        reportTitles: item['reportTitles']
-                            break
-                        case 'junit':
-                            junit allowEmptyResults: item['allowEmptyResults'],
-                                  healthScaleFactor: item['healthScaleFactor'],
-                                  keepLongStdio: item['keepLongStdio'],
-                                  testResults: item['path']
-
-                            break
+                    try {
+                        def item = pipeline_generator.getPublishable(publishable)
+                        processDefaultPublishable(pipeline_generator, publishable)
+                    catch(e) {
+                        currentBuild.result = 'FAILURE'
                     }
                 }
             }
@@ -405,6 +451,7 @@ def call() {
         if(currentBuild.result == 'FAILURE') {
             error 'This build has failed.  No user-defined pipelines will be run.'
         }
+        boolean allow_user_pipelines = true
         if(generator.isPipelineJob()) {
             if(generator.isMatrixBuild()) {
                 stage("Checkout Jenkinsfile") {
