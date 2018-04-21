@@ -377,10 +377,8 @@ def call() {
     node(generator.labels) {
         if(!generator.isMatrixBuild()) {
             Map stashMap = pipeline_generator.stashMap
-            stage("Checkout SCM") {
-                checkout global_scm
-            }
             stage("Build Project") {
+                checkout global_scm
                 withEnvSecretWrapper(pipeline_generator, jervisEnvList) {
                     environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
                     echo "ENVIRONMENT:\n    ${environment_string}"
