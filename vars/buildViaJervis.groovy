@@ -458,18 +458,20 @@ def call() {
                         path: '''^[^,\\:*?"'<>|]+$'''
                     ]
                 ]
-                //unstash and setup
-                for(String name : publishableItems) {
-                    unstash name
-                }
+                //unstash and publish in parallel
+                Map tasks = [failFast: true]
                 for(String publishable : publishableItems) {
-                    try {
-                        processDefaultPublishable(pipeline_generator.getPublishable(publishable), publishable, is_pull_request)
-                    }
-                    catch(e) {
-                        currentBuild.result = 'FAILURE'
+                    tasks["Publish ${publishable}"] = {
+                        try {
+                            unstash publishable
+                            processDefaultPublishable(pipeline_generator.getPublishable(publishable), publishable, is_pull_request)
+                        }
+                        catch(e) {
+                            currentBuild.result = 'FAILURE'
+                        }
                     }
                 }
+                parallel(tasks)
             }
         }
         if(currentBuild.result == 'FAILURE') {
