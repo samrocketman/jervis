@@ -369,7 +369,9 @@ def call() {
                 }
             }
         }
-        parallel(tasks)
+        stage("Build Project") {
+            parallel(tasks)
+        }
     }
 
     node(generator.labels) {
