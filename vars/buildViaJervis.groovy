@@ -458,6 +458,18 @@ def call() {
                         path: '''^[^,\\:*?"'<>|]+$'''
                     ]
                 ]
+                if(hasGlobalVar('adminCollectSettingsDefaultsMap')) {
+                    pipeline_generator.collect_settings_defaults = (adminCollectSettingsDefaultsMap() as Map) + pipeline_generator.collect_settings_defaults
+                }
+                if(hasGlobalVar('adminStashmapPreprocessorMap')) {
+                    pipeline_generator.stashmap_preprocessor = (adminStashmapPreprocessorMap() as Map) + pipeline_generator.stashmap_preprocessor
+                }
+                if(hasGlobalVar('adminCollectSettingsFilesetsMap')) {
+                    pipeline_generator.collect_settings_filesets = (adminCollectSettingsFilesetsMap() as Map) + pipeline_generator.collect_settings_filesets
+                }
+                if(hasGlobalVar('adminCollectSettingsValidationMap')) {
+                    pipeline_generator.collect_settings_validation = (adminCollectSettingsValidationMap() as Map) + pipeline_generator.collect_settings_validation
+                }
                 //unstash and publish in parallel
                 Map tasks = [failFast: true]
                 for(String publishable : publishableItems) {
