@@ -461,10 +461,11 @@ def call() {
                 //unstash and publish in parallel
                 Map tasks = [failFast: true]
                 for(String publishable : publishableItems) {
-                    tasks["Publish ${publishable}"] = {
+                    String publish = publishable
+                    tasks["Publish ${publish}"] = {
                         try {
-                            unstash publishable
-                            processDefaultPublishable(pipeline_generator.getPublishable(publishable), publishable, is_pull_request)
+                            unstash publish
+                            processDefaultPublishable(pipeline_generator.getPublishable(publish), publish, is_pull_request)
                         }
                         catch(e) {
                             currentBuild.result = 'FAILURE'
