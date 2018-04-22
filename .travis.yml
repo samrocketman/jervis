@@ -33,6 +33,9 @@ jenkins:
     - name: artifacts
       matrix_axis:
         env: GROOVY_VERSION="2.4.13"
+    - name: html
+      matrix_axis:
+        env: GROOVY_VERSION="2.4.13"
     - name: junit
       matrix_axis:
         env: GROOVY_VERSION="2.4.13"
@@ -43,6 +46,9 @@ jenkins:
     artifacts: build/libs/*.jar
     cobertura: build/reports/cobertura/coverage.xml
     junit: build/test-results/*.xml
+    html:
+      path: build/docs/groovydoc
+      reportName: 'Groovy Dev Docs'
 
 ########################
 # Travis CI Options Only
