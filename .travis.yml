@@ -31,15 +31,12 @@ jenkins:
   pipeline_jenkinsfile: assets/Jenkinsfile
   stash:
     - name: artifacts
-      includes: build/libs/*.jar
       matrix_axis:
         env: GROOVY_VERSION="2.4.13"
     - name: junit
-      includes: build/test-results/*.xml
       matrix_axis:
         env: GROOVY_VERSION="2.4.13"
     - name: cobertura
-      includes: build/reports/cobertura/coverage.xml
       matrix_axis:
         env: GROOVY_VERSION="1.8.9"
   collect:
