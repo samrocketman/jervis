@@ -213,9 +213,11 @@ def processDefaultPublishable(def item, String publishable, boolean is_pull_requ
 String loadCustomResource(String resource) {
     def config_files = Jenkins.instance.getExtensionList(GlobalConfigFiles)[0]
     if(hasGlobalVar('adminLibraryResource')) {
+        echo "Load resource ${resource} from adminLibraryResource."
         adminLibraryResource(resource)
     }
     else if(config_files.getById(resource)) {
+        echo "Load resource ${resource} from global config files."
         config_files.getById(resource).content
     }
     else {
