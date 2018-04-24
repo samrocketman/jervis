@@ -28,6 +28,7 @@ import hudson.console.HyperlinkNote
 import hudson.util.Secret
 import jenkins.bouncycastle.api.PEMEncodable
 import jenkins.model.Jenkins
+import org.yaml.snakeyaml.Yaml
 import org.jenkinsci.plugins.configfiles.GlobalConfigFiles
 import org.jenkinsci.plugins.workflow.libs.LibraryAdder
 import static jenkins.bouncycastle.api.PEMEncodable.decode
@@ -81,7 +82,19 @@ List getJervisMetaData(String project, String JERVIS_BRANCH) {
     else {
         throw new FileNotFoundException('Cannot find .jervis.yml nor .travis.yml')
     }
-    [jervis_yaml, folder_listing]
+    def jervis_dict = new Yaml().load(jervis_yaml)
+    Map jervis_yamls_map = [ 'main': jervis_yaml]
+    if('jervis' in jervis_dict.keySet()){
+        echo "Child yaml map found"
+        for(String component_name : jervis_dict['jervis'].keySet()) {
+            echo "New sub .jervis.yml found for component ${component_name} located at ${jervis_dict['jervis'][component_name]}"
+            jervis_yamls_map[component_name] = git_service.getFile(project, jervis_dict['jervis'][component_name], JERVIS_BRANCH)
+        }
+    }
+    else{
+        echo "No child yaml was found"
+    }
+        [folder_listing, jervis_yamls_map]
 }
 
 
@@ -226,10 +239,43 @@ String loadCustomResource(String resource) {
 }
 
 
+def call() {
+   
+    String github_org
+    String github_repo
+    String github_domain
+    List folder_listing = []
+    Map jervis_yamls = [:]
+    BRANCH_NAME = env.CHANGE_BRANCH?:env.BRANCH_NAME
+    boolean is_pull_request = (env.CHANGE_ID?:false) as Boolean
+    env.IS_PR_BUILD = "${is_pull_request}" as String
+    currentBuild.rawBuild.parent.parent.sources[0].source.with {
+        github_org = it.repoOwner
+        github_repo = it.repository
+        github_domain = (it.apiUri)? it.apiUri.split('/')[2] : 'github.com'
+    }
+    List jervis_metadata = getJervisMetaData("${github_org}/${github_repo}".toString(), BRANCH_NAME)
+    jervis_yamls = jervis_metadata[1]
+    folder_listing = jervis_metadata[0]
+    Map jervis_tasks = [failFast: true]
+    
+    jervis_yamls.keySet().each{
+       component_name -> 
+          jervis_tasks[component_name] = { 
+            node('jervis_generator'){
+            stage("Forking pipeline for component") {
+              buildViaJervisForComponent(jervis_yamls[component_name],folder_listing,component_name)
+            }
+           }
+        }
+      }
+      parallel(jervis_tasks)
+}
+
 /**
   The main method of buildViaJervis()
  */
-def call() {
+def buildViaJervisForComponent(String jervis_yaml, List folder_listing, String component_name) {
     def generator = new lifecycleGenerator()
     def pipeline_generator
     String environment_string
@@ -237,7 +283,6 @@ def call() {
     String github_org
     String github_repo
     String jenkins_folder
-    String jervis_yaml
     String lifecycles_json
     String os_stability
     String platforms_json
@@ -245,7 +290,6 @@ def call() {
     String script_header
     String toolchains_json
     Map build_meta = [:]
-    List folder_listing = []
     BRANCH_NAME = env.CHANGE_BRANCH?:env.BRANCH_NAME
     boolean is_pull_request = (env.CHANGE_ID?:false) as Boolean
     env.IS_PR_BUILD = "${is_pull_request}" as String
@@ -285,9 +329,6 @@ def call() {
         }
         platforms_json = loadCustomResource 'platforms.json'
         generator.loadPlatformsString(platforms_json)
-        List jervis_metadata = getJervisMetaData("${github_org}/${github_repo}".toString(), BRANCH_NAME)
-        jervis_yaml = jervis_metadata[0]
-        folder_listing = jervis_metadata[1]
         generator.preloadYamlString(jervis_yaml)
         os_stability = "${generator.label_os}-${generator.label_stability}"
         lifecycles_json = loadCustomResource "lifecycles-${os_stability}.json"
