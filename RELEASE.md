@@ -21,7 +21,8 @@ ossrhPassword=secret
 - [ ] Check test coverage and ensure it is high.
 - [ ] Ensure groovydoc API is fully documented.
 - [ ] Update wiki documentation for release.
-- [ ] Update [CHANGELOG.md](CHANGELOG.md).
+- [ ] Update [CHANGELOG.md](CHANGELOG.md) with changes.
+- [ ] Update [CHANGELOG.md](CHANGELOG.md) with release date.
 - [ ] Update README maven and gradle examples to reflect latest version.
 - [ ] Update pipeline scripts to grab the next version.
 
