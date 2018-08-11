@@ -225,6 +225,24 @@ String loadCustomResource(String resource) {
     }
 }
 
+/**
+  Configure the stashmap preprocessor.
+ */
+@NonCPS
+void setStashmapPreprocessor(def pipeline_generator) {
+    //admin requiring stashes for HTML publisher to be formed a compatible way.
+    pipeline_generator.stashmap_preprocessor = [
+        html: { Map settings ->
+            settings['includes']?.tokenize(',').collect {
+                "${settings['path']  -~ '/$' -~ '^/'}/${it}"
+            }.join(',').toString()
+        }
+    ]
+    if(hasGlobalVar('adminStashmapPreprocessorMap')) {
+        pipeline_generator.stashmap_preprocessor = (adminStashmapPreprocessorMap() as Map) + pipeline_generator.stashmap_preprocessor
+    }
+}
+
 
 /**
   The main method of buildViaJervis()
@@ -359,17 +377,9 @@ def call() {
         if(hasGlobalVar('adminCollectSettingsFilesetsMap')) {
             pipeline_generator.collect_settings_filesets = (adminCollectSettingsFilesetsMap() as Map) + pipeline_generator.collect_settings_filesets
         }
-        //admin requiring stashes for HTML publisher to be formed a compatible way.
-        pipeline_generator.stashmap_preprocessor = [
-            html: { Map settings ->
-                settings['includes']?.tokenize(',').collect {
-                    "${settings['path']  -~ '/$' -~ '^/'}/${it}"
-                }.join(',').toString()
-            }
-        ]
-        if(hasGlobalVar('adminStashmapPreprocessorMap')) {
-            pipeline_generator.stashmap_preprocessor = (adminStashmapPreprocessorMap() as Map) + pipeline_generator.stashmap_preprocessor
-        }
+
+        setStashmapPreprocessor(pipeline_generator)
+
         //admin requiring regex validation of specific jenkins.collect setinggs
         //if a user fails the input validation it falls back to the default option
         //if an invalid path is specified for HTML publisher then do not attempt to collect
