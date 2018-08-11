@@ -79,7 +79,7 @@ String getFolderRSAKeyCredentials(String folder, String credentials_id) {
           list of files in the root of the repository.
  */
 @NonCPS
-String initializeGenerator(lifecycleGenerator generator, String project, String JERVIS_BRANCH, String credentials_id) {
+List initializeGenerator(lifecycleGenerator generator, String project, String JERVIS_BRANCH, String credentials_id) {
     String jervis_yaml
     def git_service = new GitHub()
     git_service.gh_token = getGitHubAPIToken(credentials_id).toString()
@@ -94,8 +94,7 @@ String initializeGenerator(lifecycleGenerator generator, String project, String 
         throw new FileNotFoundException('Cannot find .jervis.yml nor .travis.yml')
     }
     generator.preloadYamlString(jervis_yaml)
-    generator.folder_listing = folder_listing
-    jervis_yaml
+    [jervis_yaml, folder_listing]
 }
 
 /**
@@ -107,10 +106,11 @@ String initializeGenerator(lifecycleGenerator generator, String project, String 
   platform and stability.
  */
 @NonCPS
-void finalizeGenerator(lifecycleGenerator generator, String lifecycles, String toolchains, String jervis_yaml, String jenkins_folder) {
+void finalizeGenerator(lifecycleGenerator generator, String lifecycles, String toolchains, String jervis_yaml, List folder_listing, String jenkins_folder) {
     generator.loadLifecyclesString(lifecycles_json)
     generator.loadToolchainsString(toolchains_json)
     generator.loadYamlString(jervis_yaml)
+    generator.folder_listing = folder_listing
     String secrets_credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
     String private_key_contents = getFolderRSAKeyCredentials(jenkins_folder, secrets_credentials_id)
     if(secrets_credentials_id && !private_key_contents) {
@@ -128,11 +128,13 @@ void call(lifecycleGenerator generator, String github_credentials) {
      */
     String project = currentBuild.rawBuild.parent.parent.sources[0].source.with { "${it.repoOwner}/${it.repository}" }
     generator.loadPlatformsString(loadCustomResource('platforms.json'))
-    String jervis_yaml = initializeGenerator(generator, project, (env.CHANGE_BRANCH ?: env.BRANCH_NAME), github_credentials)
-    String os_stability = "${generator.label_os}-${generator.label_stability}"
-    finalizeGenerator(generator,
-        loadCustomResource("lifecycles-${os_stability}.json"),
-        loadCustomResource("toolchains-${os_stability}.json"),
-        jervis_yaml,
-        currentBuild.rawBuild.parent.parent.fullName.split('/')[0])
+    initializeGenerator(generator, project, (env.CHANGE_BRANCH ?: env.BRANCH_NAME), github_credentials).with {
+        String os_stability = "${generator.label_os}-${generator.label_stability}"
+        finalizeGenerator(generator,
+            loadCustomResource("lifecycles-${os_stability}.json"),
+            loadCustomResource("toolchains-${os_stability}.json"),
+            it[0],
+            it[1],
+            currentBuild.rawBuild.parent.parent.fullName.split('/')[0])
+    }
 }
