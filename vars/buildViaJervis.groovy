@@ -17,94 +17,8 @@
 @Grab(group='net.gleske', module='jervis', version='1.1', transitive=false)
 @Grab(group='org.yaml', module='snakeyaml', version='1.19', transitive=false)
 
-import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.lang.pipelineGenerator
-import net.gleske.jervis.remotes.GitHub
-import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
-
-import hudson.console.HyperlinkNote
-import hudson.util.Secret
-import jenkins.bouncycastle.api.PEMEncodable
-import jenkins.model.Jenkins
-import static jenkins.bouncycastle.api.PEMEncodable.decode
-
-
-
-/**
-  Gets GitHub API token from the global credential store.
- */
-
-@NonCPS
-String getGitHubAPIToken() {
-    Jenkins.instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getCredentials().find {
-        it.class.simpleName == 'StringCredentialsImpl' && it.id == 'github-token'
-    }.with {
-        if(it) {
-            it.secret
-        }
-    } as String
-}
-
-
-/**
-  Reads GitHub API and returns the .jervis.yml file via API instead of a
-  workspace checkout.
-
-  @return A list where the first item is jervis_yaml and the second item is a
-          list of files in the root of the repository.
- */
-@NonCPS
-List getJervisMetaData(String project, String JERVIS_BRANCH) {
-    String jervis_yaml
-    def git_service = new GitHub()
-    git_service.gh_token = getGitHubAPIToken()
-    def folder_listing = git_service.getFolderListing(project, '/', JERVIS_BRANCH)
-    if('.jervis.yml' in folder_listing) {
-        jervis_yaml = git_service.getFile(project, '.jervis.yml', JERVIS_BRANCH)
-    }
-    else if('.travis.yml' in folder_listing) {
-        jervis_yaml = git_service.getFile(project, '.travis.yml', JERVIS_BRANCH)
-    }
-    else {
-        throw new FileNotFoundException('Cannot find .jervis.yml nor .travis.yml')
-    }
-    [jervis_yaml, folder_listing]
-}
-
-
-/**
-  Gets RSA credentials for a given folder.
- */
-@NonCPS
-String getFolderRSAKeyCredentials(String folder, String credentials_id) {
-    if(!folder || !credentials_id) {
-        return ''
-    }
-    def credentials = Jenkins.instance.getJob(folder).properties.find { it.class.simpleName == 'FolderCredentialsProperty' }
-    String found_credentials = ''
-    try {
-        if(credentials) {
-            credentials.domainCredentials*.credentials*.each { c ->
-                if(c && c.class.simpleName == 'BasicSSHUserPrivateKey' && c.id == credentials_id) {
-                    String priv_key = c.privateKey
-                    Secret p = c.passphrase
-                    found_credentials = new PEMEncodable(decode(priv_key, ((p)? p.plainText : null) as char[]).toPrivateKey()).encode()
-                }
-            }
-        }
-    }
-    catch(Throwable t) {
-        message = 'An exception occurred when decrypting credential '
-        message += HyperlinkNote.encodeTo('/' + Jenkins.instance.getItemByFullName(folder).url + 'credentials/', credentials_id)
-        message += ' from folder '
-        message += HyperlinkNote.encodeTo('/' + Jenkins.instance.getItemByFullName(folder).url, folder) + '.'
-        println message
-        throw t
-    }
-    return found_credentials
-}
-
 
 /**
   An environment wrapper which sets environment variables.  If available, also
@@ -267,36 +181,12 @@ def call() {
     ]
 
     stage('Process Jervis YAML') {
-        if(hasGlobalVar('adminPreYaml')) {
-            adminPreYaml build_meta
-        }
-        platforms_json = loadCustomResource 'platforms.json'
-        generator.loadPlatformsString(platforms_json)
-        List jervis_metadata = getJervisMetaData("${github_org}/${github_repo}".toString(), BRANCH_NAME)
-        jervis_yaml = jervis_metadata[0]
-        folder_listing = jervis_metadata[1]
-        generator.preloadYamlString(jervis_yaml)
-        os_stability = "${generator.label_os}-${generator.label_stability}"
-        lifecycles_json = loadCustomResource "lifecycles-${os_stability}.json"
-        toolchains_json = loadCustomResource "toolchains-${os_stability}.json"
-        generator.loadLifecyclesString(lifecycles_json)
-        generator.loadToolchainsString(toolchains_json)
-        generator.loadYamlString(jervis_yaml)
-        generator.folder_listing = folder_listing
+        prepareJervisLifecycleGenerator(generator, 'github-token')
         pipeline_generator = new pipelineGenerator(generator)
         pipeline_generator.supported_collections = ['cobertura', 'junit', 'artifacts']
         //attempt to get the private key else return an empty string
         String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
-        String private_key_contents = getFolderRSAKeyCredentials(jenkins_folder, credentials_id)
-        if(credentials_id && !private_key_contents) {
-            throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${credentials_id}")
-        }
-        if(private_key_contents) {
-            generator.setPrivateKey(private_key_contents)
-            generator.decryptSecrets()
-            if(hasGlobalVar('adminSecretsMap')) {
-                generator.plainmap = (adminSecretsMap() as Map) + generator.plainmap
-            }
+        if(credentials_id) {
             echo "DECRYPTED PROPERTIES\n${printDecryptedProperties(generator, credentials_id)}"
         }
         //end decrypting secrets
