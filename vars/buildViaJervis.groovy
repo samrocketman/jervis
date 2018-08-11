@@ -27,7 +27,6 @@ import hudson.console.HyperlinkNote
 import hudson.util.Secret
 import jenkins.bouncycastle.api.PEMEncodable
 import jenkins.model.Jenkins
-import org.jenkinsci.plugins.configfiles.GlobalConfigFiles
 import static jenkins.bouncycastle.api.PEMEncodable.decode
 
 
@@ -194,25 +193,6 @@ def processDefaultPublishable(def item, String publishable, boolean is_pull_requ
     }
 }
 
-/**
-  Gets a library resource.  A resource can be loaded from an external library
-  provided by an admin, a config file defined in global settings, or from this
-  library.
- */
-String loadCustomResource(String resource) {
-    def config_files = Jenkins.instance.getExtensionList(GlobalConfigFiles)[0]
-    if(hasGlobalVar('adminLibraryResource')) {
-        echo "Load resource ${resource} from adminLibraryResource."
-        adminLibraryResource(resource)
-    }
-    else if(config_files.getById(resource)) {
-        echo "Load resource ${resource} from global config files."
-        config_files.getById(resource).content
-    }
-    else {
-        libraryResource resource
-    }
-}
 
 /**
   Configure the stashmap preprocessor.
