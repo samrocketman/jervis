@@ -106,7 +106,7 @@ List initializeGenerator(lifecycleGenerator generator, String project, String JE
   platform and stability.
  */
 @NonCPS
-void finalizeGenerator(lifecycleGenerator generator, String lifecycles, String toolchains, String jervis_yaml, List folder_listing, String jenkins_folder) {
+void finalizeGenerator(lifecycleGenerator generator, String lifecycles_json, String toolchains_json, String jervis_yaml, List folder_listing, String jenkins_folder) {
     generator.loadLifecyclesString(lifecycles_json)
     generator.loadToolchainsString(toolchains_json)
     generator.loadYamlString(jervis_yaml)
