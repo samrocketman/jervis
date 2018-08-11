@@ -23,24 +23,13 @@ import net.gleske.jervis.lang.pipelineGenerator
 import net.gleske.jervis.remotes.GitHub
 import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
 
-import hudson.ExtensionList
 import hudson.console.HyperlinkNote
 import hudson.util.Secret
 import jenkins.bouncycastle.api.PEMEncodable
 import jenkins.model.Jenkins
 import org.jenkinsci.plugins.configfiles.GlobalConfigFiles
-import org.jenkinsci.plugins.workflow.libs.LibraryAdder
 import static jenkins.bouncycastle.api.PEMEncodable.decode
 
-/**
-  Check if a global library provides a var.  Useful for providing optional
-  functionality provided by other global libraries (only if they are defined).
- */
-
-@NonCPS
-boolean hasGlobalVar(String var) {
-    var in  ExtensionList.lookup(LibraryAdder.GlobalVars.class)[0].forRun(currentBuild.rawBuild)*.name
-}
 
 
 /**
