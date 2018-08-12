@@ -15,8 +15,8 @@
    */
 package net.gleske.jervis.remotes
 
-import org.yaml.snakeyaml.Yaml
 import net.gleske.jervis.tools.securityIO
+import static net.gleske.jervis.remotes.SimpleRestService.apiFetch
 
 /**
    A simple class to interact with the GitHub API for only the parts I need.
@@ -112,14 +112,12 @@ class GitHub implements JervisRemote {
                   e.g. <tt>user/repos</tt>.
       @return     A <tt>Map</tt> or <tt>List</tt> from the parsed JSON response.
     */
-    public Object fetch(String path) {
-        def yaml = new Yaml()
+    public def fetch(String path) {
+        Map http_headers = ['Accept': 'application/vnd.github.v3+json']
         if(this.gh_token) {
-            return yaml.load(new URL(this.gh_api + path).newReader(requestProperties: ['Authorization': "token ${this.gh_token}".toString(), 'Accept': 'application/vnd.github.v3+json']))
+            http_headers['Authorization'] = "token ${this.gh_token}".toString()
         }
-        else {
-            return yaml.load(new URL(this.gh_api + path).newReader(requestProperties: ['Accept': 'application/vnd.github.v3+json']))
-        }
+        apiFetch(new URL(this.gh_api + path), http_headers)
     }
 
     /*

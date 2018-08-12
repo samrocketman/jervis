@@ -18,65 +18,16 @@ package net.gleske.jervis.remotes
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 
 class GitHubTest extends GroovyTestCase {
     def mygh
     def url
-    //Mock the HTTP calls to the GitHub API and use resource files instead.
-    //http://flyingtomoon.com/tag/mocking/
-    //http://groovy.329449.n5.nabble.com/Groovy-metaclass-invokeConstructor-td5716360.html
-    def mock(Class<URL> clazz) {
-        def mc = clazz.metaClass
-        mc.invokeMethod = { String name, args ->
-            mc.getMetaMethod(name, args).invoke(delegate, args)
-        }
-        mc.getProperty = { String name  ->
-            mc.getMetaProperty(name).getProperty(delegate)
-        }
-        mc.constructor = { String url ->
-            this.url = url
-            def constructor = delegate.getConstructor([String] as Class[])
-            constructor.newInstance(url)
-        }
-        mc.newReader = {
-            //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
-            String file = this.url.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
-            try {
-                URL resource_url = this.getClass().getResource("/mocks/${file}");
-                def resource = new File(resource_url.getFile())
-                if(resource.isFile()) {
-                    return resource.newReader()
-                }
-                else {
-                    throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
-                }
-            }
-            catch(Exception e) {
-                throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
-            }
-        }
-        mc.newReader = { Map parameters ->
-            //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
-            String file = this.url.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
-            try {
-                URL resource_url = this.getClass().getResource("/mocks/${file}");
-                def resource = new File(resource_url.getFile())
-                if(resource.isFile()) {
-                    return resource.newReader()
-                }
-                else {
-                    throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
-                }
-            }
-            catch(Exception e) {
-                throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
-            }
-        }
-    }
+
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
-        mock(URL)
+        mockStaticUrl(url, URL)
         mygh = new GitHub()
     }
     //tear down after every test
