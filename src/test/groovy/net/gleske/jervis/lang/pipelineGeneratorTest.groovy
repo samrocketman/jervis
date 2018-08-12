@@ -1300,6 +1300,51 @@ class pipelineGeneratorTest extends GroovyTestCase {
         generator.is_pr = true
         assert pipeline_generator.publishableItems == ['bar']
     }
+    @Test public void test_pipelineGenerator_publish_skip_on_pr_by_admin_default() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    foo:
+            |      path: 'goodbye'
+            |    bar: hello world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'bar']
+        pipeline_generator.collect_settings_defaults = [
+            foo: [
+                title: 'foo title',
+                skip_on_pr: true
+            ]
+        ]
+
+        generator.is_pr = true
+        assert pipeline_generator.publishableItems == ['bar']
+    }
+    @Test public void test_pipelineGenerator_publish_skip_on_pr_by_admin_default_user_override() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    foo:
+            |      path: 'goodbye'
+            |      skip_on_pr: false
+            |    bar: hello world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'bar']
+        pipeline_generator.collect_settings_defaults = [
+            foo: [
+                title: 'foo title',
+                skip_on_pr: true
+            ]
+        ]
+
+        generator.is_pr = true
+        assert pipeline_generator.publishableItems == ['bar', 'foo']
+    }
     @Test public void test_pipelineGenerator_publish_skip_on_tag() {
         String yaml = '''
             |language: java
@@ -1320,5 +1365,50 @@ class pipelineGeneratorTest extends GroovyTestCase {
         assert pipeline_generator.publishableItems == ['bar', 'foo']
         generator.is_tag = true
         assert pipeline_generator.publishableItems == ['bar']
+    }
+    @Test public void test_pipelineGenerator_publish_skip_on_tag_by_admin_default() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    foo:
+            |      path: 'goodbye'
+            |    bar: hello world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'bar']
+        pipeline_generator.collect_settings_defaults = [
+            foo: [
+                title: 'foo title',
+                skip_on_tag: true
+            ]
+        ]
+
+        generator.is_tag = true
+        assert pipeline_generator.publishableItems == ['bar']
+    }
+    @Test public void test_pipelineGenerator_publish_skip_on_tag_by_admin_default_user_override() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    foo:
+            |      path: 'goodbye'
+            |      skip_on_tag: false
+            |    bar: hello world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'bar']
+        pipeline_generator.collect_settings_defaults = [
+            foo: [
+                title: 'foo title',
+                skip_on_tag: true
+            ]
+        ]
+
+        generator.is_tag = true
+        assert pipeline_generator.publishableItems == ['bar', 'foo']
     }
 }
