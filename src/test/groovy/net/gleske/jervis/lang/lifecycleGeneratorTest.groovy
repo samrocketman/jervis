@@ -779,4 +779,14 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\njenkins:\n  pipeline_jenkinsfile: path/Jenkinsfile')
         assert 'path/Jenkinsfile' == generator.getJenkinsfile()
     }
+    @Test public void test_lifecycleGenerator_is_pr() {
+        assert generator.is_pr == false
+        generator.is_pr = true
+        assert generator.is_pr == true
+    }
+    @Test public void test_lifecycleGenerator_is_tag() {
+        assert generator.is_tag == false
+        generator.is_tag = true
+        assert generator.is_tag == true
+    }
 }

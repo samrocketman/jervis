@@ -103,6 +103,18 @@ class lifecycleGenerator implements Serializable {
     Boolean matrix_build = false
 
     /**
+      A variable set by any external system relaying to Jervis that this is a
+      peer review build (commonly called a pull request).
+     */
+    Boolean is_pr = false
+
+    /**
+      A variable set by any external system relaying to Jervis that this is a
+      build associated with a tag.
+     */
+    Boolean is_tag = false
+
+    /**
       Defines the kind of branch filtering which is in effect.  Possible
       values: empty string, <tt>only</tt>, <tt>except</tt>.  <tt>only</tt> is
       used for whitelist filtering and <tt>except</tt> is used for blacklist
