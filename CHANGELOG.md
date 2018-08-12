@@ -1,3 +1,34 @@
+# jervis 1.2 - Aug 12th, 2018
+
+#### New features:
+
+- Support for `skip_on_pr` and `skip_on_tag` in YAML specification when
+  publishing collections like artifacts.  An admin can set default values for
+  each per collection in `jenkins.collect` YAML.
+- A new `net.gleske.jervis.remotes.SimpleRestService` class is available which
+  makes it easy to communicate with REST services.  SnakeYAML is used for
+  parsing JSON responses which is the same for the rest of the Jervis library.
+- `generator.is_pr` and `generator.is_tag` properties now provide a portable
+  means for changing behavior based on what type of build is occuring.
+
+#### Bug fixes:
+
+- Stashmap Preprocessor did not work at all which meant the HTML publisher was
+  broken.  This release fixes that.
+
+#### Pipeline DSL scripts changes in the `vars/` folder:
+
+- Major rewrite: `buildViaJervis` has been completely refactored and utilizes
+  better use of pipeline variables.
+- Since `skip_on_pr` support is now built into Jervis this part was removed from
+  the pipeline library.
+- Matrix builds are now grouped with a friendly name `Build Project` stage.
+- Support for admins to side load their own libraries to customize code.
+- Support to load JSON files from global config file plugin settings in Jenkins.
+- Publishing collections now occurs in parallel.
+- Updated to support `generator.is_pr` in Jervis.
+- HTML publishing is fixed!
+
 # jervis 1.1 - Apr 16th, 2018
 
 #### Warnings
