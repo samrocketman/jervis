@@ -72,8 +72,6 @@ def processDefaultPublishable(def item, String publishable, boolean is_pull_requ
  */
 def call() {
     def global_scm = scm
-    String script_footer = ''
-    String script_header = ''
     BRANCH_NAME = env.CHANGE_BRANCH ?: env.BRANCH_NAME
 
     // Pull Request detection
@@ -103,7 +101,14 @@ def call() {
      */
     def generator = new lifecycleGenerator()
     generator.is_pr = is_pull_request
-    def pipeline_generator = processJervisYamlStage(generator, jervisEnvList, script_header, script_footer)
+    def pipeline_generator
+    String script_header
+    String script_footer
+    processJervisYamlStage(generator, jervisEnvList) {
+        pipeline_generator = it
+        script_header = loadCustomResource "header.sh"
+        script_footer = loadCustomResource "footer.sh"
+    }
     if(generator.isMatrixBuild()) {
         // this occurs in parallel across multiple build nodes (1 node per axis)
         matrixBuildProjectStage(global_scm, generator, pipeline_generator, jervisEnvList, script_header, script_footer)

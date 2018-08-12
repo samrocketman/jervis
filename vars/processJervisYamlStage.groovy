@@ -33,10 +33,10 @@ String printDecryptedProperties(lifecycleGenerator generator, String credentials
     ].join('\n') as String
 }
 
-def call(lifecycleGenerator generator, List jervisEnvList, String script_header, String script_footer) {
+def call(lifecycleGenerator generator, List jervisEnvList, Closure body) {
     stage('Process Jervis YAML') {
         prepareJervisLifecycleGenerator(generator, 'github-token')
-        pipeline_generator = new pipelineGenerator(generator)
+        def pipeline_generator = new pipelineGenerator(generator)
         prepareJervisPipelineGenerator(pipeline_generator)
         //attempt to get the private key else return an empty string
         String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
@@ -45,9 +45,7 @@ def call(lifecycleGenerator generator, List jervisEnvList, String script_header,
         }
         //end decrypting secrets
 
-        script_header = loadCustomResource "header.sh"
-        script_footer = loadCustomResource "footer.sh"
         jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
+        body(pipeline_generator)
     }
-    pipeline_generator
 }
