@@ -33,7 +33,7 @@ String printDecryptedProperties(lifecycleGenerator generator, String credentials
     ].join('\n') as String
 }
 
-void call(lifecycleGenerator generator, pipelineGenerator pipeline_generator, List jervisEnvList, String script_header, String script_footer) {
+def call(lifecycleGenerator generator, List jervisEnvList, String script_header, String script_footer) {
     stage('Process Jervis YAML') {
         prepareJervisLifecycleGenerator(generator, 'github-token')
         pipeline_generator = new pipelineGenerator(generator)
@@ -49,4 +49,5 @@ void call(lifecycleGenerator generator, pipelineGenerator pipeline_generator, Li
         script_footer = loadCustomResource "footer.sh"
         jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
     }
+    pipeline_generator
 }

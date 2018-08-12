@@ -72,10 +72,9 @@ def processDefaultPublishable(def item, String publishable, boolean is_pull_requ
  */
 def call() {
     def generator = new lifecycleGenerator()
-    def pipeline_generator
     String environment_string
-    String script_footer
-    String script_header
+    String script_footer = ''
+    String script_header = ''
     BRANCH_NAME = env.CHANGE_BRANCH ?: env.BRANCH_NAME
 
     // Pull Request detection
@@ -105,7 +104,7 @@ def call() {
     /*
        Jenkins pipeline stages for a build pipeline.
      */
-    processJervisYamlStage(generator, pipeline_generator, jervisEnvList, script_header, script_footer)
+    def pipeline_generator = processJervisYamlStage(generator, jervisEnvList, script_header, script_footer)
 
     //prepare to run
     if(generator.isMatrixBuild()) {
