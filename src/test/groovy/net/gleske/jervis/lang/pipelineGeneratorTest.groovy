@@ -1118,4 +1118,89 @@ class pipelineGeneratorTest extends GroovyTestCase {
         assert [:] == pipeline_generator.getStashMap([env: 'foo=world'])
         assert [] == pipeline_generator.publishableItems
     }
+    @Test public void test_pipelineGenerator_stashmap_preprocessor_success_nonmatrix() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    html: build/docs/groovydoc
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['html']
+        pipeline_generator.collect_settings_filesets = [html: ['includes']]
+        pipeline_generator.collect_settings_defaults = [
+            html: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                includes: '**/*',
+                keepAll: false,
+                reportFiles: 'index.html',
+                reportName: 'HTML Report',
+                reportTitles: ''
+            ]
+        ]
+        pipeline_generator.stashmap_preprocessor = [
+            html: { Map settings ->
+                settings['includes']?.tokenize(',').collect {
+                    "${settings['path']  -~ '/$' -~ '^/'}/${it}"
+                }.join(',').toString()
+            }
+        ]
+        pipeline_generator.collect_settings_validation = [
+            html: [
+                path: '''^[^,\\:*?"'<>|]+$'''
+            ]
+        ]
+        assert pipeline_generator.stashMap == ['html':['includes':'build/docs/groovydoc/**/*', 'excludes':'', 'use_default_excludes':true, 'allow_empty':false, 'matrix_axis':[:]]]
+        assert pipeline_generator.getPublishable('html') == ['allowMissing':false, 'alwaysLinkToLastBuild':false, 'includes':'**/*', 'keepAll':false, 'reportFiles':'index.html', 'reportName':'HTML Report', 'reportTitles':'', 'path':'build/docs/groovydoc']
+        assert pipeline_generator.stashes == [['name':'html', 'includes':'build/docs/groovydoc']]
+    }
+    @Test public void test_pipelineGenerator_stashmap_preprocessor_success_matrix() {
+        String yaml = '''
+            |language: java
+            |env:
+            |  - foo=hello
+            |  - foo=world
+            |jenkins:
+            |  stash:
+            |    - name: html
+            |      matrix_axis:
+            |        env: 'foo=hello'
+            |  collect:
+            |    html: build/docs/groovydoc
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['html']
+        pipeline_generator.collect_settings_filesets = [html: ['includes']]
+        pipeline_generator.collect_settings_defaults = [
+            html: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                includes: '**/*',
+                keepAll: false,
+                reportFiles: 'index.html',
+                reportName: 'HTML Report',
+                reportTitles: ''
+            ]
+        ]
+        pipeline_generator.stashmap_preprocessor = [
+            html: { Map settings ->
+                settings['includes']?.tokenize(',').collect {
+                    "${settings['path']  -~ '/$' -~ '^/'}/${it}"
+                }.join(',').toString()
+            }
+        ]
+        pipeline_generator.collect_settings_validation = [
+            html: [
+                path: '''^[^,\\:*?"'<>|]+$'''
+            ]
+        ]
+        assert pipeline_generator.stashMap == [:]
+        assert pipeline_generator.getStashMap([env: 'foo=world']) == [:]
+        assert pipeline_generator.getStashMap(['env': 'foo=hello']) == ['html':['includes':'build/docs/groovydoc/**/*', 'excludes':'', 'use_default_excludes':true, 'allow_empty':false, 'matrix_axis':['env':'foo=hello']]]
+        assert pipeline_generator.getPublishable('html') == ['allowMissing':false, 'alwaysLinkToLastBuild':false, 'includes':'**/*', 'keepAll':false, 'reportFiles':'index.html', 'reportName':'HTML Report', 'reportTitles':'', 'path':'build/docs/groovydoc']
+        assert pipeline_generator.stashes == [['name':'html', 'matrix_axis':['env':'foo=hello'], 'includes':'build/docs/groovydoc']]
+    }
 }

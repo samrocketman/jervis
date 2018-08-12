@@ -84,7 +84,7 @@ class pipelineGenerator implements Serializable {
     /**
       A list of stash maps collected from the Jervis YAML.
      */
-    private List<Map> stashes
+    private List<Map> stashes = []
 
     /**
       This is a <tt>Map</tt> of default settings for the YAML key
@@ -188,8 +188,10 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
      */
     def pipelineGenerator(lifecycleGenerator generator) {
         this.generator = generator
-        def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', []))?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
-        this.stashes = (stashes instanceof List)? stashes : [stashes]
+        def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', [])) ?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
+        if(stashes) {
+            this.stashes = (stashes instanceof List)? stashes : [stashes]
+        }
         processCollectItems()
     }
 
@@ -304,6 +306,7 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
                     (!isMatrix || (getObjectValue(s, 'matrix_axis', [:]) == convertMatrixAxis(matrix_axis)))) {
                 String name = getObjectValue(s, 'name', '')
                 String includes = getObjectValue(s, 'includes', '')
+                Boolean validUserInput = isCollectUserInputValid(name, 'path', includes)
                 if((name in stashmap_preprocessor) && (getPublishable(name) in Map)) {
                     def result
                     try {
@@ -317,7 +320,7 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
                     }
                     includes = result
                 }
-                if(isCollectUserInputValid(name, 'path', includes)) {
+                if(validUserInput) {
                     stash_map[name] = [
                         'includes': includes,
                         'excludes': getObjectValue(s, 'excludes', ''),
