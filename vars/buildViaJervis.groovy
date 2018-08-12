@@ -117,22 +117,7 @@ def call() {
 
     jervisBuildNode(generator.labels) {
         if(!generator.isMatrixBuild()) {
-            Map stashMap = pipeline_generator.stashMap
-            stage("Build Project") {
-                checkout global_scm
-                withEnvSecretWrapper(pipeline_generator, jervisEnvList) {
-                    String environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
-                    echo "ENVIRONMENT:\n    ${environment_string}"
-                    sh(script: [
-                        script_header,
-                        generator.generateAll(),
-                        script_footer
-                    ].join('\n').toString())
-                }
-                for(String name : stashMap.keySet()) {
-                    stash allowEmpty: stashMap[name]['allow_empty'], includes: stashMap[name]['includes'], name: name, useDefaultExcludes: stashMap[name]['use_default_excludes']
-                }
-            }
+            buildProjectStage(global_scm, generator, pipeline_generator, jervisEnvList, script_header, script_footer)
         }
         List publishableItems = pipeline_generator.publishableItems
         if(publishableItems) {
