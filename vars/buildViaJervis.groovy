@@ -21,42 +21,6 @@ import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.lang.pipelineGenerator
 
 /**
-  An environment wrapper which sets environment variables.  If available, also
-  sets and masks decrypted properties from .jervis.yml.
- */
-def withEnvSecretWrapper(pipelineGenerator generator, List envList, Closure body) {
-    List spe = generator.secretPairsEnv
-    List secretPairs = spe[0]
-    List secretEnv = spe[1]
-    if(secretPairs) {
-        wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: secretPairs]) {
-            withEnv(secretEnv + envList) {
-                body()
-            }
-        }
-    }
-    else {
-        withEnv(envList) {
-            body()
-        }
-    }
-}
-
-
-/**
-  Returns a string which can be printed.  It is the decrypted properties from a
-  .jervis.yml file.
- */
-@NonCPS
-String printDecryptedProperties(lifecycleGenerator generator, String credentials_id) {
-    [
-        "Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}.",
-        'Decrypted the following properties (indented):',
-        '    ' + generator.plainmap.keySet().join('\n    ')
-    ].join('\n') as String
-}
-
-/**
   Process default publishable items provided by this script.
  */
 def processDefaultPublishable(def item, String publishable, boolean is_pull_request) {
@@ -103,8 +67,6 @@ def processDefaultPublishable(def item, String publishable, boolean is_pull_requ
 }
 
 
-
-
 /**
   The main method of buildViaJervis()
  */
@@ -112,48 +74,38 @@ def call() {
     def generator = new lifecycleGenerator()
     def pipeline_generator
     String environment_string
-    String github_domain
-    String github_org
-    String github_repo
     String script_footer
     String script_header
     BRANCH_NAME = env.CHANGE_BRANCH ?: env.BRANCH_NAME
+
+    // Pull Request detection
     boolean is_pull_request = (env.CHANGE_ID?:false) as Boolean
     env.IS_PR_BUILD = "${is_pull_request}" as String
-    currentBuild.rawBuild.parent.parent.sources[0].source.with {
-        github_org = it.repoOwner
-        github_repo = it.repository
-        github_domain = (it.apiUri)? it.apiUri.split('/')[2] : 'github.com'
-    }
+    generator.is_pr = is_pull_request
     //fix pull request branch name.  Otherwise shows up as PR-* as the branch name.
     if(is_pull_request) {
         env.BRANCH_NAME = env.CHANGE_BRANCH
     }
+
+    // variables which should be injected in build environments
     List jervisEnvList = [
-        "JERVIS_DOMAIN=${github_domain}",
-        "JERVIS_ORG=${github_org}",
-        "JERVIS_PROJECT=${github_repo}",
         "JERVIS_BRANCH=${BRANCH_NAME}",
         "IS_PR_BUILD=${is_pull_request}"
     ]
+    currentBuild.rawBuild.parent.parent.sources[0].source.with {
+        jervisEnvList += [
+            "JERVIS_DOMAIN=${(it.apiUri)? it.apiUri.split('/')[2] : 'github.com'}",
+            "JERVIS_ORG=${it.repoOwner}",
+            "JERVIS_PROJECT=${it.repository}",
+        ]
+    }
 
     def global_scm = scm
 
-    stage('Process Jervis YAML') {
-        prepareJervisLifecycleGenerator(generator, 'github-token')
-        pipeline_generator = new pipelineGenerator(generator)
-        prepareJervisPipelineGenerator(pipeline_generator)
-        //attempt to get the private key else return an empty string
-        String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
-        if(credentials_id) {
-            echo "DECRYPTED PROPERTIES\n${printDecryptedProperties(generator, credentials_id)}"
-        }
-        //end decrypting secrets
-
-        script_header = loadCustomResource "header.sh"
-        script_footer = loadCustomResource "footer.sh"
-        jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
-    }
+    /*
+       Jenkins pipeline stages for a build pipeline.
+     */
+    processJervisYamlStage(generator, pipeline_generator, jervisEnvList, script_header, script_footer)
 
     //prepare to run
     if(generator.isMatrixBuild()) {
