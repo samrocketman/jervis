@@ -201,6 +201,14 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
     void setCollect_settings_defaults(Map m) {
         Map tmp = m.findAll { k, v -> k && v instanceof Map && v }
         if(tmp) {
+            tmp.each { k, v ->
+                if(!('skip_on_pr' in v)) {
+                    v['skip_on_pr'] = false
+                }
+                if(!('skip_on_tag' in v)) {
+                    v['skip_on_tag'] = false
+                }
+            }
             this.collect_settings_defaults << tmp
         }
     }
@@ -385,7 +393,16 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
         if(!supported_collections) {
             throw new PipelineGeneratorException('Calling getPublishableItems() without setting supported_collections.  This issue can only be resolved by an admin of the pipeline shared library.')
         }
-        (supported_collections.intersect(known_items) as List).findAll { getPublishable(it) as Boolean }.sort()
+        (supported_collections.intersect(known_items) as List).findAll {
+            def item = getPublishable(it)
+            item as Boolean &&
+            !(
+                (item in Map) && generator.is_pr && item['skip_on_pr']
+            ) &&
+            !(
+                (item in Map) && generator.is_tag && item['skip_on_tag']
+            )
+        }.sort()
     }
 
     /**

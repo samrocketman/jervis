@@ -52,7 +52,7 @@ String printDecryptedProperties(lifecycleGenerator generator, String credentials
     [
         "Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}.",
         'Decrypted the following properties (indented):',
-        '    ' + (generator.plainmap.keySet() as List).join('\n    ')
+        '    ' + generator.plainmap.keySet().join('\n    ')
     ].join('\n') as String
 }
 
@@ -60,11 +60,6 @@ String printDecryptedProperties(lifecycleGenerator generator, String credentials
   Process default publishable items provided by this script.
  */
 def processDefaultPublishable(def item, String publishable, boolean is_pull_request) {
-    if(is_pull_request && ('skip_on_pr' in item) && (item['skip_on_pr'] in Boolean) && item['skip_on_pr']) {
-        echo "Skip publishing ${publishable} for pull request."
-        //skip because we shouldn't publish on a pull request
-        return
-    }
     switch(publishable) {
         case 'artifacts':
             archiveArtifacts artifacts: item['path'], fingerprint: true,

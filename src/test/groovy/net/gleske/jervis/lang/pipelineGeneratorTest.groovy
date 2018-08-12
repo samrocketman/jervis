@@ -222,14 +222,14 @@ class pipelineGeneratorTest extends GroovyTestCase {
             c: ['planet': 'mars'],
             d: [:]
         ]
-        assert [b: [planet: 'earth'], c: [planet: 'mars']] == pipeline_generator.collect_settings_defaults
+        assert [b: [planet: 'earth', 'skip_on_pr': false, 'skip_on_tag': false], c: [planet: 'mars', 'skip_on_pr': false, 'skip_on_tag': false]] == pipeline_generator.collect_settings_defaults
     }
     @Test public void test_pipelineGenerator_collect_settings_defaults_appending() {
         generator.loadYamlString('language: java')
         def pipeline_generator = new pipelineGenerator(generator)
         pipeline_generator.collect_settings_defaults = [a: ['planet': 'earth']]
         pipeline_generator.collect_settings_defaults = [b: ['planet': 'mars']]
-        assert [a: [planet: 'earth'], b: [planet: 'mars']] == pipeline_generator.collect_settings_defaults
+        assert [a: [planet: 'earth', 'skip_on_pr': false, 'skip_on_tag': false], b: [planet: 'mars', 'skip_on_pr': false, 'skip_on_tag': false]] == pipeline_generator.collect_settings_defaults
     }
     @Test public void test_pipelineGenerator_getPublishableItems_without_supported_collections() {
         generator.loadYamlString('language: java\njenkins:\n  collect:\n    artifacts: hello')
@@ -250,7 +250,7 @@ class pipelineGeneratorTest extends GroovyTestCase {
         pipeline_generator.supported_collections = ['artifacts']
         assert 'hello,world' == pipeline_generator.getPublishable('artifacts')
         pipeline_generator.collect_settings_defaults = [artifacts: [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true]]
-        assert [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true, path: 'hello,world'] == pipeline_generator.getPublishable('artifacts')
+        assert [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true, path: 'hello,world', 'skip_on_pr': false, 'skip_on_tag': false] == pipeline_generator.getPublishable('artifacts')
     }
     @Test public void test_pipelineGenerator_getPublishable_from_collect_settings_defaults_customized() {
         String yaml = '''
@@ -272,7 +272,7 @@ class pipelineGeneratorTest extends GroovyTestCase {
         pipeline_generator.supported_collections = ['artifacts']
         assert 'hello,world' == pipeline_generator.getPublishable('artifacts')
         pipeline_generator.collect_settings_defaults = [artifacts: [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true]]
-        assert [allowEmptyArchive: false, caseSensitive: true, defaultExcludes: true, excludes: 'mars', onlyIfSuccessful: false, path: 'hello,world'] == pipeline_generator.getPublishable('artifacts')
+        assert [allowEmptyArchive: false, caseSensitive: true, defaultExcludes: true, excludes: 'mars', onlyIfSuccessful: false, path: 'hello,world', 'skip_on_pr': false, 'skip_on_tag': false] == pipeline_generator.getPublishable('artifacts')
     }
     @Test public void test_pipelineGenerator_getPublishable_from_collect_settings_defaults_filesets() {
         String yaml = '''
@@ -293,7 +293,7 @@ class pipelineGeneratorTest extends GroovyTestCase {
         assert 'hello,world' == pipeline_generator.getPublishable('artifacts')
         pipeline_generator.collect_settings_defaults = [artifacts: [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: '', onlyIfSuccessful: true]]
         pipeline_generator.collect_settings_filesets = [artifacts: ['excludes']]
-        assert [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: 'hello,mars', onlyIfSuccessful: true, path: 'hello,world'] == pipeline_generator.getPublishable('artifacts')
+        assert [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: 'hello,mars', onlyIfSuccessful: true, path: 'hello,world', 'skip_on_pr': false, 'skip_on_tag': false] == pipeline_generator.getPublishable('artifacts')
     }
     @Test public void test_pipelineGenerator_getPublishable_from_collect_settings_defaults_empty_filesets() {
         String yaml = '''
@@ -312,7 +312,7 @@ class pipelineGeneratorTest extends GroovyTestCase {
         assert 'hello,world' == pipeline_generator.getPublishable('artifacts')
         pipeline_generator.collect_settings_defaults = [artifacts: [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: 'mars', onlyIfSuccessful: true]]
         pipeline_generator.collect_settings_filesets = [artifacts: ['excludes']]
-        assert [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: 'mars', onlyIfSuccessful: true, path: 'hello,world'] == pipeline_generator.getPublishable('artifacts')
+        assert [allowEmptyArchive: true, caseSensitive: false, defaultExcludes: false, excludes: 'mars', onlyIfSuccessful: true, path: 'hello,world', 'skip_on_pr': false, 'skip_on_tag': false] == pipeline_generator.getPublishable('artifacts')
     }
     @Test public void test_pipelineGenerator_getPublishable_bug_undefined_collect() {
         String yaml = 'language: java'
@@ -697,6 +697,82 @@ class pipelineGeneratorTest extends GroovyTestCase {
             ]
         ]
         assert '**/*' == pipeline_generator.getPublishable('fake')['anotherpath']
+    }
+    @Test public void test_pipelineGenerator_getPublishable_with_default_collect_settings_on_tag_pr_default() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    foo:
+            |      path: 'goodbye'
+            |    bar: hello world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'bar']
+        pipeline_generator.collect_settings_defaults = [
+            foo: [title: 'foo title']
+        ]
+
+        assert pipeline_generator.getPublishable('foo') == ['title': 'foo title', 'skip_on_pr': false, 'skip_on_tag': false, 'path': 'goodbye']
+    }
+    @Test public void test_pipelineGenerator_getPublishable_with_default_collect_settings_on_tag_pr_override() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    foo:
+            |      path: 'goodbye'
+            |      skip_on_pr: true
+            |      skip_on_tag: true
+            |    bar: hello world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'bar']
+        pipeline_generator.collect_settings_defaults = [
+            foo: [title: 'foo title']
+        ]
+
+        assert pipeline_generator.getPublishable('foo') == ['title': 'foo title', 'skip_on_pr': true, 'skip_on_tag': true, 'path': 'goodbye']
+    }
+    @Test public void test_pipelineGenerator_getPublishable_with_default_collect_settings_on_tag() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    foo:
+            |      path: 'goodbye'
+            |      skip_on_tag: true
+            |    bar: hello world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'bar']
+        pipeline_generator.collect_settings_defaults = [
+            foo: [title: 'foo title']
+        ]
+
+        assert pipeline_generator.getPublishable('foo') == ['title': 'foo title', 'skip_on_pr': false, 'skip_on_tag': true, 'path': 'goodbye']
+    }
+    @Test public void test_pipelineGenerator_getPublishable_with_default_collect_settings_on_pr() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    foo:
+            |      path: 'goodbye'
+            |      skip_on_pr: true
+            |    bar: hello world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'bar']
+        pipeline_generator.collect_settings_defaults = [
+            foo: [title: 'foo title']
+        ]
+
+        assert pipeline_generator.getPublishable('foo') == ['title': 'foo title', 'skip_on_pr': true, 'skip_on_tag': false, 'path':'goodbye']
     }
     @Test public void test_pipelineGenerator_stashmap_preprocessor_badargs() {
         String yaml = '''
@@ -1153,7 +1229,7 @@ class pipelineGeneratorTest extends GroovyTestCase {
             ]
         ]
         assert pipeline_generator.stashMap == ['html':['includes':'build/docs/groovydoc/**/*', 'excludes':'', 'use_default_excludes':true, 'allow_empty':false, 'matrix_axis':[:]]]
-        assert pipeline_generator.getPublishable('html') == ['allowMissing':false, 'alwaysLinkToLastBuild':false, 'includes':'**/*', 'keepAll':false, 'reportFiles':'index.html', 'reportName':'HTML Report', 'reportTitles':'', 'path':'build/docs/groovydoc']
+        assert pipeline_generator.getPublishable('html') == ['allowMissing':false, 'alwaysLinkToLastBuild':false, 'includes':'**/*', 'keepAll':false, 'reportFiles':'index.html', 'reportName':'HTML Report', 'reportTitles':'', 'path':'build/docs/groovydoc', 'skip_on_pr': false, 'skip_on_tag': false]
         assert pipeline_generator.stashes == [['name':'html', 'includes':'build/docs/groovydoc']]
     }
     @Test public void test_pipelineGenerator_stashmap_preprocessor_success_matrix() {
@@ -1200,7 +1276,49 @@ class pipelineGeneratorTest extends GroovyTestCase {
         assert pipeline_generator.stashMap == [:]
         assert pipeline_generator.getStashMap([env: 'foo=world']) == [:]
         assert pipeline_generator.getStashMap(['env': 'foo=hello']) == ['html':['includes':'build/docs/groovydoc/**/*', 'excludes':'', 'use_default_excludes':true, 'allow_empty':false, 'matrix_axis':['env':'foo=hello']]]
-        assert pipeline_generator.getPublishable('html') == ['allowMissing':false, 'alwaysLinkToLastBuild':false, 'includes':'**/*', 'keepAll':false, 'reportFiles':'index.html', 'reportName':'HTML Report', 'reportTitles':'', 'path':'build/docs/groovydoc']
+        assert pipeline_generator.getPublishable('html') == ['allowMissing':false, 'alwaysLinkToLastBuild':false, 'includes':'**/*', 'keepAll':false, 'reportFiles':'index.html', 'reportName':'HTML Report', 'reportTitles':'', 'path':'build/docs/groovydoc', 'skip_on_pr': false, 'skip_on_tag': false]
         assert pipeline_generator.stashes == [['name':'html', 'matrix_axis':['env':'foo=hello'], 'includes':'build/docs/groovydoc']]
+    }
+    @Test public void test_pipelineGenerator_publish_skip_on_pr() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    foo:
+            |      path: 'goodbye'
+            |      skip_on_pr: true
+            |    bar: hello world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'bar']
+        pipeline_generator.collect_settings_defaults = [
+            foo: [title: 'foo title']
+        ]
+
+        assert pipeline_generator.publishableItems == ['bar', 'foo']
+        generator.is_pr = true
+        assert pipeline_generator.publishableItems == ['bar']
+    }
+    @Test public void test_pipelineGenerator_publish_skip_on_tag() {
+        String yaml = '''
+            |language: java
+            |jenkins:
+            |  collect:
+            |    foo:
+            |      path: 'goodbye'
+            |      skip_on_tag: true
+            |    bar: hello world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        pipeline_generator.supported_collections = ['foo', 'bar']
+        pipeline_generator.collect_settings_defaults = [
+            foo: [title: 'foo title']
+        ]
+
+        assert pipeline_generator.publishableItems == ['bar', 'foo']
+        generator.is_tag = true
+        assert pipeline_generator.publishableItems == ['bar']
     }
 }
