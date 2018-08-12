@@ -120,17 +120,9 @@ def call() {
     String github_domain
     String github_org
     String github_repo
-    String jenkins_folder
-    String jervis_yaml
-    String lifecycles_json
-    String os_stability
-    String platforms_json
     String script_footer
     String script_header
-    String toolchains_json
-    Map build_meta = [:]
-    List folder_listing = []
-    BRANCH_NAME = env.CHANGE_BRANCH?:env.BRANCH_NAME
+    BRANCH_NAME = env.CHANGE_BRANCH ?: env.BRANCH_NAME
     boolean is_pull_request = (env.CHANGE_ID?:false) as Boolean
     env.IS_PR_BUILD = "${is_pull_request}" as String
     currentBuild.rawBuild.parent.parent.sources[0].source.with {
@@ -142,7 +134,6 @@ def call() {
     if(is_pull_request) {
         env.BRANCH_NAME = env.CHANGE_BRANCH
     }
-    jenkins_folder = currentBuild.rawBuild.parent.parent.fullName.split('/')[0]
     List jervisEnvList = [
         "JERVIS_DOMAIN=${github_domain}",
         "JERVIS_ORG=${github_org}",
@@ -152,16 +143,6 @@ def call() {
     ]
 
     def global_scm = scm
-
-    //build metadata to pass on to user defined methods
-    build_meta = [
-        BRANCH_NAME: BRANCH_NAME,
-        env: env,
-        github_domain: github_domain,
-        github_org: github_org,
-        github_repo: github_repo,
-        jenkins_folder: jenkins_folder
-    ]
 
     stage('Process Jervis YAML') {
         prepareJervisLifecycleGenerator(generator, 'github-token')
@@ -177,11 +158,6 @@ def call() {
         script_header = loadCustomResource "header.sh"
         script_footer = loadCustomResource "footer.sh"
         jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
-        build_meta['generator'] = generator
-        build_meta['pipeline_generator'] = pipeline_generator
-        if(hasGlobalVar('adminPostYaml')) {
-            adminPostYaml build_meta
-        }
     }
 
     //prepare to run
