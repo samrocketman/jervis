@@ -78,4 +78,22 @@ class SimpleRestServiceTest extends GroovyTestCase {
             apiFetch(new URL('https://example.com/post/endpoint'), http_headers, 'BARF', 'this is some test data')
         }
     }
+    @Test public void test_SimpleRestService_apiFetch_put() {
+        Map http_headers = ['Content-Type': 'text/plain']
+        String response = apiFetch(new URL('https://example.com/post/endpoint'), http_headers, 'PUT').trim()
+        assert response == 'this is mock POST response data'
+        assert request_meta['method'] == 'PUT'
+    }
+    @Test public void test_SimpleRestService_apiFetch_patch() {
+        Map http_headers = ['Content-Type': 'text/plain']
+        String response = apiFetch(new URL('https://example.com/post/endpoint'), http_headers, 'PATCH').trim()
+        assert response == 'this is mock POST response data'
+        assert request_meta['method'] == 'PATCH'
+    }
+    @Test public void test_SimpleRestService_apiFetch_delete() {
+        Map http_headers = ['Content-Type': 'text/plain']
+        String response = apiFetch(new URL('https://example.com/post/endpoint'), http_headers, 'DELETE').trim()
+        assert response == 'this is mock POST response data'
+        assert request_meta['method'] == 'DELETE'
+    }
 }
