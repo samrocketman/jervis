@@ -71,8 +71,7 @@ def processDefaultPublishable(def item, String publishable, boolean is_pull_requ
   The main method of buildViaJervis()
  */
 def call() {
-    def generator = new lifecycleGenerator()
-    String environment_string
+    def global_scm = scm
     String script_footer = ''
     String script_header = ''
     BRANCH_NAME = env.CHANGE_BRANCH ?: env.BRANCH_NAME
@@ -80,7 +79,6 @@ def call() {
     // Pull Request detection
     boolean is_pull_request = (env.CHANGE_ID?:false) as Boolean
     env.IS_PR_BUILD = "${is_pull_request}" as String
-    generator.is_pr = is_pull_request
     //fix pull request branch name.  Otherwise shows up as PR-* as the branch name.
     if(is_pull_request) {
         env.BRANCH_NAME = env.CHANGE_BRANCH
@@ -99,66 +97,17 @@ def call() {
         ]
     }
 
-    def global_scm = scm
 
     /*
        Jenkins pipeline stages for a build pipeline.
      */
+    def generator = new lifecycleGenerator()
+    generator.is_pr = is_pull_request
     def pipeline_generator = processJervisYamlStage(generator, jervisEnvList, script_header, script_footer)
-
-    //prepare to run
     if(generator.isMatrixBuild()) {
-        //a matrix build which should be executed in parallel
-        Map tasks = [failFast: true]
-        pipeline_generator.buildableMatrixAxes.each { matrix_axis ->
-            String stageIdentifier = matrix_axis.collect { k, v -> generator.matrix_fullName_by_friendly[v]?:v }.join('\n')
-            String label = generator.labels
-            List axisEnvList = matrix_axis.collect { k, v -> "${k}=${v}" }
-            Map stashMap = pipeline_generator.getStashMap(matrix_axis)
-            tasks[stageIdentifier] = {
-                jervisBuildNode(label) {
-                    stage("Checkout SCM") {
-                        checkout global_scm
-                    }
-                    stage("Build axis ${stageIdentifier}") {
-                        Boolean failed_stage = false
-                        withEnvSecretWrapper(pipeline_generator, axisEnvList + jervisEnvList) {
-                            environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
-                            echo "ENVIRONMENT:\n    ${environment_string}"
-                            try {
-                                sh(script: [
-                                    script_header,
-                                    generator.generateAll(),
-                                    script_footer
-                                ].join('\n').toString())
-                            }
-                            catch(e) {
-                                failed_stage = true
-                            }
-                        }
-                        for(String name : stashMap.keySet()) {
-                            try {
-                                echo "Stashing ${name}; includes: '${stashMap[name]['includes']}'"
-                                stash allowEmpty: stashMap[name]['allow_empty'], includes: stashMap[name]['includes'], name: name, useDefaultExcludes: stashMap[name]['use_default_excludes']
-                            }
-                            catch(e) {
-                                if(!failed_stage) {
-                                    //rethrow proper exception if this stage hasn't failed
-                                    throw e
-                                }
-                            }
-                        }
-                        if(failed_stage) {
-                            currentBuild.result = 'FAILURE'
-                        }
-                    }
-                }
-            }
-        }
-        stage("Build Project") {
-            parallel(tasks)
-        }
+        matrixBuildProjectStage(generator, pipeline_generator, jervisEnvList)
     }
+
 
     jervisBuildNode(generator.labels) {
         if(!generator.isMatrixBuild()) {
@@ -166,7 +115,7 @@ def call() {
             stage("Build Project") {
                 checkout global_scm
                 withEnvSecretWrapper(pipeline_generator, jervisEnvList) {
-                    environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
+                    String environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
                     echo "ENVIRONMENT:\n    ${environment_string}"
                     sh(script: [
                         script_header,
