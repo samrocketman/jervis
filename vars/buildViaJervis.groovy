@@ -105,7 +105,8 @@ def call() {
     generator.is_pr = is_pull_request
     def pipeline_generator = processJervisYamlStage(generator, jervisEnvList, script_header, script_footer)
     if(generator.isMatrixBuild()) {
-        matrixBuildProjectStage(generator, pipeline_generator, jervisEnvList)
+        // this occurs in parallel across multiple build nodes (1 node per axis)
+        matrixBuildProjectStage(global_scm, generator, pipeline_generator, jervisEnvList, script_header, script_footer)
     }
 
 

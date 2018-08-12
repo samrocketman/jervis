@@ -20,7 +20,7 @@
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.lang.pipelineGenerator
 
-def call(lifecycleGenerator generator, pipelineGenerator pipeline_generator, List jervisEnvList) {
+def call(def global_scm, lifecycleGenerator generator, pipelineGenerator pipeline_generator, List jervisEnvList, String script_header, String script_footer) {
     Map tasks = [failFast: true]
     pipeline_generator.buildableMatrixAxes.each { matrix_axis ->
         String stageIdentifier = matrix_axis.collect { k, v -> generator.matrix_fullName_by_friendly[v]?:v }.join('\n')
