@@ -27,7 +27,7 @@ import net.gleske.jervis.lang.pipelineGenerator
 @NonCPS
 String printDecryptedProperties(lifecycleGenerator generator, String credentials_id) {
     [
-        "Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}.",
+        "Used Jenkins Credentials ID ${credentials_id}.",
         'Decrypted the following properties (indented):',
         '    ' + generator.plainmap.keySet().join('\n    ')
     ].join('\n') as String
