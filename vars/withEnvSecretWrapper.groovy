@@ -20,13 +20,10 @@
 
 import net.gleske.jervis.lang.pipelineGenerator
 
-def call(pipelineGenerator generator, List envList, Closure body) {
-    List spe = generator.secretPairsEnv
-    List secretPairs = spe[0]
-    List secretEnv = spe[1]
+def withEnvSecretWrapper(List envList, List secretPairs = [], Closure body) {
     if(secretPairs) {
         wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: secretPairs]) {
-            withEnv(secretEnv + envList) {
+            withEnv(envList) {
                 body()
             }
         }
@@ -36,4 +33,15 @@ def call(pipelineGenerator generator, List envList, Closure body) {
             body()
         }
     }
+}
+
+def call(pipelineGenerator generator, List envList, Closure body) {
+    List spe = generator.secretPairsEnv
+    List secretPairs = spe[0]
+    List secretEnv = spe[1]
+    withEnvSecretWrapper(secretEnv + envList, secretPairs, body)
+}
+
+def call(List envList, List secretPairs = [], Closure body) {
+    withEnvSecretWrapper(envList, secretPairs, body)
 }
