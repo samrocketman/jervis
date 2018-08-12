@@ -116,7 +116,7 @@ def call() {
             List axisEnvList = matrix_axis.collect { k, v -> "${k}=${v}" }
             Map stashMap = pipeline_generator.getStashMap(matrix_axis)
             tasks[stageIdentifier] = {
-                node(label) {
+                jervisBuildNode(label) {
                     stage("Checkout SCM") {
                         checkout global_scm
                     }
@@ -160,7 +160,7 @@ def call() {
         }
     }
 
-    node(generator.labels) {
+    jervisBuildNode(generator.labels) {
         if(!generator.isMatrixBuild()) {
             Map stashMap = pipeline_generator.stashMap
             stage("Build Project") {
