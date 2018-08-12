@@ -14,8 +14,8 @@
    limitations under the License.
    */
 
-@Grab(group='net.gleske', module='jervis', version='1.1', transitive=false)
-@Grab(group='org.yaml', module='snakeyaml', version='1.19', transitive=false)
+@Grab(group='net.gleske', module='jervis', version='1.2', transitive=false)
+@Grab(group='org.yaml', module='snakeyaml', version='1.21', transitive=false)
 
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.lang.pipelineGenerator
