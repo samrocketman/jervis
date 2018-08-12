@@ -24,7 +24,7 @@ import net.gleske.jervis.lang.pipelineGenerator
 /**
   Process default publishable items provided by this script.
  */
-def processDefaultPublishable(def item, String publishable, boolean is_pull_request) {
+def processDefaultPublishable(def item, String publishable) {
     switch(publishable) {
         case 'artifacts':
             archiveArtifacts artifacts: item['path'], fingerprint: true,
@@ -81,7 +81,7 @@ def call(lifecycleGenerator generator, pipelineGenerator pipeline_generator) {
                 tasks["Publish ${publish}"] = {
                     try {
                         unstash publish
-                        processDefaultPublishable(pipeline_generator.getPublishable(publish), publish, is_pull_request)
+                        processDefaultPublishable(pipeline_generator.getPublishable(publish), publish)
                     }
                     catch(e) {
                         currentBuild.result = 'FAILURE'
