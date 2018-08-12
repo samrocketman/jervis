@@ -56,14 +56,14 @@ class SimpleRestService {
             case ~/^(POST|PUT|DELETE|PATCH)$/:
                 String response = api_url.openConnection().with { conn ->
                     conn.doOutput = true
-                    conn.requestMethod = http_method.toUpperCase()
+                    conn.setRequestMethod(http_method.toUpperCase())
                     http_headers.each { k, v ->
                         conn.setRequestProperty(k, v)
                     }
                     conn.outputStream.withWriter { writer ->
                         writer << data
                     }
-                    conn.content.text
+                    conn.getContent().getText()
                 }
                 data_response = (parse_json)? yaml.load(response ?: '{}') : response
                 break
