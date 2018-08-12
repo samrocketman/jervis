@@ -14,13 +14,13 @@ env:
   # Groovy 1.8.9 for cobertura
   - GROOVY_VERSION="1.8.9"
   # Latest Groovy 2.4.x stable
-  - GROOVY_VERSION="2.4.13"
+  - GROOVY_VERSION="2.4.15"
   # Next Groovy 2.5.x release
-  - GROOVY_VERSION="2.5.0-beta-1"
+  - GROOVY_VERSION="2.5.1"
 
 matrix:
   allow_failures:
-    - env: GROOVY_VERSION="2.5.0-beta-1"
+    - env: GROOVY_VERSION="2.5.1"
 
 branches:
   only:
@@ -32,13 +32,13 @@ jenkins:
   stash:
     - name: artifacts
       matrix_axis:
-        env: GROOVY_VERSION="2.4.13"
+        env: GROOVY_VERSION="2.4.15"
     - name: html
       matrix_axis:
-        env: GROOVY_VERSION="2.4.13"
+        env: GROOVY_VERSION="2.4.15"
     - name: junit
       matrix_axis:
-        env: GROOVY_VERSION="2.4.13"
+        env: GROOVY_VERSION="2.4.15"
     - name: cobertura
       matrix_axis:
         env: GROOVY_VERSION="1.8.9"
