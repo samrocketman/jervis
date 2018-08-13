@@ -19,15 +19,15 @@
  */
 
 import hudson.model.Job
-import jenkins.plugins.git.GitTagSCMHead
+import org.jenkinsci.plugins.github_branch_source.PullRequestSCMHead
 import org.jenkinsci.plugins.workflow.multibranch.BranchJobProperty
 
 
 @NonCPS
-Boolean isTagBuild(Job build_parent) {
-    build_parent.getProperty(BranchJobProperty).branch.head in GitTagSCMHead
+Boolean isPRBuild(Job build_parent) {
+    build_parent.getProperty(BranchJobProperty).branch.head in PullRequestSCMHead
 }
 
 Boolean call() {
-    isTagBuild(currentBuild.rawBuild.parent)
+    isPRBuild(currentBuild.rawBuild.parent)
 }
