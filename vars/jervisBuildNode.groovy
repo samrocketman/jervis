@@ -20,7 +20,12 @@
  */
 
 def call(String label, Closure body) {
-    node(label) {
-        body()
+    if(hasGlobalVar('adminJervisBuildNode')) {
+        adminJervisBuildNode(label, body)
+    }
+    else {
+        node(label) {
+            body()
+        }
     }
 }
