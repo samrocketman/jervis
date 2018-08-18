@@ -24,7 +24,7 @@ String tryReadFile(String file_path) {
 }
 
 //this should only be at the top of firstjob_dsl.groovy
-evaluate(readFileFromWorkspace('jobs/require_bindings.groovy').toString())
+evaluate(tryReadFile('jobs/require_bindings.groovy').toString())
 //this code should be at the beginning of every script included which requires bindings
 require_bindings('jobs/firstjob_dsl.groovy', ['project'])
 
