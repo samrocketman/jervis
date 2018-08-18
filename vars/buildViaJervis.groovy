@@ -77,6 +77,7 @@ def call() {
         if(currentBuild.result == 'FAILURE') {
             error 'This build has failed.  No user-defined pipelines will be run.'
         }
+        /*
         boolean allow_user_pipelines = true
         if(hasGlobalVar('adminAllowUserPipelinesBoolean')) {
             allow_user_pipelines = adminAllowUserPipelinesBoolean() as boolean
@@ -89,5 +90,7 @@ def call() {
             }
             load generator.jenkinsfile
         }
+        */
     }
+    pipeline_generator
 }
