@@ -14,13 +14,12 @@
    limitations under the License.
    */
 
-String tryReadFile(String file_path) {
-    try {
-        readFileFromWorkspace(file_path).toString()
-    }
-    catch(Exception e) {
-        readFileFromWorkspace('jervis/' + file_path).toString()
-    }
+parent_job = this
+try {
+    evaluate(readFileFromWorkspace('jobs/tryReadFile.groovy').toString())
+}
+catch(Exception e) {
+    evaluate(readFileFromWorkspace('jervis/jobs/tryReadFile.groovy').toString())
 }
 
 //this should only be at the top of firstjob_dsl.groovy
@@ -47,7 +46,6 @@ project_folder = "${project}".split('/')[0].toString()
 project_name = "${project}".split('/')[1].toString()
 script_approval = Jenkins.instance.getExtensionList('org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval')[0]
 system_creds = Jenkins.instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0]
-parent_job = this
 
 //prepare bindings from other files (order does not matter)
 evaluate(tryReadFile('jobs/git_service.groovy'))

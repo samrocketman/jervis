@@ -45,12 +45,12 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
         //travis ci defaults to ruby when no language is specified
         generator.yaml_language = 'ruby'
     }
-    generator.loadPlatformsString(parent_job.readFileFromWorkspace('resources/platforms.json').toString())
+    generator.loadPlatformsString(tryReadFile('resources/platforms.json').toString())
     generator.preloadYamlString(jervis_yaml)
     //could optionally read lifecycles and toolchains files by OS
     def os_stability = "${generator.label_os}-${generator.label_stability}"
-    generator.loadLifecyclesString(parent_job.readFileFromWorkspace("resources/lifecycles-${os_stability}.json").toString())
-    generator.loadToolchainsString(parent_job.readFileFromWorkspace("resources/toolchains-${os_stability}.json").toString())
+    generator.loadLifecyclesString(tryReadFile("resources/lifecycles-${os_stability}.json").toString())
+    generator.loadToolchainsString(tryReadFile("resources/toolchains-${os_stability}.json").toString())
     generator.loadYamlString(jervis_yaml)
     generator.folder_listing = folder_listing
     //check for branch filters
