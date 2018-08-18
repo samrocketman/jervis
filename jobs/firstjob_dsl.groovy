@@ -14,6 +14,15 @@
    limitations under the License.
    */
 
+String tryReadFile(String file_path) {
+    try {
+        readFileFromWorkspace(file_path).toString()
+    }
+    catch(Exception e) {
+        readFileFromWorkspace('jervis/' + file_path).toString()
+    }
+}
+
 //this should only be at the top of firstjob_dsl.groovy
 evaluate(readFileFromWorkspace('jobs/require_bindings.groovy').toString())
 //this code should be at the beginning of every script included which requires bindings
@@ -30,7 +39,7 @@ import net.gleske.jervis.remotes.GitHub
 import net.gleske.jervis.exceptions.JervisException
 
 //ensure all prerequisite plugins are installed
-evaluate(readFileFromWorkspace('jobs/required_plugins.groovy').toString())
+evaluate(tryReadFile('jobs/required_plugins.groovy'))
 
 //script bindings in this file
 git_service = new GitHub()
@@ -41,14 +50,14 @@ system_creds = Jenkins.instance.getExtensionList("com.cloudbees.plugins.credenti
 parent_job = this
 
 //prepare bindings from other files (order does not matter)
-evaluate(readFileFromWorkspace('jobs/git_service.groovy').toString())
-evaluate(readFileFromWorkspace('jobs/global_threadlock.groovy').toString())
-evaluate(readFileFromWorkspace('jobs/get_folder_credentials.groovy').toString())
+evaluate(tryReadFile('jobs/git_service.groovy'))
+evaluate(tryReadFile('jobs/global_threadlock.groovy'))
+evaluate(tryReadFile('jobs/get_folder_credentials.groovy'))
 
 //prepare bindings from other files (order matters due to bindings loaded from other scripts)
-evaluate(readFileFromWorkspace('jobs/is_pipeline.groovy').toString())
-evaluate(readFileFromWorkspace('jobs/jenkins_job_multibranch_pipeline.groovy').toString())
-evaluate(readFileFromWorkspace('jobs/generate_project_for.groovy').toString())
+evaluate(tryReadFile('jobs/is_pipeline.groovy'))
+evaluate(tryReadFile('jobs/jenkins_job_multibranch_pipeline.groovy'))
+evaluate(tryReadFile('jobs/generate_project_for.groovy'))
 
 println 'Generating jobs for ' + git_service.toString() + " project ${project}."
 
