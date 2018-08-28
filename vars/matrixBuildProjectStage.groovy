@@ -28,7 +28,7 @@ def call(def global_scm, lifecycleGenerator generator, pipelineGenerator pipelin
         List axisEnvList = matrix_axis.collect { k, v -> "${k}=${v}" }
         Map stashMap = pipeline_generator.getStashMap(matrix_axis)
         tasks[stageIdentifier] = {
-            jervisBuildNode(label) {
+            jervisBuildNode(pipeline_generator, label) {
                 stage("Checkout SCM") {
                     checkout global_scm
                 }

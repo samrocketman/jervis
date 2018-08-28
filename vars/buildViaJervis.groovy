@@ -68,7 +68,7 @@ def call() {
     }
 
 
-    jervisBuildNode(generator.labels) {
+    jervisBuildNode(pipeline_generator, generator.labels) {
         if(!generator.isMatrixBuild()) {
             buildProjectStage(global_scm, generator, pipeline_generator, jervisEnvList, script_header, script_footer)
         }

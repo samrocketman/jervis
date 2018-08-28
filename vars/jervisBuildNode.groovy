@@ -19,9 +19,11 @@
    provisioning where Jervis builds occur.
  */
 
-def call(String label, Closure body) {
+import net.gleske.jervis.lang.pipelineGenerator
+
+def call(pipelineGenerator pipeline_generator, String label, Closure body) {
     if(hasGlobalVar('adminJervisBuildNode')) {
-        adminJervisBuildNode(label, body)
+        adminJervisBuildNode(pipeline_generator, label, body)
     }
     else {
         node(label) {
