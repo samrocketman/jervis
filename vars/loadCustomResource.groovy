@@ -29,21 +29,26 @@ import org.jenkinsci.plugins.configfiles.GlobalConfigFiles
   null if we couldn't find a custom resource.
  */
 @NonCPS
-String tryLoadCustomResource(String resource) {
+String loadConfigFileResource(String resource) {
     def config_files = Jenkins.instance.getExtensionList(GlobalConfigFiles)[0]
-    if(hasGlobalVar('adminLibraryResource')) {
-        adminLibraryResource(resource)
-        echo "Loaded resource ${resource} from adminLibraryResource."
-    }
-    else if(config_files.getById(resource)) {
+    if(config_files.getById(resource)) {
         config_files.getById(resource).content
-        echo "Loaded resource ${resource} from global config files."
     }
     else {
-        null
+        ""
     }
 }
 
 String call(String resource) {
-    tryLoadCustomResource(resource) ?: libraryResource(resource)
+    if(hasGlobalVar('adminLibraryResource')) {
+        echo "Load resource ${resource} from adminLibraryResource."
+        adminLibraryResource(resource)
+    }
+    else if(loadConfigFileResource(resource)) {
+        echo "Load resource ${resource} from global config files."
+        loadConfigFileResource(resource)
+    }
+    else {
+        libraryResource(resource)
+    }
 }
