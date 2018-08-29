@@ -59,11 +59,8 @@ evaluate(tryReadFile('jobs/generate_project_for.groovy'))
 
 println 'Generating jobs for ' + git_service.toString() + " project ${project}."
 
-//create the folder because it doesn't exist, yet
-if(!Jenkins.instance.getItem(project_folder)) {
-    println "Creating folder ${project_folder}"
-    folder(project_folder)
-}
+//create the folder if it doesn't exist, yet
+evaluate(tryReadFile('jobs/create_folder.groovy'))
 
 println "Creating project ${project}"
 
