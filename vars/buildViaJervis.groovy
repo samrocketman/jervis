@@ -28,7 +28,9 @@ def call() {
     BRANCH_NAME = env.CHANGE_BRANCH ?: env.BRANCH_NAME
 
     // Pull Request detection
-    env.IS_PR_BUILD = "${isPRBuild()}".toString()
+    env.IS_PR_BUILD = isPRBuild().toString()
+    // Tag detection
+    env.IS_TAG_BUILD = isTagBuild().toString()
     //fix pull request branch name.  Otherwise shows up as PR-* as the branch name.
     if(isPRBuild()) {
         env.BRANCH_NAME = env.CHANGE_BRANCH
@@ -37,7 +39,8 @@ def call() {
     // variables which should be injected in build environments
     List jervisEnvList = [
         "JERVIS_BRANCH=${BRANCH_NAME}",
-        "IS_PR_BUILD=${isPRBuild()}"
+        "IS_PR_BUILD=${isPRBuild()}",
+        "IS_TAG_BUILD=${isTagBuild()}"
     ]
     currentBuild.rawBuild.parent.parent.sources[0].source.with {
         jervisEnvList += [
