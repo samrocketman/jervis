@@ -28,17 +28,16 @@ def call() {
     BRANCH_NAME = env.CHANGE_BRANCH ?: env.BRANCH_NAME
 
     // Pull Request detection
-    boolean is_pull_request = (env.CHANGE_ID?:false) as Boolean
-    env.IS_PR_BUILD = "${is_pull_request}" as String
+    env.IS_PR_BUILD = "${isPRBuild()}".toString()
     //fix pull request branch name.  Otherwise shows up as PR-* as the branch name.
-    if(is_pull_request) {
+    if(isPRBuild()) {
         env.BRANCH_NAME = env.CHANGE_BRANCH
     }
 
     // variables which should be injected in build environments
     List jervisEnvList = [
         "JERVIS_BRANCH=${BRANCH_NAME}",
-        "IS_PR_BUILD=${is_pull_request}"
+        "IS_PR_BUILD=${isPRBuild()}"
     ]
     currentBuild.rawBuild.parent.parent.sources[0].source.with {
         jervisEnvList += [
@@ -53,7 +52,7 @@ def call() {
        Jenkins pipeline stages for a build pipeline.
      */
     def generator = new lifecycleGenerator()
-    generator.is_pr = is_pull_request
+    generator.is_pr = isPRBuild()
     def pipeline_generator
     String script_header
     String script_footer
