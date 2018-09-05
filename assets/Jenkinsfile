@@ -1,17 +1,9 @@
 #!groovy
-pipeline {
-    agent {
-        label 'ubuntu1604'
-    }
-    stages {
-        stage('Simulated deploy') {
-            when { branch 'jervis_simple' }
-            steps {
-                sh 'env | LC_ALL=C sort'
-                unstash 'artifacts'
-                unstash 'junit'
-                sh 'find . -type f'
-            }
-        }
+if(BRANCH_NAME == 'jervis_simple') {
+    stage('Simulated deploy') {
+        sh 'env | LC_ALL=C sort'
+        unstash 'artifacts'
+        unstash 'junit'
+        sh 'find . -type f'
     }
 }
