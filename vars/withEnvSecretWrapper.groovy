@@ -35,7 +35,7 @@ def withEnvSecretWrapper(List envList, List secretPairs = [], Closure body) {
     }
 }
 
-def call(pipelineGenerator generator, List envList, Closure body) {
+def call(pipelineGenerator generator, List envList = [], Closure body) {
     List spe = generator.secretPairsEnv
     List secretPairs = spe[0]
     List secretEnv = spe[1]

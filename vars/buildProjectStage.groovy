@@ -21,11 +21,11 @@
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.lang.pipelineGenerator
 
-def call(def global_scm, lifecycleGenerator generator, pipelineGenerator pipeline_generator, List jervisEnvList, String script_header, String script_footer) {
+def call(def global_scm, lifecycleGenerator generator, pipelineGenerator pipeline_generator, String script_header, String script_footer) {
     Map stashMap = pipeline_generator.stashMap
     stage("Build Project") {
         checkout global_scm
-        withEnvSecretWrapper(pipeline_generator, jervisEnvList) {
+        withEnvSecretWrapper(pipeline_generator) {
             String environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
             echo "ENVIRONMENT:\n    ${environment_string}"
             sh(script: [

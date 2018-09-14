@@ -33,7 +33,7 @@ String printDecryptedProperties(lifecycleGenerator generator, String credentials
     ].join('\n') as String
 }
 
-def call(lifecycleGenerator generator, List jervisEnvList, Closure body) {
+def call(lifecycleGenerator generator, Closure body) {
     stage('Process Jervis YAML') {
         prepareJervisLifecycleGenerator(generator, 'github-token')
         def pipeline_generator = new pipelineGenerator(generator)
@@ -45,7 +45,7 @@ def call(lifecycleGenerator generator, List jervisEnvList, Closure body) {
         }
         //end decrypting secrets
 
-        jervisEnvList << "JERVIS_LANG=${generator.yaml_language}"
+        env.JERVIS_LANG = generator.yaml_language
         body(pipeline_generator)
     }
 }

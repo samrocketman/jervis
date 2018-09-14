@@ -27,29 +27,21 @@ def call() {
     def global_scm = scm
     BRANCH_NAME = env.CHANGE_BRANCH ?: env.BRANCH_NAME
 
+    // JERVIS INJECTED ENVIRONMENT VARIABLES
     // Pull Request detection
     env.IS_PR_BUILD = isPRBuild().toString()
     // Tag detection
     env.IS_TAG_BUILD = isTagBuild().toString()
+    currentBuild.rawBuild.parent.parent.sources[0].source.with {
+        env.JERVIS_DOMAIN = ((it.apiUri)? it.apiUri.split('/')[2] : 'github.com')
+        env.JERVIS_ORG = it.repoOwner
+        env.JERVIS_PROJECT =it.repository
+    }
+    env.JERVIS_BRANCH = BRANCH_NAME
     //fix pull request branch name.  Otherwise shows up as PR-* as the branch name.
     if(isPRBuild()) {
         env.BRANCH_NAME = env.CHANGE_BRANCH
     }
-
-    // variables which should be injected in build environments
-    List jervisEnvList = [
-        "JERVIS_BRANCH=${BRANCH_NAME}",
-        "IS_PR_BUILD=${isPRBuild()}",
-        "IS_TAG_BUILD=${isTagBuild()}"
-    ]
-    currentBuild.rawBuild.parent.parent.sources[0].source.with {
-        jervisEnvList += [
-            "JERVIS_DOMAIN=${(it.apiUri)? it.apiUri.split('/')[2] : 'github.com'}",
-            "JERVIS_ORG=${it.repoOwner}",
-            "JERVIS_PROJECT=${it.repository}",
-        ]
-    }
-
 
     /*
        Jenkins pipeline stages for a build pipeline.
@@ -59,20 +51,20 @@ def call() {
     def pipeline_generator
     String script_header
     String script_footer
-    processJervisYamlStage(generator, jervisEnvList) {
+    processJervisYamlStage(generator) {
         pipeline_generator = it
         script_header = loadCustomResource "header.sh"
         script_footer = loadCustomResource "footer.sh"
     }
     if(generator.isMatrixBuild()) {
         // this occurs in parallel across multiple build nodes (1 node per axis)
-        matrixBuildProjectStage(global_scm, generator, pipeline_generator, jervisEnvList, script_header, script_footer)
+        matrixBuildProjectStage(global_scm, generator, pipeline_generator, script_header, script_footer)
     }
 
 
     jervisBuildNode(pipeline_generator, generator.labels) {
         if(!generator.isMatrixBuild()) {
-            buildProjectStage(global_scm, generator, pipeline_generator, jervisEnvList, script_header, script_footer)
+            buildProjectStage(global_scm, generator, pipeline_generator, script_header, script_footer)
         }
         publishResultsStage(generator, pipeline_generator)
 

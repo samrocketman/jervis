@@ -20,7 +20,7 @@
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.lang.pipelineGenerator
 
-def call(def global_scm, lifecycleGenerator generator, pipelineGenerator pipeline_generator, List jervisEnvList, String script_header, String script_footer) {
+def call(def global_scm, lifecycleGenerator generator, pipelineGenerator pipeline_generator, String script_header, String script_footer) {
     Map tasks = [failFast: true]
     pipeline_generator.buildableMatrixAxes.each { matrix_axis ->
         String stageIdentifier = matrix_axis.collect { k, v -> generator.matrix_fullName_by_friendly[v]?:v }.join('\n')
@@ -34,7 +34,7 @@ def call(def global_scm, lifecycleGenerator generator, pipelineGenerator pipelin
                 }
                 stage("Build axis ${stageIdentifier}") {
                     Boolean failed_stage = false
-                    withEnvSecretWrapper(pipeline_generator, axisEnvList + jervisEnvList) {
+                    withEnvSecretWrapper(pipeline_generator, axisEnvList) {
                         String environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
                         echo "ENVIRONMENT:\n    ${environment_string}"
                         try {
