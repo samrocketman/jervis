@@ -79,20 +79,6 @@ def call() {
         if(currentBuild.result == 'FAILURE') {
             error 'This build has failed.  No user-defined pipelines will be run.'
         }
-        /*
-        boolean allow_user_pipelines = true
-        if(hasGlobalVar('adminAllowUserPipelinesBoolean')) {
-            allow_user_pipelines = adminAllowUserPipelinesBoolean() as boolean
-        }
-        if(generator.isPipelineJob() && allow_user_pipelines) {
-            if(generator.isMatrixBuild()) {
-                stage("Checkout Jenkinsfile") {
-                    checkout global_scm
-                }
-            }
-            load generator.jenkinsfile
-        }
-        */
     }
     pipeline_generator
 }
