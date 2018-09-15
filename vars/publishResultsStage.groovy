@@ -78,7 +78,7 @@ def call(lifecycleGenerator generator, pipelineGenerator pipeline_generator) {
                 // strangely behaves with tasks and looping.  Without it,
                 // pipeline makes publishable null in tasks oddly.
                 String publish = publishable
-                tasks["Publish ${publish}"] = {
+                tasks["${publish}"] = {
                     try {
                         unstash publish
                         processDefaultPublishable(pipeline_generator.getPublishable(publish), publish)
