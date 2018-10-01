@@ -35,6 +35,37 @@ def withEnvSecretWrapper(List envList, List secretPairs = [], Closure body) {
     }
 }
 
+/**
+  Jenkins Pipeline step withEnv requires a specific format for injecting
+  variables into a shell environment.  This method simply converts the secrets
+  Map into that expected key-value format.
+
+  See also:
+  https://jenkins.io/doc/pipeline/steps/workflow-basic-steps/#withenv-set-environment-variables
+  */
+@NonCPS
+List<String> getEnvVars(Map secrets) {
+    secrets.collect { k, v ->
+        "${k}=${v}".toString()
+    }
+}
+
+/**
+  The Mask Passwords console wrapper requires key-value pairs to be a specific
+  format.  The console wrapper is what filters passwords in the web UI and
+  turns passwords into **** replacements.  This method simply converts the
+  secrets Map into that expected key-value format.
+
+  See also:
+  https://wiki.jenkins.io/display/JENKINS/Mask+Passwords+Plugin
+  */
+@NonCPS
+List<Map> getSecretPairs(Map secrets) {
+    secrets.collect { k, v ->
+        [var: k, password: v]
+    }
+}
+
 def call(pipelineGenerator generator, List envList = [], Closure body) {
     List spe = generator.secretPairsEnv
     List secretPairs = spe[0]
@@ -44,4 +75,8 @@ def call(pipelineGenerator generator, List envList = [], Closure body) {
 
 def call(List envList, List secretPairs = [], Closure body) {
     withEnvSecretWrapper(envList, secretPairs, body)
+}
+
+def call(Map secrets, Closure body) {
+    withEnvSecretWrapper(getEnvVars(secrets), getSecretPairs(secrets), body)
 }
