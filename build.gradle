@@ -123,8 +123,22 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
+task testJar(type: Jar, dependsOn: testClasses) {
+    classifier = 'tests'
+    includes = ['net/gleske/**/*.class']
+    excludes = ['*.json', 'mocks/**/*', '**/*Test$_*.class', '**/*Test.class']
+    from sourceSets.test.output
+}
+
+task testSourcesJar(type: Jar) {
+    classifier = 'tests-sources'
+    includes = ['net/gleske/**/*.groovy']
+    excludes = ['**/*Test.groovy']
+    from sourceSets.test.allSource
+}
+
 artifacts {
-    archives javadocJar, sourcesJar
+    archives javadocJar, sourcesJar, testJar, testSourcesJar
 }
 
 signing {
