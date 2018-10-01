@@ -212,7 +212,7 @@ See also [RELEASE.md](RELEASE.md).
 [json-platforms]: resources/platforms.json
 [json-toolchains]: resources/toolchains-ubuntu1604-stable.json
 [maven-badge]: https://github.com/jirutka/maven-badges
-[maven-release]: http://search.maven.org/#search|ga|1|g:"net.gleske"%20a:"jervis"
+[maven-release]: https://search.maven.org/search?q=g:net.gleske%20AND%20a:jervis&core=gav
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
 [pipeline]: https://jenkins.io/doc/book/pipeline/shared-libraries/
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=master
