@@ -1,3 +1,11 @@
+# jervis 1.3
+
+#### New features:
+
+- Test helper classes provided by Jervis may now be referenced by other projects
+  via the `tests` classifier.  Source code for tests available within the
+  `tests-sources` classifier.
+
 # jervis 1.2 - Aug 12th, 2018
 
 #### New features:
