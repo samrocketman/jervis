@@ -4,7 +4,7 @@ configurations {
     libs
 }
 dependencies {
-    libs 'org.yaml:snakeyaml:1.18'
+    libs 'org.yaml:snakeyaml:1.21'
 }
 
 task libs(type: Copy) {
