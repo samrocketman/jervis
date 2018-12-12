@@ -26,16 +26,26 @@ def call(def global_scm, lifecycleGenerator generator, pipelineGenerator pipelin
     stage("Build Project") {
         checkout global_scm
         withEnvSecretWrapper(pipeline_generator) {
+            Exception ex
             String environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
             echo "ENVIRONMENT:\n    ${environment_string}"
-            sh(script: [
-                script_header,
-                generator.generateAll(),
-                script_footer
-            ].join('\n').toString())
-        }
-        for(String name : stashMap.keySet()) {
-            stash allowEmpty: stashMap[name]['allow_empty'], includes: stashMap[name]['includes'], name: name, useDefaultExcludes: stashMap[name]['use_default_excludes']
+            try {
+                sh(script: [
+                    script_header,
+                    generator.generateAll(),
+                    script_footer
+                ].join('\n').toString())
+            }
+            catch(e) {
+                ex = e
+            }
+            for(String name : stashMap.keySet()) {
+                stash allowEmpty: stashMap[name]['allow_empty'], includes: stashMap[name]['includes'], name: name, useDefaultExcludes: stashMap[name]['use_default_excludes']
+            }
+            if(ex) {
+                echo 'Build failed.'
+                throw ex
+            }
         }
     }
 }

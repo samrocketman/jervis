@@ -64,7 +64,12 @@ def call() {
 
     jervisBuildNode(pipeline_generator, generator.labels) {
         if(!generator.isMatrixBuild()) {
-            buildProjectStage(global_scm, generator, pipeline_generator, script_header, script_footer)
+            try {
+                buildProjectStage(global_scm, generator, pipeline_generator, script_header, script_footer)
+            }
+            catch(e) {
+                currentBuild.result = 'FAILURE'
+            }
         }
         publishResultsStage(generator, pipeline_generator)
 
