@@ -25,7 +25,7 @@ import org.jenkinsci.plugins.workflow.multibranch.BranchJobProperty
 
 @NonCPS
 Boolean isTagBuild(Job build_parent) {
-    build_parent.getProperty(BranchJobProperty).branch.head in GitTagSCMHead
+    build_parent?.getProperty(BranchJobProperty)?.branch?.head instanceof GitTagSCMHead
 }
 
 Boolean call() {
