@@ -88,10 +88,6 @@ class GitHubTest extends GroovyTestCase {
         mygh.gh_token = 'a'
         assert mygh.gh_token == 'a'
     }
-    @Test public void test_GitHub_set2Gh_token() {
-        mygh.gh_token = ''
-        assert mygh.gh_token == null
-    }
     @Test public void test_GitHub_set3Gh_token() {
         mygh.gh_token = 'a'
         assert 'language: groovy\n' == mygh.getFile('samrocketman/jervis', '.travis.yml', 'master')

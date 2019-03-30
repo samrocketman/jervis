@@ -36,7 +36,8 @@ println x.getFile('samrocketman/jervis','.travis.yml','master')</tt></pre><br>
 class GitHub implements JervisRemote, SimpleRestServiceSupport {
 
     private static final String DEFAULT_URL = 'https://api.github.com/'
-	private static final String DEFAULT_WEB_URL = 'https://github.com/'
+    private static final String DEFAULT_WEB_URL = 'https://github.com/'
+    private static final String DEFAULT_GHE = 'https://github.com/api/v3/'
 
     @Override
     String baseUrl() {
@@ -81,7 +82,7 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
      */
     //gh_web will always end with a trailing slash
     void setGh_web(String gh_web) {
-		gh_web = (gh_web[-1] == '/')? gh_web : gh_web + '/'
+        gh_web = (gh_web[-1] == '/')? gh_web : gh_web + '/'
         this.gh_web = (gh_web == DEFAULT_WEB_URL)? DEFAULT_WEB_URL : gh_web
         this.setGh_api(this.gh_web + 'api/v3/')
     }
@@ -92,12 +93,7 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
     //gh_api will always end with a trailing slash
     void setGh_api(String gh_api) {
         gh_api = (gh_api[-1] == '/')? gh_api : gh_api + '/'
-        if('https://github.com/api/v3/'.equals(gh_api)) {
-            this.gh_api = DEFAULT_URL
-        }
-        else {
-            this.gh_api = gh_api
-        }
+        this.gh_api = (DEFAULT_GHE == gh_api)? DEFAULT_URL : gh_api
     }
 
     /**
@@ -106,14 +102,6 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
     //gh_clone will always end with a trailing slash
     void setGh_clone(String gh_clone) {
         this.gh_clone = (gh_clone[-1] == '/')? gh_clone : gh_clone + '/'
-    }
-
-    /**
-      Sets the <tt>{@link #gh_token}</tt> property.
-     */
-    //gh_token should be null if it is a zero length string.
-    void setGh_token(String gh_token) {
-        this.gh_token = (gh_token.length() > 0)? gh_token : null
     }
 
     /*
