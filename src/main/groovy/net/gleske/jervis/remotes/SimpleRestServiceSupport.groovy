@@ -31,9 +31,10 @@ trait SimpleRestServiceSupport {
     /**
       A method to simplify fetching from remote REST services.
       */
-    def apiFetch(String path, Map http_headers = [:], String http_method = 'GET', String data = '') {
+    def apiFetch(String path = '', Map http_headers = [:], String http_method = 'GET', String data = '') {
         http_headers = header(http_headers)
-        URL api_url = new URL(baseUrl() + path)
+        path = path ? (baseUrl() + path) : baseUrl()
+        URL api_url = new URL(path)
         SimpleRestService.apiFetch(api_url, http_headers, http_method, data)
     }
 }

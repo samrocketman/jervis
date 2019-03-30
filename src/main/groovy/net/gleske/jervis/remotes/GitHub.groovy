@@ -21,9 +21,9 @@ import net.gleske.jervis.tools.securityIO
    A simple class to interact with the GitHub v3 API for only the parts I need.
 
    <h2>Sample usage</h2>
-  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
-  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
-  with the classpath set up.</p>
+   <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+   to bring up a <a href="http://groovy-lang.org/groovyconsole.html"
+   target="_blank">Groovy Console</a> with the classpath set up.</p>
 
 <pre><tt>import net.gleske.jervis.remotes.GitHub
 
@@ -57,7 +57,7 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
     String gh_web = 'https://github.com/'
 
     /**
-      URL to the <a href="https://developer.github.com/v3/" target="_blank">GitHub API</a>. For GitHub Enterprise it should be <tt>{@link #gh_web} + 'api/v3/'</tt>.  Default: <tt>https://api.github.com/</tt>
+      URL to the <a href="https://developer.github.com/v3/" target="_blank">GitHub v3 API</a>. For GitHub Enterprise it should be <tt>{@link #gh_web} + 'api/v3/'</tt>.  Default: <tt>https://api.github.com/</tt>
      */
     String gh_api = DEFAULT_URL
 
