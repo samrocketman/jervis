@@ -75,8 +75,16 @@ class GitHubGraphQLTest extends GroovyTestCase {
         mygh.sendGQL('query { foo }')
         assert request_meta['data'].toString() == '{"query":"query { foo }"}'
     }
+    @Test public void test_GitHubGraphQL_sendGQL_custom_with_quotes() {
+        mygh.sendGQL('query { foo(expr: "hello") }')
+        assert request_meta['data'].toString() == '{"query":"query { foo(expr: \\"hello\\") }"}'
+    }
     @Test public void test_GitHubGraphQL_sendGQL_custom_with_variables() {
         mygh.sendGQL('query { foo }', 'variables { bar }')
         assert request_meta['data'].toString() == '{"query":"query { foo }","variables":"variables { bar }"}'
+    }
+    @Test public void test_GitHubGraphQL_sendGQL_custom_with_variables_and_quotes() {
+        mygh.sendGQL('query { foo(expr: "hello") }', 'variables { "myvar": 3 }')
+        assert request_meta['data'].toString() == '{"query":"query { foo(expr: \\"hello\\") }","variables":"variables { \\"myvar\\": 3 }"}'
     }
 }
