@@ -11,8 +11,6 @@ install: ./assemble.sh
 script: ./gradlew clean check cobertura Jar groovydoc
 
 env:
-  # Groovy 1.8.9 for cobertura
-  - GROOVY_VERSION="1.8.9"
   # Latest Groovy 2.4.x stable
   - GROOVY_VERSION="2.4.15"
   # Next Groovy 2.5.x release
@@ -29,19 +27,19 @@ branches:
 
 jenkins:
   pipeline_jenkinsfile: assets/Jenkinsfile
+  # see YAML anchors and aliases for how this works
+  default_stash_axis: &stash_axis
+    matrix_axis:
+      env: GROOVY_VERSION="2.4.15"
   stash:
     - name: artifacts
-      matrix_axis:
-        env: GROOVY_VERSION="2.4.15"
+      <<: *stash_axis
     - name: html
-      matrix_axis:
-        env: GROOVY_VERSION="2.4.15"
+      <<: *stash_axis
     - name: junit
-      matrix_axis:
-        env: GROOVY_VERSION="2.4.15"
+      <<: *stash_axis
     - name: cobertura
-      matrix_axis:
-        env: GROOVY_VERSION="1.8.9"
+      <<: *stash_axis
   collect:
     artifacts: build/libs/*.jar
     cobertura: build/reports/cobertura/coverage.xml
