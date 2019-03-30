@@ -1,5 +1,5 @@
 /*
-   Copyright 2014-2018 Sam Gleske - https://github.com/samrocketman/jervis
+   Copyright 2014-2019 Sam Gleske - https://github.com/samrocketman/jervis
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package net.gleske.jervis.remotes
 import net.gleske.jervis.tools.securityIO
 
 /**
-   A simple class to interact with the GitHub API for only the parts I need.
+   A simple class to interact with the GitHub v3 API for only the parts I need.
 
    <h2>Sample usage</h2>
   <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>

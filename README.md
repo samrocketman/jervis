@@ -181,7 +181,7 @@ See also [RELEASE.md](RELEASE.md).
 
 # License
 
-    Copyright 2014-2018 Sam Gleske
+    Copyright 2014-2019 Sam Gleske
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
