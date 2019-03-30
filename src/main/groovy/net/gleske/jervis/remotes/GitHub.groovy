@@ -36,6 +36,7 @@ println x.getFile('samrocketman/jervis','.travis.yml','master')</tt></pre><br>
 class GitHub implements JervisRemote, SimpleRestServiceSupport {
 
     private static final String DEFAULT_URL = 'https://api.github.com/'
+	private static final String DEFAULT_WEB_URL = 'https://github.com/'
 
     @Override
     String baseUrl() {
@@ -54,7 +55,7 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
     /**
       URL to the GitHub web interface. Default: <tt>https://github.com/</tt>
      */
-    String gh_web = 'https://github.com/'
+    String gh_web = DEFAULT_WEB_URL
 
     /**
       URL to the <a href="https://developer.github.com/v3/" target="_blank">GitHub v3 API</a>. For GitHub Enterprise it should be <tt>{@link #gh_web} + 'api/v3/'</tt>.  Default: <tt>https://api.github.com/</tt>
@@ -64,7 +65,7 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
     /**
       The base clone URI in which repositories will be cloned.  Default: <tt>https://github.com/</tt>
      */
-    String gh_clone = 'https://github.com/'
+    String gh_clone = DEFAULT_WEB_URL
 
     /**
       The <a href="https://github.com/blog/1509-personal-api-tokens" target="_blank">API token</a>, which can be used to communicate with GitHub using authentication.  Default: <tt>null</tt>
@@ -80,7 +81,8 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
      */
     //gh_web will always end with a trailing slash
     void setGh_web(String gh_web) {
-        this.gh_web = (gh_web[-1] == '/')? gh_web : gh_web + '/'
+		gh_web = (gh_web[-1] == '/')? gh_web : gh_web + '/'
+        this.gh_web = (gh_web == DEFAULT_WEB_URL)? DEFAULT_WEB_URL : gh_web
         this.setGh_api(this.gh_web + 'api/v3/')
     }
 
