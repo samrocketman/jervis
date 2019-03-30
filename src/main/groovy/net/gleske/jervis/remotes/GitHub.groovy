@@ -16,7 +16,6 @@
 package net.gleske.jervis.remotes
 
 import net.gleske.jervis.tools.securityIO
-import static net.gleske.jervis.remotes.SimpleRestService.apiFetch
 
 /**
    A simple class to interact with the GitHub API for only the parts I need.
@@ -34,7 +33,23 @@ x.branches('samrocketman/jervis').each{ println it }
 println 'Print the contents of .travis.yml from the master branch.'
 println x.getFile('samrocketman/jervis','.travis.yml','master')</tt></pre><br>
  */
-class GitHub implements JervisRemote {
+class GitHub implements JervisRemote, SimpleRestServiceSupport {
+
+    private static final String DEFAULT_URL = 'https://api.github.com/'
+
+    @Override
+    String baseUrl() {
+        this.gh_api
+    }
+
+    @Override
+    Map header(Map http_headers = [:]) {
+        http_headers['Accept'] = http_headers['Accept'] ?:  'application/vnd.github.v3+json'
+        if(this.gh_token) {
+            http_headers['Authorization'] = "token ${this.gh_token}".toString()
+        }
+        http_headers
+    }
 
     /**
       URL to the GitHub web interface. Default: <tt>https://github.com/</tt>
@@ -44,7 +59,7 @@ class GitHub implements JervisRemote {
     /**
       URL to the <a href="https://developer.github.com/v3/" target="_blank">GitHub API</a>. For GitHub Enterprise it should be <tt>{@link #gh_web} + 'api/v3/'</tt>.  Default: <tt>https://api.github.com/</tt>
      */
-    String gh_api = 'https://api.github.com/'
+    String gh_api = DEFAULT_URL
 
     /**
       The base clone URI in which repositories will be cloned.  Default: <tt>https://github.com/</tt>
@@ -76,7 +91,7 @@ class GitHub implements JervisRemote {
     void setGh_api(String gh_api) {
         gh_api = (gh_api[-1] == '/')? gh_api : gh_api + '/'
         if('https://github.com/api/v3/'.equals(gh_api)) {
-            this.gh_api = 'https://api.github.com/'
+            this.gh_api = DEFAULT_URL
         }
         else {
             this.gh_api = gh_api
@@ -113,11 +128,7 @@ class GitHub implements JervisRemote {
       @return     A <tt>Map</tt> or <tt>List</tt> from the parsed JSON response.
     */
     public def fetch(String path) {
-        Map http_headers = ['Accept': 'application/vnd.github.v3+json']
-        if(this.gh_token) {
-            http_headers['Authorization'] = "token ${this.gh_token}".toString()
-        }
-        apiFetch(new URL(this.gh_api + path), http_headers)
+        apiFetch(path)
     }
 
     /*

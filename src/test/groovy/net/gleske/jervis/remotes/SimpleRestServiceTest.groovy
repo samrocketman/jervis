@@ -72,12 +72,6 @@ class SimpleRestServiceTest extends GroovyTestCase {
             apiFetch(new URL('https://example.com/does/not/exist'), http_headers, 'POST', 'this is some test data')
         }
     }
-    @Test public void test_SimpleRestService_apiFetch_unsupported_method() {
-        Map http_headers = ['Content-Type': 'text/plain']
-        shouldFail(JervisException) {
-            apiFetch(new URL('https://example.com/post/endpoint'), http_headers, 'BARF', 'this is some test data')
-        }
-    }
     @Test public void test_SimpleRestService_apiFetch_put() {
         Map http_headers = ['Content-Type': 'text/plain']
         String response = apiFetch(new URL('https://example.com/post/endpoint'), http_headers, 'PUT').trim()

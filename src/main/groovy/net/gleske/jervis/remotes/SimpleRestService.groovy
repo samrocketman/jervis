@@ -53,7 +53,11 @@ class SimpleRestService {
         //data_response could be either a List or Map depending on the JSON
         def data_response
         switch(http_method.toUpperCase()) {
-            case ~/^(POST|PUT|DELETE|PATCH)$/:
+            case 'GET':
+                Reader request = api_url.newReader(requestProperties: http_headers)
+                data_response = (parse_json)? yaml.load(request) : request.text.toString()
+                break
+            default:
                 String response = api_url.openConnection().with { conn ->
                     conn.doOutput = true
                     conn.setRequestMethod(http_method.toUpperCase())
@@ -66,13 +70,6 @@ class SimpleRestService {
                     conn.getContent().getText()
                 }
                 data_response = (parse_json)? yaml.load(response ?: '{}') : response
-                break
-            case 'GET':
-                Reader request = api_url.newReader(requestProperties: http_headers)
-                data_response = (parse_json)? yaml.load(request) : request.text.toString()
-                break
-            default:
-                throw new JervisException("SimpleRestService ERROR: Invalid request method ${http_method}")
         }
         data_response
     }
