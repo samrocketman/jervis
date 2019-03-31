@@ -40,29 +40,29 @@ class GitHubGraphQLTest extends GroovyTestCase {
     //test GitHubGraphQL().sendGQL()
     @Test public void test_GitHubGraphQL_sendGQL() {
         String graphql = '''
-			|query {
-			|  repository(owner: "samrocketman", name: "jervis") {
-			|	jervisYaml:object(expression: "master:.jervis.yml") {
-			|	  ...file
-			|	}
-			|	travisYaml:object(expression: "master:.travis.yml") {
-			|	  ...file
-			|	}
-			|	rootFolder:object(expression: "master:") {
-			|	  ...file
-			|	}
-			|  }
-			|}
-			|fragment file on GitObject {
-			|  ... on Blob {
-			|	text
-			|  }
-			|  ... on Tree {
-			|	file:entries {
-			|	  name
-			|	}
-			|  }
-			|}
+            |query {
+            |  repository(owner: "samrocketman", name: "jervis") {
+            |    jervisYaml:object(expression: "master:.jervis.yml") {
+            |      ...file
+            |    }
+            |    travisYaml:object(expression: "master:.travis.yml") {
+            |      ...file
+            |    }
+            |    rootFolder:object(expression: "master:") {
+            |      ...file
+            |    }
+            |  }
+            |}
+            |fragment file on GitObject {
+            |  ... on Blob {
+            |    text
+            |  }
+            |  ... on Tree {
+            |    file:entries {
+            |      name
+            |    }
+            |  }
+            |}
             '''.stripMargin()
         mygh.token = 'foo'
         Map response = mygh.sendGQL(graphql)
