@@ -30,6 +30,7 @@ println "Building ${archivesBaseName}-${version}"
 
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
     }
     dependencies {
