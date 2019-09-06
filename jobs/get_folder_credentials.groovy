@@ -20,9 +20,7 @@
  */
 import hudson.console.HyperlinkNote
 import hudson.util.Secret
-import jenkins.bouncycastle.api.PEMEncodable
 import jenkins.model.Jenkins
-import static jenkins.bouncycastle.api.PEMEncodable.decode
 
 getFolderRSAKeyCredentials = null
 getFolderRSAKeyCredentials = { String folder, String credentials_id ->
@@ -37,7 +35,8 @@ getFolderRSAKeyCredentials = { String folder, String credentials_id ->
                 if(c && c.class.simpleName == 'BasicSSHUserPrivateKey' && c.id == credentials_id) {
                     String priv_key = c.privateKey
                     Secret p = c.passphrase
-                    found_credentials = new PEMEncodable(decode(priv_key, ((p)? p.plainText : null) as char[]).toPrivateKey()).encode()
+                    def pEMEncodableClazz = Jenkins.instance.pluginManager.uberClassLoader.findClass('jenkins.bouncycastle.api.PEMEncodable')
+                    found_credentials = pEMEncodableClazz.decode(priv_key, ((p)? p.plainText : null) as char[]).encode()
                 }
             }
         }
