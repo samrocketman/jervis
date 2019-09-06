@@ -59,28 +59,6 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
         println "Skipping branch: ${JERVIS_BRANCH}"
         return
     }
-    /*
-    //attempt to get the private key else return an empty string
-    //force detecting decryption failures before attempting to create the job
-    String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
-    String private_key_contents = getFolderRSAKeyCredentials(project_folder, credentials_id)
-
-    if(credentials_id && !private_key_contents) {
-        throw new SecurityException("Branch: ${JERVIS_BRANCH}.  Could not find private key using Jenkins Credentials ID: ${credentials_id}")
-    }
-    if(private_key_contents) {
-        println "Branch: ${JERVIS_BRANCH?:'default branch in GitHub (typically master but not always)'}.  Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}."
-        Binding superBinding = new Binding([generator: generator, private_key_contents: private_key_contents])
-        GroovyShell superShell = new GroovyShell(Jenkins.instance.pluginManager.uberClassLoader, superBinding)
-        superShell.evaluate('''
-            |import org.bouncycastle.openssl.PEMParser
-            |generator.setPrivateKey(private_key_contents)
-            |generator.decryptSecrets()
-            '''.trim().stripMargin())
-        println "Branch: ${JERVIS_BRANCH}.  Decrypted the following properties (indented):"
-        println '    ' + generator.plainlist*.get('key').join('\n    ')
-    }
-    */
     if(!JERVIS_BRANCH) {
         //default branch is being referenced so save it for referencing later
         default_generator = generator
