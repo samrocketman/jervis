@@ -33,13 +33,14 @@ getFolderRSAKeyCredentials = { String folder, String credentials_id ->
     String found_credentials = ''
     try {
         if(credentials) {
+            // Hack the classloader in order to use PEMEncodable;
+            // classes are defined in reverse order of their use.
+            hack_class_loader(this.class.classLoader)
+            def pEMEncodableClazz = Jenkins.instance.pluginManager.uberClassLoader.findClass('jenkins.bouncycastle.api.PEMEncodable')
             credentials.domainCredentials*.credentials*.each { c ->
                 if(c && c.class.simpleName == 'BasicSSHUserPrivateKey' && c.id == credentials_id) {
                     String priv_key = c.privateKey
                     Secret p = c.passphrase
-                    // load the PEMParser class which is depended on by PEMEncodable
-                    hack_class_loader(this.class.classLoader, 'org.bouncycastle.openssl.PEMParser')
-                    def pEMEncodableClazz = Jenkins.instance.pluginManager.uberClassLoader.findClass('jenkins.bouncycastle.api.PEMEncodable')
                     found_credentials = pEMEncodableClazz.decode(priv_key, ((p)? p.plainText : null) as char[]).encode()
                 }
             }
