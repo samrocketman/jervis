@@ -24,6 +24,7 @@ require_bindings('jobs/is_pipeline.groovy', ['git_service', 'project', 'project_
 
 import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
+import jenkins.model.Jenkins
 
 is_pipeline = null
 is_pipeline = { String JERVIS_BRANCH = '' ->
@@ -68,8 +69,13 @@ is_pipeline = { String JERVIS_BRANCH = '' ->
     }
     if(private_key_contents) {
         println "Branch: ${JERVIS_BRANCH?:'default branch in GitHub (typically master but not always)'}.  Attempting to decrypt jenkins.secrets using Jenkins Credentials ID ${credentials_id}."
-        generator.setPrivateKey(private_key_contents)
-        generator.decryptSecrets()
+        Binding superBinding = new Binding([generator: generator, private_key_contents: private_key_contents])
+        GroovyShell superShell = new GroovyShell(Jenkins.instance.pluginManager.uberClassLoader, superBinding)
+        superShell.evaluate('''
+            |import org.bouncycastle.openssl.PEMParser
+            |generator.setPrivateKey(private_key_contents)
+            |generator.decryptSecrets()
+            '''.trim().stripMargin())
         println "Branch: ${JERVIS_BRANCH}.  Decrypted the following properties (indented):"
         println '    ' + generator.plainlist*.get('key').join('\n    ')
     }
