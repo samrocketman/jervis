@@ -81,16 +81,11 @@ jenkinsJobMultibranchPipeline = { String JERVIS_BRANCH ->
                 */
             }
         }
-        orphanedItemStrategy {
-            discardOldItems {
-                numToKeep(20)
+        factory {
+            pipelineBranchDefaultsProjectFactory {
+                useSandbox true
+                scriptId 'Jenkinsfile'
             }
-        }
-        configure {
-            //overwrite default factory with the pipeline multibranch defaults plugin "Global Jenkinsfile"
-            Node factoryNode = it / factory
-            factoryNode.attributes().put 'class', 'org.jenkinsci.plugins.pipeline.multibranch.defaults.PipelineBranchDefaultsProjectFactory'
-            (factoryNode / 'owner').attributes().put 'class', 'org.jenkinsci.plugins.pipeline.multibranch.defaults.PipelineMultiBranchDefaultsProject'
         }
         configure {
             def folderConfig = it / 'properties' / 'org.jenkinsci.plugins.pipeline.modeldefinition.config.FolderConfig'
