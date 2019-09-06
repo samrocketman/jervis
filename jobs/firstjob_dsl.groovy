@@ -50,6 +50,7 @@ system_creds = Jenkins.instance.getExtensionList("com.cloudbees.plugins.credenti
 //prepare bindings from other files (order does not matter)
 evaluate(tryReadFile('jobs/git_service.groovy'))
 evaluate(tryReadFile('jobs/global_threadlock.groovy'))
+evaluate(tryReadFile('jobs/hack_class_loader.groovy'))
 evaluate(tryReadFile('jobs/get_folder_credentials.groovy'))
 
 //prepare bindings from other files (order matters due to bindings loaded from other scripts)

@@ -22,6 +22,8 @@ import hudson.console.HyperlinkNote
 import hudson.util.Secret
 import jenkins.model.Jenkins
 
+require_bindings('jobs/get_folder_credentials.groovy', ['hack_class_loader'])
+
 getFolderRSAKeyCredentials = null
 getFolderRSAKeyCredentials = { String folder, String credentials_id ->
     if(!folder || !credentials_id) {
@@ -36,7 +38,7 @@ getFolderRSAKeyCredentials = { String folder, String credentials_id ->
                     String priv_key = c.privateKey
                     Secret p = c.passphrase
                     // load the PEMParser class which is depended on by PEMEncodable
-                    this.class.classLoader.defineClass('org.bouncycastle.openssl.PEMParser', Jenkins.instance.pluginManager.uberClassLoader.getResourceAsStream('org/bouncycastle/openssl/PEMParser.class').getBytes())
+                    hack_class_loader(this.class.classLoader, 'org.bouncycastle.openssl.PEMParser')
                     def pEMEncodableClazz = Jenkins.instance.pluginManager.uberClassLoader.findClass('jenkins.bouncycastle.api.PEMEncodable')
                     found_credentials = pEMEncodableClazz.decode(priv_key, ((p)? p.plainText : null) as char[]).encode()
                 }
