@@ -14,8 +14,19 @@
    limitations under the License.
    */
 
+import jenkins.model.Jenkins
+
 //this code should be at the beginning of every script included which requires bindings
 require_bindings('jobs/jenkins_job_multibranch_pipeline.groovy', ['parent_job', 'project', 'project_folder', 'project_name', 'script_approval', 'git_service'])
+
+String getGitHubUrlPrefix() {
+    def github = Jenkins.instance.with { j ->
+        def clazz = j.pluginManager.uberClassLoader.findClass('org.jenkinsci.plugins.github.config.GitHubPluginConfig')
+        j.getExtensionList(clazz)[0].configs.first()
+    }
+    String url = github.apiUrl -~ '/?(api/v3/?)?$'
+    (url == 'https://api.github.com') ? 'https://github.com' : url
+}
 
 /*
    Configures a pipeline job designed to execute Jervis YAML.
@@ -36,6 +47,8 @@ jenkinsJobMultibranchPipeline = { String JERVIS_BRANCH ->
                         credentialsId 'github-user-and-token'
                         repoOwner project_folder
                         repository project_name
+                        repositoryUrl "${getGitHubUrlPrefix()}/${project_folder}/${project_name}"
+                        configuredByUrl true
                         //behaviors not supported by job dsl
 
                         //additional behaviors
