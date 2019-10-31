@@ -14,15 +14,11 @@
    limitations under the License.
    */
 /**
-  Contains <tt>remotes</tt> for Jervis to communicate to different API services.  Commonly for sources hosting
-  Git repositories.  If writing a remote, be sure to follow the implementation of
-  the <tt>{@link net.gleske.jervis.remotes.interfaces.JervisRemote}</tt>
-  interface.  Otherwise, API clients should be implementing
-  <tt>{@link net.gleske.jervis.remotes.SimpleRestServiceSupport}</tt>.
-
+  Contains partially implemented credentials for <tt>remotes</tt>.  This allows
+  applications to provide secure credentials to the remote clients.
   <p>
-  This allows remotes to be interchangeable.  Jervis will call only those functions to interact with a remote.
-  See the <tt>GitHub</tt> class as an example for the implementation of a remote.
+  See <tt>{@link ReadonlyTokenCredential}</tt> which serves as an example and
+  provides sample usage.
   </p>
  */
-package net.gleske.jervis.remotes
+package net.gleske.jervis.remotes.creds

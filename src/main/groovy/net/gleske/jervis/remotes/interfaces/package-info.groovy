@@ -14,15 +14,6 @@
    limitations under the License.
    */
 /**
-  Contains <tt>remotes</tt> for Jervis to communicate to different API services.  Commonly for sources hosting
-  Git repositories.  If writing a remote, be sure to follow the implementation of
-  the <tt>{@link net.gleske.jervis.remotes.interfaces.JervisRemote}</tt>
-  interface.  Otherwise, API clients should be implementing
-  <tt>{@link net.gleske.jervis.remotes.SimpleRestServiceSupport}</tt>.
-
-  <p>
-  This allows remotes to be interchangeable.  Jervis will call only those functions to interact with a remote.
-  See the <tt>GitHub</tt> class as an example for the implementation of a remote.
-  </p>
+  Contains interfaces for <tt>remotes</tt> to implement.
  */
-package net.gleske.jervis.remotes
+package net.gleske.jervis.remotes.interfaces
