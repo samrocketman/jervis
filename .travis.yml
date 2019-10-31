@@ -8,7 +8,7 @@ language: groovy
 #build library
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
 install: ./assemble.sh
-script: ./gradlew clean check cobertura Jar groovydoc
+script: ./gradlew clean check jacocoTestReport Jar groovydoc
 
 env:
   # Latest Groovy 2.4.x stable
