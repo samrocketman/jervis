@@ -7,6 +7,7 @@ buildscript {
 
 plugins {
     id 'groovy'
+    id 'jacoco'
     id 'maven'
     id 'signing'
 }
@@ -163,8 +164,19 @@ jar.dependsOn tasks.findAll { task -> task.name.endsWith('Jar') }
 //disable optimizations for accurate branch coverage
 //http://pbetkier.blogspot.com/2014/08/groovy-code-coverage-issues.html
 gradle.taskGraph.whenReady { graph ->
-    if (graph.hasTask(':cobertura')) {
+    if (graph.hasTask(':jacocoTestReport')) {
         compileGroovy.groovyOptions.optimizationOptions.all = false
+    }
+}
+
+jacocoTestReport {
+    reports {
+        csv.enabled false
+        xml {
+            enabled true
+            destination file("${buildDir}/test-results/jacoco.xml")
+        }
+        html.destination file("${buildDir}/reports/jacoco")
     }
 }
 

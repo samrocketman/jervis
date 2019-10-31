@@ -163,11 +163,9 @@ Groovy Console is built into the Gradle file.
 
 # Other development commands
 
-Generate code coverage reports.  Due to a [bug][#39], cobertura code coverage
-is most reliable in Groovy versions 1.8.9 or 2.0.8.  See the final report in
-`build/reports/cobertura`.
+Generate code coverage reports.
 
-    GROOVY_VERSION=1.8.9 ./gradlew clean cobertura
+    ./gradlew clean check jacocoTestReport
 
 Build the jar file.
 
@@ -195,7 +193,6 @@ See also [RELEASE.md](RELEASE.md).
     See the License for the specific language governing permissions and
     limitations under the License.
 
-[#39]: https://github.com/samrocketman/jervis/issues/39
 [jenkins-plugin-docker]: https://wiki.jenkins-ci.org/display/JENKINS/Docker+Plugin
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jenkins]: https://jenkins-ci.org/
