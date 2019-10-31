@@ -16,6 +16,7 @@
 package net.gleske.jervis.remotes
 
 import groovy.json.JsonBuilder
+import net.gleske.jervis.remotes.interfaces.TokenCredential
 
 /**
    A simple class to interact with the GitHub v4 API.
@@ -76,8 +77,8 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
 
     @Override
     Map header(Map http_headers = [:]) {
-        if(this.token) {
-            http_headers['Authorization'] = "bearer ${this.token}".toString()
+        if(this.getToken()) {
+            http_headers['Authorization'] = "bearer ${this.getToken()}".toString()
         }
         http_headers
     }
@@ -91,6 +92,33 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
       The <a href="https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line" target="_blank">API token</a>, which can be used to communicate with GitHub using authentication.  Default: <tt>null</tt>
      */
     String token
+
+    /**
+       A credential for interacting with an external credential store.  If this
+       is defined or set, then <tt>{@link token}</tt> is ignored and not used.
+      */
+    TokenCredential credential
+
+    /**
+       Retrieves the token used to authenticate with GitHub.
+
+       @return A personal access token or an OAuth access token typically.
+      */
+    String getToken() {
+        (this.credential) ? this.credential.getToken() : this.token
+    }
+
+    /**
+       Sets the token to be used by GitHub.
+      */
+    void setToken(String token) {
+        if(this.credential) {
+            this.credential.setToken(token)
+        }
+        else {
+            this.token = token
+        }
+    }
 
     String getGqlData(String query, String variables = '') {
         Map data = [ query: query ]

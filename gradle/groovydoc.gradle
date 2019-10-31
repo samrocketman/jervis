@@ -16,6 +16,7 @@ groovydoc {
     footer = '<a href="https://github.com/samrocketman/jervis" target="_blank">Jervis</a> API documentation.'
     link 'http://download.oracle.com/javase/8/docs/api/', 'java.'
     link 'http://docs.groovy-lang.org/latest/html/gapi/', 'groovy.', 'org.codehaus.groovy.'
+    link 'https://javadoc.jenkins-ci.org/', 'hudson.', 'jenkins.'
     doLast {
         copy {
             rename "stylesheet-${groovyVersion.tokenize('.')[0..1].join('.')}.css", 'stylesheet.css'

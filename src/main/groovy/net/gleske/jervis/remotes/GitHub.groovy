@@ -15,6 +15,8 @@
    */
 package net.gleske.jervis.remotes
 
+import net.gleske.jervis.remotes.interfaces.JervisRemote
+import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.tools.securityIO
 
 /**
@@ -47,8 +49,8 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
     @Override
     Map header(Map http_headers = [:]) {
         http_headers['Accept'] = http_headers['Accept'] ?:  'application/vnd.github.v3+json'
-        if(this.gh_token) {
-            http_headers['Authorization'] = "token ${this.gh_token}".toString()
+        if(getGh_token()) {
+            http_headers['Authorization'] = "token ${this.getGh_token()}".toString()
         }
         http_headers
     }
@@ -72,6 +74,21 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
       The <a href="https://github.com/blog/1509-personal-api-tokens" target="_blank">API token</a>, which can be used to communicate with GitHub using authentication.  Default: <tt>null</tt>
      */
     String gh_token
+
+    TokenCredential credential
+
+    String getGh_token() {
+        (this.credential) ? this.credential.getToken() : this.gh_token
+    }
+
+    void setGh_token(String token) {
+        if(this.credential) {
+            this.credential.setToken(token)
+        }
+        else {
+            this.gh_token = token
+        }
+    }
 
     /*
      * Setters for internal variables
