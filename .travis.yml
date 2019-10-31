@@ -38,11 +38,8 @@ jenkins:
       <<: *stash_axis
     - name: junit
       <<: *stash_axis
-    - name: cobertura
-      <<: *stash_axis
   collect:
     artifacts: build/libs/*.jar
-    cobertura: build/reports/cobertura/coverage.xml
     junit: build/test-results/*.xml
     html:
       path: build/docs/groovydoc
@@ -55,7 +52,7 @@ jenkins:
 #None of the following options are interpreted by Jenkins.
 
 after_success:
-  - ./coveralls.sh
+  - ./gradlew jacocoTestReport coveralls
 
 #https://docs.travis-ci.com/user/languages/groovy#caching
 before_cache:

@@ -6,6 +6,7 @@ buildscript {
 }
 
 plugins {
+    id 'com.github.kt3k.coveralls'
     id 'groovy'
     id 'jacoco'
     id 'maven'
@@ -180,6 +181,9 @@ jacocoTestReport {
     }
 }
 
+coveralls {
+    jacocoReportPath 'build/test-results/jacoco.xml'
+}
 
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 //generate gradlew with: ./gradlew wrapper --gradle-version 5.6.3
