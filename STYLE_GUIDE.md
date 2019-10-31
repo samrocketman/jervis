@@ -18,7 +18,8 @@ should adhere to it in order to be accepted.
     sign.
 9.  Use specific type definitions as much as possible and only use generic type
     definitions where appropriate.
-10. No semicolons at the end of code lines.  Keep lack of using semicolons consistent.
+10. No semicolons at the end of code lines.  Keep lack of using semicolons
+    consistent.
 
 # Style guide examples.
 
