@@ -3,7 +3,10 @@
 ### New features:
 
 - Support for external credentials integration.  Most likely used by Jenkins
-  credentials store.
+  credentials store.  Currently, the only credential type is a TokenCredential
+  for GitHub services.
+- `net.gleske.jervis.remotes.creds.ReadonlyTokenCredential` is available for
+  implementation for a TokenCredential which doesn't support writing.
 
 # jervis 1.3 - Oct 31st, 2019
 
