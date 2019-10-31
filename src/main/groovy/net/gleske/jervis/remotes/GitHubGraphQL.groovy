@@ -95,12 +95,15 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
 
     /**
        A credential for interacting with an external credential store.  If this
-       is defined or set, then <tt>{@link token}</tt> is ignored and not used.
+       is defined or set, then <tt>{@link #token}</tt> is ignored and not used.
+       Default: <tt>null</tt>
       */
     TokenCredential credential
 
     /**
-       Retrieves the token used to authenticate with GitHub.
+       Retrieves the token used to authenticate with GitHub.  If
+       <tt>{@link #credential}</tt> is set, then this will get the credential
+       token, instead of <tt>{@link #token}</tt>.
 
        @return A personal access token or an OAuth access token typically.
       */
@@ -109,7 +112,11 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
     }
 
     /**
-       Sets the token to be used by GitHub.
+       Sets the token to be used by GitHub.  If <tt>{@link #credential}</tt> is
+       set then this will set the credential token, instead of
+       <tt>{@link #token}</tt>.
+
+       @param token A personal access token or an OAuth access token typically.
       */
     void setToken(String token) {
         if(this.credential) {

@@ -75,12 +75,31 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
      */
     String gh_token
 
+    /**
+       A credential for interacting with an external credential store.  If this
+       is defined or set, then <tt>{@link #gh_token}</tt> is ignored and not used.
+       Default: <tt>null</tt>
+      */
     TokenCredential credential
 
+    /**
+       Retrieves the token used to authenticate with GitHub.  If
+       <tt>{@link #credential}</tt> is set, then this will get the credential
+       token, instead of <tt>{@link #gh_token}</tt>.
+
+       @return A personal access token or an OAuth access token typically.
+      */
     String getGh_token() {
         (this.credential) ? this.credential.getToken() : this.gh_token
     }
 
+    /**
+       Sets the token to be used by GitHub.  If <tt>{@link #credential}</tt> is
+       set, then this will set the credential token, instead of
+       <tt>{@link #gh_token}</tt>.
+
+       @param token A personal access token or an OAuth access token typically.
+      */
     void setGh_token(String token) {
         if(this.credential) {
             this.credential.setToken(token)
