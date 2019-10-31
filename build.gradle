@@ -1,6 +1,4 @@
 apply plugin: 'groovy'
-apply plugin: 'cobertura'
-apply plugin: 'com.github.kt3k.coveralls'
 //maven central
 apply plugin: 'maven'
 apply plugin: 'signing'
@@ -24,7 +22,6 @@ apply from: 'file:gradle/groovydoc.gradle'
 apply from: 'file:gradle/jervis.gradle'
 
 println "Using Groovy ${groovyVersion}"
-println "Using Gradle ${GradleVersion.current().getVersion()}"
 println "Using Java ${org.gradle.internal.jvm.Jvm.current()}"
 println "Building ${archivesBaseName}-${version}"
 
@@ -33,21 +30,8 @@ buildscript {
         mavenLocal()
         mavenCentral()
     }
-    dependencies {
-        classpath 'net.saliman:gradle-cobertura-plugin:2.2.6'
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.3.1'
-    }
 }
 
-
-configurations.all {
-    resolutionStrategy {
-        //https://github.com/stevesaliman/gradle-cobertura-plugin/issues/56
-        // Cobertura includes an ASM version that can't handle Java 8, ASM 5.0.3+ handles Java8
-        force 'org.ow2.asm:asm:6.0'
-        forcedModules = [ 'org.ow2.asm:asm:6.0' ]
-    }
-}
 
 repositories {
     mavenCentral()
@@ -82,30 +66,6 @@ test {
        logger.lifecycle('Test: ' + descriptor + ' produced standard out/err: ' + event.message )
     }
 }
-
-//http://jdpgrailsdev.github.io/blog/2014/04/29/gradle_cobertura.html
-//https://github.com/stevesaliman/gradle-cobertura-plugin/blob/master/usage.md
-cobertura {
-    //fix cobertura version
-    //https://github.com/stevesaliman/gradle-cobertura-plugin/issues/72
-    //coberturaVersion = '2.1.1'
-    //coberturaVersion = '2.0.3'
-    coverageFormats = ['html', 'xml']
-    coverageIgnoreTrivial = true
-    coverageIgnores = ['org.slf4j.Logger.*']
-    coverageExcludes = ['.*package-info.*', 'net\\.gleske\\.jervis\\.exceptions\\..*']
-
-    //coberturaCheck values 80% (./gradlew coberturaCheck test)
-    //coverageCheckBranchRate = 80
-    //coverageCheckLineRate = 80
-    coverageCheckPackageBranchRate = 50
-    coverageCheckPackageLineRate = 80
-    coverageCheckTotalBranchRate = 50
-    coverageCheckTotalLineRate = 80
-    coverageCheckHaltOnFailure = true
-
-}
-test.finalizedBy(project.tasks.cobertura)
 
 //http://swalsh.org/blog/2014/07/17/running-the-groovy-console-from-gradle/
 task( console, dependsOn: "classes", type: JavaExec ) {
@@ -207,7 +167,4 @@ gradle.taskGraph.whenReady { graph ->
 
 
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
-//generate gradlew with: gradle wrapper
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.4.1'
-}
+//generate gradlew with: ./gradlew wrapper --gradle-version 5.6.3
