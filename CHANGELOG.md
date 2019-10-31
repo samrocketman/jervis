@@ -1,4 +1,11 @@
-# jervis 1.3
+# jervis 1.4
+
+### New features:
+
+- Support for external credentials integration.  Most likely used by Jenkins
+  credentials store.
+
+# jervis 1.3 - Oct 31st, 2019
 
 #### New features:
 
