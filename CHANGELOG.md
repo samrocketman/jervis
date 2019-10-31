@@ -5,6 +5,29 @@
 - Test helper classes provided by Jervis may now be referenced by other projects
   via the `tests` classifier.  Source code for tests available within the
   `tests-sources` classifier.
+- Add a GitHub GraphQL v4 API client.  It's not used yet but is available for me
+  to start using it in pipeline scripts.
+
+#### Pipeline DSL scripts changes in the `vars/` folder:
+
+- Added `isPRBuild()` step for filtering pull request builds.  `IS_PR_BUILD`
+  environment variable is available to shell scripts.
+- Added `isTagBuild()` step for filtering tag builds.  `IS_TAG_BUILD`
+  environment variable is available to shell scripts.
+- Allow admin extension of `jervisBuildNode` via `adminJervisBuildNode` step.
+- Allow admin extension of library resources with adminLibraryResource.  This
+  allows 3rd parties to integrate their own custom resources.
+- withEnvSecretWrapper now supports a secrets map.
+- BugFix decoding private keys
+
+#### Job DSL scripts changes in the `jobs/` folder:
+
+- Added support for the scm-filter-branch-pr 0.4 plugin which allows for
+  filtering for branches and tags.
+- New Feature: `tryReadFile` is implemented for all Job DSL bindings so that Job
+  DSL scripts can be customized as-needed by 3rd parties.  This is to support
+  reading jervis from a Git submodule.
+- Remove decoding private keys during job generation.
 
 # jervis 1.2 - Aug 12th, 2018
 
