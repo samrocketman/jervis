@@ -15,6 +15,9 @@
    */
 package net.gleske.jervis.remotes
 
+/**
+   REST service classes can derive some default implementation from this trait.
+  */
 trait SimpleRestServiceSupport {
 
     /**

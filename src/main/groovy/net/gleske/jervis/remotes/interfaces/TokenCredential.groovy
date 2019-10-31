@@ -28,11 +28,22 @@ package net.gleske.jervis.remotes.interfaces
 
 <pre><tt>import net.gleske.jervis.remotes.interfaces.TokenCredential
 
-// in this example creds.setToken('') is a no-op
-def creds = [getToken: { -> "super secret" }, setToken: { String s -> } ] as TokenCredential
+class MyCredential implements TokenCredential {
+    String secret = 'super secret'
+    String getToken() {
+        this.secret
+    }
+    void setToken(String s) {
+        this.secret = s
+    }
+}
+
+def creds = new MyCredential()
 
 println "TokenCredential instance? ${creds instanceof TokenCredential}"
-println "Secret token: ${creds.token}"</tt></pre><br>
+println "Secret token: ${creds.token}"
+creds.setToken( 'foo')
+println creds.getToken()</tt></pre><br>
  */
 interface TokenCredential {
 
