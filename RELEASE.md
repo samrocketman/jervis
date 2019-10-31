@@ -9,12 +9,28 @@
   and uploading jars to Maven Central.
 
 ```
-signing.keyId=7257E65F
-signing.password=secret
-signing.secretKeyRingFile=/home/sam/.gnupg/secring.gpg
 ossrhUsername=samrocketman
 ossrhPassword=secret
 ```
+
+Next we need to prepare the environment according to the [signing plugin
+documentation][sign-plugin] for Gradle.
+
+    ORG_GRADLE_PROJECT_signingKey="$(gpg -a --export-secret-keys "Sam Gleske")"
+    read -sp pass: ORG_GRADLE_PROJECT_signingPassword
+    export ORG_GRADLE_PROJECT_signingKey ORG_GRADLE_PROJECT_signingPassword
+
+I now use in-memory signing keys because versions of GnuPG 2.1 and newer are
+challenging to set up for the signing Gradle plugin.
+
+[sign-plugin]: https://docs.gradle.org/current/userguide/signing_plugin.html
+
+# About signatures
+
+All Jervis releases are signed by Sam Gleske GPG key ID `7257E65F`.  The long
+fingerprint is the following.
+
+    8D8B F0E2 42D8 A068 572E  BF3C E8F7 3234 7257 E65F
 
 ### Prepare for release checklist
 

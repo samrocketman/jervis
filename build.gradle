@@ -1,7 +1,15 @@
-apply plugin: 'groovy'
-//maven central
-apply plugin: 'maven'
-apply plugin: 'signing'
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'groovy'
+    id 'maven'
+    id 'signing'
+}
 
 group = 'net.gleske'
 archivesBaseName = 'jervis'
@@ -24,14 +32,6 @@ apply from: 'file:gradle/jervis.gradle'
 println "Using Groovy ${groovyVersion}"
 println "Using Java ${org.gradle.internal.jvm.Jvm.current()}"
 println "Building ${archivesBaseName}-${version}"
-
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
-}
-
 
 repositories {
     mavenCentral()
@@ -104,6 +104,9 @@ artifacts {
 
 signing {
     required { gradle.taskGraph.hasTask("uploadArchives") }
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
     sign configurations.archives
 }
 
