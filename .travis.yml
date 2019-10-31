@@ -4,6 +4,7 @@
 # User guide for this file: https://github.com/samrocketman/jervis/wiki/User-Guide
 
 language: groovy
+jdk: openjdk8
 
 #build library
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
