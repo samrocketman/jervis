@@ -7,6 +7,9 @@
   `tests-sources` classifier.
 - Add a GitHub GraphQL v4 API client.  It's not used yet but is available for me
   to start using it in pipeline scripts.
+- Upgrade to Gradle 5.6.3.  Unfortunately, we're losing our ability to calculate
+  code coverage with Cobertura.  However, that hasn't really worked since Groovy
+  2.0.8 anyways so there's no reason to keep holding back any longer.
 
 #### Pipeline DSL scripts changes in the `vars/` folder:
 
@@ -28,6 +31,7 @@
   DSL scripts can be customized as-needed by 3rd parties.  This is to support
   reading jervis from a Git submodule.
 - Remove decoding private keys during job generation.
+- Replace config with pipelineBranchDefaultsProjectFactory
 
 # jervis 1.2 - Aug 12th, 2018
 
