@@ -21,6 +21,7 @@ version = "${version}"
 ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.15'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
+ext.snakeYamlVersion = '1.25'
 
 //Apparently cobertura is only accurate at Java 1.6 byte code and earlier
 //However, this caused a bug that if this library is used on JDK7+ and then
@@ -41,7 +42,7 @@ repositories {
 dependencies {
     compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
     compile 'org.bouncycastle:bcpkix-jdk15on:1.60'
-    compile 'org.yaml:snakeyaml:1.25'
+    compile "org.yaml:snakeyaml:${snakeYamlVersion}"
     testCompile 'junit:junit:4.12'
 }
 
