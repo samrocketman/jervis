@@ -15,8 +15,6 @@
    */
 package net.gleske.jervis.exceptions;
 
-import net.gleske.jervis.exceptions.wikiPages;
-
 /**
   A group of exceptions that are thrown when validation errors occur in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycles file</a>.
 

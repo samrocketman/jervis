@@ -15,8 +15,6 @@
    */
 package net.gleske.jervis.exceptions;
 
-import net.gleske.jervis.exceptions.wikiPages;
-
 /**
   A type of <tt>{@link net.gleske.jervis.exceptions.GeneratorException}</tt> which is thrown when an unsupported language lifecycle generation is attempted.
 

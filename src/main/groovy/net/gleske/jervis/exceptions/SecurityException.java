@@ -16,8 +16,6 @@
 
 package net.gleske.jervis.exceptions;
 
-import net.gleske.jervis.exceptions.wikiPages;
-
 /**
   A group of exceptions that are thrown when security issues occur.
 
