@@ -12,7 +12,7 @@ Prerequisites:
 
 # Setup
 
-Start sonarqube by running the following command relative to this directory.
+Start SonarQube by running the following command relative to this directory.
 
    ```
    docker-compose up -d
@@ -30,13 +30,13 @@ At the root of this repository, simply run
 
 and see the results appear.
 
-# Starting and stopping Sonarqube
+# Starting and stopping SonarQube
 
-You can stop Sonarqube with
+You can stop SonarQube with
 
     docker-compose down
 
-Start Sonarqube with
+Start SonarQube with
 
     docker-compose up -d
 
