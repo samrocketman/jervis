@@ -48,7 +48,7 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
 
     @Override
     Map header(Map http_headers = [:]) {
-        http_headers['Accept'] = http_headers['Accept'] ?:  'application/vnd.github.v3+json'
+        http_headers['Accept'] = 'application/vnd.github.v3+json'
         if(this.getGh_token()) {
             http_headers['Authorization'] = "token ${this.getGh_token()}".toString()
         }
@@ -227,7 +227,7 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
       @returns            An <tt>ArrayList</tt> which contains the contents of the file requested.
     */
     public ArrayList getFolderListing(String project, String dir_path = '/', String ref = '') {
-        if(dir_path.length() > 0 && dir_path[0] != '/') {
+        if(!dir_path?.startsWith('/')) {
             dir_path = '/' + dir_path
         }
         String path

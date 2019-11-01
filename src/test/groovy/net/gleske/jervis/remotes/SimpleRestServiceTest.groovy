@@ -90,4 +90,13 @@ class SimpleRestServiceTest extends GroovyTestCase {
         assert response == 'this is mock POST response data'
         assert request_meta['method'] == 'DELETE'
     }
+    @Test public void test_SimpleRestService_apiFetch_no_json_parse() {
+        Map http_headers = ['Content-Type': 'text/plain']
+        assert '[]\n' == apiFetch(new URL('https://api.github.com/repos/samrocketman/emptyList/contents'), http_headers)
+    }
+    @Test public void test_SimpleRestService_apiFetch_no_empty_response_default_to_map() {
+        Map http_headers = ['Content-Type': 'text/plain']
+        assert [:] == apiFetch(new URL('https://api.github.com/repos/samrocketman/empty/contents'))
+        assert '' == apiFetch(new URL('https://api.github.com/repos/samrocketman/empty/contents'), http_headers)
+    }
 }

@@ -139,6 +139,9 @@ class GitHubTest extends GroovyTestCase {
         assert ['.gitignore', '.travis.yml', 'LICENSE', 'README.md', 'build.gradle', 'src'] == mygh.getFolderListing('samrocketman/jervis')
         assert ['main', 'resources', 'test'] == mygh.getFolderListing('samrocketman/jervis', 'src')
     }
+    @Test public void test_GitHub_getFolderListing_emptyList() {
+        assert [] == mygh.getFolderListing('samrocketman/emptyList', '/')
+    }
     @Test public void test_GitHub_isUser() {
         assert true == mygh.isUser("samrocketman")
         assert false == mygh.isUser("jenkinsci")
