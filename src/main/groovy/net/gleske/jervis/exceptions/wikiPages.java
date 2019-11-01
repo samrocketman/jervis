@@ -109,35 +109,35 @@ public class wikiPages {
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Supported-Languages" target="_blank">supported languages wiki page</a>.
      */
-    public static String supported_languages = "https://github.com/samrocketman/jervis/wiki/Supported-Languages";
+    public static final String supported_languages = "https://github.com/samrocketman/jervis/wiki/Supported-Languages";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Supported-Tools" target="_blank">supported tools wiki page</a>.
      */
-    public static String supported_tools = "https://github.com/samrocketman/jervis/wiki/Supported-Tools";
+    public static final String supported_tools = "https://github.com/samrocketman/jervis/wiki/Supported-Tools";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycles file spec wiki page</a>.
      */
-    public static String lifecycles_spec = "https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file";
+    public static final String lifecycles_spec = "https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file" target="_blank">toolchains file spec wiki page</a>.
      */
-    public static String toolchains_spec = "https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file";
+    public static final String toolchains_spec = "https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file" target="_blank">platforms file spec wiki page</a>.
      */
-    public static String platforms_spec = "https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file";
+    public static final String platforms_spec = "https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories" target="_blank">secure secrets in repositories wiki page</a>.
      */
-    public static String secure_secrets = "https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories";
+    public static final String secure_secrets = "https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Pipeline-support" target="_blank">pipeline support wiki page</a>.
      */
-    public static String pipeline_support = "https://github.com/samrocketman/jervis/wiki/Pipeline-support";
+    public static final String pipeline_support = "https://github.com/samrocketman/jervis/wiki/Pipeline-support";
 }

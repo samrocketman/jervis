@@ -954,7 +954,7 @@ env:
         </li>
       </ol>
      */
-    public static Object getObjectValue(Map object, String key, Object defaultValue) {
+    public static final Object getObjectValue(Map object, String key, Object defaultValue) {
         if(key.indexOf('.') >= 0) {
             String key1 = key.split('\\.', 2)[0]
             String key2 = key.split('\\.', 2)[1]
@@ -996,7 +996,7 @@ env:
       @return       <tt>true</tt> if <tt>object</tt> is an instance of any one of the
                     items in the <tt>list</tt>.
      */
-    public static boolean isInstanceFromList(Object object, List<Class> list) {
+    public static final boolean isInstanceFromList(Object object, List<Class> list) {
         true in list*.isInstance(object)
     }
 
