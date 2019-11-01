@@ -26,7 +26,7 @@ package net.gleske.jervis.exceptions;
 throw new UnsupportedToolException('derpy')</tt></pre><br>
  */
 public class UnsupportedToolException extends GeneratorException {
-    private static final String wikiPage = WikiPages.supportedTools;
+    private static final String WIKI_PAGE = WikiPages.supportedTools;
 
     /**
       Throw an exception when an unsupported tool generation is attempted.  It would
@@ -38,6 +38,6 @@ public class UnsupportedToolException extends GeneratorException {
       @param message A simple message that will be prepended with <tt>'ERROR: Unsupported language in yaml -> ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.WikiPages#supportedTools}</tt>.
      */
     public UnsupportedToolException(String message) {
-        super("\nERROR: Unsupported tool in yaml -> " + message + "\n\nSee wiki page:\n" + wikiPage + "\n\n");
+        super("\nERROR: Unsupported tool in yaml -> " + message + "\n\nSee wiki page:\n" + WIKI_PAGE + "\n\n");
     }
 }

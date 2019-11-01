@@ -26,7 +26,7 @@ package net.gleske.jervis.exceptions;
 throw new ToolchainValidationException('some text')</tt></pre><br>
  */
 public class ToolchainValidationException extends JervisException {
-    private static final String wikiPage = WikiPages.toolchainsSpec;
+    private static final String WIKI_PAGE = WikiPages.toolchainsSpec;
 
     /**
       Throw a <tt>ToolchainValidationException</tt>
@@ -34,6 +34,6 @@ public class ToolchainValidationException extends JervisException {
       @param message A simple message that will be prepended with <tt>'ERROR: Toolchain validation failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.WikiPages#toolchainsSpec}</tt>.
      */
     public ToolchainValidationException(String message) {
-        super("\nERROR: Toolchain validation failed.  " + message + "\n\nSee wiki page:\n" + wikiPage + "\n\n");
+        super("\nERROR: Toolchain validation failed.  " + message + "\n\nSee wiki page:\n" + WIKI_PAGE + "\n\n");
     }
 }
