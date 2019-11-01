@@ -26,12 +26,12 @@ package net.gleske.jervis.exceptions;
 throw new PlatformValidationException('some text')</tt></pre><br>
  */
 public class PlatformValidationException extends JervisException {
-    private static String wiki_page = wikiPages.platforms_spec;
+    private static String wiki_page = WikiPages.platforms_spec;
 
     /**
       Throw a <tt>PlatformValidationException</tt>
 
-      @param message A simple message that will be prepended with <tt>'ERROR: Platform validation failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.wikiPages#platforms_spec}</tt>.
+      @param message A simple message that will be prepended with <tt>'ERROR: Platform validation failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.WikiPages#platforms_spec}</tt>.
      */
     public PlatformValidationException(String message) {
         super("\nERROR: Platform validation failed.  " + message + "\n\nSee wiki page:\n" + wiki_page + "\n\n");

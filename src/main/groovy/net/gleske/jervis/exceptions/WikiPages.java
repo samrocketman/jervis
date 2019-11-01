@@ -20,7 +20,7 @@ package net.gleske.jervis.exceptions;
   to be used as helpful hints when throwing exceptions.
 
   <h2>Overriding URLs</h2>
-  Each of the <tt>wikiPages</tt> class URLs can be overridden by making use of
+  Each of the <tt>WikiPages</tt> class URLs can be overridden by making use of
   Groovy meta programming.  This is a technique which modifies static classes
   during the runtime.  Groovy automatically generates a camel cased setter and
   getter methods for class properties.  Here's a list of the generated getter
@@ -52,8 +52,8 @@ package net.gleske.jervis.exceptions;
   programming.  The following is an example of overriding the
   <tt>{@link #lifecycles_spec}</tt>.</p>
 
-<pre><tt>import net.gleske.jervis.exceptions.wikiPages
-wikiPages.metaClass.static.getLifecycles_spec = {->'https://wiki.example.com/lifecycle_explanation.html'}
+<pre><tt>import net.gleske.jervis.exceptions.WikiPages
+WikiPages.metaClass.static.getLifecycles_spec = {->'https://wiki.example.com/lifecycle_explanation.html'}
 
 import net.gleske.jervis.lang.lifecycleValidator
 
@@ -81,12 +81,12 @@ x.validate()</tt></pre>
 
   The important part of the above example is the following excerpt.
 
-<pre><tt>import net.gleske.jervis.exceptions.wikiPages
-wikiPages.metaClass.static.getLifecycles_spec = {->'https://wiki.example.com/lifecycle_explanation.html'}
+<pre><tt>import net.gleske.jervis.exceptions.WikiPages
+WikiPages.metaClass.static.getLifecycles_spec = {->'https://wiki.example.com/lifecycle_explanation.html'}
 
 import net.gleske.jervis.lang.lifecycleValidator</tt></pre>
 
-  What is important is that we modified the <tt>wikiPages</tt> class
+  What is important is that we modified the <tt>WikiPages</tt> class
   <strong>before</strong> we imported the <tt>{@link net.gleske.jervis.lang.lifecycleValidator}</tt> class.
   This is important because the class can't be statically modified from within the
   <tt>lifecycleValidator</tt> after it is imported.
@@ -104,7 +104,7 @@ https://wiki.example.com/lifecycle_explanation.html
     at net.gleske.jervis.lang.lifecycleValidator.validate(lifecycleValidator.groovy:112)
     at net.gleske.jervis.lang.lifecycleValidator$validate$0.call(Unknown Source)</tt></pre>
  */
-public class wikiPages {
+public class WikiPages {
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Supported-Languages" target="_blank">supported languages wiki page</a>.
