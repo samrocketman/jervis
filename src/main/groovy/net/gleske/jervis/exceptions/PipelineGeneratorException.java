@@ -26,7 +26,7 @@ package net.gleske.jervis.exceptions;
 throw new PipelineGeneratorException('some text')</tt></pre><br>
  */
 public class PipelineGeneratorException extends JervisException {
-    private static String wikiPage = WikiPages.pipelineSupport;
+    private static final String wikiPage = WikiPages.pipelineSupport;
 
     /**
       Throw a <tt>PipelineGeneratorException</tt>.

@@ -26,7 +26,7 @@ package net.gleske.jervis.exceptions;
 throw new PlatformValidationException('some text')</tt></pre><br>
  */
 public class PlatformValidationException extends JervisException {
-    private static String wikiPage = WikiPages.platformsSpec;
+    private static final String wikiPage = WikiPages.platformsSpec;
 
     /**
       Throw a <tt>PlatformValidationException</tt>

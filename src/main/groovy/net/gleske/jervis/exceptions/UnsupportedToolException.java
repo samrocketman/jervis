@@ -26,7 +26,7 @@ package net.gleske.jervis.exceptions;
 throw new UnsupportedToolException('derpy')</tt></pre><br>
  */
 public class UnsupportedToolException extends GeneratorException {
-    private static String wikiPage = WikiPages.supportedTools;
+    private static final String wikiPage = WikiPages.supportedTools;
 
     /**
       Throw an exception when an unsupported tool generation is attempted.  It would

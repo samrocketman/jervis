@@ -27,7 +27,7 @@ package net.gleske.jervis.exceptions;
 throw new SecurityException('some text')</tt></pre><br>
  */
 public class SecurityException extends JervisException {
-    private static String wikiPage = WikiPages.secureSecrets;
+    private static final String wikiPage = WikiPages.secureSecrets;
 
     /**
       Throw a <tt>SecurityException</tt>.

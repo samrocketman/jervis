@@ -26,7 +26,7 @@ package net.gleske.jervis.exceptions;
 throw new UnsupportedLanguageException('derpy')</tt></pre><br>
  */
 public class UnsupportedLanguageException extends GeneratorException {
-    private static String wikiPage = WikiPages.supportedLanguages;
+    private static final String wikiPage = WikiPages.supportedLanguages;
 
     /**
       Throw an exception when an unsupported language lifecycle generation is attempted.

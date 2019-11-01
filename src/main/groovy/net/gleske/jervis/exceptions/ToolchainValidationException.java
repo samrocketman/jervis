@@ -26,7 +26,7 @@ package net.gleske.jervis.exceptions;
 throw new ToolchainValidationException('some text')</tt></pre><br>
  */
 public class ToolchainValidationException extends JervisException {
-    private static String wikiPage = WikiPages.toolchainsSpec;
+    private static final String wikiPage = WikiPages.toolchainsSpec;
 
     /**
       Throw a <tt>ToolchainValidationException</tt>

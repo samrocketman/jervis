@@ -26,7 +26,7 @@ package net.gleske.jervis.exceptions;
 throw new LifecycleValidationException('some text')</tt></pre><br>
  */
 public class LifecycleValidationException extends JervisException {
-    private static String wikiPage = WikiPages.lifecyclesSpec;
+    private static final String wikiPage = WikiPages.lifecyclesSpec;
 
     /**
       Throw a <tt>LifecycleValidationException</tt>.
