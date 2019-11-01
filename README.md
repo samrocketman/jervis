@@ -177,6 +177,10 @@ Sign build jars and sign archives.
 
 See also [RELEASE.md](RELEASE.md).
 
+# Local SonarQube Analysis
+
+See [SonarQube README](sonarqube/README.md).
+
 # License
 
     Copyright 2014-2019 Sam Gleske

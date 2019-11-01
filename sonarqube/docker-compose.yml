@@ -1,0 +1,16 @@
+version: '2.2'
+volumes:
+  conf:
+  extensions:
+  data:
+services:
+  sonarqube:
+    init: true
+    # https://hub.docker.com/_/sonarqube/
+    image: sonarqube:7.9.1-community
+    volumes:
+      - conf:/opt/sonarqube/conf
+      - extensions:/opt/sonarqube/extensions
+      - data:/opt/sonarqube/data
+    ports:
+      - 9000:9000
