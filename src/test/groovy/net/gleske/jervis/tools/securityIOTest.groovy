@@ -19,7 +19,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import net.gleske.jervis.exceptions.DecryptException
 import net.gleske.jervis.exceptions.EncryptException
-import net.gleske.jervis.exceptions.KeyGenerationException
 import net.gleske.jervis.exceptions.KeyPairDecodeException
 import net.gleske.jervis.exceptions.SecurityException
 import org.junit.After
