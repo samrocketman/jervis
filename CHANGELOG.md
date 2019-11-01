@@ -8,6 +8,11 @@
 - `net.gleske.jervis.remotes.creds.ReadonlyTokenCredential` is available for
   implementation for a TokenCredential which doesn't support writing.
 
+### Other notes
+
+- Local SonarQube analysis available.
+- Code has been refactored based on SonarQube analysis.
+
 # jervis 1.3 - Oct 31st, 2019
 
 #### New features:
