@@ -24,6 +24,13 @@ import java.net.URLConnection
  */
 class StaticMocking {
 
+    /**
+      Throw an error if a user attempts to instantiate an instance of <tt>StaticMocking</tt>.
+      */
+    private StaticMocking() {
+        throw new IllegalStateException("This utility class is only meant for referencing static methods.  This is not meant to be instantiated.")
+    }
+
     /*
       Mock the HTTP calls to any API and use resources files, instead.  Under
       the hood, URL will utilize a file reader rather than attempting to

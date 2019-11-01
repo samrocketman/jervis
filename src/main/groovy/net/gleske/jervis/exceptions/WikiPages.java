@@ -107,6 +107,13 @@ https://wiki.example.com/lifecycle_explanation.html
 public class WikiPages {
 
     /**
+      Throw an error if a user attempts to instantiate an instance of <tt>WikiPages</tt>.
+      */
+    private WikiPages() {
+        throw new IllegalStateException("This utility class is only meant for referencing static properties.  This is not meant to be instantiated.");
+    }
+
+    /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Supported-Languages" target="_blank">supported languages wiki page</a>.
      */
     public static final String supported_languages = "https://github.com/samrocketman/jervis/wiki/Supported-Languages";
