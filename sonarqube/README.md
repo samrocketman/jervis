@@ -28,7 +28,7 @@ At the root of this repository, simply run
 
     ./gradlew sonar
 
-and see the results appear.
+Visit http://localhost:9000/ and see the results appear.
 
 # Starting and stopping SonarQube
 
