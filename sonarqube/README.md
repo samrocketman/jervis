@@ -26,7 +26,7 @@ Start SonarQube by running the following command relative to this directory.
 
 At the root of this repository, simply run
 
-    ./gradlew sonar
+    ./gradlew clean sonar
 
 Visit http://localhost:9000/ and see the results appear.
 
