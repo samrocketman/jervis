@@ -15,6 +15,7 @@
    */
 package net.gleske.jervis.remotes
 
+import net.gleske.jervis.remotes.interfaces.JervisCredential
 import net.gleske.jervis.remotes.interfaces.JervisRemote
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.tools.securityIO
@@ -81,6 +82,9 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
        Default: <tt>null</tt>
       */
     TokenCredential credential
+    void setCredential(TokenCredential c) {
+        this.credential = c
+    }
 
     /**
        Retrieves the token used to authenticate with GitHub.  If

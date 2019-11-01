@@ -14,6 +14,7 @@
    limitations under the License.
    */
 package net.gleske.jervis.remotes
+import net.gleske.jervis.remotes.interfaces.JervisCredential
 
 /**
    REST service classes can derive some default implementation from this trait.

@@ -16,10 +16,8 @@
 package net.gleske.jervis.remotes.interfaces
 
 /**
-   Provides a way to call an external credential store in case there's an
-   alternate means of storing and retrieving credentials.  This allows Jervis
-   to store credentials securely in a system like Jenkins without having to
-   depend on Jenkins for <tt>{@link hudson.util.Secret}</tt>.
+   Abstracted token credential allows retrieving a token from an external
+   credential store.
 
    <h2>Sample usage</h2>
    <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
@@ -45,7 +43,7 @@ println "Secret token: ${creds.token}"
 creds.setToken( 'foo')
 println creds.getToken()</tt></pre><br>
  */
-interface TokenCredential {
+interface TokenCredential extends JervisCredential {
 
     /**
        When implemented, this method should return a String that is a token to
