@@ -27,11 +27,11 @@ package net.gleske.jervis.exceptions;
   methods for this class.
 
   <ul>
-    <li><tt>{@link #supportedLanguages}</tt> has the getter <tt>getSupported_languages()</tt></li>
-    <li><tt>{@link #supportedTools}</tt> has the getter <tt>getSupported_tools()</tt></li>
-    <li><tt>{@link #lifecyclesSpec}</tt> has the getter <tt>getLifecycles_spec()</tt></li>
-    <li><tt>{@link #toolchainsSpec}</tt> has the getter <tt>getToolchains_spec()</tt></li>
-    <li><tt>{@link #platformsSpec}</tt> has the getter <tt>getPlatforms_spec()</tt></li>
+    <li><tt>{@link #supportedLanguages}</tt> has the getter <tt>getSupportedLanguages()</tt></li>
+    <li><tt>{@link #supportedTools}</tt> has the getter <tt>getSupportedTools()</tt></li>
+    <li><tt>{@link #lifecyclesSpec}</tt> has the getter <tt>getLifecyclesSpec()</tt></li>
+    <li><tt>{@link #toolchainsSpec}</tt> has the getter <tt>getToolchainsSpec()</tt></li>
+    <li><tt>{@link #platformsSpec}</tt> has the getter <tt>getPlatformsSpec()</tt></li>
   </ul>
 
   <h2>Why bother overridding URLs?</h2>
@@ -53,7 +53,7 @@ package net.gleske.jervis.exceptions;
   <tt>{@link #lifecyclesSpec}</tt>.</p>
 
 <pre><tt>import net.gleske.jervis.exceptions.WikiPages
-WikiPages.metaClass.static.getLifecycles_spec = {->'https://wiki.example.com/lifecycle_explanation.html'}
+WikiPages.metaClass.static.getLifecyclesSpec = {->'https://wiki.example.com/lifecycle_explanation.html'}
 
 import net.gleske.jervis.lang.lifecycleValidator
 
@@ -82,7 +82,7 @@ x.validate()</tt></pre>
   The important part of the above example is the following excerpt.
 
 <pre><tt>import net.gleske.jervis.exceptions.WikiPages
-WikiPages.metaClass.static.getLifecycles_spec = {->'https://wiki.example.com/lifecycle_explanation.html'}
+WikiPages.metaClass.static.getLifecyclesSpec = {->'https://wiki.example.com/lifecycle_explanation.html'}
 
 import net.gleske.jervis.lang.lifecycleValidator</tt></pre>
 
