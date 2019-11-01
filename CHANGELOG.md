@@ -1,4 +1,4 @@
-# jervis 1.4
+# jervis 1.4 - Nov 1st, 2019
 
 ### New features:
 
@@ -10,8 +10,11 @@
 
 ### Other notes
 
-- Local SonarQube analysis available.
+- Added Jacoco for code coverage.
+- Updated builds and coveralls to support Jacoco instead of Cobertura.
+- [Local SonarQube analysis](sonarqube/README.md) available.
 - Code has been refactored based on SonarQube analysis.
+- Upgraded SnakeYAML dependency to 1.25.
 
 # jervis 1.3 - Oct 31st, 2019
 
