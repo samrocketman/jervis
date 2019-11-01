@@ -26,7 +26,7 @@ package net.gleske.jervis.exceptions;
 throw new PipelineGeneratorException('some text')</tt></pre><br>
  */
 public class PipelineGeneratorException extends JervisException {
-    private static String wiki_page = WikiPages.pipelineSupport;
+    private static String wikiPage = WikiPages.pipelineSupport;
 
     /**
       Throw a <tt>PipelineGeneratorException</tt>.
@@ -34,6 +34,6 @@ public class PipelineGeneratorException extends JervisException {
       @param message A simple message that will be prepended with <tt>'ERROR: Pipeline Generator failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.WikiPages#pipelineSupport}</tt>.
      */
     public PipelineGeneratorException(String message) {
-        super("\nERROR: Pipeline Generator failed.  " + message + "\n\nSee wiki page:\n" + wiki_page + "\n\n");
+        super("\nERROR: Pipeline Generator failed.  " + message + "\n\nSee wiki page:\n" + wikiPage + "\n\n");
     }
 }
