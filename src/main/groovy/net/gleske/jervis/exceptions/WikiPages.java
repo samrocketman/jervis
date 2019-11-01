@@ -27,11 +27,11 @@ package net.gleske.jervis.exceptions;
   methods for this class.
 
   <ul>
-    <li><tt>{@link #supportedLanguages}</tt> has the getter <tt>getSupportedLanguages()</tt></li>
-    <li><tt>{@link #supportedTools}</tt> has the getter <tt>getSupportedTools()</tt></li>
-    <li><tt>{@link #lifecyclesSpec}</tt> has the getter <tt>getLifecyclesSpec()</tt></li>
-    <li><tt>{@link #toolchainsSpec}</tt> has the getter <tt>getToolchainsSpec()</tt></li>
-    <li><tt>{@link #platformsSpec}</tt> has the getter <tt>getPlatformsSpec()</tt></li>
+    <li><tt>{@link #SUPPORTED_LANGUAGES}</tt> has the getter <tt>getSupportedLanguages()</tt></li>
+    <li><tt>{@link #SUPPORTED_TOOLS}</tt> has the getter <tt>getSupportedTools()</tt></li>
+    <li><tt>{@link #LIFECYCLES_SPEC}</tt> has the getter <tt>getLifecyclesSpec()</tt></li>
+    <li><tt>{@link #TOOLCHAINS_SPEC}</tt> has the getter <tt>getToolchainsSpec()</tt></li>
+    <li><tt>{@link #PLATFORMS_SPEC}</tt> has the getter <tt>getPlatformsSpec()</tt></li>
   </ul>
 
   <h2>Why bother overridding URLs?</h2>
@@ -50,7 +50,7 @@ package net.gleske.jervis.exceptions;
 
   <p>When overriding the URLs you must override the getter method using meta
   programming.  The following is an example of overriding the
-  <tt>{@link #lifecyclesSpec}</tt>.</p>
+  <tt>{@link #LIFECYCLES_SPEC}</tt>.</p>
 
 <pre><tt>import net.gleske.jervis.exceptions.WikiPages
 WikiPages.metaClass.static.getLifecyclesSpec = {->'https://wiki.example.com/lifecycle_explanation.html'}
@@ -116,35 +116,35 @@ public class WikiPages {
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Supported-Languages" target="_blank">supported languages wiki page</a>.
      */
-    public static final String supportedLanguages = "https://github.com/samrocketman/jervis/wiki/Supported-Languages";
+    public static final String SUPPORTED_LANGUAGES = "https://github.com/samrocketman/jervis/wiki/Supported-Languages";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Supported-Tools" target="_blank">supported tools wiki page</a>.
      */
-    public static final String supportedTools = "https://github.com/samrocketman/jervis/wiki/Supported-Tools";
+    public static final String SUPPORTED_TOOLS = "https://github.com/samrocketman/jervis/wiki/Supported-Tools";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file" target="_blank">lifecycles file spec wiki page</a>.
      */
-    public static final String lifecyclesSpec = "https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file";
+    public static final String LIFECYCLES_SPEC = "https://github.com/samrocketman/jervis/wiki/Specification-for-lifecycles-file";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file" target="_blank">toolchains file spec wiki page</a>.
      */
-    public static final String toolchainsSpec = "https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file";
+    public static final String TOOLCHAINS_SPEC = "https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file" target="_blank">platforms file spec wiki page</a>.
      */
-    public static final String platformsSpec = "https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file";
+    public static final String PLATFORMS_SPEC = "https://github.com/samrocketman/jervis/wiki/Specification-for-platforms-file";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories" target="_blank">secure secrets in repositories wiki page</a>.
      */
-    public static final String secureSecrets = "https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories";
+    public static final String SECURE_SECRETS = "https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories";
 
     /**
       A static reference to the <a href="https://github.com/samrocketman/jervis/wiki/Pipeline-support" target="_blank">pipeline support wiki page</a>.
      */
-    public static final String pipelineSupport = "https://github.com/samrocketman/jervis/wiki/Pipeline-support";
+    public static final String PIPELINE_SUPPORT = "https://github.com/samrocketman/jervis/wiki/Pipeline-support";
 }

@@ -26,12 +26,12 @@ package net.gleske.jervis.exceptions;
 throw new LifecycleValidationException('some text')</tt></pre><br>
  */
 public class LifecycleValidationException extends JervisException {
-    private static final String WIKI_PAGE = WikiPages.lifecyclesSpec;
+    private static final String WIKI_PAGE = WikiPages.LIFECYCLES_SPEC;
 
     /**
       Throw a <tt>LifecycleValidationException</tt>.
 
-      @param message A simple message that will be prepended with <tt>'ERROR: Lifecycle validation failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.WikiPages#lifecyclesSpec}</tt>.
+      @param message A simple message that will be prepended with <tt>'ERROR: Lifecycle validation failed.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.WikiPages#LIFECYCLES_SPEC}</tt>.
      */
     public LifecycleValidationException(String message) {
         super("\nERROR: Lifecycle validation failed.  " + message + "\n\nSee wiki page:\n" + WIKI_PAGE + "\n\n");

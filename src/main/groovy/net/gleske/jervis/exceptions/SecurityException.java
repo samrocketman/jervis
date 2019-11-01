@@ -27,12 +27,12 @@ package net.gleske.jervis.exceptions;
 throw new SecurityException('some text')</tt></pre><br>
  */
 public class SecurityException extends JervisException {
-    private static final String WIKI_PAGE = WikiPages.secureSecrets;
+    private static final String WIKI_PAGE = WikiPages.SECURE_SECRETS;
 
     /**
       Throw a <tt>SecurityException</tt>.
 
-      @param message A simple message that will be prepended with <tt>'ERROR: An encryption related issue occurred.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.WikiPages#secureSecrets}</tt>.
+      @param message A simple message that will be prepended with <tt>'ERROR: An encryption related issue occurred.  ' + message</tt> as well as provide a link to a helpful wiki page, <tt>{@link net.gleske.jervis.exceptions.WikiPages#SECURE_SECRETS}</tt>.
      */
     public SecurityException(String message) {
         super("\nERROR: An encryption related issue occured.  " + message + "\n\nSee wiki page:\n" + WIKI_PAGE + "\n\n");
