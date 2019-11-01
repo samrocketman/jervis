@@ -111,7 +111,7 @@ include it in your build tool.
 <dependency>
   <groupId>net.gleske</groupId>
   <artifactId>jervis</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <type>pom</type>
 </dependency>
 ```
@@ -134,8 +134,8 @@ configurations {
 }
 
 dependencies {
-    libs 'net.gleske:jervis:1.3'
-    libs 'org.yaml:snakeyaml:1.21'
+    libs 'net.gleske:jervis:1.4'
+    libs 'org.yaml:snakeyaml:1.25'
 }
 
 task cleanLibs(type: Delete) {
