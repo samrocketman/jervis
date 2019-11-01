@@ -17,7 +17,7 @@ Next we need to prepare the environment according to the [signing plugin
 documentation][sign-plugin] for Gradle.
 
     ORG_GRADLE_PROJECT_signingKey="$(gpg -a --export-secret-keys "Sam Gleske")"
-    read -sp pass: ORG_GRADLE_PROJECT_signingPassword
+    read -ersp pass: ORG_GRADLE_PROJECT_signingPassword
     export ORG_GRADLE_PROJECT_signingKey ORG_GRADLE_PROJECT_signingPassword
 
 I now use in-memory signing keys because versions of GnuPG 2.1 and newer are
