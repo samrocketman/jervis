@@ -14,7 +14,7 @@
    limitations under the License.
    */
 package net.gleske.jervis.remotes
-//the GitHubTest() class automatically sees the GitHub() class because they're in the same package
+//the GitHubGraphQLTest() class automatically sees the GitHub() class because they're in the same package
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -86,5 +86,25 @@ class GitHubGraphQLTest extends GroovyTestCase {
     @Test public void test_GitHubGraphQL_sendGQL_custom_with_variables_and_quotes() {
         mygh.sendGQL('query { foo(expr: "hello") }', 'variables { "myvar": 3 }')
         assert request_meta['data'].toString() == '{"query":"query { foo(expr: \\"hello\\") }","variables":"variables { \\"myvar\\": 3 }"}'
+    }
+    @Test public void test_GitHubGraphQL_credentials_read() {
+        mygh.credential = new CredentialsInterfaceHelper.ROCreds()
+        assert mygh.token == 'ro secret'
+        mygh.sendGQL('stuff')
+        assert request_meta['headers']['Authorization'] == 'bearer ro secret'
+        mygh.token = 'foo'
+        assert mygh.token == 'ro secret'
+        mygh.sendGQL('stuff')
+        assert request_meta['headers']['Authorization'] == 'bearer ro secret'
+    }
+    @Test public void test_GitHubGraphQL_credentials_write() {
+        mygh.credential = new CredentialsInterfaceHelper.RWCreds()
+        assert mygh.token == 'rw secret'
+        mygh.sendGQL('stuff')
+        assert request_meta['headers']['Authorization'] == 'bearer rw secret'
+        mygh.token = 'foo'
+        assert mygh.token == 'foo'
+        mygh.sendGQL('stuff')
+        assert request_meta['headers']['Authorization'] == 'bearer foo'
     }
 }

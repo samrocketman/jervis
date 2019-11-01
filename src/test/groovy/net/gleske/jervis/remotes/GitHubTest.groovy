@@ -23,16 +23,18 @@ import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 class GitHubTest extends GroovyTestCase {
     def mygh
     def url
+    Map request_meta = [:]
 
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
-        mockStaticUrl(url, URL)
+        mockStaticUrl(url, URL, request_meta)
         mygh = new GitHub()
     }
     //tear down after every test
     @After protected void tearDown() {
         mygh = null
+        request_meta = [:]
         super.tearDown()
     }
     //test GitHub().gh_web
@@ -91,6 +93,7 @@ class GitHubTest extends GroovyTestCase {
     @Test public void test_GitHub_set3Gh_token() {
         mygh.gh_token = 'a'
         assert 'language: groovy\n' == mygh.getFile('samrocketman/jervis', '.travis.yml', 'master')
+        assert request_meta['headers']['Authorization'] == 'token a'
     }
     //test GitHub().getWebUrl()
     @Test public void test_GitHub_getWebUrl1() {
@@ -139,5 +142,25 @@ class GitHubTest extends GroovyTestCase {
     @Test public void test_GitHub_isUser() {
         assert true == mygh.isUser("samrocketman")
         assert false == mygh.isUser("jenkinsci")
+    }
+    @Test public void test_GitHub_credentials_read() {
+        mygh.credential = new CredentialsInterfaceHelper.ROCreds()
+        assert mygh.gh_token == 'ro secret'
+        mygh.getFolderListing('samrocketman/jervis')
+        assert request_meta['headers']?.get('Authorization') == 'token ro secret'
+        mygh.gh_token = 'foo'
+        assert mygh.gh_token == 'ro secret'
+        mygh.getFolderListing('samrocketman/jervis')
+        assert request_meta['headers']['Authorization'] == 'token ro secret'
+    }
+    @Test public void test_GitHub_credentials_write() {
+        mygh.credential = new CredentialsInterfaceHelper.RWCreds()
+        assert mygh.gh_token == 'rw secret'
+        mygh.getFolderListing('samrocketman/jervis')
+        assert request_meta['headers']['Authorization'] == 'token rw secret'
+        mygh.gh_token = 'foo'
+        assert mygh.gh_token == 'foo'
+        mygh.getFolderListing('samrocketman/jervis')
+        assert request_meta['headers']['Authorization'] == 'token foo'
     }
 }

@@ -52,25 +52,20 @@ class SimpleRestService {
 
         //data_response could be either a List or Map depending on the JSON
         def data_response
-        switch(http_method.toUpperCase()) {
-            case 'GET':
-                Reader request = api_url.newReader(requestProperties: http_headers)
-                data_response = (parse_json)? yaml.load(request) : request.text.toString()
-                break
-            default:
-                String response = api_url.openConnection().with { conn ->
-                    conn.doOutput = true
-                    conn.setRequestMethod(http_method.toUpperCase())
-                    http_headers.each { k, v ->
-                        conn.setRequestProperty(k, v)
-                    }
-                    conn.outputStream.withWriter { writer ->
-                        writer << data
-                    }
-                    conn.getContent().getText()
+        String response = api_url.openConnection().with { conn ->
+            conn.doOutput = true
+            conn.setRequestMethod(http_method.toUpperCase())
+            http_headers.each { k, v ->
+                conn.setRequestProperty(k, v)
+            }
+            if(http_method.toUpperCase() != 'GET') {
+                conn.outputStream.withWriter { writer ->
+                    writer << data
                 }
-                data_response = (parse_json)? yaml.load(response ?: '{}') : response
+            }
+            conn.getContent().getText()
         }
+        data_response = (parse_json)? yaml.load(response ?: '{}') : response
         data_response
     }
 }
