@@ -14,6 +14,9 @@ plugins {
     id 'signing'
 }
 
+if(JavaVersion.current() != JavaVersion.VERSION_1_8) {
+    throw new GradleException("This project requires Java 8, but it's running on "+JavaVersion.current())
+}
 
 group = 'net.gleske'
 archivesBaseName = 'jervis'
@@ -169,6 +172,11 @@ jar.dependsOn tasks.findAll { task -> task.name.endsWith('Jar') }
 gradle.taskGraph.whenReady { graph ->
     if (graph.hasTask(':jacocoTestReport')) {
         compileGroovy.groovyOptions.optimizationOptions.all = false
+    }
+    if (graph.hasTask(':uploadArchives')) {
+        if(!(System.getenv('ORG_GRADLE_PROJECT_signingKey') && System.getenv('ORG_GRADLE_PROJECT_signingPassword'))) {
+            throw new GradleException("ERROR: Attempting to release without signing key and password.  See RELEASE.md for details.")
+        }
     }
 }
 
