@@ -98,4 +98,18 @@ class AutoReleaseTest extends GroovyTestCase {
             AutoRelease.getNextSemanticRelease('1.0-beta', [])
         }
     }
+    @Test public void test_AutoRelease_getNextSemanticRelease_isMatched() {
+        assert false == AutoRelease.isMatched('hello', 'world')
+        assert true == AutoRelease.isMatched('hello', 'hello')
+        assert false == AutoRelease.isMatched('/hello', '/world')
+        assert true == AutoRelease.isMatched('/hello', '/hello')
+        assert false == AutoRelease.isMatched('hello/', 'world/')
+        assert true == AutoRelease.isMatched('hello/', 'hello/')
+        assert true == AutoRelease.isMatched('/[0-9]+/', '8675309')
+        assert false == AutoRelease.isMatched('/[0-9]+/', 'jenny')
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_getScriptFromTemplate() {
+        assert 'goodbye friend' == AutoRelease.getScriptFromTemplate('${hello} ${world}', [hello: 'goodbye', world: 'friend'])
+        assert 'animals: dog cat snake' == AutoRelease.getScriptFromTemplate('animals:<% animals.each { print " ${it}" } %>', [animals: ['dog', 'cat', 'snake']])
+    }
 }
