@@ -2391,7 +2391,7 @@ table.example {
 table.example tr th {
     border-collapse: collapse;
     border: 1px solid black;
-    color: white;
+    color: black;
     background: rgba(219, 72, 0, 0.10);
     border-top: none;
 }

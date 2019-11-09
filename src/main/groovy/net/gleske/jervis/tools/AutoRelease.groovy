@@ -24,11 +24,11 @@ class AutoRelease {
         This is utility function can make it easier to provided automated
         continuous release of projects which follow semantic versioning.
 
-        <h3>For NodeJS</h3>
+        <h2>For NodeJS</h2>
         NodeJS follows a very strict
         <a href="https://docs.npmjs.com/about-semantic-versioning" target="_blank">version format for semantic versioning</a>.
         NodeJS only allows the following two formats for version:
-        <tt>W.X.Y</tt> and <tt>W.X.Y-Z<tt> where <tt>W</tt>, <tt>X</tt>, and
+        <tt>W.X.Y</tt> and <tt>W.X.Y-Z</tt> where <tt>W</tt>, <tt>X</tt>, and
         <tt>Y</tt> are integers.  <tt>Z</tt> can be anything.  In the case of
         this method, it treats <tt>Z</tt> as a hotfix number which needs to be
         bumped.
@@ -111,17 +111,13 @@ class AutoRelease {
                 throw new Exception("ERROR: ${currentVersion} is invalid. NodeJS projects are required to follow sem-ver.  Refer to https://stackoverflow.com/questions/16887993/npm-why-is-a-version-0-1-invalid")
             }
             else if(parsed_version[-1] == '0'){
-             /**
-               * a normal semver release
-               */
+                // a normal semver release
                 String partial_version = parsed_version[0..1].join('.')
                 nextVersion = getNextRelease(partial_version, git_tags, '.', prefix)
             }
             else{
-                /**
-                  * in this case, version would end up being a patch for a hotfix
-                  * so we need to return the greatest hotfix tag
-                  */
+                // In this case, version would end up being a patch for a
+                // hotfix so we need to return the greatest hotfix tag
                 String hotfix_seperator = '-'
                 nextVersion = getNextRelease(currentVersion, git_tags, hotfix_seperator, prefix)
             }
@@ -149,49 +145,49 @@ class AutoRelease {
             <tr>
                 <td><tt>1.0-SNAPSHOT</tt></td>
                 <td><tt>1.1</tt>, <tt>1.2</tt></td>
-                <td><tt>.</tt></td>
+                <td><tt>.</tt> (period)</td>
                 <td>none</td>
                 <td><tt>1.3</tt></td>
             </tr>
             <tr>
                 <td><tt>1.1.5</tt></td>
                 <td><tt>1.1.6</tt>, <tt>1.1.5.1</tt>, <tt>1.1.5.2</tt></td>
-                <td><tt>.</tt></td>
+                <td><tt>.</tt> (period)</td>
                 <td>none</td>
                 <td><tt>1.1.5.3</tt></td>
             </tr>
             <tr>
                 <td><tt>2.1-SNAPSHOT</tt></td>
                 <td><tt>client-2.1.1</tt>, <tt>client-2.1.2</tt></td>
-                <td><tt>.</tt></td>
+                <td><tt>.</tt> (period)</td>
                 <td><tt>client-</tt></td>
                 <td><tt>client-2.1.3</tt></td>
             </tr>
             <tr>
                 <td><tt>1.3</tt></td>
                 <td><tt>v1.1.1</tt>, <tt>v1.2.1</tt>, <tt>v1.3.1</tt>, <tt>v1.3.2</tt>, <tt>v1.3.3</tt></td>
-                <td><tt>.</tt></td>
+                <td><tt>.</tt> (period)</td>
                 <td><tt>v</tt></td>
                 <td><tt>v1.3.4</tt></td>
             </tr>
             <tr>
                 <td><tt>1.3.0</tt></td>
                 <td><tt>v1.1.1</tt>, <tt>v1.2.1</tt>, <tt>v1.3.1</tt>, <tt>v1.3.2</tt>, <tt>v1.3.3</tt></td>
-                <td><tt>.</tt></td>
+                <td><tt>.</tt> (period)</td>
                 <td><tt>v</tt></td>
                 <td><tt>v1.3.4</tt></td>
             </tr>
             <tr>
                 <td><tt>1.0</tt></td>
                 <td><tt>v1.1</tt>, <tt>v1.2</tt>, <tt>v1.3</tt>, <tt>v1.3.2</tt>, <tt>v1.3.3</tt></td>
-                <td><tt>.</tt></td>
+                <td><tt>.</tt> (period)</td>
                 <td><tt>v</tt></td>
                 <td><tt>v1.4</tt></td>
             </tr>
             <tr>
                 <td><tt>20200101</tt></td>
                 <td><tt>20200101-1</tt>, <tt>20200101-2</tt></td>
-                <td><tt>-</tt></td>
+                <td><tt>-</tt> (hyphen)</td>
                 <td>none</td>
                 <td><tt>20200101-3</tt></td>
             </tr>
