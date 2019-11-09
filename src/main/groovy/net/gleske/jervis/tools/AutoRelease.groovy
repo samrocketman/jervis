@@ -1,7 +1,17 @@
-/**
-  This class provides utility functions helpful for continuous automated release.
+/*
+   Copyright 2014-2019 Sam Gleske - https://github.com/samrocketman/jervis
 
-  @author Sam Gleske (GitHub @samrocketman)
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
   */
 
 package net.gleske.jervis.tools
@@ -12,7 +22,51 @@ import groovy.text.SimpleTemplateEngine
 import java.util.regex.Pattern
 
 /**
-  This class provides automatic release utility functions such as pattern matching
+  This utility class provides automatic release methods such as pattern
+  matching and version bumping if given existing releases.
+
+   <h2>Sample usage</h2>
+   <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+   to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a> with the classpath set up.</p>
+
+<pre><tt>import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
+import static net.gleske.jervis.tools.AutoRelease.getNextRelease
+import static net.gleske.jervis.tools.AutoRelease.getNextSemanticRelease
+import static net.gleske.jervis.tools.AutoRelease.isMatched
+
+String template = '''
+Say hello to the ${type}: <% print kinds.join(', ') %><% kinds.each { String kind -> %>
+  Hello ${kind}!<% } %>
+'''.trim()
+println "Show a string built from a simple Groovy template:"
+println getScriptFromTemplate(template, [type: 'animals', kinds: ['dog', 'cat', 'snake']])
+println getScriptFromTemplate(template, [type: 'people', kinds: ['sam', 'kristie', 'tammy']])
+println()
+
+String date = new Date().format('YYMMdd')
+List<String> git_tags = ['v1.1', 'v1.2', '1.1.2-1']
+
+println 'the first release for a date-based version comparing already released git tags:'
+println getNextRelease(date, git_tags)
+println()
+
+println 'the 3rd release for a version whose git tags start with the prefix "v"; hotfix releases keep a "." as the separator:'
+println getNextRelease('1.0', git_tags, '.', 'v')
+println()
+
+println 'get the next semantic versioning hotfix release when a hotfix for 1.1.2 has already been released as git tags:'
+println getNextSemanticRelease('1.1.2', git_tags)
+println()
+
+println('='*80)
+println 'check some version numbers to see if they are a valid semantic versioning format'
+println()
+['1.0', '1.0.1-3', '1.2.1', '1.2.1-beta', '1.0.0-rc', '1.0-beta'].each { String version ->
+    println "${version} version matches semantic versioning?"
+    println isMatched('/([0-9]+\\.){2}[0-9]+(-.*)?$/', version)
+    println()
+}
+println('='*80)</pre></tt>
   */
 class AutoRelease {
 
@@ -163,9 +217,11 @@ class AutoRelease {
    }
 
     /**
-        Get bumps the version with a more loosely formed format.  This
+        Gets a bumped version with a more loosely formed format.  This
         automatic releasing method is similar to semantic versioning but it is
-        not as strict.
+        not as strict.  Passed in version numbers can be anything.  For more
+        strict semantic versioning see
+        <tt><a href="#getNextSemanticRelease(java.lang.String, List<String>, java.lang.String)">getNextSemanticRelease</a></tt>.
 
         <h2>For Java, Python, and other languages</h2>
         <tt>-SNAPSHOT</tt> is automatically stripped from <tt>version</tt> as part of getting the next semantic version release.
@@ -286,11 +342,85 @@ class AutoRelease {
         complicated shell scripting such as using regex and needing to substitute
         Groovy variables.
 
+        An example of <tt>script</tt> and <tt>variables</tt> used by this
+        method would be the following.
+
+<pre><tt>import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
+
+String script = '''
+#!/bin/bash
+set -euxo pipefail
+
+<% tools.each { Map tool -> %>if [ -f "${tool.markerFile}" ]; then
+  echo "This project contains code for the build tool ${tool.name}."
+fi
+<% } %>
+'''.trim()
+
+Map variables = [
+    tools: [
+        [
+            name: 'maven',
+            markerFile: 'pom.xml'
+        ],
+        [
+            name: 'gradle',
+            markerFile: 'build.gradle'
+        ],
+        [
+            name: 'NodeJS npm',
+            markerFile: 'package.json'
+        ],
+        [
+            name: 'NodeJS yarn',
+            markerFile: 'yarn.lock'
+        ],
+        [
+            name: 'Python setuptools',
+            markerFile: 'setup.py'
+        ]
+    ]
+]
+println 'Build tool detection script'
+println('='*80)
+println getScriptFromTemplate(script, variables)
+println('='*80)</tt></pre>
+
+        Which returns the following output.
+
+<pre><tt>Build tool detection script
+================================================================================
+#!/bin/bash
+set -euxo pipefail
+
+if [ -f "pom.xml" ]; then
+  echo "This project contains code for the build tool maven."
+fi
+if [ -f "build.gradle" ]; then
+  echo "This project contains code for the build tool gradle."
+fi
+if [ -f "package.json" ]; then
+  echo "This project contains code for the build tool NodeJS npm."
+fi
+if [ -f "yarn.lock" ]; then
+  echo "This project contains code for the build tool NodeJS yarn."
+fi
+if [ -f "setup.py" ]; then
+  echo "This project contains code for the build tool Python setuptools."
+fi
+
+================================================================================</tt></pre>
+
+        This example shows that you can pass in Groovy templates with bindings.
+        By using this method yourself you do not need to manage the template
+        engine or binding.  Just pass in the template, bindings, and use them
+        through this method.
+
         @param script A shell script which is a Groovy template meant to
                       contain variables to be replaced.
         @param variables A Map of variables to replace in the script.
       */
-    static String getScriptFromTemplate(String script, Map<String, String> variables) {
+    static String getScriptFromTemplate(String script, Map variables) {
         SimpleTemplateEngine engine = new SimpleTemplateEngine()
         engine.createTemplate(script).make(variables).toString()
     }
