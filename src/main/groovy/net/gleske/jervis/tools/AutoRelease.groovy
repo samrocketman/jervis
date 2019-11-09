@@ -6,6 +6,8 @@
 
 package net.gleske.jervis.tools
 
+import net.gleske.jervis.exceptions.JervisException
+
 import groovy.text.SimpleTemplateEngine
 import java.util.regex.Pattern
 
@@ -24,7 +26,7 @@ class AutoRelease {
         This is utility function can make it easier to provided automated
         continuous release of projects which follow semantic versioning.
 
-        <h2>For NodeJS</h2>
+        <h2>For NodeJS and strict semantic versioning</h2>
         NodeJS follows a very strict
         <a href="https://docs.npmjs.com/about-semantic-versioning" target="_blank">version format for semantic versioning</a>.
         NodeJS only allows the following two formats for version:
@@ -78,6 +80,33 @@ class AutoRelease {
                 <td><tt>v</tt></td>
                 <td><tt>v1.3.2-3</tt></td>
             </tr>
+            <tr>
+                <td><tt>1.3.2-1</tt></td>
+                <td>
+                    <tt>v1.1.1</tt>, <tt>v1.2.1</tt>, <tt>v1.3.1</tt>, <tt>v1.3.2</tt>, <tt>v1.3.3</tt>,
+                    <tt>v1.3.2-1</tt>, <tt>v1.3.2-2</tt>
+                </td>
+                <td><tt>v</tt></td>
+                <td><tt>v1.3.2-1-1</tt></td>
+            </tr>
+            <tr>
+                <td><tt>1.0.0-rc</tt></td>
+                <td><tt>v0.10.3</tt>, <tt>v1.0.0-rc-1</tt></td>
+                <td><tt>v</tt></td>
+                <td><tt>v1.0.0-rc-2</tt></td>
+            </tr>
+            <tr>
+                <td><tt>1.1.0-beta</tt></td>
+                <td><tt>v0.10.3</tt>, <tt>v1.0.0-rc-1</tt></td>
+                <td><tt>v</tt></td>
+                <td><tt>v1.1.0-beta-1</tt></td>
+            </tr>
+            <tr>
+                <td><tt>1.1.0-beta</tt></td>
+                <td><tt>1.1.0-beta-1</tt>, <tt>1.1.0-beta-2</tt>, <tt>1.1.0-beta-3</tt></td>
+                <td>none</td>
+                <td><tt>1.1.0-beta-4</tt></td>
+            </tr>
         </table>
 
 
@@ -106,28 +135,28 @@ class AutoRelease {
         String currentVersion = (version -~ '-SNAPSHOT$') -~ "^\\Q${prefix}\\E"
         // nextVersion will be set and returned at the end.
         String nextVersion = ''
+        String hotfix_seperator = '-'
 
         if(currentVersion.contains('-')) {
-            def parsed_version = currentVersion.tokenize('-')
-            String partial_version = parsed_version[0]
-            String hotfix_seperator = '-'
-            nextVersion = getNextRelease(partial_version, git_tags, hotfix_seperator, prefix)
+            if(!isMatched('/([0-9]+\\.){2}[0-9]+-.*/', currentVersion)) {
+                throw new JervisException("ERROR: ${currentVersion} is an invalid semantic version.  See https://semver.org/")
+            }
+            // hotfixing a hotfix (strange but it happens in software)
+            nextVersion = getNextRelease(currentVersion, git_tags, hotfix_seperator, prefix)
         }
         else{
             def parsed_version = currentVersion.tokenize('.')
-            if(parsed_version.size() != 3)
-            {
-                throw new JervisException("ERROR: ${currentVersion} is invalid. NodeJS projects are required to strictly follow sem-ver.  Refer to https://stackoverflow.com/questions/16887993/npm-why-is-a-version-0-1-invalid")
+            if(parsed_version.size() != 3) {
+                throw new JervisException("ERROR: ${currentVersion} is an invalid semantic version.  See https://semver.org/")
             }
-            else if(parsed_version[-1] == '0'){
+            else if(parsed_version[-1] == '0') {
                 // a normal semver release
                 String partial_version = parsed_version[0..1].join('.')
                 nextVersion = getNextRelease(partial_version, git_tags, '.', prefix)
             }
-            else{
+            else {
                 // In this case, version would end up being a patch for a
                 // hotfix so we need to return the greatest hotfix tag
-                String hotfix_seperator = '-'
                 nextVersion = getNextRelease(currentVersion, git_tags, hotfix_seperator, prefix)
             }
         }
