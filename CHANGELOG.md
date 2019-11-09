@@ -1,4 +1,4 @@
-# jervis 1.5
+# jervis 1.5 - Nov 9th, 2019
 
 ### New features:
 
