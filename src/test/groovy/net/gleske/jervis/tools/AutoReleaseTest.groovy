@@ -55,6 +55,12 @@ class AutoReleaseTest extends GroovyTestCase {
     @Test public void test_AutoRelease_getNextRelease_20200101_hotfix() {
         assert '20200101-3' == AutoRelease.getNextRelease('20200101', ['20200101-1', '20200101-2'], '-')
     }
+    @Test public void test_AutoRelease_getNextRelease_1_0_beta_prefix_hotfix() {
+        assert 'v1.0-beta-1' == AutoRelease.getNextRelease('1.0-beta', [], '-', 'v')
+    }
+    @Test public void test_AutoRelease_getNextRelease_1_0_rc_prefix_hotfix() {
+        assert 'v1.0-rc-3' == AutoRelease.getNextRelease('1.0-rc', ['v1.0-rc-1', 'v1.0-rc-2'], '-', 'v')
+    }
     @Test public void test_AutoRelease_getNextSemanticRelease_fail_nonsemantic() {
         shouldFail(JervisException) {
             AutoRelease.getNextSemanticRelease('1.0', ['1.1', '1.2', '1.3'], '-')
