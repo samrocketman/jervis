@@ -1,3 +1,15 @@
+# jervis 1.5
+
+### New features:
+
+- AutoRelease support class added which provides automated bumping for versions.
+  This is useful in Jenkins pipeline scripts by giving the next version if given
+  a version and a set of existing Git tags.  It supports unconventional
+  continuos release and semantic versioning.  It supports tags having prefixes
+  like `v1.0` (prefix being `v`) and suffixes like `v1.0-beta`.  The API
+  documentation for the AutoRelease class has several examples for how this new
+  feature behaves.
+
 # jervis 1.4 - Nov 1st, 2019
 
 ### New features:
