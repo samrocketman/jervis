@@ -49,7 +49,7 @@ class AutoRelease {
                 <td><tt>1.1.5</tt></td>
                 <td><tt>1.1.6</tt>, <tt>1.1.5-1</tt>, <tt>1.1.5-2</tt></td>
                 <td>none</td>
-                <td><tt>1.1.5.3</tt></td>
+                <td><tt>1.1.5-3</tt></td>
             </tr>
             <tr>
                 <td><tt>2.1.0</tt></td>
@@ -64,10 +64,19 @@ class AutoRelease {
                 <td><tt>v1.3.4</tt></td>
             </tr>
             <tr>
-                <td><tt>1.3.0</tt></td>
+                <td><tt>1.3.2</tt></td>
                 <td><tt>v1.1.1</tt>, <tt>v1.2.1</tt>, <tt>v1.3.1</tt>, <tt>v1.3.2</tt>, <tt>v1.3.3</tt></td>
                 <td><tt>v</tt></td>
-                <td><tt>v1.3.4</tt></td>
+                <td><tt>v1.3.2-1</tt></td>
+            </tr>
+            <tr>
+                <td><tt>1.3.2</tt></td>
+                <td>
+                    <tt>v1.1.1</tt>, <tt>v1.2.1</tt>, <tt>v1.3.1</tt>, <tt>v1.3.2</tt>, <tt>v1.3.3</tt>,
+                    <tt>v1.3.2-1</tt>, <tt>v1.3.2-2</tt>
+                </td>
+                <td><tt>v</tt></td>
+                <td><tt>v1.3.2-3</tt></td>
             </tr>
         </table>
 
