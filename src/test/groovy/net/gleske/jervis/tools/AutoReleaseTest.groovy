@@ -15,6 +15,7 @@
    */
 package net.gleske.jervis.tools
 //the AutoReleaseTest() class automatically sees the securityIO() class because they're in the same package
+import net.gleske.jervis.exceptions.JervisException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -53,5 +54,48 @@ class AutoReleaseTest extends GroovyTestCase {
     }
     @Test public void test_AutoRelease_getNextRelease_20200101_hotfix() {
         assert '20200101-3' == AutoRelease.getNextRelease('20200101', ['20200101-1', '20200101-2'], '-')
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_fail_nonsemantic() {
+        shouldFail(JervisException) {
+            AutoRelease.getNextSemanticRelease('1.0', ['1.1', '1.2', '1.3'], '-')
+        }
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_0_1_0_defaults() {
+        assert '0.1.3' == AutoRelease.getNextSemanticRelease('0.1.0', ['0.1.1', '0.1.2'])
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_1_1_5_first_hotfix() {
+        assert '1.1.5-1' == AutoRelease.getNextSemanticRelease('1.1.5', ['1.1.5', '1.1.6'])
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_1_1_5_multi_hotfix() {
+        assert '1.1.5-3' == AutoRelease.getNextSemanticRelease('1.1.5', ['1.1.6', '1.1.5-1', '1.1.5-2'])
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_2_1_0_prefix() {
+        assert 'client-2.1.3' == AutoRelease.getNextSemanticRelease('2.1.0', ['client-2.1.1', 'client-2.1.2'], 'client-')
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_1_3_0_prefix() {
+        assert 'v1.3.4' == AutoRelease.getNextSemanticRelease('1.3.0', ['v1.1.1', 'v1.2.1', 'v1.3.1', 'v1.3.2', 'v1.3.3'], 'v')
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_1_3_2_prefix_first_hotfix() {
+        assert 'v1.3.2-1' == AutoRelease.getNextSemanticRelease('1.3.2', ['v1.1.1', 'v1.2.1', 'v1.3.1', 'v1.3.2', 'v1.3.3'], 'v')
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_1_3_2_prefix_multi_hotfix() {
+        assert 'v1.3.2-3' == AutoRelease.getNextSemanticRelease('1.3.2', ['v1.3.2', 'v1.3.3', 'v1.3.2-1', 'v1.3.2-2'], 'v')
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_1_3_2_prefix_nested_hotfix() {
+        assert 'v1.3.2-1-1' == AutoRelease.getNextSemanticRelease('1.3.2-1', ['v1.3.2', 'v1.3.3', 'v1.3.2-1', 'v1.3.2-2'], 'v')
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_1_0_0_rc_prefix() {
+        assert 'v1.0.0-rc-2' == AutoRelease.getNextSemanticRelease('1.0.0-rc', ['v0.10.3', 'v1.0.0-rc-1'], 'v')
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_1_1_0_beta_prefix_first_release() {
+        assert 'v1.1.0-beta-1' == AutoRelease.getNextSemanticRelease('1.1.0-beta', ['0.10.3', 'v1.0.0-rc-1'], 'v')
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_1_1_0_beta_prefix_multi_release() {
+        assert '1.1.0-beta-4' == AutoRelease.getNextSemanticRelease('1.1.0-beta', ['1.1.0-beta-1', '1.1.0-beta-2', '1.1.0-beta-3'])
+    }
+    @Test public void test_AutoRelease_getNextSemanticRelease_non_semantic_beta_failure() {
+        shouldFail(JervisException) {
+            AutoRelease.getNextSemanticRelease('1.0-beta', [])
+        }
     }
 }
