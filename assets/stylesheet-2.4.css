@@ -2380,3 +2380,49 @@ pre tt:before, pre tt:after {
 ul.blockListLast ol.numbered li {
   list-style-type: decimal;
 }
+
+table.example {
+    border-collapse: separate;
+    border: 2px solid grey;
+    border-radius: 5px 20px;
+    -moz-border-radius: 5px 20px;
+}
+
+table.example tr th {
+    border-collapse: collapse;
+    border: 1px solid black;
+    color: white;
+    background: rgba(219, 72, 0, 0.10);
+    border-top: none;
+}
+table.example tr th:last-child {
+    border-right: none;
+    border-top-right-radius: 19px;
+    -moz-border-top-right-radius: 19px;
+}
+table.example tr th:first-child {
+    border-left: none;
+    border-top-left-radius: 4px;
+    -moz-border-top-left-radius: 4px;
+}
+table.example tr td {
+    border-collapse: collapse;
+    border: 1px dotted grey;
+}
+table.example tr:last-child td {
+    border-bottom: none;
+}
+table.example tr td:first-child {
+    border-left: none;
+}
+table.example tr:last-child td:first-child {
+    border-bottom-left-radius: 20px;
+    -moz-border-bottom-left-radius: 20px;
+}
+table.example tr td:last-child {
+    border-right: none;
+}
+table.example tr:last-child td:last-child {
+    border-bottom-left-radius: 5px;
+    -moz-border-bottom-left-radius: 5px;
+}
