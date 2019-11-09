@@ -108,7 +108,7 @@ class AutoRelease {
             def parsed_version = currentVersion.tokenize('.')
             if(parsed_version.size() != 3)
             {
-                throw new Exception("ERROR: ${currentVersion} is invalid. NodeJS projects are required to follow sem-ver.  Refer to https://stackoverflow.com/questions/16887993/npm-why-is-a-version-0-1-invalid")
+                throw new JervisException("ERROR: ${currentVersion} is invalid. NodeJS projects are required to strictly follow sem-ver.  Refer to https://stackoverflow.com/questions/16887993/npm-why-is-a-version-0-1-invalid")
             }
             else if(parsed_version[-1] == '0'){
                 // a normal semver release
