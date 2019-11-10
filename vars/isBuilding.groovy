@@ -100,7 +100,7 @@ Boolean isTimerBuild(Job build_parent) {
   */
 Map call(Map filters) {
     Map results = [:]
-    for(k : filters.keySet()) {
+    for(String k : filters.keySet()) {
         Boolean result = false
         if(k == 'cron') {
             result = isTimerBuild(currentBuild.rawBuild.parent)
@@ -109,7 +109,7 @@ Map call(Map filters) {
             result = isMatchedPRBuild(currentBuild.rawBuild.parent)
         }
         if(k == 'tag') {
-            result = isMatchedTagBuild(currentBuild.rawBuild.parent, filters[k])
+            result = isMatchedTagBuild(currentBuild.rawBuild.parent, env.BRANCH_NAME, filters[k])
         }
         if(k == 'branch') {
             result = isMatchedBranchBuild(currentBuild.rawBuild.parent, env.BRANCH_NAME, filters[k])
