@@ -10,6 +10,16 @@
   comment in [`vars/isBuilding.groovy`](vars/isBuilding.groovy) which has
   documentation and examples for how to use the step.
 
+#### Job DSL scripts changes in the `jobs/` folder:
+
+- Lots of code cleanup.  Generating jobs just got a lot simpler!  With the
+  release of the scm-filter-jervis plugin we can now rely on on-the-fly branch
+  detection.  So we can generate jobs without pre-populating the repository with
+  YAML.  Rather than exhaustively listing everything that was deleted please
+  review this [git diff of code cleanup][code-cleanup-1].
+
+[code-cleanup-1]: https://github.com/samrocketman/jervis/commit/0e29edd5b1cadae11a02a1d680296ebfda52ad0e
+
 # jervis 1.5 - Nov 9th, 2019
 
 ### New features:
