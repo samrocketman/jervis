@@ -8,8 +8,13 @@
   for an example of how it is used in tests.
 - For tests, `./gradlew console` now includes test classes in its classpath to
   help with debugging `net.gleske.jervis.remotes.StaticMocking`.
+- [`net.gleske.jervis.remotes.GitHubGraphQL`][GitHubGraphQL] has a new method
+  `getJervisYamlFiles` which allows a caller to get multiple Jervis YAML files
+  from multiple branches in a single API call.  It is overloaded to return a
+  list of files in each branch as well.
 
 [GitHubGraphQLTest.groovy]: src/test/groovy/net/gleske/jervis/remotes/GitHubGraphQLTest.groovy
+[GitHubGraphQL]: net/gleske/jervis/remotes/GitHubGraphQL.groovy
 
 #### Pipeline DSL scripts changes in the `vars/` folder:
 

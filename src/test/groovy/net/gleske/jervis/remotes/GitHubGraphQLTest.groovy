@@ -110,15 +110,27 @@ class GitHubGraphQLTest extends GroovyTestCase {
         assert request_meta['headers']['Authorization'] == 'bearer foo'
     }
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_defaults() {
-        Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock response data']]]
+        Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock response data'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'README.md', 'type':'blob']]]]]
         Map response = mygh.getJervisYamlFiles('samrocketman', 'jervis')
         assert shouldRespond.keySet() == response.keySet()
         assert shouldRespond['gitRef0'].keySet() == response['gitRef0'].keySet()
         assert shouldRespond['gitRef0']['jervisYaml0'] == response['gitRef0']['jervisYaml0']
         assert shouldRespond['gitRef0']['jervisYaml1'] == response['gitRef0']['jervisYaml1']
+        assert shouldRespond['gitRef0']['rootFolder']['file']*.name == response['gitRef0']['rootFolder']['file']*.name
+        assert shouldRespond['gitRef0']['rootFolder']['file']*.type == response['gitRef0']['rootFolder']['file']*.type
     }
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_two_branches_defaults() {
-        Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 1']], 'gitRef1':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 2']]]
+        Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 1'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'README.md', 'type':'blob']]]], 'gitRef1':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 2'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'CHANGELOG.md', 'type':'blob'], ['name':'README.md', 'type':'blob']]]]]
         Map response = mygh.getJervisYamlFiles('samrocketman', 'jervis', ['refs/heads/master', 'refs/heads/jervis_simple'])
+        assert shouldRespond['gitRef0'].keySet() == response['gitRef0'].keySet()
+        assert shouldRespond['gitRef0']['jervisYaml0'] == response['gitRef0']['jervisYaml0']
+        assert shouldRespond['gitRef0']['jervisYaml1'] == response['gitRef0']['jervisYaml1']
+        assert shouldRespond['gitRef0']['rootFolder']['file']*.name == response['gitRef0']['rootFolder']['file']*.name
+        assert shouldRespond['gitRef0']['rootFolder']['file']*.type == response['gitRef0']['rootFolder']['file']*.type
+        assert shouldRespond['gitRef1'].keySet() == response['gitRef1'].keySet()
+        assert shouldRespond['gitRef1']['jervisYaml0'] == response['gitRef1']['jervisYaml0']
+        assert shouldRespond['gitRef1']['jervisYaml1'] == response['gitRef1']['jervisYaml1']
+        assert shouldRespond['gitRef1']['rootFolder']['file']*.name == response['gitRef1']['rootFolder']['file']*.name
+        assert shouldRespond['gitRef1']['rootFolder']['file']*.type == response['gitRef1']['rootFolder']['file']*.type
     }
 }

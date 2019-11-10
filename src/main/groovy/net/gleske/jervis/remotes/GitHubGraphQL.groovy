@@ -77,13 +77,22 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
         |        <% yamlFiles.eachWithIndex { yamlFileName, fileIndex -> %>jervisYaml${fileIndex}:object(expression: "${gitRef}:${yamlFileName}") {
         |            ...file
         |        }
-        |<% } %>
+        |        <% } %>
+        |        rootFolder:object(expression: "${gitRef}:") {
+        |          ...file
+        |        }
         |    }
         |<% } %>
         |}
         |fragment file on GitObject {
         |    ... on Blob {
         |        text
+        |    }
+        |    ... on Tree {
+        |        file:entries {
+        |            name
+        |            type
+        |        }
         |    }
         |}
         '''.stripMargin().trim()

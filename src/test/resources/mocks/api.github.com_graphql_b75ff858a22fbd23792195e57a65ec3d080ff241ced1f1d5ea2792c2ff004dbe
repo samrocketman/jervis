@@ -1,0 +1,22 @@
+{
+  "data": {
+    "gitRef0": {
+      "jervisYaml0": null,
+      "jervisYaml1": {
+        "text": "mock response data"
+      },
+      "rootFolder": {
+        "file": [
+          {
+            "name": ".travis.yml",
+            "type": "blob"
+          },
+          {
+            "name": "README.md",
+            "type": "blob"
+          }
+        ]
+      }
+    }
+  }
+}
