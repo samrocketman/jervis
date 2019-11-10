@@ -49,6 +49,7 @@
 import static net.gleske.jervis.tools.AutoRelease.isMatched
 
 import hudson.model.Job
+import hudson.triggers.TimerTrigger
 import jenkins.plugins.git.GitTagSCMHead
 import jenkins.scm.api.SCMHead
 import org.jenkinsci.plugins.github_branch_source.PullRequestSCMHead
