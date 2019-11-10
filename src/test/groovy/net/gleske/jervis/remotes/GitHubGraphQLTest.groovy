@@ -28,7 +28,9 @@ class GitHubGraphQLTest extends GroovyTestCase {
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
-        mockStaticUrl(url, URL, request_meta)
+        // mock GraphQL endpoint but reference local mocks by SHA-256 checksum
+        // from the GraphQL query payload.
+        mockStaticUrl(url, URL, request_meta, true, 'SHA-256')
         mygh = new GitHubGraphQL()
     }
     //tear down after every test

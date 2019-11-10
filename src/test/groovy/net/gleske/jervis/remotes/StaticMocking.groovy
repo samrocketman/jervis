@@ -17,6 +17,7 @@ package net.gleske.jervis.remotes
 
 import java.net.URL
 import java.net.URLConnection
+import java.security.MessageDigest
 
 /**
   A helper class for tests which makes it easy to statically mock other
@@ -31,7 +32,28 @@ class StaticMocking {
         throw new IllegalStateException("This utility class is only meant for referencing static methods.  This is not meant to be instantiated.")
     }
 
-    /*
+    /**
+      Checksum String data for use in static mocking of GraphQL payloads.
+      Valid checksum algorithms:
+        MD2
+        MD5
+        SHA-1
+        SHA-256
+        SHA-384
+        SHA-512
+      */
+    static String checksumString(String contents, String type = 'SHA-256') {
+        def buffer = new byte[16384]
+        def len
+        def digest = MessageDigest.getInstance(type)
+        InputStream targetStream = new ByteArrayInputStream(contents.getBytes())
+        while((len=targetStream.read(buffer)) > 0) {
+            digest.update(buffer, 0, len)
+        }
+        digest.digest().encodeHex().toString()
+    }
+
+    /**
       Mock the HTTP calls to any API and use resources files, instead.  Under
       the hood, URL will utilize a file reader rather than attempting to
       connect to the internet.  This utilizes a Groovy feature known as meta
@@ -42,7 +64,7 @@ class StaticMocking {
         http://flyingtomoon.com/tag/mocking/
         http://groovy.329449.n5.nabble.com/Groovy-metaclass-invokeConstructor-td5716360.html
      */
-    static def mockStaticUrl(String mockedUrl, Class<URL> clazz, Map request_meta = [:]) {
+    static def mockStaticUrl(String mockedUrl, Class<URL> clazz, Map request_meta = [:], Boolean checksumMocks = false, String checksumAlgorithm = 'SHA-256') {
         def mc = clazz.metaClass
         mc.invokeMethod = { String name, args ->
             mc.getMetaMethod(name, args).invoke(delegate, args)
@@ -109,8 +131,12 @@ class StaticMocking {
                 getContent: { ->
                     [
                         getText: { ->
+                            String checksum = ''
+                            if(checksumMocks) {
+                                checksum = checksumString(request_meta['data'].toString(), checksumAlgorithm)
+                            }
                             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
-                            String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
+                            String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_') + ((checksum) ? '_' + checksum : '')
                             try {
                                 URL resource_url = this.getClass().getResource("/mocks/${file}");
                                 def resource = new File(resource_url.getFile())
