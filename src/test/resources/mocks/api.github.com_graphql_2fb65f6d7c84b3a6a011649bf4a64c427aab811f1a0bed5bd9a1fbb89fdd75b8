@@ -1,0 +1,16 @@
+{
+  "data": {
+    "gitRef0": {
+      "jervisYaml0": null,
+      "jervisYaml1": {
+        "text": "mock data 1"
+      }
+    },
+    "gitRef1": {
+      "jervisYaml0": null,
+      "jervisYaml1": {
+        "text": "mock data 2"
+      }
+    }
+  }
+}

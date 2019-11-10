@@ -109,4 +109,16 @@ class GitHubGraphQLTest extends GroovyTestCase {
         mygh.sendGQL('stuff')
         assert request_meta['headers']['Authorization'] == 'bearer foo'
     }
+    @Test public void test_GitHubGraphQL_getJervisYamlFiles_defaults() {
+        Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock response data']]]
+        Map response = mygh.getJervisYamlFiles('samrocketman', 'jervis')
+        assert shouldRespond.keySet() == response.keySet()
+        assert shouldRespond['gitRef0'].keySet() == response['gitRef0'].keySet()
+        assert shouldRespond['gitRef0']['jervisYaml0'] == response['gitRef0']['jervisYaml0']
+        assert shouldRespond['gitRef0']['jervisYaml1'] == response['gitRef0']['jervisYaml1']
+    }
+    @Test public void test_GitHubGraphQL_getJervisYamlFiles_two_branches_defaults() {
+        Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 1']], 'gitRef1':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 2']]]
+        Map response = mygh.getJervisYamlFiles('samrocketman', 'jervis', ['refs/heads/master', 'refs/heads/jervis_simple'])
+    }
 }

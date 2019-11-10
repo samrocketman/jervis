@@ -17,6 +17,7 @@ package net.gleske.jervis.remotes
 
 import groovy.json.JsonBuilder
 import net.gleske.jervis.remotes.interfaces.TokenCredential
+import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
 
 /**
    A simple class to interact with the GitHub v4 API.
@@ -69,6 +70,23 @@ if(['.jervis.yml', '.travis.yml'].intersect((response.data.repository.rootFolder
 class GitHubGraphQL implements SimpleRestServiceSupport {
 
     private static final String DEFAULT_URL = 'https://api.github.com/graphql'
+
+    private static final graphql_expr_template = '''
+        |query {
+        |    <% gitRefs.eachWithIndex { String gitRef, refIndex -> %>gitRef${refIndex}: repository(owner: "${repoOwner}", name: "${repo}") {
+        |        <% yamlFiles.eachWithIndex { yamlFileName, fileIndex -> %>jervisYaml${fileIndex}:object(expression: "${gitRef}:${yamlFileName}") {
+        |            ...file
+        |        }
+        |<% } %>
+        |    }
+        |<% } %>
+        |}
+        |fragment file on GitObject {
+        |    ... on Blob {
+        |        text
+        |    }
+        |}
+        '''.stripMargin().trim()
 
     @Override
     String baseUrl() {
@@ -136,6 +154,63 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
     }
 
     public def sendGQL(String graphql, String variables = '', String http_method = 'POST', Map http_headers = [:]) {
+        println graphql
         apiFetch('', http_headers, http_method, getGqlData(graphql, variables))
+    }
+
+    /**
+      Get Jervis YAML from a remote repository.  It supports getting YAML from
+      multiple branches at once (<tt>gitRefs</tt> and from multiple alternate
+      YAML file locations (<tt>yamlFiles</tt>).
+
+      @param owner      GitHub repository owner such as an Organization or User.
+                        e.g. GitHub user
+                        <a href="https://github.com/samrocketman" target="_blank"><tt>samrocketman</tt></a>.
+      @param repository The name of the repository.  e.g.
+                        <a href="https://github.com/samrocketman/jervis" target="_blank"><tt>jervis</tt></a>.
+      @param gitRefs    A list of get references (branches, tags, commits, etc)
+                        in order to retrieve files.  By default, the value
+                        <tt>['refs/heads/master']</tt>.
+      @param yamlFiles  A list of YAML files to try getting the Jervis YAML
+                        contents from.  By default, the value is
+                        <tt>['.jervis.yml', '.travis.yml']</tt>.
+
+      @return Returns a fully formed graphql response.  The following is an
+              example when calling with defaults.
+
+              <p>Call with default arguments</p>
+<pre><tt>import net.gleske.jervis.remotes.GitHubGraphQL
+
+GitHubGraphQL github = new GitHubGraphQL()
+github.token = new File('../github_token').text.trim()
+
+
+// Make an API call to GitHub
+Map response = github.getJervisYamlFiles('samrocketman', 'jervis')</tt></pre>
+              <p>Responds with parsed data</p>
+<pre><tt>[
+    gitRef0: [
+        jervisYaml0: null,
+        jervisYaml1: [
+            text: 'language: groovy\n'
+        ]
+    ]
+]</tt></pre>
+              <p>The above response indicates there was no
+              <tt>.jervis.yml</tt>, but there was a <tt>.travis.yml</tt>
+              file.</p>
+      */
+    public Map getJervisYamlFiles(String owner,
+            String repository,
+            List gitRefs = ['refs/heads/master'],
+            List yamlFiles = ['.jervis.yml', '.travis.yml']) {
+
+        Map binding = [
+            repoOwner: owner,
+            repo: repository,
+            gitRefs: gitRefs,
+            yamlFiles: yamlFiles
+        ]
+        sendGQL(getScriptFromTemplate(graphql_expr_template, binding))?.get('data') ?: [:]
     }
 }
