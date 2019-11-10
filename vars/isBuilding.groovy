@@ -49,6 +49,7 @@
 import static net.gleske.jervis.tools.AutoRelease.isMatched
 
 import hudson.model.Job
+import hudson.model.Run
 import hudson.triggers.TimerTrigger
 import jenkins.plugins.git.GitTagSCMHead
 import jenkins.scm.api.SCMHead
@@ -60,7 +61,7 @@ Boolean isMatchedBranchBuild(Job build_parent, String branch, String expression)
     if(isMatchedTagBuild(build_parent, '/.*/') || isMatchedPRBuild(build_parent)) {
         return false
     }
-    isMatched(expression, branch)
+    isMatched(expression, branch ?: '')
 }
 
 @NonCPS
@@ -69,20 +70,20 @@ Boolean isMatchedTagBuild(Job build_parent, String expression) {
     if(!(head instanceof GitTagSCMHead)) {
         return false
     }
-    isMatched(expression, head.name)
+    isMatched(expression, head?.name ?: '')
 }
 
 @NonCPS
 Boolean isMatchedPRBuild(Job build_parent) {
     SCMHead head = build_parent.getProperty(BranchJobProperty).branch.head
-    (head instanceof PullRequestSCMHead)
+    (head instanceof PullRequestSCMHead) ?: false
 }
 
 @NonCPS
-Boolean isTimerBuild(Job build_parent) {
-    build_parent?.causes?.find {
+Boolean isTimerBuild(Run build) {
+    (build?.causes?.find {
       it instanceof TimerTrigger.TimerTriggerCause
-    } as Boolean
+    } as Boolean) ?: false
 }
 
 /**
@@ -104,7 +105,7 @@ Map call(Map filters) {
     for(String k : filters.keySet()) {
         Boolean result = false
         if(k == 'cron') {
-            result = isTimerBuild(currentBuild.rawBuild.parent)
+            result = isTimerBuild(currentBuild.rawBuild)
         }
         if(k == 'pr') {
             result = isMatchedPRBuild(currentBuild.rawBuild.parent)
@@ -131,7 +132,7 @@ Map call(Map filters) {
      isBuilding('cron')
   */
 Boolean call(String filter) {
-    call([(filter): '/.*/'])?.get(filter)
+    call([(filter): '/.*/'])?.get(filter) ?: false
 }
 
 void call() {
