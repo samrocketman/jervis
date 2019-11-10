@@ -18,16 +18,6 @@
    tag.  Designed for multibranch pipeline jobs.
  */
 
-import hudson.model.Job
-import jenkins.plugins.git.GitTagSCMHead
-import org.jenkinsci.plugins.workflow.multibranch.BranchJobProperty
-
-
-@NonCPS
-Boolean isTagBuild(Job build_parent) {
-    build_parent?.getProperty(BranchJobProperty)?.branch?.head instanceof GitTagSCMHead
-}
-
 Boolean call() {
-    isTagBuild(currentBuild.rawBuild.parent)
+    isBuilding('tag')
 }

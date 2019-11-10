@@ -14,8 +14,9 @@
    limitations under the License.
    */
 
-@Grab(group='net.gleske', module='jervis', version='1.5', transitive=false)
-@Grab(group='org.yaml', module='snakeyaml', version='1.25', transitive=false)
+if(!hasGlobalVar('adminInjectEnvironment')) {
+    injectEnvironment()
+}
 
 import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.lang.pipelineGenerator
@@ -29,9 +30,13 @@ def call() {
 
     // JERVIS INJECTED ENVIRONMENT VARIABLES
     // Pull Request detection
-    env.IS_PR_BUILD = isPRBuild().toString()
+    env.IS_PR_BUILD = isBuilding('pr').toString()
     // Tag detection
-    env.IS_TAG_BUILD = isTagBuild().toString()
+    env.IS_TAG_BUILD = isBuilding('tag').toString()
+    // Timer build detection
+    env.IS_CRON_BUILD = isBuilding('cron').toString()
+    // Branch detection
+    env.IS_BRANCH_BUILD = isBuilding('branch').toString()
     currentBuild.rawBuild.parent.parent.sources[0].source.with {
         env.JERVIS_DOMAIN = ((it.apiUri)? it.apiUri.split('/')[2] : 'github.com')
         env.JERVIS_ORG = it.repoOwner
@@ -39,7 +44,7 @@ def call() {
     }
     env.JERVIS_BRANCH = BRANCH_NAME
     //fix pull request branch name.  Otherwise shows up as PR-* as the branch name.
-    if(isPRBuild()) {
+    if(isBuilding('pr')) {
         env.BRANCH_NAME = env.CHANGE_BRANCH
     }
 
@@ -47,7 +52,7 @@ def call() {
        Jenkins pipeline stages for a build pipeline.
      */
     def generator = new lifecycleGenerator()
-    generator.is_pr = isPRBuild()
+    generator.is_pr = isBuilding('pr')
     def pipeline_generator
     String script_header
     String script_footer
