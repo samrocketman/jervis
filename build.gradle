@@ -77,7 +77,7 @@ test {
 //http://swalsh.org/blog/2014/07/17/running-the-groovy-console-from-gradle/
 task( console, dependsOn: "classes", type: JavaExec ) {
     main = "groovy.ui.Console"
-    classpath = sourceSets.main.runtimeClasspath
+    classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
 }
 
 //Maven Central uploads

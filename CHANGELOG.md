@@ -1,5 +1,16 @@
 # jervis 1.6
 
+### New features:
+
+- For tests, `net.gleske.jervis.remotes.StaticMocking` now supports mocking
+  GraphQL and can render a different response depending on the query passed to
+  the GraphQL mock.  See [`GitHubGraphQLTest.groovy`][GitHubGraphQLTest.groovy]
+  for an example of how it is used in tests.
+- For tests, `./gradlew console` now includes test classes in its classpath to
+  help with debugging `net.gleske.jervis.remotes.StaticMocking`.
+
+[GitHubGraphQLTest.groovy]: src/test/groovy/net/gleske/jervis/remotes/GitHubGraphQLTest.groovy
+
 #### Pipeline DSL scripts changes in the `vars/` folder:
 
 - New pipeline step `isBuilding()` which provides a versatile conditional which
