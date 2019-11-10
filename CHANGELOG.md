@@ -1,3 +1,15 @@
+# jervis 1.6
+
+#### Pipeline DSL scripts changes in the `vars/` folder:
+
+- New pipeline step `isBuilding()` which provides a versatile conditional which
+  allows a Jenkins pipeline user to filter the type of build that the current
+  runtime is.  e.g. Cron build, PR build, tag build, branch build... It supports
+  checking tags and branches against a filter (literal or regex) so that it
+  matches only tags and branches which have a specific name.  See the header
+  comment in [`vars/isBuilding.groovy`](vars/isBuilding.groovy) which has
+  documentation and examples for how to use the step.
+
 # jervis 1.5 - Nov 9th, 2019
 
 ### New features:
