@@ -133,4 +133,9 @@ class GitHubGraphQLTest extends GroovyTestCase {
         assert shouldRespond['gitRef1']['rootFolder']['file']*.name == response['gitRef1']['rootFolder']['file']*.name
         assert shouldRespond['gitRef1']['rootFolder']['file']*.type == response['gitRef1']['rootFolder']['file']*.type
     }
+    @Test public void test_GitHubGraphQL_getJervisYamlFiles_invalid() {
+        Map response = mygh.getJervisYamlFiles('invalid', 'invalid')
+        assert response instanceof Map
+        assert response == [:]
+    }
 }
