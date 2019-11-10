@@ -110,7 +110,7 @@ Map call(Map filters) {
             result = isMatchedPRBuild(currentBuild.rawBuild.parent)
         }
         if(k == 'tag') {
-            result = isMatchedTagBuild(currentBuild.rawBuild.parent, env.BRANCH_NAME, filters[k])
+            result = isMatchedTagBuild(currentBuild.rawBuild.parent, filters[k])
         }
         if(k == 'branch') {
             result = isMatchedBranchBuild(currentBuild.rawBuild.parent, env.BRANCH_NAME, filters[k])
