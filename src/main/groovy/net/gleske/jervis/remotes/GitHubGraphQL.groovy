@@ -17,6 +17,7 @@ package net.gleske.jervis.remotes
 
 import groovy.json.JsonBuilder
 import net.gleske.jervis.remotes.interfaces.TokenCredential
+import net.gleske.jervis.exceptions.JervisException
 import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
 
 /**
@@ -163,7 +164,6 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
     }
 
     public def sendGQL(String graphql, String variables = '', String http_method = 'POST', Map http_headers = [:]) {
-        println graphql
         apiFetch('', http_headers, http_method, getGqlData(graphql, variables))
     }
 
@@ -221,5 +221,15 @@ Map response = github.getJervisYamlFiles('samrocketman', 'jervis')</tt></pre>
             yamlFiles: yamlFiles
         ]
         sendGQL(getScriptFromTemplate(graphql_expr_template, binding))?.get('data') ?: [:]
+    }
+    public Map getJervisYamlFiles(String repositoryWithOwner,
+            List gitRefs = ['refs/heads/master'],
+            List yamlFiles = ['.jervis.yml', '.travis.yml']) {
+        if(!repositoryWithOwner.contains('/') || (repositoryWithOwner.tokenize('/').size() > 2)) {
+            throw new JervisException("ERROR: getJervisYamlFiles recieved a malformated repositoryWithOwner ${repositoryWithOwner}.")
+        }
+        repositoryWithOwner.tokenize('/').with {
+            getJervisYamlFiles(it[0], it[1], gitRefs, yamlFiles)
+        }
     }
 }
