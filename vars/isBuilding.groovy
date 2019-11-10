@@ -57,7 +57,7 @@ import org.jenkinsci.plugins.workflow.multibranch.BranchJobProperty
 
 @NonCPS
 Boolean isMatchedBranchBuild(Job build_parent, String branch, String expression) {
-    if(isMatchedTagBuild(build_parent, '/.*/') || isMatchedPRBuild(build_parent, '/.*/')) {
+    if(isMatchedTagBuild(build_parent, '/.*/') || isMatchedPRBuild(build_parent)) {
         return false
     }
     isMatched(expression, branch)
