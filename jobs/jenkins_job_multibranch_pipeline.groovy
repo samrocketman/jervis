@@ -33,7 +33,7 @@ String getGitHubUrlPrefix() {
  */
 
 jenkinsJobMultibranchPipeline = null
-jenkinsJobMultibranchPipeline = { String JERVIS_BRANCH ->
+jenkinsJobMultibranchPipeline = { List yamlFiles ->
     //uses groovy bindings to properly reference the Job DSL; in this case parent_job
     parent_job.multibranchPipelineJob(project) {
         description(job_description)
@@ -53,32 +53,12 @@ jenkinsJobMultibranchPipeline = { String JERVIS_BRANCH ->
 
                         //additional behaviors
                         traits {
-                            if(default_generator && default_generator.filter_type == 'only' && default_generator.hasRegexFilter()) {
-                                headRegexFilterWithPR {
-                                    regex default_generator.getFullBranchRegexString(JERVIS_BRANCH.split(' ') as List)
-                                    tagRegex ''
-                                }
-                            }
-                            else {
-                                headWildcardFilterWithPR {
-                                    includes "${JERVIS_BRANCH}"
-                                    excludes ''
-                                    tagIncludes ''
-                                    tagExcludes ''
-                                }
+                            jervisFilter {
+                                yamlFileName(yamlFiles.join(', '))
                             }
                         }
                     }
                 }
-                /* prevented webhooks from building
-                strategy {
-                    defaultBranchPropertyStrategy {
-                        props {
-                            noTriggerBranchProperty()
-                        }
-                    }
-                }
-                */
             }
         }
         factory {

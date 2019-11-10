@@ -54,9 +54,7 @@ evaluate(tryReadFile('jobs/hack_class_loader.groovy'))
 evaluate(tryReadFile('jobs/get_folder_credentials.groovy'))
 
 //prepare bindings from other files (order matters due to bindings loaded from other scripts)
-evaluate(tryReadFile('jobs/is_pipeline.groovy'))
 evaluate(tryReadFile('jobs/jenkins_job_multibranch_pipeline.groovy'))
-evaluate(tryReadFile('jobs/generate_project_for.groovy'))
 
 println 'Generating jobs for ' + git_service.toString() + " project ${project}."
 
@@ -65,43 +63,12 @@ evaluate(tryReadFile('jobs/create_folder.groovy'))
 
 println "Creating project ${project}"
 
-//monkey patch Thread to handle surfacing exceptions
-Thread.metaClass.ex = null
-Thread.metaClass.checkForException = { ->
-    if(ex) {
-        throw ex
-    }
-}
-
 //populate project description from GitHub
 job_description = git_service.fetch("repos/${project}")['description']
-branches = []
 default_generator = null
 
 if(binding.hasVariable('branch') && branch) {
     throw new JervisException('Specifying a branch is no longer supported.  If you see this, then your admin should remove it from the calling job.')
 }
 
-//populate the default branch with Jervis YAML first
-is_pipeline()
-//iterate through all branches in parallel to discover
-List <Thread> threads = []
-git_service.branches(project).each { branch ->
-    threads << Thread.start {
-        try {
-            //generating jobs fails with 'anonymous' user permissions without impersonate
-            Jenkins.instance.ACL.impersonate(hudson.security.ACL.SYSTEM)
-            is_pipeline(branch)
-        }
-        catch(Throwable t) {
-            //save the caught exception to be surfaced in the job result
-            ex = t
-        }
-    }
-}
-threads.each {
-    it.join()
-    //throws an exception from the thread
-    it.checkForException()
-}
-generate_project_for(branches.join(' '))
+jenkinsJobMultibranchPipeline(['.jervis.yml', '.travis.yml'])
