@@ -21,7 +21,7 @@ import net.gleske.jervis.exceptions.JervisException
 import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
 
 /**
-   A simple class to interact with the GitHub v4 API.
+   A simple class to interact with the GitHub v4 GraphQL API.
 
    <h2>Sample usage</h2>
    <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
@@ -98,11 +98,23 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
         |}
         '''.stripMargin().trim()
 
+    /**
+      A method which returns the base URL for the GitHub v4 GraphQL API.  This
+      method is not meant to be called by end users.
+
+      @return Returns <tt>{@link #gh_api}</tt>.
+      */
     @Override
     String baseUrl() {
         this.gh_api
     }
 
+    /**
+      A method which sets authentication headers.  This method is not meant to
+      be called by end users.
+
+      @return Returns HTTP header map with authentication headers set.
+      */
     @Override
     Map header(Map http_headers = [:]) {
         if(this.getToken()) {
@@ -112,7 +124,8 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
     }
 
     /**
-      URL to the <a href="https://developer.github.com/v4/" target="_blank">GitHub v4 API</a>.  Default: <tt>https://api.github.com/</tt>
+      URL to the <a href="https://developer.github.com/v4/" target="_blank">GitHub v4 GraphQL API</a>.
+      Default: <tt>https://api.github.com/graphql</tt>
      */
     String gh_api = DEFAULT_URL
 
@@ -155,6 +168,17 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
         }
     }
 
+    /**
+      Transforms a GraphQL query and variables into data which can be submitted
+      with a POST request.  This is used by <tt>sendGQL</tt> to submit
+      transformed GraphQL to the GitHub API v4 GraphQL.
+
+      @param query     A GraphQL query.
+      @param variables GraphQL variables meant to be used by a GraphQL query.
+
+      @return Stringified data which can be submitted directly to a remote HTTP
+              service that accepts GraphQL.
+      */
     String getGqlData(String query, String variables = '') {
         Map data = [ query: query ]
         if(variables) {
@@ -163,6 +187,19 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
         (data as JsonBuilder).toString()
     }
 
+    /**
+      A method for calling the GitHub v4 GraphQL API with a GraphQL query and
+      variables.
+
+      @param graphql      A GraphQL query.
+      @param variables    GraphQL variables meant to be used by a GraphQL query.
+      @param http_method  Customize the method to be submitted to the GitHub
+                          GraphQL API.  Typically <tt>POST</tt>, but could be
+                          another method if performing a mutation.
+      @param http_headers Add custom HTTP headers.  This does not normally need
+                          to be called but is available for customization.
+      @return A parsed response from the GitHub v4 GraphQL API.
+      */
     public def sendGQL(String graphql, String variables = '', String http_method = 'POST', Map http_headers = [:]) {
         apiFetch('', http_headers, http_method, getGqlData(graphql, variables))
     }
@@ -203,11 +240,29 @@ Map response = github.getJervisYamlFiles('samrocketman', 'jervis')</tt></pre>
         jervisYaml1: [
             text: 'language: groovy\n'
         ]
+        rootFolder: [
+            file: [
+                [
+                    name: ".travis.yml",
+                    type: "blob"
+                ],
+                [
+                    name: "src",
+                    type: "tree"
+                ]
+            ]
+        ]
     ]
 ]</tt></pre>
               <p>The above response indicates there was no
               <tt>.jervis.yml</tt>, but there was a <tt>.travis.yml</tt>
               file.</p>
+              <p>Files returned are typically one of three types:</p>
+              <ul>
+                  <li><tt>blob</tt> - A file which has contents.</li>
+                  <li><tt>tree</tt> - A folder which can be recursed into.</li>
+                  <li><tt>commit</tt> - A Git submodule to a referenced repository.</li>
+              </ul>
       */
     public Map getJervisYamlFiles(String owner,
             String repository,
@@ -222,6 +277,25 @@ Map response = github.getJervisYamlFiles('samrocketman', 'jervis')</tt></pre>
         ]
         sendGQL(getScriptFromTemplate(graphql_expr_template, binding))?.get('data') ?: [:]
     }
+
+    /**
+      Get Jervis YAML from a remote repository.  It supports getting YAML from
+      multiple branches at once (<tt>gitRefs</tt> and from multiple alternate
+      YAML file locations (<tt>yamlFiles</tt>).
+
+      @param repositoryWithOwner
+                       A repository URL which includes the GitHub owner.  e.g.
+                       <tt>samrocketman/jervis</tt>.
+      @param gitRefs   A list of get references (branches, tags, commits, etc)
+                       in order to retrieve files.  By default, the value
+                       <tt>['refs/heads/master']</tt>.
+      @param yamlFiles A list of YAML files to try getting the Jervis YAML
+                       contents from.  By default, the value is
+                       <tt>['.jervis.yml', '.travis.yml']</tt>.
+      @return See other <a href="#getJervisYamlFiles(java.lang.String, java.lang.String, java.util.List, java.util.List)"><tt>getJervisYamlFiles</tt></a>
+              which returns the same thing.  This method is just overloading
+              the other.
+      */
     public Map getJervisYamlFiles(String repositoryWithOwner,
             List gitRefs = ['refs/heads/master'],
             List yamlFiles = ['.jervis.yml', '.travis.yml']) {
