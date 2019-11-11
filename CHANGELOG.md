@@ -2,18 +2,11 @@
 
 ### New features:
 
-- For tests, `net.gleske.jervis.remotes.StaticMocking` now supports mocking
-  GraphQL and can render a different response depending on the query passed to
-  the GraphQL mock.  See [`GitHubGraphQLTest.groovy`][GitHubGraphQLTest.groovy]
-  for an example of how it is used in tests.
-- For tests, `./gradlew console` now includes test classes in its classpath to
-  help with debugging `net.gleske.jervis.remotes.StaticMocking`.
 - [`net.gleske.jervis.remotes.GitHubGraphQL`][GitHubGraphQL] has a new method
   `getJervisYamlFiles` which allows a caller to get multiple Jervis YAML files
   from multiple branches in a single API call.  It is overloaded to return a
   list of files in each branch as well.
 
-[GitHubGraphQLTest.groovy]: src/test/groovy/net/gleske/jervis/remotes/GitHubGraphQLTest.groovy
 [GitHubGraphQL]: net/gleske/jervis/remotes/GitHubGraphQL.groovy
 
 #### Pipeline DSL scripts changes in the `vars/` folder:
@@ -35,6 +28,17 @@
   review this [git diff of code cleanup][code-cleanup-1].
 
 [code-cleanup-1]: https://github.com/samrocketman/jervis/commit/0e29edd5b1cadae11a02a1d680296ebfda52ad0e
+
+### Other notes
+
+- For tests, `net.gleske.jervis.remotes.StaticMocking` now supports mocking
+  GraphQL and can render a different response depending on the query passed to
+  the GraphQL mock.  See [`GitHubGraphQLTest.groovy`][GitHubGraphQLTest.groovy]
+  for an example of how it is used in tests.
+- For tests, `./gradlew console` now includes test classes in its classpath to
+  help with debugging `net.gleske.jervis.remotes.StaticMocking`.
+
+[GitHubGraphQLTest.groovy]: src/test/groovy/net/gleske/jervis/remotes/GitHubGraphQLTest.groovy
 
 # jervis 1.5 - Nov 9th, 2019
 
