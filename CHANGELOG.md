@@ -7,7 +7,7 @@
   from multiple branches in a single API call.  It is overloaded to return a
   list of files in each branch as well.
 
-[GitHubGraphQL]: net/gleske/jervis/remotes/GitHubGraphQL.groovy
+[GitHubGraphQL]: src/main/groovy/net/gleske/jervis/remotes/GitHubGraphQL.groovy
 
 #### Pipeline DSL scripts changes in the `vars/` folder:
 
