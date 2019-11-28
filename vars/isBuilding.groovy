@@ -44,13 +44,16 @@
          isBuilding('pr')
          isBuilding('tag')
          isBuilding('cron')
+         isBuilding('manually')
   */
 
 import static net.gleske.jervis.tools.AutoRelease.isMatched
 
+import hudson.model.Cause
 import hudson.model.Job
 import hudson.model.Run
 import hudson.triggers.TimerTrigger
+import jenkins.model.Jenkins
 import jenkins.plugins.git.GitTagSCMHead
 import jenkins.scm.api.SCMHead
 import org.jenkinsci.plugins.github_branch_source.PullRequestSCMHead
@@ -86,6 +89,13 @@ Boolean isTimerBuild(Run build) {
     } as Boolean) ?: false
 }
 
+@NonCPS
+String getUserCause(Run build) {
+    build.causes.find { Cause c ->
+        c instanceof Cause.UserIdCause
+    }?.userId ?: ''
+}
+
 /**
    This is the entrypoint for passing an expression to filtering builds.
 
@@ -94,16 +104,18 @@ Boolean isTimerBuild(Run build) {
      isBuilding(branch: '/^\\Qmaster\\E$|^[0-9.]+-hotfix$')
      isBuilding(tag: '1.0')
      isBuilding(tag: '/([0-9]+\\.){2}[0-9]+(-.*)?$/') - only matches semantic version tags
+     isBuilding(manually: true, tag: '/.*/', combined: true) - return a single boolean of the overall status
 
    @param filters key-value filters to match build types.  e.g. branch, pr,
                   tag, schedule, and their associated filters to match.
    @return A map of the results for what is found.  If nothing is matched, then
            this will return an empty Map which is boolean falsey in groovy.
+           Can also return a Boolean if a user passes in the combined: true option.
   */
-Map call(Map filters) {
+def call(Map filters) {
     Map results = [:]
     for(String k : filters.keySet()) {
-        Boolean result = false
+        def result = false
         if(k == 'cron') {
             result = isTimerBuild(currentBuild.rawBuild)
         }
@@ -116,11 +128,21 @@ Map call(Map filters) {
         if(k == 'branch') {
             result = isMatchedBranchBuild(currentBuild.rawBuild.parent, env.BRANCH_NAME, filters[k])
         }
+        if(k == 'manually') {
+            result = getUserCause(currentBuild.rawBuild)
+        }
         if(result) {
             results[k] = result
         }
     }
-    results
+    // return a combined single boolean or a map of all the results
+    if(filters?.get('combined', false)) {
+        results.every { k, v ->
+            v
+        }
+    else {
+        results
+    }
 }
 
 /**
@@ -130,11 +152,15 @@ Map call(Map filters) {
      isBuilding('pr')
      isBuilding('tag')
      isBuilding('cron')
+     isBuilding('manually')
+
+   @param filter a pre-defined filter such as branch, pr, tag, cron, or manually.
+   @return a String (for manually triggered user ID) or boolean (for everything else)
   */
-Boolean call(String filter) {
+def call(String filter) {
     call([(filter): '/.*/'])?.get(filter) ?: false
 }
 
 void call() {
-    throw new Exception('ERROR: this step must be called with arguments.  e.g. branch, pr, tag, or cron')
+    throw new Exception('ERROR: this step must be called with arguments.  e.g. branch, pr, tag, cron, or manually')
 }
