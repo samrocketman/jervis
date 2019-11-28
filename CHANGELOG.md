@@ -1,3 +1,22 @@
+# jervis 1.7
+
+#### Pipeline DSL scripts changes in the `vars/` folder:
+
+- `isBuilding` now supports `manually` triggered builds via
+  `isBuilding('manually')`.  `manually` takes several options
+  - `isBuilding(manually: false, combined: true)` - a boolean where if true returns the
+    username of the user who triggered the build and is boolean truthy.  If
+    false it will return true if the build was triggered by anything except a
+    user, manually.
+  - `isBuilding(manually: 'samrocketman', combined: true)` - returns true only
+    if the build was manually triggered by user `samrocketman`.
+- `isBuilding` now supports a `combined` boolean status of all filters for
+  easing use in pipelines logic.  Example of filtering for manually triggered
+  tags is `isBuilding(manually: true, tag: '/.*/', combined: true)` which
+  instead of returning a HashMap of the results for each filter it will return a
+  single boolean.  Returns `true` if all examples were true and false if any
+  filter was not true.
+
 # jervis 1.6 - Nov 10th, 2019
 
 ### New features:
