@@ -105,6 +105,8 @@ String getUserCause(Run build) {
      isBuilding(tag: '1.0')
      isBuilding(tag: '/([0-9]+\\.){2}[0-9]+(-.*)?$/') - only matches semantic version tags
      isBuilding(manually: true, tag: '/.*/', combined: true) - return a single boolean of the overall status
+     isBuilding(manually: 'samrocketman', combined: true) - return a single boolean if a specific user triggered the build.
+     isBuilding(manually: false, combined: true) - returns true if the build was triggered by anything except a user, manually.
 
    @param filters key-value filters to match build types.  e.g. branch, pr,
                   tag, schedule, and their associated filters to match.
@@ -130,6 +132,15 @@ def call(Map filters) {
         }
         if(k == 'manually') {
             result = getUserCause(currentBuild.rawBuild)
+            if(filters[k] instanceof String) {
+                // if user passes in a username then return a boolean for if
+                // that user was the one who triggered it.
+                result = (result == filters[k])
+            }
+            else if(!filters[k]) {
+                // if user passes in manually: false
+                result = !(result as Boolean)
+            }
         }
         if(result) {
             results[k] = result
