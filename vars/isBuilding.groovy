@@ -104,7 +104,7 @@ String getUserCause(Run build) {
      isBuilding(branch: '/^\\Qmaster\\E$|^[0-9.]+-hotfix$')
      isBuilding(tag: '1.0')
      isBuilding(tag: '/([0-9]+\\.){2}[0-9]+(-.*)?$/') - only matches semantic version tags
-     isBuilding(manually: true, tag: '/.*/', combined: true) - return a single boolean of the overall status
+     isBuilding(manually: true, branch: true, combined: true) - return a single boolean of the overall status
      isBuilding(manually: 'samrocketman', combined: true) - return a single boolean if a specific user triggered the build.
      isBuilding(manually: false, combined: true) - returns true if the build was triggered by anything except a user, manually.
 
@@ -148,9 +148,10 @@ def call(Map filters) {
     }
     // return a combined single boolean or a map of all the results
     if(filters?.get('combined', false)) {
-        results.every { k, v ->
+        (results ?: ['': false]).every { k, v ->
             v
         }
+    }
     else {
         results
     }
