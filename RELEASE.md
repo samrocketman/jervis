@@ -52,11 +52,16 @@ fingerprint is the following.
    ./gradlew clean check uploadArchives
    ```
 4. Increment plugin version to next snapshot: e.g. `0.3-SNAPSHOT`.  Commit.
-5. Upload jervis-api docs for the latest release.
 
-This will initially upload the artifact to a staging repository.  Once confident
-about the release visit [Maven Central Nexus][ossrh] and follow [instructions on
-releasing to production][ossrh-release].
+This will initially upload the artifact to a staging repository.
+
+
+# Final releasing steps
+
+1. Visit [Maven Central Nexus][ossrh] and follow [instructions on releasing to
+   production][ossrh-release].
+2. Upload jervis-api docs for the latest release.
+3. Upload GitHub release notes by executing `./submit-github-release-notes.sh`.
 
 [gradle-signing]: https://docs.gradle.org/current/userguide/signing_plugin.html
 [ossrh-gradle]: http://central.sonatype.org/pages/gradle.html
