@@ -2,6 +2,12 @@
 
 #### Pipeline DSL scripts changes in the `vars/` folder:
 
+- New pipeline steps:
+  - `getMatrixAxes()` - Spawned from a [Jenkins blog post][jenkins-blog-matrix].
+    It is not used directly by Jervis but is available to users of Jervis.
+  - `getUserBinding('somevar')` - Users can set bindings in their pipeline
+    runtime.  This step allows pipeline shared libraries to retrieve bindings as
+    opposed to having them passed as arguments to a step.
 - `isBuilding` now supports `manually` triggered builds via
   `isBuilding('manually')`.  `manually` takes several options
   - `isBuilding(manually: false, combined: true)` - a boolean where if true returns the
@@ -16,6 +22,8 @@
   instead of returning a HashMap of the results for each filter it will return a
   single boolean.  Returns `true` if all examples were true and false if any
   filter was not true.
+
+[jenkins-blog-matrix]: https://jenkins.io/blog/2019/12/02/matrix-building-with-scripted-pipeline/
 
 # jervis 1.6 - Nov 10th, 2019
 
