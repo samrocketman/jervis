@@ -179,15 +179,11 @@
             "rvm gemset delete \"${JERVIS_GEMSET}\" --force"
         ],
         "*": [
-            "set +x",
+            "set +ux",
             "echo \"$ source \\\"${HOME}/.rvm/scripts/rvm\\\"\"",
             "source \"${HOME}/.rvm/scripts/rvm\"",
-            "if ! rvm list | grep -q \"${jervis_toolchain_ivalue}\";then",
-            "  rvm install \"${jervis_toolchain_ivalue}\"",
-            "  rvm \"${jervis_toolchain_ivalue}\" do gem install bundler",
-            "fi",
             "export JERVIS_GEMSET=\"${jervis_toolchain_ivalue}@${JERVIS_PROJECT}-${BUILD_NUMBER}\"",
-            "rvm use \"${JERVIS_GEMSET}\" --create",
+            "rvm use \"${JERVIS_GEMSET}\" --create --install --binary --fuzzy",
             "set -x",
             "rvm current",
             "ruby --version"
