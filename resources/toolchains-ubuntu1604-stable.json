@@ -180,6 +180,7 @@
         ],
         "*": [
             "set +ux",
+            "echo rvm_silence_path_mismatch_check_flag=1 > ~/.rvmrc",
             "echo \"$ source \\\"${HOME}/.rvm/scripts/rvm\\\"\"",
             "source \"${HOME}/.rvm/scripts/rvm\"",
             "export JERVIS_GEMSET=\"${jervis_toolchain_ivalue}@${JERVIS_PROJECT}-${BUILD_NUMBER}\"",
