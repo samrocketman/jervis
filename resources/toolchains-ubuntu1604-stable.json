@@ -193,6 +193,7 @@
             "else",
             "  rvm \"${jervis_toolchain_ivalue}\" do gem install bundler",
             "fi",
+            "gem install rubygems-bundler",
             "echo '$ rvm current'",
             "rvm current",
             "set -x",
