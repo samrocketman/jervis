@@ -185,7 +185,7 @@
             "source \"${HOME}/.rvm/scripts/rvm\"",
             "if ! rvm list | grep -q \"${jervis_toolchain_ivalue}\";then",
             "  rvm install \"${jervis_toolchain_ivalue}\"",
-            "  if awk -F. '$1 >= 2 && $2 >= 3) {exit(1)}' <<< \"${jervis_toolchain_ivalue}\"; then",
+            "  if awk -F. '$1 >= 2 && $2 >= 3 {exit(1)}' <<< \"${jervis_toolchain_ivalue}\"; then",
             "    rvm \"${jervis_toolchain_ivalue}\" do gem install bundler -v '~>1'",
             "  else",
             "    rvm \"${jervis_toolchain_ivalue}\" do gem install bundler",
