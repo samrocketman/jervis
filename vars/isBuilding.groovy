@@ -173,6 +173,40 @@ def call(String filter) {
     call([(filter): '/.*/'])?.get(filter) ?: false
 }
 
+/**
+  This filtering entry point takes a list of items and passes it through
+  isBuilding.  The list can contain Strings, Maps, or a combination of the two.
+
+  If the String 'combined' is in the List then it will require that all items
+  in the List match the filter.  Otherwise, if any item is true it will return
+  true.
+
+  Check for only manually built tags.
+    isBuilding(['combined', 'tag', 'manually'])
+
+  Match branches or pull requests.
+    isBuilding(['pr', 'tag'])
+
+  Match manually built pull requests or manually built tags.
+    isBuilding([['combined', 'tag', 'manually'], ['combined', 'pr', 'manually']])
+
+  Alternate syntax for manually built pull requests or manually built tags.
+    isBuilding(['combined', ['pr', 'tag'], 'manually'])
+  */
+
+def call(List filter) {
+    if('combined' in filter) {
+        (filter - ['combined']).every {
+            isBuilding(it)
+        }
+    }
+    else {
+        filter.any {
+            isBuilding(it)
+        }
+    }
+}
+
 void call() {
     throw new Exception('ERROR: this step must be called with arguments.  e.g. branch, pr, tag, cron, or manually')
 }
