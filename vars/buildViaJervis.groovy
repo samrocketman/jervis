@@ -14,7 +14,10 @@
    limitations under the License.
    */
 
-if(!hasGlobalVar('adminInjectEnvironment')) {
+if(hasGlobalVar('adminInjectEnvironment')) {
+    adminInjectEnvironment()
+}
+else {
     injectEnvironment()
 }
 
