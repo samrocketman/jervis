@@ -1,6 +1,50 @@
 # jervis 1.7
 
-#### Pipeline DSL scripts changes in the `vars/` folder:
+### Breaking Job DSL changes
+
+Jobs generated now use the [SCM Filter Jervis YAML][plugin-sf-jervis] plugin
+instead of the [SCM Filter Branch PR][plugin-sf-bpr] plugin.  If your Jenkins
+instance does not have the SCM Filter Jervis YAML plugin installed, then you'll
+get errors attempting to generate new jobs.  This should not affect jobs that
+already exist but it also means existing jobs can't be regenerated without the
+plugin.
+
+As a recommended migration path to convert all jobs to use the SCM Filter for
+Jervis YAML, you can run a [script console script to regenerate all
+jbos][regenerate-jobs-script]
+
+[plugin-sf-jervis]: https://plugins.jenkins.io/scm-filter-jervis
+[plugin-sf-bpr]: https://plugins.jenkins.io/scm-filter-branch-pr
+[regenerate-jobs-script]: https://github.com/samrocketman/jenkins-script-console-scripts/blob/master/generate-all-jervis-jobs.groovy
+
+### Deprecated pipeline steps
+
+The following Jenkins pipeline steps provided by Jervis are deprecated and will
+go away in a future release.
+
+- `isPRBuild()` - use `isBuilding('pr')` instead.
+- `isTagBuild()` - use `isBuilding('tag') instead.
+
+As an admin, if you still want to support these steps then create your own steps
+within your own shared pipeline library.  Here are some examples:
+
+Contents of `vars/isPRBuild()`:
+
+```groovy
+Boolean call() {
+    isBuilding('pr')
+}
+```
+
+Contents of `vars/isTagBuild.groovy`:
+
+```groovy
+Boolean call() {
+    isBuilding('tag')
+}
+```
+
+### Pipeline DSL scripts changes in the `vars/` folder:
 
 - New pipeline steps:
   - `getMatrixAxes()` - Spawned from a [Jenkins blog post][jenkins-blog-matrix].
@@ -22,6 +66,9 @@
   instead of returning a HashMap of the results for each filter it will return a
   single boolean.  Returns `true` if all examples were true and false if any
   filter was not true.
+- `isBuilding` now supports a List.  See also documentation in the [Jervis wiki].
+
+[isBuilding-list]: 
 
 [jenkins-blog-matrix]: https://jenkins.io/blog/2019/12/02/matrix-building-with-scripted-pipeline/
 
