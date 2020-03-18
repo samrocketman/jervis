@@ -194,15 +194,15 @@ def call(String filter) {
     isBuilding(['combined', ['pr', 'tag'], 'manually'])
   */
 
-def call(List filter) {
+Boolean call(List filter) {
     if('combined' in filter) {
         (filter - ['combined']).every {
-            isBuilding(it)
+            call(it)
         }
     }
     else {
         filter.any {
-            isBuilding(it)
+            call(it)
         }
     }
 }
