@@ -1411,4 +1411,85 @@ class pipelineGeneratorTest extends GroovyTestCase {
         generator.is_tag = true
         assert pipeline_generator.publishableItems == ['bar', 'foo']
     }
+    @Test public void test_pipelineGenerator_getDefaultToolchainsScript_nonmatrix() {
+        String yaml = '''
+            |language: java
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        String script = '''
+            |#
+            |# TOOLCHAINS SECTION
+            |#
+            |set +x
+            |echo '# TOOLCHAINS SECTION'
+            |set -x
+            |#env toolchain section
+            |#jdk toolchain section
+            |some commands
+            '''.stripMargin().trim() + '\n'
+        assert pipeline_generator.getDefaultToolchainsScript() == script
+    }
+    @Test public void test_pipelineGenerator_getDefaultToolchainsScript_matrix() {
+        String yaml = '''
+            |language: java
+            |jdk:
+            |  - openjdk6
+            |  - openjdk7
+            |env:
+            |  - foo=hello
+            |  - foo=world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        String script = '''
+            |#
+            |# TOOLCHAINS SECTION
+            |#
+            |set +x
+            |echo '# TOOLCHAINS SECTION'
+            |set -x
+            |#env toolchain section
+            |case ${env} in
+            |  env0)
+            |    export foo=hello
+            |    ;;
+            |  env1)
+            |    export foo=world
+            |    ;;
+            |esac
+            |#jdk toolchain section
+            |case ${jdk} in
+            |  jdk0)
+            |    more commands
+            |    ;;
+            |  jdk1)
+            |    some commands
+            |    ;;
+            |esac
+            '''.stripMargin().trim() + '\n'
+        assert pipeline_generator.getDefaultToolchainsScript() == script
+    }
+    @Test public void test_pipelineGenerator_getDefaultToolchainsEnvironment_nonmatrix() {
+        String yaml = '''
+            |language: java
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getDefaultToolchainsEnvironment() == [:]
+    }
+    @Test public void test_pipelineGenerator_getDefaultToolchainsEnvironment_matrix() {
+        String yaml = '''
+            |language: java
+            |jdk:
+            |  - openjdk6
+            |  - openjdk7
+            |env:
+            |  - foo=hello
+            |  - foo=world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        assert pipeline_generator.getDefaultToolchainsEnvironment() == [env: 'env0', jdk: 'jdk0']
+    }
 }

@@ -470,4 +470,33 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
             return isCollectUserInputValid(item, 'path', path)? path : ''
         }
     }
+
+    /**
+      Get default toolchains script.  This is meant to provide compatible
+      defaults for matrix and non-matrix builds alike when running shell
+      environment for a pipeline deploy.
+
+      @return Returns a shell script which sets up the environment toolchains.
+              This is meant to be run in conjunction with
+              <tt>getDefaultEnvironment()</tt> method.
+      */
+    String getDefaultToolchainsScript() {
+        generator.generateToolchainSection()
+    }
+
+    /**
+      Get default toolchains environment.
+
+      @return Returns an empty <tt>Map</tt> for a non-matrix build.  For a
+              matrix build, it will return a Map of the first item of every
+              matrix to be part of the environment.
+      */
+    Map getDefaultToolchainsEnvironment() {
+        if(generator.isMatrixBuild()) {
+            getBuildableMatrixAxes().first()
+        }
+        else {
+            [:]
+        }
+    }
 }
