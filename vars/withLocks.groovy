@@ -59,7 +59,14 @@
 
     In the following scenario, the first three locks will race for foo lock
     with limits and wait on bar for execution.  The remaining two tasks will
-    wait on just foo with limits.
+    wait on just foo with limits.  As an ordering recommendation, in the locks
+    list, foo is first item so that any limited tasks not blocked by bar can
+    execute right away.
+
+    Please note: when using multiple locks this way there's actually a
+    performance difference between the order in the list of foo or bar versus
+    reversing the order.  I have no control over this and just appears to be a
+    severe limitation in how pipeline handles CPS sequence.
 
         Map tasks = [failFast: true]
         for(int i = 0; i < 5; i++) {
@@ -70,7 +77,7 @@
                     locks = ['foo']
                 }
                 stage("Task ${taskInt}") {
-                    withLocks(obtain_lock: ['foo', 'bar'], foo_limit: 3, foo_index: taskInt) {
+                    withLocks(obtain_lock: locks, foo_limit: 3, foo_index: taskInt) {
                         echo 'This is an example task being executed'
                         sleep(30)
                     }
@@ -87,16 +94,33 @@
     underscore, then it must be quoted.
 
         withLocks(obtain_lock: ['hello-world'], 'hello-world_limit': 3, ...) ...
+
+    If you want locks printed out for debugging purposes you can use the
+    printLocks option.  It simply echos out the locks it will attempt to obtain
+    in the parallel stage.
+
+        withLocks(..., printLocks: true, ...) ...
  */
 
 @NonCPS
 Map prepareAndCheckSettings(Map settings) {
     List errors = []
+
+    // convert compatible types
     if(settings['obtain_lock'] instanceof String) {
         settings['obtain_lock'] = [settings['obtain_lock']]
     }
+    if(settings['printLocks'] instanceof String) {
+        settings['printLocks'] = settings['printLocks'].toBoolean()
+    }
+    settings['printLocks'] = settings['printLocks'] ?: false
+
+    // error check
     if(!(settings['obtain_lock'] instanceof List)) {
         errors << "obtain_lock must be a String or List of lock names to be obtained."
+    }
+    if(!(settings['printLocks'] instanceof Boolean)) {
+        errors << 'printLocks must be a boolean.'
     }
     // find and test all integers
     settings.keySet().toList().findAll { key ->
@@ -127,24 +151,46 @@ Map prepareAndCheckSettings(Map settings) {
     settings
 }
 
+@NonCPS
+int getLockLimit(Map settings, String lockName) {
+    String limitKey = "${lockName}_limit"
+    settings[limitKey] ?: (settings['limit'] ?: 1)
+}
+
+@NonCPS
+int getLockIndex(Map settings, String lockName) {
+    int lockIndex = -1
+    String lockKey = "${lockName}_index"
+    if(settings.containsKey(lockKey)) {
+        lockIndex = settings[lockKey]
+    }
+    else if(settings.containsKey('index')) {
+        lockIndex = settings.get('index')
+    }
+    lockIndex
+}
+
+@NonCPS
+String updateLockName(String lockName, int lockNameIndex, int limit) {
+    if(lockNameIndex >= 0 ) {
+        // Set a parallel execution limit across all resources using modulo
+        // operator.
+        lockName += '-' + (lockNameIndex % limit)
+    }
+    lockName
+}
+
 def call(Map settings, Closure body) {
     List locks = []
     settings = prepareAndCheckSettings(settings)
     List obtain_lock = settings['obtain_lock'] ?: []
     if(obtain_lock) {
         String lockName = obtain_lock.pop()
-        int limit = settings["${lockName}_limit"] ?: (settings['limit'] ?: 1)
-        int lockNameIndex = -1
-        if(settings.containsKey("${lockName}_index")) {
-            lockNameIndex = settings["${lockName}_index"]
-        }
-        else if(settings.containsKey('index')) {
-            lockNameIndex = settings['index']
-        }
-        if(lockNameIndex >= 0 ) {
-            // Set a parallel execution limit across all resources using modulo
-            // operator.
-            lockName += '-' + (lockNameIndex % limit)
+        int limit = getLockLimit(settings, lockName)
+        int lockNameIndex = getLockIndex(settings, lockName)
+        lockName = updateLockName(lockName, lockNameIndex, limit)
+        if(settings['printLocks']) {
+            echo "Waiting on lock ${lockName}"
         }
         lock(lockName) {
             withLocks(settings, obtain_lock: obtain_lock, body)
