@@ -132,6 +132,7 @@ def call(Map settings, Closure body) {
             // operator.
             lockName += '-' + (lockNameIndex % limit)
         }
+        echo "Waiting on lock ${lockName}"
         lock(lockName) {
             withLocks(settings, obtain_lock: obtain_lock, body)
         }
