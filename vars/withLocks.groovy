@@ -126,7 +126,13 @@ def call(Map settings, Closure body) {
     if(obtain_lock) {
         String lockName = obtain_lock.pop()
         int limit = settings["${lockName}_limit"] ?: (settings['limit'] ?: 1)
-        int lockNameIndex = settings["${lockName}_index"] ?: (settings['index'] ?: -1)
+        int lockNameIndex = -1
+        if("${lockName}_index" in settings) {
+            lockNameIndex = settings["${lockName}_index"]
+        }
+        else if('index' in settings) {
+            lockNameIndex = settings['index']
+        }
         if(lockNameIndex >= 0 ) {
             // Set a parallel execution limit across all resources using modulo
             // operator.
