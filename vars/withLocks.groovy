@@ -57,10 +57,18 @@
     in the setting with lock name plus _limit and _index to define behavior for
     just that lock.
 
+    In the following scenario, the first three locks will race for foo lock
+    with limits and wait on bar for execution.  The remaining two tasks will
+    wait on just foo with limits.
+
         Map tasks = [failFast: true]
         for(int i = 0; i < 5; i++) {
             int taskInt = i
             tasks["Task ${taskInt}"] = {
+                List locks = ['foo', 'bar']
+                if(taskInt > 2) {
+                    locks = ['foo']
+                }
                 stage("Task ${taskInt}") {
                     withLocks(obtain_lock: ['foo', 'bar'], foo_limit: 3, foo_index: taskInt) {
                         echo 'This is an example task being executed'
