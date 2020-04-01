@@ -47,6 +47,9 @@
                 }
             }
         }
+        stage("Parallel tasks") {
+            parallel(tasks)
+        }
 
     Obtain obtain the foo and bar locks.  Only proceed if both locks have been
     obtained simultaneously.  However, set foo locks to be limited by 3
@@ -66,6 +69,9 @@
                     echo 'End of task execution.'
                 }
             }
+        }
+        stage("Parallel tasks") {
+            parallel(tasks)
         }
 
     You may need to quote the setting depending on the characters used.  For
@@ -124,7 +130,6 @@ def call(Map settings, Closure body) {
             // Set a parallel execution limit across all resources using modulo
             // operator.
             lockName += '-' + (lockNameIndex % limit)
-        }
         }
         lock(lockName) {
             withLocks(settings, obtain_lock: obtain_locks, body)
