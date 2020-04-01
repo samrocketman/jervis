@@ -127,10 +127,10 @@ def call(Map settings, Closure body) {
         String lockName = obtain_lock.pop()
         int limit = settings["${lockName}_limit"] ?: (settings['limit'] ?: 1)
         int lockNameIndex = -1
-        if("${lockName}_index" in settings) {
+        if(settings.containsKey("${lockName}_index")) {
             lockNameIndex = settings["${lockName}_index"]
         }
-        else if('index' in settings) {
+        else if(settings.containsKey('index')) {
             lockNameIndex = settings['index']
         }
         if(lockNameIndex >= 0 ) {
@@ -138,7 +138,6 @@ def call(Map settings, Closure body) {
             // operator.
             lockName += '-' + (lockNameIndex % limit)
         }
-        echo "Waiting on lock ${lockName}"
         lock(lockName) {
             withLocks(settings, obtain_lock: obtain_lock, body)
         }
