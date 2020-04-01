@@ -193,6 +193,8 @@ def call(Map settings, Closure body) {
             echo "Waiting on lock ${lockName}"
         }
         lock(lockName) {
+            // use step name instead of call() method because of recursion
+            // depth errors because... CPS...
             withLocks(settings, obtain_lock: obtain_lock, body)
         }
     }
