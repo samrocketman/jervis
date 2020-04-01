@@ -122,8 +122,9 @@ Map prepareAndCheckSettings(Map settings) {
 def call(Map settings, Closure body) {
     List locks = []
     settings = prepareAndCheckSettings(settings)
-    if(obtain_locks) {
-        String lockName = obtain_locks.pop()
+    List obtain_lock = settings['obtain_lock'] ?: []
+    if(obtain_lock) {
+        String lockName = obtain_lock.pop()
         int limit = settings["${lockName}_limit"] ?: (settings['limit'] ?: 1)
         int lockNameIndex = settings["${lockName}_index"] ?: (settings['index'] ?: -1)
         if(lockNameIndex >= 0 ) {
@@ -132,7 +133,7 @@ def call(Map settings, Closure body) {
             lockName += '-' + (lockNameIndex % limit)
         }
         lock(lockName) {
-            withLocks(settings, obtain_lock: obtain_locks, body)
+            withLocks(settings, obtain_lock: obtain_lock, body)
         }
     }
     else {
