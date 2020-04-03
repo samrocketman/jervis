@@ -98,11 +98,6 @@ class lifecycleGenerator implements Serializable {
     String[] yaml_keys
 
     /**
-      A variable for determining whether or not this is a matrix build.
-     */
-    Boolean matrix_build = false
-
-    /**
       A variable set by any external system relaying to Jervis that this is a
       peer review build (commonly called a pull request).
      */
@@ -411,44 +406,45 @@ class lifecycleGenerator implements Serializable {
         //avoid throwing a NullPointer exception if the user forgets to call obj.folder_listing to load a list of files.
         //just load an empty file list by default initially that can then be overridden.
         this.setFolder_listing([])
-        //configure the matrix axes if it is a matrix build i.e. set yaml_matrix_axes
-        matrix_build = false
-        yaml_matrix_axes = []
-        toolchain_obj.toolchains["toolchains"][yaml_language].each { toolchain ->
-            if(toolchain_obj.supportedMatrix(yaml_language, toolchain)) {
-                String matrix_type = toolchain_obj.toolchainType(toolchain)
-                if((matrix_type != 'disabled') && (getObjectValue(jervis_yaml, toolchain, []).size() > 1)) {
-                    matrix_build = true
-                    yaml_matrix_axes << toolchain
-                }
-                else if((matrix_type == 'advanced') && (getObjectValue(jervis_yaml, "${toolchain}.matrix", []).size() > 1)) {
-                    matrix_build = true
-                    yaml_matrix_axes << toolchain
-                }
-                //else matrix_type == disabled
-            }
-        }
         //allow ordered loading additional toolchains into a language key
-        if('additional_toolchains' in jervis_yaml) {
-            if((jervis_yaml['additional_toolchains'] instanceof String) &&
-                    (jervis_yaml['additional_toolchains'] in toolchain_obj.toolchains) &&
-                    !(jervis_yaml['additional_toolchains'] in toolchain_obj.toolchains["toolchains"][yaml_language])) {
-                toolchain_obj.toolchains["toolchains"][yaml_language] << jervis_yaml['additional_toolchains']
-            }
-            if(jervis_yaml['additional_toolchains'] instanceof List) {
-                jervis_yaml['additional_toolchains'].findAll { (it instanceof String) && (it in toolchain_obj.toolchains) }.each { toolchain ->
-                    if(!(toolchain in toolchain_obj.toolchains["toolchains"][yaml_language])) {
-                        toolchain_obj.toolchains["toolchains"][yaml_language] << toolchain
-                    }
+        List additional_toolchains = []
+        toolchain_obj.toolchains["toolchains"][yaml_language].with { List toolchainList ->
+            getObjectValue(jervis_yaml, 'additional_toolchains', '').with {
+                if(!it || (it in toolchainList)) {
+                    return
+                }
+                if(it in toolchain_obj.toolchains) {
+                    additional_toolchains << it
                 }
             }
+            getObjectValue(jervis_yaml, 'additional_toolchains', []).with { List it ->
+                if(!it || !(it - toolchainList)) {
+                    return
+                }
+                additional_toolchains += (it - toolchainList).intersect(toolchain_obj.matrix_toolchain_list)
+            }
         }
-        //go through any toolchains that may be left; order is not guaranteed but will likely remain the order in which they're in the YAML file.
+        toolchain_obj.toolchains["toolchains"][yaml_language] += additional_toolchains
+
+        // go through any toolchains that may be left; order i's not guaranteed
+        // but will likely remain the order in which they're in the YAML file.
         yaml_keys.each { key ->
             if((key in toolchain_obj.toolchains) && !(key in toolchain_obj.toolchains["toolchains"][yaml_language])) {
                 toolchain_obj.toolchains["toolchains"][yaml_language] << key
             }
         }
+
+        // determine which toolchains need to be built as a matrix build
+        yaml_matrix_axes = toolchain_obj.toolchains["toolchains"][yaml_language].findAll { String toolchain ->
+            toolchain_obj.supportedMatrix(yaml_language, toolchain) &&
+            (
+                (getObjectValue(jervis_yaml, toolchain, []).size() > 1) ||
+                (
+                    toolchain_obj.toolchainType(toolchain) == 'advanced' &&
+                    (getObjectValue(jervis_yaml, "${toolchain}.matrix", []).size() > 1)
+                )
+            )
+        } ?: []
         //populate unfriendly names being accessible by friendly name
         matrix_fullName_by_friendly = [:]
         //populate branch filtering keys removing extra information
@@ -498,7 +494,7 @@ env:
       @return <tt>true</tt> if a matrix build will be generated or <tt>false</tt> if it will just be a regular build.
      */
     public Boolean isMatrixBuild() {
-        matrix_build
+        yaml_matrix_axes as Boolean
     }
 
     /*
