@@ -62,6 +62,11 @@ class toolchainValidator implements Serializable {
     String[] toolchain_list
 
     /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of toolchains in the toolchains file which are capable of matrix building.  This is just a list of the keys in <tt>{@link #toolchains}</tt>.
+     */
+    List matrix_toolchain_list
+
+    /**
       A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of supported languages in the lifecycles file.  This is just a list of the keys in {@link #lifecycles}.
      */
     String[] languages
@@ -90,6 +95,9 @@ class toolchainValidator implements Serializable {
         def yaml = new Yaml()
         toolchains = yaml.load(json)?: [:]
         toolchain_list = toolchains.keySet() as String[]
+        matrix_toolchain_list = toolchain_list.findAll { String toolchain ->
+            toolchainType(toolchain) != 'disabled'
+        }
         if('toolchains' in toolchain_list) {
             languages = toolchains.toolchains.keySet() as String[]
         }
@@ -156,7 +164,7 @@ class toolchainValidator implements Serializable {
       @return          <tt>true</tt> if the toolchain is a matrix builder or <tt>false</tt> if the matrix build is not supported for that language.  Note: it can exist as a toolchain but not be supported as a matrix builder.
      */
     public Boolean supportedMatrix(String lang, String toolchain) {
-        (toolchain in toolchains['toolchains'][lang]) && (toolchains[toolchain]['matrix'] != 'disabled')
+        (toolchain in toolchains['toolchains'][lang]) && (toolchain in matrix_toolchain_list)
     }
 
     /**
