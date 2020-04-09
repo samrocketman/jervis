@@ -1492,4 +1492,24 @@ class pipelineGeneratorTest extends GroovyTestCase {
         def pipeline_generator = new pipelineGenerator(generator)
         assert pipeline_generator.getDefaultToolchainsEnvironment() == [env: 'env0', jdk: 'jdk0']
     }
+    @Test public void test_pipelineGenerator_matrix_additional_toolchain() {
+        generator = new lifecycleGenerator()
+        URL url = this.getClass().getResource('/good_lifecycles_matrix_added_toolchain.json')
+        generator.loadLifecycles(url.getFile())
+        url = this.getClass().getResource('/good_toolchains_matrix_added_toolchain.json')
+        generator.loadToolchains(url.getFile())
+        String yaml = """
+            |language: python
+            |python:
+            |  - 2.7
+            |  - 3.6
+            |jdk:
+            |  - openjdk8
+            |  - openjdk11
+            """.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new pipelineGenerator(generator)
+        List result = [['python':'python0', 'jdk':'jdk0'], ['python':'python1', 'jdk':'jdk0'], ['python':'python0', 'jdk':'jdk1'], ['python':'python1', 'jdk':'jdk1']]
+        assert pipeline_generator.getBuildableMatrixAxes() == result
+    }
 }

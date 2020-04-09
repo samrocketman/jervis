@@ -1,0 +1,10 @@
+{
+    "python": {
+        "friendlyName": "Python",
+        "defaultKey": "default",
+        "default": {
+            "install": "foo",
+            "script": "bar"
+        }
+    }
+}

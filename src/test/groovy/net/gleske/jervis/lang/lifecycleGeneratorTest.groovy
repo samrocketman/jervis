@@ -789,4 +789,65 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.is_tag = true
         assert generator.is_tag == true
     }
+    @Test public void test_lifecycleGenerator_matrix_additional_toolchain() {
+        generator = new lifecycleGenerator()
+        URL url = this.getClass().getResource('/good_lifecycles_matrix_added_toolchain.json')
+        generator.loadLifecycles(url.getFile())
+        url = this.getClass().getResource('/good_toolchains_matrix_added_toolchain.json')
+        generator.loadToolchains(url.getFile())
+        String yaml = """
+            |language: python
+            |python:
+            |  - 2.7
+            |  - 3.6
+            |jdk:
+            |  - openjdk8
+            |  - openjdk11
+            """.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        String result = '''
+            |#
+            |# TOOLCHAINS SECTION
+            |#
+            |set +x
+            |echo '# TOOLCHAINS SECTION'
+            |set -x
+            |#env toolchain section
+            |#python toolchain section
+            |case ${python} in
+            |  python0)
+            |    foo
+            |    ;;
+            |  python1)
+            |    bar
+            |    ;;
+            |esac
+            |#jdk toolchain section
+            |case ${jdk} in
+            |  jdk0)
+            |    foo
+            |    ;;
+            |  jdk1)
+            |    bar
+            |    ;;
+            |esac
+            |
+            |#
+            |# INSTALL SECTION
+            |#
+            |set +x
+            |echo '# INSTALL SECTION'
+            |set -x
+            |foo
+            |
+            |#
+            |# SCRIPT SECTION
+            |#
+            |set +x
+            |echo '# SCRIPT SECTION'
+            |set -x
+            |bar
+            '''.stripMargin().trim()
+        assert generator.generateAll().trim() == result
+    }
 }
