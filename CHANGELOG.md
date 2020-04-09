@@ -1,5 +1,10 @@
 # jervis 1.7
 
+### Bug fixes
+
+- Bugfix: Additional toolchains loaded into a matrix build did not properly
+  matrix.  This bug has been fixed and tests added to avoid it.
+
 ### Breaking Job DSL changes
 
 Jobs generated now use the [SCM Filter Jervis YAML][plugin-sf-jervis] plugin
@@ -66,10 +71,10 @@ Boolean call() {
   instead of returning a HashMap of the results for each filter it will return a
   single boolean.  Returns `true` if all examples were true and false if any
   filter was not true.
-- `isBuilding` now supports a List.  See also documentation in the [Jervis wiki].
+- `isBuilding` now supports a List.  See also documentation in the [Jervis
+  wiki][isBuilding-list].
 
-[isBuilding-list]: 
-
+[isBuilding-list]: https://github.com/samrocketman/jervis/wiki/Pipeline-support#isBuilding-step
 [jenkins-blog-matrix]: https://jenkins.io/blog/2019/12/02/matrix-building-with-scripted-pipeline/
 
 # jervis 1.6 - Nov 10th, 2019
