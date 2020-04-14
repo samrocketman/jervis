@@ -17,7 +17,9 @@ package net.gleske.jervis.remotes
 
 
 import net.gleske.jervis.exceptions.JervisException
+
 import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.constructor.SafeConstructor
 
 /**
   A simple class which makes using REST services like the GitHub API really
@@ -48,7 +50,7 @@ class SimpleRestService {
     static def apiFetch(URL api_url, Map http_headers = [:], String http_method = 'GET', String data = '') {
         http_headers['Content-Type'] = http_headers['Content-Type'] ?: 'application/json'
         Boolean parse_json = http_headers['Content-Type'] == 'application/json'
-        def yaml = new Yaml()
+        def yaml = new Yaml(new SafeConstructor())
 
         //data_response could be either a List or Map depending on the JSON
         def data_response

@@ -4,7 +4,12 @@
 
 - Bugfix: Additional toolchains loaded into a matrix build did not properly
   matrix.  This bug has been fixed and tests added to avoid it.
-- Bump snakeyaml to 1.26.
+- Bump snakeyaml to 1.26 to protect against billion laughs style attacks.
+- Use SafeConstructor when parsing YAML to prevent remote code execution.  See
+  [Documentation][safeconst] and [Java Doc][safeconst-java].
+
+[safeconst]: https://bitbucket.org/asomov/snakeyaml/wiki/Documentation
+[safeconst-java]: https://www.javadoc.io/doc/org.yaml/snakeyaml/1.19/org/yaml/snakeyaml/constructor/SafeConstructor.html
 
 ### Breaking Job DSL changes
 

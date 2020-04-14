@@ -15,10 +15,12 @@
    */
 package net.gleske.jervis.lang
 
-import org.yaml.snakeyaml.Yaml
+import net.gleske.jervis.exceptions.ToolchainBadValueInKeyException
 import net.gleske.jervis.exceptions.ToolchainMissingKeyException
 import net.gleske.jervis.exceptions.ToolchainValidationException
-import net.gleske.jervis.exceptions.ToolchainBadValueInKeyException
+
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.constructor.SafeConstructor
 
 /**
   Validates the contents of a
@@ -92,7 +94,7 @@ class toolchainValidator implements Serializable {
       @param json A <tt>String</tt> the contents of a toolchains file.
      */
     public void load_JSONString(String json) {
-        def yaml = new Yaml()
+        def yaml = new Yaml(new SafeConstructor())
         toolchains = yaml.load(json)?: [:]
         toolchain_list = toolchains.keySet() as String[]
         matrix_toolchain_list = toolchain_list.findAll { String toolchain ->

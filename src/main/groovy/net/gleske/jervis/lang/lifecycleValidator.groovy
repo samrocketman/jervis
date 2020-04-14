@@ -15,11 +15,13 @@
    */
 package net.gleske.jervis.lang
 
-import org.yaml.snakeyaml.Yaml
 import net.gleske.jervis.exceptions.LifecycleBadValueInKeyException
 import net.gleske.jervis.exceptions.LifecycleInfiniteLoopException
 import net.gleske.jervis.exceptions.LifecycleMissingKeyException
 import net.gleske.jervis.exceptions.LifecycleValidationException
+
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.constructor.SafeConstructor
 
 /**
   Validates the contents of a
@@ -77,7 +79,7 @@ class lifecycleValidator implements Serializable {
       @param json A <tt>String</tt> containing the contents of a lifecycles file.
      */
     public void load_JSONString(String json) {
-        def yaml = new Yaml()
+        def yaml = new Yaml(new SafeConstructor())
         lifecycles = yaml.load(json)?: [:]
         languages = lifecycles.keySet() as String[];
     }

@@ -15,10 +15,12 @@
    */
 package net.gleske.jervis.lang
 
-import org.yaml.snakeyaml.Yaml
 import net.gleske.jervis.exceptions.PlatformBadValueInKeyException
 import net.gleske.jervis.exceptions.PlatformMissingKeyException
 import net.gleske.jervis.exceptions.PlatformValidationException
+
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.constructor.SafeConstructor
 
 /**
   Validates the contents of a
@@ -74,7 +76,7 @@ class platformValidator implements Serializable {
       @param json A <tt>String</tt> containing the contents of a platforms file.
      */
     public void load_JSONString(String json) {
-        def yaml = new Yaml()
+        def yaml = new Yaml(new SafeConstructor())
         platforms = yaml.load(json)?: [:]
     }
 
