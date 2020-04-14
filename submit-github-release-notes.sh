@@ -67,7 +67,7 @@ $(java -version 2>&1)
 $(./gradlew -version)
 \`\`\`
 
-Releases signed with [`8D8BF0E242D8A068572EBF3CE8F732347257E65F`][keybase].
+Releases signed with [\`8D8BF0E242D8A068572EBF3CE8F732347257E65F\`][keybase].
 
 [keybase]: https://keybase.io/samrocketman/pgp_keys.asc?fingerprint=8d8bf0e242d8a068572ebf3ce8f732347257e65f
 
