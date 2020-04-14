@@ -135,7 +135,7 @@ configurations {
 
 dependencies {
     libs 'net.gleske:jervis:1.6'
-    libs 'org.yaml:snakeyaml:1.25'
+    libs 'org.yaml:snakeyaml:1.26'
 }
 
 task cleanLibs(type: Delete) {

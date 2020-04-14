@@ -4,6 +4,7 @@
 
 - Bugfix: Additional toolchains loaded into a matrix build did not properly
   matrix.  This bug has been fixed and tests added to avoid it.
+- Bump snakeyaml to 1.26.
 
 ### Breaking Job DSL changes
 
