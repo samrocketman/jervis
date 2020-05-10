@@ -53,6 +53,7 @@ dependencies {
     compile "org.yaml:snakeyaml:${snakeYamlVersion}"
     testCompile 'junit:junit:4.12'
     testCompile "org.codehaus.groovy:groovy-test:${groovyVersion}"
+    testCompile "org.codehaus.groovy:groovy-console:${groovyVersion}"
 }
 
 test {

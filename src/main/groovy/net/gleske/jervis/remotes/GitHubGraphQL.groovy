@@ -205,6 +205,23 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
     }
 
     /**
+      A method for calling the GitHub v4 GraphQL API with a GraphQL query and
+      variables.
+
+      @param graphql      A GraphQL query.
+      @param variables    GraphQL variables meant to be used by a GraphQL query.
+      @param http_method  Customize the method to be submitted to the GitHub
+                          GraphQL API.  Typically <tt>POST</tt>, but could be
+                          another method if performing a mutation.
+      @param http_headers Add custom HTTP headers.  This does not normally need
+                          to be called but is available for customization.
+      @return A parsed response from the GitHub v4 GraphQL API.
+      */
+    public def sendGQL(String graphql, Map variables, String http_method = 'POST', Map http_headers = [:]) {
+        sendGQL(graphql, (variables as JsonBuilder).toString(), http_method, http_headers)
+    }
+
+    /**
       Get Jervis YAML from a remote repository.  It supports getting YAML from
       multiple branches at once (<tt>gitRefs</tt> and from multiple alternate
       YAML file locations (<tt>yamlFiles</tt>).

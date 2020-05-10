@@ -1,3 +1,12 @@
+# jervis 1.8
+
+### New features:
+
+- [`net.gleske.jervis.remotes.GitHubGraphQL`][GitHubGraphQL] has a new `sendGQL`
+  method.  `variables` are now supported as a Map in addition to a String.  The
+  Map will be automatically converted to a String before being sent to GitHub as
+  a query.
+
 # jervis 1.7 - Apr 14th, 2020
 
 ### Bug fixes
