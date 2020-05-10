@@ -45,10 +45,14 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    //compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    compile "org.codehaus.groovy:groovy:${groovyVersion}"
+    compile "org.codehaus.groovy:groovy-templates:${groovyVersion}"
+    compile "org.codehaus.groovy:groovy-json:${groovyVersion}"
     compile 'org.bouncycastle:bcpkix-jdk15on:1.60'
     compile "org.yaml:snakeyaml:${snakeYamlVersion}"
     testCompile 'junit:junit:4.12'
+    testCompile "org.codehaus.groovy:groovy-test:${groovyVersion}"
 }
 
 test {
