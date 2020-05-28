@@ -1,3 +1,8 @@
+# CHANGELOG
+
+This file contains all of the notable changes from Jervis releases.  For the
+full change log see the commit log.
+
 # jervis 1.8
 
 ### New features:
@@ -17,9 +22,6 @@
 - Use SafeConstructor when parsing YAML to prevent remote code execution.  See
   [Documentation][safeconst] and [Java Doc][safeconst-java].
 
-[safeconst]: https://bitbucket.org/asomov/snakeyaml/wiki/Documentation
-[safeconst-java]: https://www.javadoc.io/doc/org.yaml/snakeyaml/1.19/org/yaml/snakeyaml/constructor/SafeConstructor.html
-
 ### Breaking Job DSL changes
 
 Jobs generated now use the [SCM Filter Jervis YAML][plugin-sf-jervis] plugin
@@ -32,10 +34,6 @@ plugin.
 As a recommended migration path to convert all jobs to use the SCM Filter for
 Jervis YAML, you can run a [script console script to regenerate all
 jbos][regenerate-jobs-script]
-
-[plugin-sf-jervis]: https://plugins.jenkins.io/scm-filter-jervis
-[plugin-sf-bpr]: https://plugins.jenkins.io/scm-filter-branch-pr
-[regenerate-jobs-script]: https://github.com/samrocketman/jenkins-script-console-scripts/blob/master/generate-all-jervis-jobs.groovy
 
 ### Deprecated pipeline steps
 
@@ -91,6 +89,11 @@ Boolean call() {
 
 [isBuilding-list]: https://github.com/samrocketman/jervis/wiki/Pipeline-support#isBuilding-step
 [jenkins-blog-matrix]: https://jenkins.io/blog/2019/12/02/matrix-building-with-scripted-pipeline/
+[plugin-sf-bpr]: https://plugins.jenkins.io/scm-filter-branch-pr
+[plugin-sf-jervis]: https://plugins.jenkins.io/scm-filter-jervis
+[regenerate-jobs-script]: https://github.com/samrocketman/jenkins-script-console-scripts/blob/master/generate-all-jervis-jobs.groovy
+[safeconst-java]: https://www.javadoc.io/doc/org.yaml/snakeyaml/1.19/org/yaml/snakeyaml/constructor/SafeConstructor.html
+[safeconst]: https://bitbucket.org/asomov/snakeyaml/wiki/Documentation
 
 # jervis 1.6 - Nov 10th, 2019
 
@@ -100,8 +103,6 @@ Boolean call() {
   `getJervisYamlFiles` which allows a caller to get multiple Jervis YAML files
   from multiple branches in a single API call.  It is overloaded to return a
   list of files in each branch as well.
-
-[GitHubGraphQL]: src/main/groovy/net/gleske/jervis/remotes/GitHubGraphQL.groovy
 
 #### Pipeline DSL scripts changes in the `vars/` folder:
 
@@ -121,8 +122,6 @@ Boolean call() {
   YAML.  Rather than exhaustively listing everything that was deleted please
   review this [git diff of code cleanup][code-cleanup-1].
 
-[code-cleanup-1]: https://github.com/samrocketman/jervis/commit/0e29edd5b1cadae11a02a1d680296ebfda52ad0e
-
 ### Other notes
 
 - For tests, `net.gleske.jervis.remotes.StaticMocking` now supports mocking
@@ -133,6 +132,8 @@ Boolean call() {
   help with debugging `net.gleske.jervis.remotes.StaticMocking`.
 
 [GitHubGraphQLTest.groovy]: src/test/groovy/net/gleske/jervis/remotes/GitHubGraphQLTest.groovy
+[GitHubGraphQL]: src/main/groovy/net/gleske/jervis/remotes/GitHubGraphQL.groovy
+[code-cleanup-1]: https://github.com/samrocketman/jervis/commit/0e29edd5b1cadae11a02a1d680296ebfda52ad0e
 
 # jervis 1.5 - Nov 9th, 2019
 
@@ -273,8 +274,8 @@ them.  The following migration path is recommended:
   provided by the plugins [Multibranch: Pipeline with defaults][mpwd] and
   [Config File Provider][cfp].
 
-[mpwd]: https://plugins.jenkins.io/pipeline-multibranch-defaults
 [cfp]: https://plugins.jenkins.io/config-file-provider
+[mpwd]: https://plugins.jenkins.io/pipeline-multibranch-defaults
 
 #### Pipeline DSL scripts changes in the `vars/` folder:
 
