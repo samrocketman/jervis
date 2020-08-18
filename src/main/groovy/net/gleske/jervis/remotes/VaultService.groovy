@@ -43,7 +43,7 @@ class VaultService implements SimpleRestServiceSupport {
     /*
        Get secret from a KV v1 or v2 secret engine.
       */
-    Map getSecret(String path, int version = 0) {
+    Map getSecret(String path, Integer version = 0) {
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
         if(isKeyValueV2(mount)) {
@@ -58,7 +58,8 @@ class VaultService implements SimpleRestServiceSupport {
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
         if(isKeyValueV2(mount)) {
-            apiFetch("${mount}/data/${subpath}?version=${version}")?.data?.data
+            // TODO
+            //apiFetch("${mount}/data/${subpath}?version=${version}")?.data?.data
         }
         else {
             apiFetch(path, [:], 'POST', objToJson(secret))
@@ -146,10 +147,12 @@ class VaultService implements SimpleRestServiceSupport {
 
     /**
       Copies the contents of secret from a source key, srcKey, to the
-      destination key, destKey.
+      destination key, destKey.  Optional argument srcVersion allows you to
+      select a specific version from a Key-Value v2 engine (default is get
+      latest version of secret).
       */
-    void copySecret(String srcKey, String destKey) {
-        setSecret(destKey, getSecret(srcKey))
+    void copySecret(String srcKey, String destKey, Integer srcVersion = 0) {
+        setSecret(destKey, getSecret(srcKey, srcVersion))
     }
 
     /**
@@ -158,5 +161,32 @@ class VaultService implements SimpleRestServiceSupport {
       */
     void copyAllKeys(String srcPath, destPath, Integer level = 0) {
         // TODO
+    }
+
+    /**
+      Returns a Map of key-value pairs compatible with bash environment
+      variables.
+      */
+    Map getEnvironmentSecret(String path, Integer version = 0) {
+        getSecret(path, version).findAll { k, v ->
+            k in String &&
+            k ==~ '^[a-zA-Z0-9_]+$' && (
+                v in String ||
+                v in Boolean ||
+                v in Number
+            )
+        }
+    }
+
+    /**
+      Returns a Map of key-value pairs compatible with bash environment
+      variables.  Given a list of paths, they'll be combined with the end of
+      the list taking precedence over the beginning of  the list.  When
+      combining the Maps, last Key-Value pair wins.
+      */
+    Map getEnvironmentSecrets(List paths) {
+        paths.collect { String path ->
+            getEnvironmentSecret(path)
+        }.sum()
     }
 }
