@@ -64,7 +64,7 @@ class VaultAppRoleCredential implements ReadonlyTokenCredential, SimpleRestServi
             return
         }
         this.token = null
-        String data = mapToJson([role_id: this.credential.role_id, secret_id: this.credential.secret_id])
+        String data = objToJson([role_id: this.credential.role_id, secret_id: this.credential.secret_id])
         this.leaseCreated = new Date().toInstant()
         Map response = apiFetch('v1/auth/approle/login', [:], 'POST', data)
         this.ttl = response.auth.lease_duration
@@ -85,7 +85,7 @@ class VaultAppRoleCredential implements ReadonlyTokenCredential, SimpleRestServi
             return false
         }
         try {
-            String data = mapToJson([increment: "${this.ttl}s"])
+            String data = objToJson([increment: "${this.ttl}s"])
             Map response = apiFetch('v1/auth/token/renew-self', [:], 'POST', data)
             this.leaseCreated = new Date().toInstant()
             this.ttl = response.auth.lease_duration

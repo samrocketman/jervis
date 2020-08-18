@@ -36,8 +36,8 @@ trait SimpleRestServiceSupport {
     /**
       A method for converting a HashMap to a JSON String.
       */
-    static String mapToJson(Map m) {
-        (m as JsonBuilder).toString()
+    static String objToJson(Map obj) {
+        (obj as JsonBuilder).toString()
     }
 
     /**
