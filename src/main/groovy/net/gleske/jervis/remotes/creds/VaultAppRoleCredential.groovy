@@ -9,7 +9,7 @@ import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
 class VaultAppRoleCredential implements ReadonlyTokenCredential, SimpleRestServiceSupport {
     // values specific to token instance
     private final String vault_url
-    private final VaultRoleIdCredential cred
+    private final VaultRoleIdCredential credential
 
     // values specific to token lifetime
     private Integer ttl = 0
@@ -33,9 +33,9 @@ class VaultAppRoleCredential implements ReadonlyTokenCredential, SimpleRestServi
         this(vault_url, new VaultRoleIdCredentialImpl(role_id, secret_id))
     }
 
-    VaultAppRoleCredential(String vault_url, VaultRoleIdCredential cred) {
+    VaultAppRoleCredential(String vault_url, VaultRoleIdCredential credential) {
         this.vault_url = (vault_url[-1] == '/')? vault_url : vault_url + '/'
-        this.cred = cred
+        this.credential = credential
     }
 
     private Boolean isExpired() {
@@ -47,10 +47,6 @@ class VaultAppRoleCredential implements ReadonlyTokenCredential, SimpleRestServi
             return false
         }
         true
-    }
-
-    private String mapToJson(Map m) {
-        (m as JsonBuilder).toString()
     }
 
     void revokeToken() {
@@ -68,7 +64,7 @@ class VaultAppRoleCredential implements ReadonlyTokenCredential, SimpleRestServi
             return
         }
         this.token = null
-        String data = mapToJson([role_id: this.cred.role_id, secret_id: this.cred.secret_id])
+        String data = mapToJson([role_id: this.credential.role_id, secret_id: this.credential.secret_id])
         this.leaseCreated = new Date().toInstant()
         Map response = apiFetch('v1/auth/approle/login', [:], 'POST', data)
         this.ttl = response.auth.lease_duration

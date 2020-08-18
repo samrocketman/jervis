@@ -14,7 +14,8 @@
    limitations under the License.
    */
 package net.gleske.jervis.remotes
-import net.gleske.jervis.remotes.interfaces.JervisCredential
+
+import groovy.json.JsonBuilder
 
 /**
    REST service classes can derive some default implementation from this trait.
@@ -31,6 +32,13 @@ trait SimpleRestServiceSupport {
       used by apiFetch(String).
       */
     abstract Map header(Map original_headers)
+
+    /**
+      A method for converting a HashMap to a JSON String.
+      */
+    static String mapToJson(Map m) {
+        (m as JsonBuilder).toString()
+    }
 
     /**
       A method to simplify fetching from remote REST services.
