@@ -252,4 +252,5 @@ class VaultService implements SimpleRestServiceSupport {
 
     // TODO implement DELETE key
     // TODO implement recursive DELETE path
+    // TODO implement combining path of keys into a List of Maps?  This might not be useful.
 }
