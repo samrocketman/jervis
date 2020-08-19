@@ -49,7 +49,7 @@ class VaultAppRoleCredential implements ReadonlyTokenCredential, SimpleRestServi
     }
 
     VaultAppRoleCredential(String vault_url, VaultRoleIdCredential credential) {
-        this.vault_url = (vault_url[-1] == '/')? vault_url : vault_url + '/'
+        this.vault_url = addTrailingSlash(vault_url)
         this.credential = credential
     }
 

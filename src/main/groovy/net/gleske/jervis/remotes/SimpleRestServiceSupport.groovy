@@ -24,24 +24,37 @@ trait SimpleRestServiceSupport {
 
     /**
       A method for getting the API URL which will be used by apiFetch(String).
+      TODO better java doc
       */
     abstract String baseUrl()
 
     /**
       A method for getting authentication headers and other default headers
       used by apiFetch(String).
+      TODO better java doc
       */
     abstract Map header(Map original_headers)
 
     /**
       A method for converting a HashMap to a JSON String.
+      TODO better java doc
       */
     static String objToJson(Map obj) {
         (obj as JsonBuilder).toString()
     }
 
+    // TODO java doc
+    static String addTrailingSlash(String s) {
+        if(s.endsWith('/')) {
+            return s
+        }
+        s + '/'
+    }
+
+
     /**
       A method to simplify fetching from remote REST services.
+      TODO better java doc
       */
     def apiFetch(String path = '', Map http_headers = [:], String http_method = 'GET', String data = '') {
         http_headers = header(http_headers)

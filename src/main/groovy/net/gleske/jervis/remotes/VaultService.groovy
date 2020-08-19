@@ -18,30 +18,38 @@ package net.gleske.jervis.remotes
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.exceptions.JervisException
 
+// TODO: java doc
 class VaultService implements SimpleRestServiceSupport {
+    // final class variables used for authentication
     private final String vault_url
     private final TokenCredential credential
+
+    // TODO: java doc
     Map mountVersions = [:]
 
     VaultService(String vault_url, TokenCredential credential) {
-        this.vault_url = (vault_url[-1] == '/')? vault_url : vault_url + '/'
+        this.vault_url = addTrailingSlash(vault_url)
         if(!this.vault_url.endsWith('v1/')) {
             this.vault_url += 'v1/'
         }
         this.credential = credential
     }
 
+    // TODO: java doc
     String baseUrl() {
         this.vault_url
     }
 
+    // TODO: java doc
     Map header(Map headers = [:]) {
         headers['X-Vault-Token'] = credential.getToken()
         headers
     }
 
-    /*
+    /**
        Get secret from a KV v1 or v2 secret engine.
+
+       TODO better java doc
       */
     Map getSecret(String path, Integer version = 0) {
         String mount = path -~ '/.*$'
@@ -50,22 +58,34 @@ class VaultService implements SimpleRestServiceSupport {
             apiFetch("${mount}/data/${subpath}?version=${version}")?.data?.data
         }
         else {
-            apiFetch(path)
+            apiFetch(path)?.data
         }
     }
 
-    void setSecret(String path, Map secret) {
+    // TODO: java doc
+    void setSecret(String path, Map secret, Boolean enableCas = false) {
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
         if(isKeyValueV2(mount)) {
-            // TODO
-            //apiFetch("${mount}/data/${subpath}?version=${version}")?.data?.data
+            Map secretMeta = [:]
+            try {
+                secretMeta = apiFetch("${mount}/metadata/${subpath}")
+            } catch(IOException e) {}
+            if(secretMeta?.data?.cas_required) {
+                enableCas = true
+            }
+            Map data = [data: secret]
+            if(enableCas) {
+                data['options'] = [cas: (secretMeta?.data?.current_version ?: 0)]
+            }
+            apiFetch("${mount}/data/${subpath}", [:], 'POST', objToJson(data))
         }
         else {
             apiFetch(path, [:], 'POST', objToJson(secret))
         }
     }
 
+    // TODO: java doc
     void setMountVersions(String mount, def version) {
         if(!(version in ['1', '2'])) {
             throw new JervisException('Error: Vault key-value mounts can only be version "1" or "2" (String).')
@@ -73,6 +93,7 @@ class VaultService implements SimpleRestServiceSupport {
         this.mountVersions[mount] = version
     }
 
+    // TODO: java doc
     void setMountVersions(Map mountVersions) {
         mountVersions.each { k, v ->
             this.setMountVersions(k, v)
@@ -82,6 +103,7 @@ class VaultService implements SimpleRestServiceSupport {
     /**
       Checks version of a Key-Value engine mount.  Returns true if Key-Value v2
       or false if Key-Value v2.
+       TODO better java doc
       */
     private Boolean isKeyValueV2(String mount) {
         discoverMountVersion(mount)
@@ -91,6 +113,8 @@ class VaultService implements SimpleRestServiceSupport {
     /**
       If the mount is not already in mountVersions, then this will inspect the
       mount and set whether the mount is a Key-Value secret engine v1 or v2.
+
+      TODO better java doc
       */
     private void discoverMountVersion(String mount) {
         if(mount in this.mountVersions) {
@@ -99,10 +123,11 @@ class VaultService implements SimpleRestServiceSupport {
         setMountVersions(mount, apiFetch("sys/mounts/${mount}/tune")?.options?.version)
     }
 
+    // TODO: java doc
     List listPath(String path) {
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
-        subpath = (!subpath || subpath[-1] == '/')? subpath : subpath + '/'
+        subpath = addTrailingSlash(subpath)
 
         if(isKeyValueV2(mount)) {
             apiFetch("${mount}/metadata/${subpath}?list=true")?.data?.keys
@@ -114,7 +139,10 @@ class VaultService implements SimpleRestServiceSupport {
     }
 
     /**
-      Internal method used by findAllKeys() which tracks recursion level in addition to the user-passed settings.
+      Internal method used by findAllKeys() which tracks recursion level in
+      addition to the user-passed settings.
+
+      TODO better java doc
       */
     private List recursiveFindAllKeys(String path, Integer desiredLevel, Integer level) {
         if(desiredLevel > 0 && level > desiredLevel) {
@@ -140,7 +168,9 @@ class VaultService implements SimpleRestServiceSupport {
     /**
       Recursively traverses the path for subkeys.  If level is 0 then there's
       no depth limit.  When level = n, keys are traversed up to the limit.
-       */
+
+      TODO better java doc
+      */
     List findAllKeys(String path, Integer level = 0) {
         recursiveFindAllKeys(path, level, 1)
     }
@@ -150,22 +180,31 @@ class VaultService implements SimpleRestServiceSupport {
       destination key, destKey.  Optional argument srcVersion allows you to
       select a specific version from a Key-Value v2 engine (default is get
       latest version of secret).
+
+      TODO better java doc
       */
     void copySecret(String srcKey, String destKey, Integer srcVersion = 0) {
-        setSecret(destKey, getSecret(srcKey, srcVersion))
+        setSecret(destKey, getSecret(srcKey, srcVersion), true)
     }
 
     /**
       Recursively copies all secrets from the source path, srcPath, to the
       destination path, destPath.
+
+      TODO better java doc
       */
     void copyAllKeys(String srcPath, destPath, Integer level = 0) {
-        // TODO
+        findAllKeys(srcPath, level).each { String srcKey ->
+            String destKey = destPath + (srcKey -~ "^\\Q${srcPath}\\E")
+            copySecret(srcKey, destKey)
+        }
     }
 
     /**
       Returns a Map of key-value pairs compatible with bash environment
       variables.
+
+      TODO better java doc
       */
     Map getEnvironmentSecret(String path, Integer version = 0) {
         getSecret(path, version).findAll { k, v ->
@@ -183,6 +222,8 @@ class VaultService implements SimpleRestServiceSupport {
       variables.  Given a list of paths, they'll be combined with the end of
       the list taking precedence over the beginning of  the list.  When
       combining the Maps, last Key-Value pair wins.
+
+      TODO better java doc
       */
     Map getEnvironmentSecrets(List paths) {
         paths.collect { String path ->
