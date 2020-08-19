@@ -19,8 +19,14 @@ import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.exceptions.JervisException
 
 // TODO: java doc
+    // TODO document recommended setup and usage (setting up recommended
+    //   policy, AppId, use batch token, manually set mountVersions to cut down
+    //   on API calls).  Add a bullet point list of useful methods.  Document
+    //   usage of the method within the method itself.
+    // TODO document minimum required role for full functionality
+    // TODO document reducing the role and code changes required (e.g. using
+    //   mountVersions or a batch token instead of a service token)
 class VaultService implements SimpleRestServiceSupport {
-    // final class variables used for authentication
     private final String vault_url
     private final TokenCredential credential
 
@@ -202,32 +208,48 @@ class VaultService implements SimpleRestServiceSupport {
 
     /**
       Returns a Map of key-value pairs compatible with bash environment
-      variables.
+      variables.  The key and value returned in the Map will always be type String.
 
       TODO better java doc
       */
-    Map getEnvironmentSecret(String path, Integer version = 0) {
+    Map getEnvironmentSecret(String path, Integer version = 0, Boolean allowInvalidKeys = false) {
         getSecret(path, version).findAll { k, v ->
             k in String &&
-            k ==~ '^[a-zA-Z0-9_]+$' && (
+            (k ==~ '^[a-zA-Z0-9_]+$' || allowInvalidKeys) && (
                 v in String ||
                 v in Boolean ||
                 v in Number
             )
-        }
+        }.collect { k, v ->
+            [(k): v.toString()]
+        }.sum() ?: [:]
     }
 
     /**
       Returns a Map of key-value pairs compatible with bash environment
       variables.  Given a list of paths, they'll be combined with the end of
       the list taking precedence over the beginning of  the list.  When
-      combining the Maps, last Key-Value pair wins.
+      combining the Maps, the last Key-Value pair wins when key names conflict.
+
+      @param paths            A List of paths to search Vault for Maps.  Maps
+                              are eventually combined.
+      @param allowInvalidKeys Includes keys which have invalid bash variable
+                              names.  This might be useful for additional logic
+                              processing.
+      @return Returns a Map which is the sum of all of the keys provided.
 
       TODO better java doc
       */
-    Map getEnvironmentSecrets(List paths) {
+    Map getEnvironmentSecrets(List paths, Boolean allowInvalidKeys = false) {
         paths.collect { String path ->
-            getEnvironmentSecret(path)
+            try {
+                getEnvironmentSecret(path, 0, allowInvalidKeys)
+            } catch(FileNotFoundException e) {
+                [:]
+            }
         }.sum()
     }
+
+    // TODO implement DELETE key
+    // TODO implement recursive DELETE path
 }
