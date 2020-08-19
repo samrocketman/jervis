@@ -15,6 +15,7 @@
    */
 package net.gleske.jervis.remotes.interfaces
 
+// TODO add java doc
 interface VaultRoleIdCredential extends JervisCredential {
     String getRole_id()
     String getSecret_id()

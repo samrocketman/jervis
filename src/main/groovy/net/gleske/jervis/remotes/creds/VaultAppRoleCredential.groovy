@@ -21,6 +21,7 @@ import java.time.Instant
 import net.gleske.jervis.remotes.SimpleRestServiceSupport
 import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
 
+// TODO add java doc
 class VaultAppRoleCredential implements ReadonlyTokenCredential, SimpleRestServiceSupport {
     // values specific to token instance
     private final String vault_url
