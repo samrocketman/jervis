@@ -46,9 +46,11 @@ repositories {
 }
 dependencies {
     //compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    compile "org.codehaus.groovy:groovy:${groovyVersion}"
-    compile "org.codehaus.groovy:groovy-templates:${groovyVersion}"
+    compile "org.codehaus.groovy:groovy-ant:${groovyVersion}"
+    compile "org.codehaus.groovy:groovy-groovydoc:${groovyVersion}"
     compile "org.codehaus.groovy:groovy-json:${groovyVersion}"
+    compile "org.codehaus.groovy:groovy-templates:${groovyVersion}"
+    compile "org.codehaus.groovy:groovy:${groovyVersion}"
     compile 'org.bouncycastle:bcpkix-jdk15on:1.60'
     compile "org.yaml:snakeyaml:${snakeYamlVersion}"
     testCompile 'junit:junit:4.12'
