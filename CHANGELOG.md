@@ -11,6 +11,25 @@ full change log see the commit log.
   method.  `variables` are now supported as a Map in addition to a String.  The
   Map will be automatically converted to a String before being sent to GitHub as
   a query.
+- [HashiCorp Vault][vault.io] support classes available.  This will eventually
+  lead to better native pipeline integration with Vault.
+  - [`VaultService`][VaultService] class provides an easy to use communication
+    class to KV Secrets Engine v1 and v2.  AppRole authentication is recommended
+    but any [`TokenCredential`][TokenCredential] type can be used.
+  - AppRole authentication provided by
+    [`VaultAppRoleCredential`][VaultAppRoleCredential].  It automatically renews
+    leases and rotates credentials as leases run out.  By default AppRole
+    `role_id` and `secret_id` are resolved from
+    [`VaultRoleIdCredentialImpl`][VaultRoleIdCredentialImpl], but custom
+    credential resolver can be implented on
+    [`VaultRoleIdCredential`][VaultRoleIdCredential] interface.
+
+[TokenCredential]: src/main/groovy/net/gleske/jervis/remotes/interfaces/TokenCredential.groovy
+[VaultAppRoleCredential]: src/main/groovy/net/gleske/jervis/remotes/creds/VaultAppRoleCredential.groovy
+[VaultRoleIdCredentialImpl]: src/main/groovy/net/gleske/jervis/remotes/creds/VaultRoleIdCredentialImpl.groovy
+[VaultRoleIdCredential]: src/main/groovy/net/gleske/jervis/remotes/interfaces/VaultRoleIdCredential.groovy
+[VaultService]: src/main/groovy/net/gleske/jervis/remotes/VaultService.groovy
+[vault.io]: https://www.vaultproject.io/
 
 # jervis 1.7 - Apr 14th, 2020
 
@@ -18,9 +37,10 @@ full change log see the commit log.
 
 - Bugfix: Additional toolchains loaded into a matrix build did not properly
   matrix.  This bug has been fixed and tests added to avoid it.
-- Bump snakeyaml to 1.26 to protect against billion laughs style attacks.
-- Use SafeConstructor when parsing YAML to prevent remote code execution.  See
-  [Documentation][safeconst] and [Java Doc][safeconst-java].
+- Security: Bump snakeyaml to 1.26 to protect against billion laughs style
+  attacks.
+- Security: Use SafeConstructor when parsing YAML to prevent remote code
+  execution.  See [Documentation][safeconst] and [Java Doc][safeconst-java].
 
 ### Breaking Job DSL changes
 
