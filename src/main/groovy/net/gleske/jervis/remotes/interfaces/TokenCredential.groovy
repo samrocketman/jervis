@@ -40,7 +40,7 @@ def creds = new MyCredential()
 
 println "TokenCredential instance? ${creds instanceof TokenCredential}"
 println "Secret token: ${creds.token}"
-creds.setToken( 'foo')
+creds.setToken('foo')
 println creds.getToken()</tt></pre><br>
  */
 interface TokenCredential extends JervisCredential {

@@ -60,8 +60,34 @@ import net.gleske.jervis.remotes.interfaces.VaultCredential
   <p>The recommended way to authenticate with Vault is to use AppRole
   authentication.  Token-based authentication is possible but not recommended.
   This section will discuss both AppRole and Token-based authentication.</p>
+
   <h4>AppRole Authentication</h4>
+<pre><tt>import net.gleske.jervis.remotes.creds.VaultAppRoleCredential
+import net.gleske.jervis.remotes.VaultService
+
+VaultAppRoleCredential creds = new VaultAppRoleCredential('http://active.vault.service.consul:8200/', 'app-roll-id', 'secret-id')
+VaultService vault = new VaultService(creds)
+
+// read a secret
+vault.getSecret('path/to/secret')
+</tt></pre>
+
   <h4>Token Authentication</h4>
+  <p>Authenticating with Vault using a Token is pretty basic.  There's no
+  built-in support in this library because in general there's no need for it.
+  Instead, the recommended method for authentication is AppRole.   However, if
+  you must use a Vault Token, then this example describes a basic method.  This
+  example uses a basic static token and will not automatically renew the token
+  like AppRole support.</p>
+<pre><tt>import net.gleske.jervis.remotes.interfaces.TokenCredential
+import net.gleske.jervis.remotes.VaultService
+
+// 's.fuFc...' is a vault token in this example
+TokenCredential creds = [getToken: {-> 's.fuFc...' }] as TokenCredential
+VaultService vault = new VaultService('http://active.vault.service.consul:8200/', creds)
+
+// get a secret using the basic Vault Token
+vault.getSecret('path/to/secret')</tt></pre>
   */
 class VaultService implements SimpleRestServiceSupport {
     private final String vault_url
@@ -80,11 +106,12 @@ class VaultService implements SimpleRestServiceSupport {
       <p>If you choose not to manually set the mount version, then you'll need
       the following
       <a href="https://www.vaultproject.io/docs/concepts/policies#policy-syntax" target="_blank">Vault policy ACL</a>.</p>
-<pre><tt>path "sys/mounts/+/tune" {
+<pre><tt># Read mount config to detect KV secrets engine version
+path "sys/mounts/+/tune" {
     capabilities = ["read"]
 }</tt></pre>
 
-      <h4>Manually setting mount version</h4>
+      <h5>Manually setting mount version</h5>
 
       <p>Recommendation: manually setting the mount version avoids making an
       API call to read the mount configuration.  If the application using this
@@ -95,16 +122,25 @@ class VaultService implements SimpleRestServiceSupport {
       <p>The default mount points for KV secrets engines are the following.</p>
 
       <ul>
-        <li><tt>secret/</tt> for KV v1.</li>
-        <li><tt>kv/</tt> for KV v2.</li>
+        <li style="list-style: circle outside none"><tt>secret/</tt> for KV v1.</li>
+        <li style="list-style: circle outside none"><tt>kv/</tt> for KV v2.</li>
       </ul>
 
-      <h6>Code Example</h6>
+      <h5>Code Example</h5>
 <pre><tt>import net.gleske.jervis.remotes.VaultService
 import net.gleske.jervis.remotes.creds.VaultAppRoleCredential
 
 VaultAppRoleCredential cred = new VaultAppRoleCredential('http://active.vault.service.consul:8200/', 'app-id', 'secret-id')
-VaultService vault = new VaultService(cred)</tt></pre>
+VaultService vault = new VaultService(cred)
+
+// add a single entry to mountVersions for secret being KV v1
+vault.setMountVersions('secret', '1')
+vault.setMountVersions('kv', '2')
+
+// alternately
+Map versions = [secret: '1', kv: '2']
+vault.setMountVersions(versions)
+vault.mountVersions = versions</tt></pre>
       */
     Map mountVersions = [:]
 
