@@ -15,8 +15,9 @@
    */
 package net.gleske.jervis.remotes
 
-import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.exceptions.JervisException
+import net.gleske.jervis.remotes.interfaces.TokenCredential
+import net.gleske.jervis.remotes.interfaces.VaultCredential
 
 // TODO: java doc
     // TODO document recommended setup and usage (setting up recommended
@@ -26,11 +27,85 @@ import net.gleske.jervis.exceptions.JervisException
     // TODO document minimum required role for full functionality
     // TODO document reducing the role and code changes required (e.g. using
     //   mountVersions or a batch token instead of a service token)
+/**
+  Provides easy access to HashiCorp Vault Key-Value secrets engine.  Both KV v1
+  and KV v2 secrets engines are supported.
+
+  <h2>Recommended setup and usage</h2>
+  <ul>
+    <li>
+      Use <a href="https://www.vaultproject.io/docs/auth/approle" target="_blank">AppRole</a>
+      for authenticating. This library provides easy integration via automatic
+      token renewal and token management transparent to the user.  This is done
+      when using the <tt>{@link net.gleske.jervis.remotes.creds.VaultAppRoleCredential}</tt>
+      for authenticating.
+    </li>
+    <li>
+      Use short lived <a href="https://learn.hashicorp.com/tutorials/vault/tokens" target="_blank"><tt>batch</tt> tokens</a>
+      with a 60s TTL.  When following recommended classes token re-issue and
+      TTL monitoring will be handled automatically.
+    </li>
+    <li>
+        Manually set <tt>{@link #mountVersions}</tt> so that API calls are
+        reduced when copying secrets between Key-Value mounts.  Otherwise, your
+        role will need to grant read permissions to the mount tune in order to
+        detect if it is KV v1 or KV v2 secrets engine.
+    </li>
+    <li>
+      Limit the role granted to the AppRole <tt>role_id</tt> to only the permissions necessary.
+    </li>
+  </ul>
+
+  <h2>Authenticating with Vault</h2>
+  <p>The recommended way to authenticate with Vault is to use AppRole
+  authentication.  Token-based authentication is possible but not recommended.
+  This section will discuss both AppRole and Token-based authentication.</p>
+  <h4>AppRole Authentication</h4>
+  <h4>Token Authentication</h4>
+  */
 class VaultService implements SimpleRestServiceSupport {
     private final String vault_url
     private final TokenCredential credential
 
     // TODO: java doc
+    /**
+      This property tracks whether a mount is KV v1 or KV v2 secrets engine.
+      This only gets discovered once by API and does not change during the
+      lifetime of the object.  If a version is not manually set, then the mount
+      version is detected by calling
+      <a href="https://www.vaultproject.io/api-docs/system/mounts#read-mount-configuration" target="_blank"><tt>/sys/mounts/:path/tune</tt> API</a>
+      where <tt>:path</tt> is the name of the mount used for the KV secrets
+      engine.
+
+      <p>If you choose not to manually set the mount version, then you'll need
+      the following
+      <a href="https://www.vaultproject.io/docs/concepts/policies#policy-syntax" target="_blank">Vault policy ACL</a>.</p>
+<pre><tt>path "sys/mounts/+/tune" {
+    capabilities = ["read"]
+}</tt></pre>
+
+      <h4>Manually setting mount version</h4>
+
+      <p>Recommendation: manually setting the mount version avoids making an
+      API call to read the mount configuration.  If the application using this
+      library creates several instances of <tt>VaultService</tt>, then manually
+      setting the KV engine version will significantly save on API calls to
+      Vault.</p>
+
+      <p>The default mount points for KV secrets engines are the following.</p>
+
+      <ul>
+        <li><tt>secret/</tt> for KV v1.</li>
+        <li><tt>kv/</tt> for KV v2.</li>
+      </ul>
+
+      <h6>Code Example</h6>
+<pre><tt>import net.gleske.jervis.remotes.VaultService
+import net.gleske.jervis.remotes.creds.VaultAppRoleCredential
+
+VaultAppRoleCredential cred = new VaultAppRoleCredential('http://active.vault.service.consul:8200/', 'app-id', 'secret-id')
+VaultService vault = new VaultService(cred)</tt></pre>
+      */
     Map mountVersions = [:]
 
     VaultService(String vault_url, TokenCredential credential) {
@@ -39,6 +114,9 @@ class VaultService implements SimpleRestServiceSupport {
             this.vault_url += 'v1/'
         }
         this.credential = credential
+    }
+    VaultService(VaultCredential credential) {
+        this(credential.vault_url, credential)
     }
 
     // TODO: java doc
@@ -255,4 +333,6 @@ class VaultService implements SimpleRestServiceSupport {
     // TODO implement combining path of keys into a List of Maps?  This might not be useful.
     // TODO organize private methods to bottom of class
     // TODO add Vault exception higherarchy?
+    // TODO getSecretsAsList should return a combined list matching the order of the input keys.
+    // TODO getSecretsAsMap should return a Key-Value Map where the key is the secret key and value is contents of the secret.
 }

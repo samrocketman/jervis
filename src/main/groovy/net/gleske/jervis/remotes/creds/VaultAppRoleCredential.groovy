@@ -19,10 +19,11 @@ import groovy.json.JsonBuilder
 import java.io.IOException
 import java.time.Instant
 import net.gleske.jervis.remotes.SimpleRestServiceSupport
+import net.gleske.jervis.remotes.interfaces.VaultCredential
 import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
 
 // TODO add java doc
-class VaultAppRoleCredential implements ReadonlyTokenCredential, SimpleRestServiceSupport {
+class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential, SimpleRestServiceSupport {
     // values specific to token instance
     private final String vault_url
     private final VaultRoleIdCredential credential
@@ -33,6 +34,11 @@ class VaultAppRoleCredential implements ReadonlyTokenCredential, SimpleRestServi
     private String token_type
     private Boolean renewable = false
     private Instant leaseCreated
+
+
+    String getVault_url() {
+        this.vault_url
+    }
 
     String baseUrl() {
         this.vault_url
