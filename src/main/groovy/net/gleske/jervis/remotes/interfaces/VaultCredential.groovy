@@ -46,7 +46,7 @@ println vault.getSecret('path/to/secret')</tt></pre><br>
   */
 interface VaultCredential extends TokenCredential {
     /**
-      When i mplemented, this method should return a String that is the URL to
+      When implemented, this method should return a String that is the URL to
       a HashiCorp Vault instance API endpoint.
       */
     String getVault_url();
