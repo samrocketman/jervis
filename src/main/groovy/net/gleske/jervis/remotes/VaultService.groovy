@@ -28,8 +28,10 @@ import net.gleske.jervis.remotes.interfaces.VaultCredential
     // TODO document reducing the role and code changes required (e.g. using
     //   mountVersions or a batch token instead of a service token)
 /**
-  Provides easy access to HashiCorp Vault Key-Value secrets engine.  Both KV v1
-  and KV v2 secrets engines are supported.
+  Provides easy access to
+  <a href="https://www.vaultproject.io/" target="_blank">HashiCorp Vault</a>
+  Key-Value secrets engine.  Both KV v1 and KV v2 secrets engines are
+  supported.
 
   <h2>Recommended setup and usage</h2>
   <ul>
@@ -152,7 +154,6 @@ class VaultService implements SimpleRestServiceSupport {
         setMountVersions(mount, apiFetch("sys/mounts/${mount}/tune")?.options?.version)
     }
 
-    // TODO: java doc
     /**
       This property tracks whether a mount is KV v1 or KV v2 secrets engine.
       This only gets discovered once by API and does not change during the
@@ -214,21 +215,40 @@ vault.mountVersions = versions</tt></pre>
         this(credential.vault_url, credential)
     }
 
-    // TODO: java doc
+    /**
+      Resolves the API base URL to be used by
+      <tt>{@link net.gleske.jervis.remotes.SimpleRestService#apiFetch(java.net.URL, java.util.Map, java.lang.String, java.lang.String)}</tt>.
+      <tt>SimpleRestService.apiFetch</tt> is used internally for
+      <tt>VaultService</tt> communication.
+
+      @return A base API URL for a Vault instance for the <tt>SimpleRestService</tt> support class.
+      */
     String baseUrl() {
         this.vault_url
     }
 
-    // TODO: java doc
+    /**
+      Resolves the API base URL to be used by
+      <tt>{@link net.gleske.jervis.remotes.SimpleRestService#apiFetch(java.net.URL, java.util.Map, java.lang.String, java.lang.String)}</tt>.
+      <tt>SimpleRestService.apiFetch</tt> is used internally for
+      <tt>VaultService</tt> communication.
+
+      @return Authentication headers for the <tt>SimpleRestService</tt> support class.
+      */
     Map header(Map headers = [:]) {
         headers['X-Vault-Token'] = credential.getToken()
         headers
     }
 
     /**
-       Get secret from a KV v1 or v2 secret engine.
+       Get secret from a KV v1 or v2 secret engine.  Regardless of the version
+       of the KV secret engine this method will work for both.
 
-       TODO better java doc
+       @param path    A path to a secret JSON object to read from Vault.
+       @param version Returns a specific version of a secret.  If <tt>0</tt>,
+                      then the latest version is returned.  This option is
+                      ignored for KV v1 secrets engine.
+       @return JSON object content from a secret <tt>path</tt>.
       */
     Map getSecret(String path, Integer version = 0) {
         String mount = path -~ '/.*$'
