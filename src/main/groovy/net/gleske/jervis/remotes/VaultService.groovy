@@ -132,8 +132,7 @@ class VaultService implements SimpleRestServiceSupport {
       Checks version of a Key-Value engine mount.
 
       @param mount A Vault secrets engine mount point.
-      @return Returns <tt>true</tt> if Key-Value v2 or <tt>false</tt> if
-              Key-Value v2.
+      @return <tt>true</tt> if Key-Value v2 or <tt>false</tt> if Key-Value v1.
       */
     private Boolean isKeyValueV2(String mount) {
         discoverMountVersion(mount)
@@ -202,7 +201,7 @@ Map versions = [secret: '1', kv: '2']
 vault.setMountVersions(versions)
 vault.mountVersions = versions</tt></pre>
       */
-    Map mountVersions = [:]
+    Map<String, String> mountVersions = [:]
 
     VaultService(String vault_url, TokenCredential credential) {
         this.vault_url = addTrailingSlash(vault_url)
@@ -228,7 +227,7 @@ vault.mountVersions = versions</tt></pre>
     }
 
     /**
-      Resolves the API base URL to be used by
+      Resolves authentication headers to be used by
       <tt>{@link net.gleske.jervis.remotes.SimpleRestService#apiFetch(java.net.URL, java.util.Map, java.lang.String, java.lang.String)}</tt>.
       <tt>SimpleRestService.apiFetch</tt> is used internally for
       <tt>VaultService</tt> communication.
@@ -241,14 +240,16 @@ vault.mountVersions = versions</tt></pre>
     }
 
     /**
-       Get secret from a KV v1 or v2 secret engine.  Regardless of the version
-       of the KV secret engine this method will work for both.
+       Get secret from a KV v1 or KV v2 secret engine.  This method will
+       gracefully handle either KV v1 or KV v2.
 
        @param path    A path to a secret JSON object to read from Vault.
-       @param version Returns a specific version of a secret.  If <tt>0</tt>,
+       @param version Request a specific version of a secret.  If <tt>0</tt>,
                       then the latest version is returned.  This option is
                       ignored for KV v1 secrets engine.
-       @return JSON object content from a secret <tt>path</tt>.
+       @return Parsed JSON object content from a secret <tt>path</tt>.  If KV
+               v2 secrets engine and <tt>version</tt> was customized, then the
+               secret at that version is returned (if it exists).
       */
     Map getSecret(String path, Integer version = 0) {
         String mount = path -~ '/.*$'
@@ -261,7 +262,19 @@ vault.mountVersions = versions</tt></pre>
         }
     }
 
-    // TODO: java doc
+    /**
+      Writes a secret to Vault KV v1 or KV v2 secrets engine.  This method will
+      gracefully handle either KV v1 or KV v2.  It is recommend to set
+      <tt>enableCas=true</tt> when writing to Vault, because it will only write
+      if the destination <tt>path</tt> is in an expected state.
+
+      @param path      The destination to write the <tt>secret</tt>.
+      @param secret    A Map converted to a JSON Object written to the Vault
+                       <tt>path</tt>.
+      @param enableCas If enabled, a
+                       <a href="https://learn.hashicorp.com/tutorials/vault/versioned-kv#step-8-check-and-set-operations" target="_blank">Check-and-Set operation</a>
+                       is performed when writing to Vault.
+      */
     void setSecret(String path, Map secret, Boolean enableCas = false) {
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
@@ -284,16 +297,30 @@ vault.mountVersions = versions</tt></pre>
         }
     }
 
-    // TODO: java doc
-    void setMountVersions(String mount, def version) {
+    /**
+      Forces a specified secrets engine <tt>mount</tt> to be KV v1 or KV v2.
+      See <tt>{@link #mountVersions}</tt> for additional usage.
+
+      @param mount   A Vault secrets engine mount.
+      @param version Must be <tt>"1"</tt> or <tt>"2"</tt> to denote KV v1 or KV
+                     v2 secrets engine.  Any type is allowed to catch invalid
+                     version setting.
+      */
+    void setMountVersions(String mount, String version) {
         if(!(version in ['1', '2'])) {
             throw new JervisException('Error: Vault key-value mounts can only be version "1" or "2" (String).')
         }
         this.mountVersions[mount] = version
     }
 
-    // TODO: java doc
-    void setMountVersions(Map mountVersions) {
+    /**
+      Forces a specified secrets engine mount to be KV v1 or KV v2.  See
+      <tt>{@link #mountVersions}</tt> for additional usage.
+
+      @param mountVersions A Key-Value map containing multiple Vault mounts and
+                           respective version numbers.
+      */
+    void setMountVersions(Map<String, String> mountVersions) {
         mountVersions.each { k, v ->
             this.setMountVersions(k, v)
         }
@@ -395,7 +422,11 @@ vault.mountVersions = versions</tt></pre>
     }
 
     // TODO implement DELETE key
-    // TODO implement recursive DELETE path
+    /* TODO implement recursive DELETE path
+           Reverse sort showing deepest depth keys first in the list
+           ['a', 'a/b/c', 'a/b', 'a/b/c/d'].sort { a, b -> b.count('/') <=> a.count('/') }
+           returns ['a/b/c/d', 'a/b/c', 'a/b', 'a']
+     */
     // TODO implement combining path of keys into a List of Maps?  This might not be useful.
     // TODO organize private methods to bottom of class
     // TODO add Vault exception higherarchy?
