@@ -93,6 +93,65 @@ class VaultService implements SimpleRestServiceSupport {
     private final String vault_url
     private final TokenCredential credential
 
+    /**
+      Internal method used by
+      <tt>{@link #findAllKeys(java.lang.String, java.lang.Integer)}</tt>
+      which tracks recursion level in addition to the user-passed settings.
+
+      @param path         A path to recursively search.
+      @param desiredLevel A recursive depth level to avoid going beyond to
+                          limit recursion.
+      @param level        Tracks the current recursive depth level used to
+                          compare against desiredLevel.
+      @return A list of keys that are paths.
+      */
+    private List<String> recursiveFindAllKeys(String path, Integer desiredLevel, Integer level) {
+        if(desiredLevel > 0 && level > desiredLevel) {
+            return []
+        }
+        List entries = listPath(path).collect { String key ->
+            if(key.endsWith('/')) {
+                recursiveFindAllKeys(path + key, desiredLevel, level + 1)
+            }
+            else {
+                [path + key]
+            }
+        }
+
+        if(entries) {
+            entries.sum()
+        }
+        else {
+            []
+        }
+    }
+
+    /**
+      Checks version of a Key-Value engine mount.
+
+      @param mount A Vault secrets engine mount point.
+      @return Returns <tt>true</tt> if Key-Value v2 or <tt>false</tt> if
+              Key-Value v2.
+      */
+    private Boolean isKeyValueV2(String mount) {
+        discoverMountVersion(mount)
+        this.mountVersions[mount] == '2'
+    }
+
+    /**
+      If the mount is not already in mountVersions, then this will inspect the
+      mount and set whether the mount is a Key-Value secret engine v1 or v2.
+
+      @param mount A Vault secrets engine mount point.  The tune API is called
+                   to discover the KV secrets engine version
+      */
+    private void discoverMountVersion(String mount) {
+        if(mount in this.mountVersions) {
+            return
+        }
+        setMountVersions(mount, apiFetch("sys/mounts/${mount}/tune")?.options?.version)
+    }
+
     // TODO: java doc
     /**
       This property tracks whether a mount is KV v1 or KV v2 secrets engine.
@@ -220,29 +279,6 @@ vault.mountVersions = versions</tt></pre>
         }
     }
 
-    /**
-      Checks version of a Key-Value engine mount.  Returns true if Key-Value v2
-      or false if Key-Value v2.
-       TODO better java doc
-      */
-    private Boolean isKeyValueV2(String mount) {
-        discoverMountVersion(mount)
-        this.mountVersions[mount] == '2'
-    }
-
-    /**
-      If the mount is not already in mountVersions, then this will inspect the
-      mount and set whether the mount is a Key-Value secret engine v1 or v2.
-
-      TODO better java doc
-      */
-    private void discoverMountVersion(String mount) {
-        if(mount in this.mountVersions) {
-            return
-        }
-        setMountVersions(mount, apiFetch("sys/mounts/${mount}/tune")?.options?.version)
-    }
-
     // TODO: java doc
     List listPath(String path) {
         String mount = path -~ '/.*$'
@@ -259,39 +295,12 @@ vault.mountVersions = versions</tt></pre>
     }
 
     /**
-      Internal method used by findAllKeys() which tracks recursion level in
-      addition to the user-passed settings.
-
-      TODO better java doc
-      */
-    private List recursiveFindAllKeys(String path, Integer desiredLevel, Integer level) {
-        if(desiredLevel > 0 && level > desiredLevel) {
-            return []
-        }
-        List entries = listPath(path).collect { String key ->
-            if(key.endsWith('/')) {
-                recursiveFindAllKeys(path + key, desiredLevel, level + 1)
-            }
-            else {
-                [path + key]
-            }
-        }
-
-        if(entries) {
-            entries.sum()
-        }
-        else {
-            []
-        }
-    }
-
-    /**
       Recursively traverses the path for subkeys.  If level is 0 then there's
       no depth limit.  When level = n, keys are traversed up to the limit.
 
       TODO better java doc
       */
-    List findAllKeys(String path, Integer level = 0) {
+    List<String> findAllKeys(String path, Integer level = 0) {
         recursiveFindAllKeys(path, level, 1)
     }
 
@@ -322,11 +331,12 @@ vault.mountVersions = versions</tt></pre>
 
     /**
       Returns a Map of key-value pairs compatible with bash environment
-      variables.  The key and value returned in the Map will always be type String.
+      variables.  The key and value returned in the Map will always be type
+      String.
 
       TODO better java doc
       */
-    Map getEnvironmentSecret(String path, Integer version = 0, Boolean allowInvalidKeys = false) {
+    Map<String, String> getEnvironmentSecret(String path, Integer version = 0, Boolean allowInvalidKeys = false) {
         getSecret(path, version).findAll { k, v ->
             k in String &&
             (k ==~ '^[a-zA-Z0-9_]+$' || allowInvalidKeys) && (
@@ -354,7 +364,7 @@ vault.mountVersions = versions</tt></pre>
 
       TODO better java doc
       */
-    Map getEnvironmentSecrets(List paths, Boolean allowInvalidKeys = false) {
+    Map<String, String> getEnvironmentSecrets(List paths, Boolean allowInvalidKeys = false) {
         paths.collect { String path ->
             try {
                 getEnvironmentSecret(path, 0, allowInvalidKeys)
