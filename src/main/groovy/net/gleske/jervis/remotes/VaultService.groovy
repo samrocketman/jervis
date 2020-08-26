@@ -203,6 +203,12 @@ vault.mountVersions = versions</tt></pre>
       */
     Map<String, String> mountVersions = [:]
 
+    /**
+      Customizable HTTP headers which get sent to Vault in addition to
+      authentication headers.
+      */
+    Map<String, String> headers = [:]
+
     VaultService(String vault_url, TokenCredential credential) {
         this.vault_url = addTrailingSlash(vault_url)
         if(!this.vault_url.endsWith('v1/')) {
@@ -235,8 +241,11 @@ vault.mountVersions = versions</tt></pre>
       @return Authentication headers for the <tt>SimpleRestService</tt> support class.
       */
     Map header(Map headers = [:]) {
-        headers['X-Vault-Token'] = credential.getToken()
-        headers
+        Map tempHeaders = this.headers + headers
+        tempHeaders['X-Vault-Token'] = credential.getToken()
+        // https://www.vaultproject.io/api-docs#the-x-vault-request-header
+        tempHeaders['X-Vault-Request'] = "true"
+        tempHeaders
     }
 
     /**
