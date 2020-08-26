@@ -19,6 +19,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import net.gleske.jervis.remotes.interfaces.TokenCredential
+import net.gleske.jervis.remotes.interfaces.VaultCredential
 import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 
 class VaultServiceTest extends GroovyTestCase {
@@ -38,6 +39,28 @@ class VaultServiceTest extends GroovyTestCase {
         myvault = null
         request_meta = [:]
         super.tearDown()
+    }
+    @Test public void test_VaultService_newInstance_and_baseUrl() {
+        TokenCredential cred = [getToken: {-> 'fake-token' }] as TokenCredential
+        List urls = [
+            'http://active.vault.service.consul:8200',
+            'http://active.vault.service.consul:8200/',
+            'http://active.vault.service.consul:8200/v1',
+            'http://active.vault.service.consul:8200/v1/'
+        ]
+        urls.each { String vault_url ->
+            myvault = new VaultService(vault_url, cred)
+            assert myvault.baseUrl() == 'http://active.vault.service.consul:8200/v1/'
+            assert myvault.credential instanceof TokenCredential
+            assert myvault.header() == ['X-Vault-Token': 'fake-token', 'X-Vault-Request': 'true']
+        }
+        urls.each { String vault_url ->
+            VaultCredential vault_cred = [getVault_url: {-> vault_url }, getToken: {-> 'fake-token2' }] as VaultCredential
+            myvault = new VaultService(vault_cred)
+            assert myvault.baseUrl() == 'http://active.vault.service.consul:8200/v1/'
+            assert myvault.credential instanceof VaultCredential
+            assert myvault.header() == ['X-Vault-Token': 'fake-token2', 'X-Vault-Request': 'true']
+        }
     }
     @Test public void test_VaultService_headers() {
         assert myvault.headers == [:]
