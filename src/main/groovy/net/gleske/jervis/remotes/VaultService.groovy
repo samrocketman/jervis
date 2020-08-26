@@ -421,6 +421,60 @@ vault.mountVersions = versions</tt></pre>
         }.sum()
     }
 
+    /**
+      Deletes data from a KV v1 or KV v2 secrets engine.
+      @param key
+      @param destroyVersions
+      @param destroyAllVersions Permanently deletes the key metadata and all
+                                version data for the specified <tt>key</tt>.
+                                When enabled, <tt>destroyVersions</tt> is
+                                ignored.  This option is ignored for KV v1
+                                secrets engine.
+      */
+    /* TODO work in progress
+    void deleteKey(String key, List<Integer> destroyVersions = [], Boolean destroyAllVersions = false) {
+        String mount = path -~ '/.*$'
+        String subpath = path -~ '^[^/]+/'
+        if(isKeyValueV2(mount)) {
+            if(destroyAllVersions) {
+                apiFetch("${mount}/metadata/${subpath}", [:], 'DELETE')
+            }
+            else if(destroyVersions) {
+                apiFetch("${mount}/destroy/${subpath}", [:], 'DELETE', objToJson([versions: destroyVersions]))
+            }
+            else {
+                // soft delete
+                apiFetch("${mount}/data/${subpath}", [:], 'DELETE')
+            }
+        }
+        else {
+            apiFetch(path, [:], 'DELETE')
+        }
+    }
+    */
+
+    /**
+      Deletes data from a KV v1 or KV v2 secrets engine.
+      @param path
+      @param level
+      @param destroyAllVersions Permanently deletes the key metadata and all
+                                version data for the specified <tt>key</tt>.
+                                When enabled, <tt>destroyVersions</tt> is
+                                ignored.  This option is ignored for KV v1
+                                secrets engine.
+      */
+    /* TODO work in progress
+    void deletePath(String path, Boolean level = 0, Boolean destroyAllVersions = false) {
+        findAllKeys(path, level).sort { String a, String b ->
+            // performs a reverse sort to list maximum depth at the beginning
+            // of the list.  Depth is defined as the number of '/' in the path.
+            b.count('/') <=> a.count('/')
+        }.each { String key ->
+            deleteKey(key)
+        }
+    }
+    */
+
     // TODO implement DELETE key
     /* TODO implement recursive DELETE path
            Reverse sort showing deepest depth keys first in the list
