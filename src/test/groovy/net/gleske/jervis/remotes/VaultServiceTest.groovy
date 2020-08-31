@@ -72,4 +72,17 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.headers == ['X-Vault-Token': 'hacked', 'X-Vault-Request': 'false']
         assert myvault.header() == ['X-Vault-Token': 'fake-token', 'X-Vault-Request': 'true']
     }
+    @Test public void test_VaultService_getSecret_kv_v1() {
+        assert myvault.getSecret('secret/foo') == [test: 'data']
+        assert myvault.getSecret('secret/foo/bar') == [someother: 'data']
+        assert myvault.getSecret('secret/foo/bar/baz') == [more: 'secrets']
+    }
+    @Test public void test_VaultService_getSecret_kv_v2() {
+        assert myvault.getSecret('kv/foo') == [another: 'secret', hello: 'world']
+        assert myvault.getSecret('kv/foo/bar') == [hello: 'friend']
+        assert myvault.getSecret('kv/foo/bar/baz') == [foo: 'bar']
+    }
+    @Test public void test_VaultService_getSecret_kv_v2_older_version_1() {
+        assert myvault.getSecret('kv/foo', 1) == [hello: 'world']
+    }
 }
