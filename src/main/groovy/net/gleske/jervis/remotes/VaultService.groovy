@@ -39,8 +39,8 @@ import net.gleske.jervis.remotes.interfaces.VaultCredential
   <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
   with the classpath set up.  Additionally, you'll need to clone and setup a
   <a href="https://github.com/samrocketman/docker-compose-ha-consul-vault-ui" target="_blank">local Vault cluster</a>.
-  After you instantiate the Vault cluster you'll need to run the following
-  Shell commands relative to the root of the repository at
+  After you instantiate the local Vault cluster you'll need to run the
+  following Shell commands relative to the root of the repository at
   <tt>~/git/github/docker-compose-ha-consul-vault-ui</tt>.</p>
 <pre><tt># Enable secrets engines KV v1 and KV v2
 ./scripts/curl-api.sh --request POST --data '{"type": "kv", "options": {"version": "1"}}' http://active.vault.service.consul:8200/v1/sys/mounts/secret
@@ -69,10 +69,9 @@ vault.setSecret("kv/foo/bar/baz", ['foo':'bar'])
 vault.setSecret("secret/foo", ['test':'data'])
 vault.setSecret("secret/foo/bar", ['someother':'data'])
 vault.setSecret("secret/foo/bar/baz", ['more':'secrets'])</tt></pre>
-  <p><b>Please note:</b> If you're practicing against the Vault cluster, then
-  your Groovy console requires the following lines of code at the top of the
-  Groovy script so that it uses the SOCKS proxy provided by the test
-  cluster.</p>
+  <p><b>Please note:</b> If you're practicing against the local Vault cluster,
+  then your Groovy Console requires the following lines of code at the top of
+  the Groovy script.  It uses the SOCKS proxy provided by the test cluster.</p>
 <pre><tt>System.setProperty("socksProxyHost", "localhost")
 System.setProperty("socksProxyPort", "1080")</tt></pre>
 
