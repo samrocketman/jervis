@@ -63,7 +63,7 @@ class VaultServiceTest extends GroovyTestCase {
             assert myvault.header() == ['X-Vault-Token': 'fake-token2', 'X-Vault-Request': 'true']
         }
     }
-    @Test public void test_VaultService_headers() {
+    @Test public void test_VaultService_headers_and_header_method() {
         assert myvault.headers == [:]
         assert myvault.header() == ['X-Vault-Token': 'fake-token', 'X-Vault-Request': 'true']
         myvault.headers = [foo: 'bar']
@@ -85,5 +85,21 @@ class VaultServiceTest extends GroovyTestCase {
     }
     @Test public void test_VaultService_getSecret_kv_v2_older_version_1() {
         assert myvault.getSecret('kv/foo', 1) == [hello: 'world']
+    }
+    @Test public void test_VaultService_discover_mount_versions() {
+        assert myvault.mountVersions == [:]
+        myvault.getSecret('secret/foo')
+        myvault.getSecret('kv/foo')
+        assert myvault.mountVersions == [kv: '2', secret: '1']
+    }
+    @Test public void test_VaultService_discover_mount_version_v1() {
+        assert myvault.mountVersions == [:]
+        myvault.getSecret('secret/foo')
+        assert myvault.mountVersions == [secret: '1']
+    }
+    @Test public void test_VaultService_discover_mount_version_v2() {
+        assert myvault.mountVersions == [:]
+        myvault.getSecret('kv/foo')
+        assert myvault.mountVersions == [kv: '2']
     }
 }
