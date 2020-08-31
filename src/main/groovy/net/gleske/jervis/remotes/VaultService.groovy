@@ -137,6 +137,12 @@ class VaultService implements SimpleRestServiceSupport {
     private final String vault_url
     private final TokenCredential credential
 
+    private static void checkLocationMap(Map location) {
+        if(!(('mount' in location) && ('path' in location))) {
+            throw new JervisException('"mount" and "path" must be set when using setSecret.')
+        }
+    }
+
     /**
       Internal method used by
       <tt>{@link #findAllKeys(java.lang.String, java.lang.Integer)}</tt>
@@ -188,6 +194,7 @@ class VaultService implements SimpleRestServiceSupport {
       @param mount A Vault secrets engine mount point.  The tune API is called
                    to discover the KV secrets engine version
       */
+    // TODO test mounts that have a slash in its name
     private void discoverMountVersion(String mount) {
         if(mount in this.mountVersions) {
             return
@@ -292,6 +299,21 @@ vault.mountVersions = versions</tt></pre>
         tempHeaders
     }
 
+    // TODO docs
+    // TODO test alternate syntax
+    // TODO test exception throwing
+    Map getSecret(Map location, Integer version = 0) {
+        checkLocationMap(location)
+        String mount = location.mount
+        String subpath = location.path
+        if(isKeyValueV2(mount)) {
+            apiFetch("${mount}/data/${subpath}?version=${version}")?.data?.data
+        }
+        else {
+            apiFetch("${mount}/${subpath}")?.data
+        }
+    }
+
     /**
        Get secret from a KV v1 or KV v2 secret engine.  This method will
        gracefully handle either KV v1 or KV v2.
@@ -304,22 +326,17 @@ vault.mountVersions = versions</tt></pre>
                v2 secrets engine and <tt>version</tt> was customized, then the
                secret at that version is returned (if it exists).
       */
+    // TODO test getting mount with a slash in its name
     Map getSecret(String path, Integer version = 0) {
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
-        if(isKeyValueV2(mount)) {
-            apiFetch("${mount}/data/${subpath}?version=${version}")?.data?.data
-        }
-        else {
-            apiFetch(path)?.data
-        }
+        getSecret(mount: mount, path: subpath, version)
     }
 
     // TODO test mounts which contain a slash... because Vault allows that
+    // TODO test exception throwing
     void setSecret(Map location, Map secret, Boolean enableCas = false) {
-        if(!(('mount' in location) && ('path' in location))) {
-            throw new JervisException('"mount" and "path" must be set when using setSecret.')
-        }
+        checkLocationMap(location)
         String mount = location.mount
         String subpath = location.path
         if(isKeyValueV2(mount)) {
@@ -371,6 +388,7 @@ vault.mountVersions = versions</tt></pre>
                      version setting.
       */
     // TODO write tests
+    // TODO test manual mounts that have a slash in its name
     void setMountVersions(String mount, String version) {
         if(!(version in ['1', '2'])) {
             throw new JervisException('Error: Vault key-value mounts can only be version "1" or "2" (String).')
