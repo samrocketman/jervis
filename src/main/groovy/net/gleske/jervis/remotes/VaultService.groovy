@@ -286,6 +286,7 @@ vault.mountVersions = versions</tt></pre>
                        <a href="https://learn.hashicorp.com/tutorials/vault/versioned-kv#step-8-check-and-set-operations" target="_blank">Check-and-Set operation</a>
                        is performed when writing to Vault.
       */
+    // TODO write tests
     void setSecret(String path, Map secret, Boolean enableCas = false) {
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
@@ -317,6 +318,7 @@ vault.mountVersions = versions</tt></pre>
                      v2 secrets engine.  Any type is allowed to catch invalid
                      version setting.
       */
+    // TODO write tests
     void setMountVersions(String mount, String version) {
         if(!(version in ['1', '2'])) {
             throw new JervisException('Error: Vault key-value mounts can only be version "1" or "2" (String).')
@@ -331,6 +333,7 @@ vault.mountVersions = versions</tt></pre>
       @param mountVersions A Key-Value map containing multiple Vault mounts and
                            respective version numbers.
       */
+    // TODO write tests
     void setMountVersions(Map<String, String> mountVersions) {
         mountVersions.each { k, v ->
             this.setMountVersions(k, v)
@@ -338,6 +341,7 @@ vault.mountVersions = versions</tt></pre>
     }
 
     // TODO: java doc
+    // TODO write tests
     List listPath(String path) {
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
@@ -358,6 +362,7 @@ vault.mountVersions = versions</tt></pre>
 
       TODO better java doc
       */
+    // TODO write tests
     List<String> findAllKeys(String path, Integer level = 0) {
         recursiveFindAllKeys(path, level, 1)
     }
@@ -370,6 +375,7 @@ vault.mountVersions = versions</tt></pre>
 
       TODO better java doc
       */
+    // TODO write tests
     void copySecret(String srcKey, String destKey, Integer srcVersion = 0) {
         setSecret(destKey, getSecret(srcKey, srcVersion), true)
     }
@@ -380,6 +386,7 @@ vault.mountVersions = versions</tt></pre>
 
       TODO better java doc
       */
+    // TODO write tests
     void copyAllKeys(String srcPath, destPath, Integer level = 0) {
         findAllKeys(srcPath, level).each { String srcKey ->
             String destKey = destPath + (srcKey -~ "^\\Q${srcPath}\\E")
@@ -394,6 +401,7 @@ vault.mountVersions = versions</tt></pre>
 
       TODO better java doc
       */
+    // TODO write tests
     Map<String, String> getEnvironmentSecret(String path, Integer version = 0, Boolean allowInvalidKeys = false) {
         getSecret(path, version).findAll { k, v ->
             k in String &&
@@ -422,6 +430,7 @@ vault.mountVersions = versions</tt></pre>
 
       TODO better java doc
       */
+    // TODO write tests
     Map<String, String> getEnvironmentSecrets(List paths, Boolean allowInvalidKeys = false) {
         paths.collect { String path ->
             try {
@@ -443,6 +452,7 @@ vault.mountVersions = versions</tt></pre>
                                 secrets engine.
       */
     /* TODO work in progress
+    // TODO write tests
     void deleteKey(String key, List<Integer> destroyVersions = [], Boolean destroyAllVersions = false) {
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
@@ -475,6 +485,8 @@ vault.mountVersions = versions</tt></pre>
                                 secrets engine.
       */
     /* TODO work in progress
+    // TODO write tests
+    void deleteKey(String key, List<Integer> destroyVersions = [], Boolean destroyAllVersions = false) {
     void deletePath(String path, Boolean level = 0, Boolean destroyAllVersions = false) {
         findAllKeys(path, level).sort { String a, String b ->
             // performs a reverse sort to list maximum depth at the beginning
