@@ -209,6 +209,7 @@ vault.mountVersions = versions</tt></pre>
       */
     Map<String, String> headers = [:]
 
+    // TODO document constructor
     VaultService(String vault_url, TokenCredential credential) {
         this.vault_url = addTrailingSlash(vault_url)
         if(!this.vault_url.endsWith('v1/')) {
@@ -216,6 +217,7 @@ vault.mountVersions = versions</tt></pre>
         }
         this.credential = credential
     }
+    // TODO document constructor
     VaultService(VaultCredential credential) {
         this(credential.vault_url, credential)
     }
