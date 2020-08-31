@@ -43,8 +43,8 @@ import net.gleske.jervis.remotes.interfaces.VaultCredential
   Shell commands relative to the root of the repository at
   <tt>~/git/github/docker-compose-ha-consul-vault-ui</tt>.</p>
 <pre><tt># Enable secrets engines KV v1 and KV v2
-./scripts/curl-api.sh --request POST --data '{"type": "kv", "config": {"version": "1"}}' http://active.vault.service.consul:8200/v1/sys/mounts/secret
-./scripts/curl-api.sh --request POST --data '{"type": "kv", "config": {"version": "2"}}' http://active.vault.service.consul:8200/v1/sys/mounts/kv
+./scripts/curl-api.sh --request POST --data '{"type": "kv", "options": {"version": "1"}}' http://active.vault.service.consul:8200/v1/sys/mounts/secret
+./scripts/curl-api.sh --request POST --data '{"type": "kv", "options": {"version": "2"}}' http://active.vault.service.consul:8200/v1/sys/mounts/kv
 
 # Generate an admin token for initial setup
 ./scripts/get-admin-token.sh</tt></pre>
@@ -64,12 +64,11 @@ VaultService vault = new VaultService('http://active.vault.service.consul:8200/'
 // populate secret mounts with dummy data
 vault.setSecret("kv/foo", ['hello':'world'])
 vault.setSecret("kv/foo", ['another':'secret', 'hello':'world'])
-vault.setSecret("secret/foo", ['test':'data'])
 vault.setSecret("kv/foo/bar", ['hello':'friend'])
-vault.setSecret("secret/foo/bar", ['someother':'data'])
 vault.setSecret("kv/foo/bar/baz", ['foo':'bar'])
-vault.setSecret("secret/foo/bar/baz", ['more':'secrets'])
-</tt></pre>
+vault.setSecret("secret/foo", ['test':'data'])
+vault.setSecret("secret/foo/bar", ['someother':'data'])
+vault.setSecret("secret/foo/bar/baz", ['more':'secrets'])</tt></pre>
   <p><b>Please note:</b> If you're practicing against the Vault cluster, then
   your Groovy console requires the following lines of code at the top of the
   Groovy script so that it uses the SOCKS proxy provided by the test
