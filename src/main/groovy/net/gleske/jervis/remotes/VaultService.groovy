@@ -315,6 +315,32 @@ vault.mountVersions = versions</tt></pre>
         }
     }
 
+    // TODO test mounts which contain a slash... because Vault allows that
+    void setSecret(Map location, Map secret, Boolean enableCas = false) {
+        if(!(('mount' in location) && ('path' in location))) {
+            throw new JervisException('"mount" and "path" must be set when using setSecret.')
+        }
+        String mount = location.mount
+        String subpath = location.path
+        if(isKeyValueV2(mount)) {
+            Map secretMeta = [:]
+            try {
+                secretMeta = apiFetch("${mount}/metadata/${subpath}")
+            } catch(IOException e) {}
+            if(secretMeta?.data?.cas_required) {
+                enableCas = true
+            }
+            Map data = [data: secret]
+            if(enableCas) {
+                data['options'] = [cas: (secretMeta?.data?.current_version ?: 0)]
+            }
+            apiFetch("${mount}/data/${subpath}", [:], 'POST', objToJson(data))
+        }
+        else {
+            apiFetch("${mount}/${subpath}", [:], 'POST', objToJson(secret))
+        }
+    }
+
     /**
       Writes a secret to Vault KV v1 or KV v2 secrets engine.  This method will
       gracefully handle either KV v1 or KV v2.  It is recommend to set
@@ -332,23 +358,7 @@ vault.mountVersions = versions</tt></pre>
     void setSecret(String path, Map secret, Boolean enableCas = false) {
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
-        if(isKeyValueV2(mount)) {
-            Map secretMeta = [:]
-            try {
-                secretMeta = apiFetch("${mount}/metadata/${subpath}")
-            } catch(IOException e) {}
-            if(secretMeta?.data?.cas_required) {
-                enableCas = true
-            }
-            Map data = [data: secret]
-            if(enableCas) {
-                data['options'] = [cas: (secretMeta?.data?.current_version ?: 0)]
-            }
-            apiFetch("${mount}/data/${subpath}", [:], 'POST', objToJson(data))
-        }
-        else {
-            apiFetch(path, [:], 'POST', objToJson(secret))
-        }
+        setSecret(mount: mount, path: subpath, secret, enableCas)
     }
 
     /**
