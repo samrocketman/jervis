@@ -33,7 +33,51 @@ import net.gleske.jervis.remotes.interfaces.VaultCredential
   Key-Value secrets engine.  Both KV v1 and KV v2 secrets engines are
   supported.
 
-  <h2>Recommended setup and usage</h2>
+  <h2>Sample usage</h2>
+  <p>To run examples, clone Jervis and execute <tt>./gradlew console</tt> to
+  bring up a
+  <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.  Additionally, you'll need to clone and setup a
+  <a href="https://github.com/samrocketman/docker-compose-ha-consul-vault-ui" target="_blank">local Vault cluster</a>.
+  After you instantiate the Vault cluster you'll need to run the following
+  Shell commands relative to the root of the repository at
+  <tt>~/git/github/docker-compose-ha-consul-vault-ui</tt>.</p>
+<pre><tt># Enable secrets engines KV v1 and KV v2
+./scripts/curl-api.sh --request POST --data '{"type": "kv", "config": {"version": "1"}}' http://active.vault.service.consul:8200/v1/sys/mounts/secret
+./scripts/curl-api.sh --request POST --data '{"type": "kv", "config": {"version": "2"}}' http://active.vault.service.consul:8200/v1/sys/mounts/kv
+
+# Generate an admin token for initial setup
+./scripts/get-admin-token.sh</tt></pre>
+  <p>Afterwards, run the following Groovy Console script to populate the local
+  Vault cluster with dummy secret data.</p>
+<pre><tt>System.setProperty("socksProxyHost", "localhost")
+System.setProperty("socksProxyPort", "1080")
+
+import net.gleske.jervis.remotes.interfaces.TokenCredential
+import net.gleske.jervis.remotes.VaultService
+
+// generate token by executing ./scripts/get-admin-token.sh in
+// docker-compose-ha-consul-vault-ui repo
+TokenCredential creds = [getToken: {-> 'admin token' }] as TokenCredential
+VaultService vault = new VaultService('http://active.vault.service.consul:8200/', creds)
+
+// populate secret mounts with dummy data
+vault.setSecret("kv/foo", ['hello':'world'])
+vault.setSecret("kv/foo", ['another':'secret', 'hello':'world'])
+vault.setSecret("secret/foo", ['test':'data'])
+vault.setSecret("kv/foo/bar", ['hello':'friend'])
+vault.setSecret("secret/foo/bar", ['someother':'data'])
+vault.setSecret("kv/foo/bar/baz", ['foo':'bar'])
+vault.setSecret("secret/foo/bar/baz", ['more':'secrets'])
+</tt></pre>
+  <p><b>Please note:</b> If you're practicing against the Vault cluster, then
+  your Groovy console requires the following lines of code at the top of the
+  Groovy script so that it uses the SOCKS proxy provided by the test
+  cluster.</p>
+<pre><tt>System.setProperty("socksProxyHost", "localhost")
+System.setProperty("socksProxyPort", "1080")</tt></pre>
+
+  <h2>Recommended setup</h2>
   <ul>
     <li>
       Use <a href="https://www.vaultproject.io/docs/auth/approle" target="_blank">AppRole</a>
@@ -67,7 +111,7 @@ import net.gleske.jervis.remotes.interfaces.VaultCredential
 <pre><tt>import net.gleske.jervis.remotes.creds.VaultAppRoleCredential
 import net.gleske.jervis.remotes.VaultService
 
-VaultAppRoleCredential creds = new VaultAppRoleCredential('http://active.vault.service.consul:8200/', 'app-roll-id', 'secret-id')
+VaultAppRoleCredential creds = new VaultAppRoleCredential('http://active.vault.service.consul:8200/', 'my-app-role', 'my-secret-id')
 VaultService vault = new VaultService(creds)
 
 // read a secret
