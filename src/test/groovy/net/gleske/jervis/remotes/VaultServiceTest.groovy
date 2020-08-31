@@ -26,13 +26,14 @@ class VaultServiceTest extends GroovyTestCase {
     def myvault
     def url
     Map request_meta = [:]
+    private static String DEFAULT_VAULT_URL = 'http://active.vault.service.consul:8200/v1/'
 
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
         mockStaticUrl(url, URL, request_meta, true, 'SHA-256')
         TokenCredential cred = [getToken: {-> 'fake-token' }] as TokenCredential
-        myvault = new VaultService('http://active.vault.service.consul:8200', cred)
+        myvault = new VaultService(DEFAULT_VAULT_URL, cred)
     }
     //tear down after every test
     @After protected void tearDown() {
@@ -46,18 +47,18 @@ class VaultServiceTest extends GroovyTestCase {
             'http://active.vault.service.consul:8200',
             'http://active.vault.service.consul:8200/',
             'http://active.vault.service.consul:8200/v1',
-            'http://active.vault.service.consul:8200/v1/'
+            DEFAULT_VAULT_URL
         ]
         urls.each { String vault_url ->
             myvault = new VaultService(vault_url, cred)
-            assert myvault.baseUrl() == 'http://active.vault.service.consul:8200/v1/'
+            assert myvault.baseUrl() == DEFAULT_VAULT_URL
             assert myvault.credential instanceof TokenCredential
             assert myvault.header() == ['X-Vault-Token': 'fake-token', 'X-Vault-Request': 'true']
         }
         urls.each { String vault_url ->
             VaultCredential vault_cred = [getVault_url: {-> vault_url }, getToken: {-> 'fake-token2' }] as VaultCredential
             myvault = new VaultService(vault_cred)
-            assert myvault.baseUrl() == 'http://active.vault.service.consul:8200/v1/'
+            assert myvault.baseUrl() == DEFAULT_VAULT_URL
             assert myvault.credential instanceof VaultCredential
             assert myvault.header() == ['X-Vault-Token': 'fake-token2', 'X-Vault-Request': 'true']
         }
