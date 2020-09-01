@@ -102,4 +102,34 @@ class VaultServiceTest extends GroovyTestCase {
         myvault.getSecret('kv/foo')
         assert myvault.mountVersions == [kv: '2']
     }
+    @Test public void test_VaultService_getSecret_map_kv_v1() {
+        assert myvault.getSecret(mount: 'secret', path: 'foo') == [test: 'data']
+        assert myvault.getSecret(mount: 'secret', path: 'foo/bar') == [someother: 'data']
+        assert myvault.getSecret(mount: 'secret', path: 'foo/bar/baz') == [more: 'secrets']
+    }
+    @Test public void test_VaultService_getSecret_map_kv_v2() {
+        assert myvault.getSecret(mount: 'kv', path: 'foo') == [another: 'secret', hello: 'world']
+        assert myvault.getSecret(mount: 'kv', path: 'foo/bar') == [hello: 'friend']
+        assert myvault.getSecret(mount: 'kv', path: 'foo/bar/baz') == [foo: 'bar']
+    }
+    @Test public void test_VaultService_getSecret_map_kv_v2_older_version_1() {
+        assert myvault.getSecret(mount: 'kv', path: 'foo', 1) == [hello: 'world']
+    }
+    //start
+    @Test public void test_VaultService_discover_mount_versions_getSecret_map() {
+        assert myvault.mountVersions == [:]
+        myvault.getSecret(mount: 'secret', path: 'foo')
+        myvault.getSecret(mount: 'kv', path: 'foo')
+        assert myvault.mountVersions == [kv: '2', secret: '1']
+    }
+    @Test public void test_VaultService_discover_mount_version_v1_getSecret_map() {
+        assert myvault.mountVersions == [:]
+        myvault.getSecret(mount: 'secret', path: 'foo')
+        assert myvault.mountVersions == [secret: '1']
+    }
+    @Test public void test_VaultService_discover_mount_version_v2_getSecret_map() {
+        assert myvault.mountVersions == [:]
+        myvault.getSecret(mount: 'kv', path: 'foo')
+        assert myvault.mountVersions == [kv: '2']
+    }
 }
