@@ -17,14 +17,17 @@ script: |
   ./gradlew clean check jacocoTestReport Jar groovydoc
 
 env:
-  # Latest Groovy 2.4.x stable
-  - GROOVY_VERSION="2.4.15"
-  # Next Groovy 2.5.x release
-  - GROOVY_VERSION="2.5.1"
+  # Jenkins weekly uses Groovy 2.4.12 as of this writing
+  - GROOVY_VERSION="2.4.12"
+  - GROOVY_VERSION="2.4.20"
+  - GROOVY_VERSION="2.5.13"
+  # Groovy 3.0 current stable
+  - GROOVY_VERSION="3.0.5"
 
 matrix:
   allow_failures:
-    - env: GROOVY_VERSION="2.5.1"
+    - env: GROOVY_VERSION="2.5.13"
+    - env: GROOVY_VERSION="3.0.5"
 
 branches:
   only:

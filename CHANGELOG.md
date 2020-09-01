@@ -24,6 +24,13 @@ full change log see the commit log.
     credential resolver can be implented on
     [`VaultRoleIdCredential`][VaultRoleIdCredential] interface.
 
+### Bug fixes
+
+- Bugfix: Groovy 3.0.5 YAML `additional_toolchains` order was not preserved.
+  This change makes Jervis compatible with Groovy 2.4, 2.5, and 3.0 series of
+  releases.  Jenkins weekly currently uses Groovy 2.4.12 so this is more of a
+  future-proofing fix than a bug for existing usage.
+
 [TokenCredential]: src/main/groovy/net/gleske/jervis/remotes/interfaces/TokenCredential.groovy
 [VaultAppRoleCredential]: src/main/groovy/net/gleske/jervis/remotes/creds/VaultAppRoleCredential.groovy
 [VaultRoleIdCredentialImpl]: src/main/groovy/net/gleske/jervis/remotes/creds/VaultRoleIdCredentialImpl.groovy

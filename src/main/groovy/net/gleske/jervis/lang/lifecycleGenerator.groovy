@@ -410,19 +410,12 @@ class lifecycleGenerator implements Serializable {
         //allow ordered loading additional toolchains into a language key
         List additional_toolchains = []
         toolchain_obj.toolchains["toolchains"][yaml_language].with { List toolchainList ->
-            getObjectValue(jervis_yaml, 'additional_toolchains', '').with {
-                if(!it || (it in toolchainList)) {
-                    return
-                }
-                if(it in toolchain_obj.toolchains) {
-                    additional_toolchains << it
-                }
+            List yaml_additional_toolchains = getObjectValue(jervis_yaml, 'additional_toolchains', [])
+            if(getObjectValue(jervis_yaml, 'additional_toolchains', '')) {
+                yaml_additional_toolchains = [getObjectValue(jervis_yaml, 'additional_toolchains', '')]
             }
-            getObjectValue(jervis_yaml, 'additional_toolchains', []).with { List it ->
-                if(!it || !(it - toolchainList)) {
-                    return
-                }
-                additional_toolchains += (it - toolchainList).intersect(toolchain_obj.matrix_toolchain_list)
+            additional_toolchains += (yaml_additional_toolchains - toolchainList).findAll {
+                it in toolchain_obj.matrix_toolchain_list
             }
         }
         toolchain_obj.toolchains["toolchains"][yaml_language] += additional_toolchains

@@ -19,6 +19,7 @@ import net.gleske.jervis.exceptions.JervisException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.text.SimpleDateFormat
 
 class AutoReleaseTest extends GroovyTestCase {
     @Test public void test_AutoRelease_fail_instantiation() {
@@ -27,7 +28,9 @@ class AutoReleaseTest extends GroovyTestCase {
         }
     }
     @Test public void test_AutoRelease_getNextRelease_date_hotfix_prefix() {
-        String date = new Date().format('YYYMMdd')
+        //Date.format is not relably future-proof https://issues.apache.org/jira/browse/GROOVY-9709
+        //String date = new Date().format('YYYMMdd')
+        String date = new SimpleDateFormat('YYYYMMdd').format(new Date())
 
         assert "v${date}-1" == AutoRelease.getNextRelease(date, ['foo'], '-', 'v')
         assert "v${date}-2" == AutoRelease.getNextRelease(date, ['foo', "v${date}-1"], '-', 'v')
