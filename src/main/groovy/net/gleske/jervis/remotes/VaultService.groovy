@@ -68,7 +68,8 @@ vault.setSecret("kv/foo/bar", ['hello':'friend'])
 vault.setSecret("kv/foo/bar/baz", ['foo':'bar'])
 vault.setSecret("secret/foo", ['test':'data'])
 vault.setSecret("secret/foo/bar", ['someother':'data'])
-vault.setSecret("secret/foo/bar/baz", ['more':'secrets'])</tt></pre>
+vault.setSecret("secret/foo/bar/baz", ['more':'secrets'])
+println 'Success.'</tt></pre>
   <p><b>Please note:</b> If you're practicing against the local Vault cluster,
   then your Groovy Console requires the following lines of code at the top of
   the Groovy script.  It uses the SOCKS proxy provided by the test cluster.</p>
@@ -389,7 +390,7 @@ vault.mountVersions = versions</tt></pre>
       */
     // TODO write tests
     // TODO test manual mounts that have a slash in its name
-    void setMountVersions(String mount, String version) {
+    void setMountVersions(String mount, def version) {
         if(!(version in ['1', '2'])) {
             throw new JervisException('Error: Vault key-value mounts can only be version "1" or "2" (String).')
         }
@@ -404,7 +405,7 @@ vault.mountVersions = versions</tt></pre>
                            respective version numbers.
       */
     // TODO write tests
-    void setMountVersions(Map<String, String> mountVersions) {
+    void setMountVersions(Map mountVersions) {
         mountVersions.each { k, v ->
             this.setMountVersions(k, v)
         }
@@ -412,6 +413,7 @@ vault.mountVersions = versions</tt></pre>
 
     // TODO: java doc
     // TODO write tests
+    // TODO support Map location
     List listPath(String path) {
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
@@ -433,6 +435,7 @@ vault.mountVersions = versions</tt></pre>
       TODO better java doc
       */
     // TODO write tests
+    // TODO support Map location
     List<String> findAllKeys(String path, Integer level = 0) {
         recursiveFindAllKeys(path, level, 1)
     }
@@ -446,6 +449,7 @@ vault.mountVersions = versions</tt></pre>
       TODO better java doc
       */
     // TODO write tests
+    // TODO support Map location
     void copySecret(String srcKey, String destKey, Integer srcVersion = 0) {
         setSecret(destKey, getSecret(srcKey, srcVersion), true)
     }
@@ -457,7 +461,8 @@ vault.mountVersions = versions</tt></pre>
       TODO better java doc
       */
     // TODO write tests
-    void copyAllKeys(String srcPath, destPath, Integer level = 0) {
+    // TODO support Map location for both srcPath and destPath
+    void copyAllKeys(String srcPath, String destPath, Integer level = 0) {
         findAllKeys(srcPath, level).each { String srcKey ->
             String destKey = destPath + (srcKey -~ "^\\Q${srcPath}\\E")
             copySecret(srcKey, destKey)
@@ -472,6 +477,7 @@ vault.mountVersions = versions</tt></pre>
       TODO better java doc
       */
     // TODO write tests
+    // TODO support Map location
     Map<String, String> getEnvironmentSecret(String path, Integer version = 0, Boolean allowInvalidKeys = false) {
         getSecret(path, version).findAll { k, v ->
             k in String &&
@@ -492,7 +498,10 @@ vault.mountVersions = versions</tt></pre>
       combining the Maps, the last Key-Value pair wins when key names conflict.
 
       @param paths            A List of paths to search Vault for Maps.  Maps
-                              are eventually combined.
+                              are eventually combined.  A path can be a String
+                              or a location Map.  A location Map includes a
+                              mount and path key e.g.
+                              <tt>[mount: 'kv', path: 'my/secret/path']</tt>.
       @param allowInvalidKeys Includes keys which have invalid bash variable
                               names.  This might be useful for additional logic
                               processing.
@@ -501,6 +510,7 @@ vault.mountVersions = versions</tt></pre>
       TODO better java doc
       */
     // TODO write tests
+    // TODO support Map location
     Map<String, String> getEnvironmentSecrets(List paths, Boolean allowInvalidKeys = false) {
         paths.collect { String path ->
             try {

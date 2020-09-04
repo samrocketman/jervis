@@ -18,6 +18,7 @@ package net.gleske.jervis.remotes
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import net.gleske.jervis.exceptions.JervisException
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.interfaces.VaultCredential
 import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
@@ -131,5 +132,38 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.mountVersions == [:]
         myvault.getSecret(mount: 'kv', path: 'foo')
         assert myvault.mountVersions == [kv: '2']
+    }
+    @Test public void test_VaultService_setMountVersions_String() {
+        myvault.setMountVersions('kv', '2')
+        assert myvault.mountVersions == [kv: '2']
+        myvault.setMountVersions('secret', '1')
+        assert myvault.mountVersions == [kv: '2', secret: '1']
+        shouldFail(JervisException) {
+            myvault.setMountVersions('secret', 1)
+        }
+        shouldFail(JervisException) {
+            myvault.setMountVersions('kv', 2)
+        }
+        shouldFail(JervisException) {
+            myvault.setMountVersions('another', 'hello')
+        }
+    }
+    @Test public void test_VaultService_setMountVersions_Map() {
+        myvault.mountVersions = [kv: '2']
+        assert myvault.mountVersions == [kv: '2']
+        myvault.mountVersions = [secret: '1']
+        assert myvault.mountVersions == [kv: '2', secret: '1']
+        shouldFail(JervisException) {
+            myvault.mountVersions = [secret: 1]
+        }
+        shouldFail(JervisException) {
+            myvault.mountVersions = [kv: 2]
+        }
+        shouldFail(JervisException) {
+            myvault.mountVersions = [another: 'hello']
+        }
+        shouldFail(JervisException) {
+            myvault.mountVersions = [kv: '2', secret: '1', another: 'hello']
+        }
     }
 }
