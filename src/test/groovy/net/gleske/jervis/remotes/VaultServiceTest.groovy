@@ -107,14 +107,43 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.getSecret(mount: 'secret', path: 'foo') == [test: 'data']
         assert myvault.getSecret(mount: 'secret', path: 'foo/bar') == [someother: 'data']
         assert myvault.getSecret(mount: 'secret', path: 'foo/bar/baz') == [more: 'secrets']
+        assert myvault.getSecret(mount: 'secret', path: 'foo/bar/baz', dont_care: 'value') == [more: 'secrets']
+        shouldFail(JervisException) {
+            myvault.getSecret([:])
+        }
+        shouldFail(JervisException) {
+            myvault.getSecret(mount: 'secret')
+        }
+        shouldFail(JervisException) {
+            myvault.getSecret(path: 'foo/bar/baz')
+        }
     }
     @Test public void test_VaultService_getSecret_map_kv_v2() {
         assert myvault.getSecret(mount: 'kv', path: 'foo') == [another: 'secret', hello: 'world']
         assert myvault.getSecret(mount: 'kv', path: 'foo/bar') == [hello: 'friend']
         assert myvault.getSecret(mount: 'kv', path: 'foo/bar/baz') == [foo: 'bar']
+        assert myvault.getSecret(mount: 'kv', path: 'foo/bar/baz', dont_care: 'value') == [foo: 'bar']
+        shouldFail(JervisException) {
+            myvault.getSecret([:])
+        }
+        shouldFail(JervisException) {
+            myvault.getSecret(mount: 'kv')
+        }
+        shouldFail(JervisException) {
+            myvault.getSecret(path: 'foo/bar/baz')
+        }
     }
     @Test public void test_VaultService_getSecret_map_kv_v2_older_version_1() {
         assert myvault.getSecret(mount: 'kv', path: 'foo', 1) == [hello: 'world']
+        shouldFail(JervisException) {
+            myvault.getSecret([:], 1)
+        }
+        shouldFail(JervisException) {
+            myvault.getSecret(mount: 'kv', 1)
+        }
+        shouldFail(JervisException) {
+            myvault.getSecret(path: 'foo', 1)
+        }
     }
     //start
     @Test public void test_VaultService_discover_mount_versions_getSecret_map() {

@@ -140,7 +140,7 @@ class VaultService implements SimpleRestServiceSupport {
 
     private static void checkLocationMap(Map location) {
         if(!(('mount' in location) && ('path' in location))) {
-            throw new JervisException('"mount" and "path" must be set when using setSecret.')
+            throw new JervisException('"mount" and "path" must be set when using location Map.')
         }
     }
 
