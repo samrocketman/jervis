@@ -417,7 +417,9 @@ vault.mountVersions = versions</tt></pre>
     List listPath(String path) {
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
-        subpath = addTrailingSlash(subpath)
+        if(subpath) {
+            subpath = addTrailingSlash(subpath)
+        }
 
         if(isKeyValueV2(mount)) {
             apiFetch("${mount}/metadata/${subpath}?list=true")?.data?.keys
@@ -437,6 +439,7 @@ vault.mountVersions = versions</tt></pre>
     // TODO write tests
     // TODO support Map location
     List<String> findAllKeys(String path, Integer level = 0) {
+        path = addTrailingSlash(path)
         recursiveFindAllKeys(path, level, 1)
     }
 

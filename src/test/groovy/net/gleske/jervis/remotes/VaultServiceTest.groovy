@@ -166,4 +166,18 @@ class VaultServiceTest extends GroovyTestCase {
             myvault.mountVersions = [kv: '2', secret: '1', another: 'hello']
         }
     }
+    @Test public void test_VaultService_findAllKeys_v1() {
+        assert myvault.findAllKeys('secret') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
+        assert myvault.findAllKeys('secret/') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
+        assert myvault.findAllKeys('secret/', 1) == ['secret/foo']
+        assert myvault.findAllKeys('secret/', 2) == ['secret/foo', 'secret/foo/bar']
+        assert myvault.findAllKeys('secret/', 3) == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
+    }
+    @Test public void test_VaultService_findAllKeys_v2() {
+        assert myvault.findAllKeys('kv') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
+        assert myvault.findAllKeys('kv/') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
+        assert myvault.findAllKeys('kv/', 1) == ['kv/foo']
+        assert myvault.findAllKeys('kv/', 2) == ['kv/foo', 'kv/foo/bar']
+        assert myvault.findAllKeys('kv/', 3) == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
+    }
 }
