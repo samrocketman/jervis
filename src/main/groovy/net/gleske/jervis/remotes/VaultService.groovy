@@ -160,7 +160,8 @@ class VaultService implements SimpleRestServiceSupport {
         if(desiredLevel > 0 && level > desiredLevel) {
             return []
         }
-        List entries = listPath(path).collect { String key ->
+        List entries = []
+        entries = listPath(path).collect { String key ->
             if(key.endsWith('/')) {
                 recursiveFindAllKeys(path + key, desiredLevel, level + 1)
             }
@@ -168,13 +169,7 @@ class VaultService implements SimpleRestServiceSupport {
                 [path + key]
             }
         }
-
-        if(entries) {
-            entries.sum()
-        }
-        else {
-            []
-        }
+        entries.sum()
     }
 
     /**
