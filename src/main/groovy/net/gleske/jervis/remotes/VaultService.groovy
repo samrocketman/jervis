@@ -415,11 +415,9 @@ vault.mountVersions = versions</tt></pre>
     // TODO write tests
     // TODO support Map location
     List listPath(String path) {
+        path = addTrailingSlash(path)
         String mount = path -~ '/.*$'
         String subpath = path -~ '^[^/]+/'
-        if(subpath) {
-            subpath = addTrailingSlash(subpath)
-        }
 
         if(isKeyValueV2(mount)) {
             apiFetch("${mount}/metadata/${subpath}?list=true")?.data?.keys

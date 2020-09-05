@@ -180,4 +180,26 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.findAllKeys('kv/', 2) == ['kv/foo', 'kv/foo/bar']
         assert myvault.findAllKeys('kv/', 3) == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
     }
+    @Test public void test_VaultService_listPath_v1() {
+        assert myvault.listPath('secret') == ['foo', 'foo/']
+        assert myvault.listPath('secret/') == ['foo', 'foo/']
+        assert myvault.listPath('secret/foo') == ['bar', 'bar/']
+        assert myvault.listPath('secret/foo/') == ['bar', 'bar/']
+        assert myvault.listPath('secret/foo/bar') == ['baz']
+        assert myvault.listPath('secret/foo/bar/') == ['baz']
+        shouldFail(Exception) {
+            myvault.listPath('secret/foo/bar/baz/')
+        }
+    }
+    @Test public void test_VaultService_listPath_v2() {
+        assert myvault.listPath('kv') == ['foo', 'foo/']
+        assert myvault.listPath('kv/') == ['foo', 'foo/']
+        assert myvault.listPath('kv/foo') == ['bar', 'bar/']
+        assert myvault.listPath('kv/foo/') == ['bar', 'bar/']
+        assert myvault.listPath('kv/foo/bar') == ['baz']
+        assert myvault.listPath('kv/foo/bar/') == ['baz']
+        shouldFail(Exception) {
+            myvault.listPath('kv/foo/bar/baz/')
+        }
+    }
 }
