@@ -27,12 +27,13 @@ class VaultServiceTest extends GroovyTestCase {
     def myvault
     def url
     Map request_meta = [:]
+    List request_history = []
     private static String DEFAULT_VAULT_URL = 'http://active.vault.service.consul:8200/v1/'
 
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
-        mockStaticUrl(url, URL, request_meta, true, 'SHA-256')
+        mockStaticUrl(url, URL, request_meta, true, 'SHA-256', request_history)
         TokenCredential cred = [getToken: {-> 'fake-token' }] as TokenCredential
         myvault = new VaultService(DEFAULT_VAULT_URL, cred)
     }
@@ -40,6 +41,7 @@ class VaultServiceTest extends GroovyTestCase {
     @After protected void tearDown() {
         myvault = null
         request_meta = [:]
+        request_history = []
         super.tearDown()
     }
     @Test public void test_VaultService_newInstance_and_baseUrl() {
@@ -230,5 +232,49 @@ class VaultServiceTest extends GroovyTestCase {
         shouldFail(Exception) {
             myvault.listPath('kv/foo/bar/baz/')
         }
+    }
+    @Test public void test_VaultService_copySecret_v1_to_v2() {
+        myvault.mountVersions = [kv: '2', secret: '1']
+        myvault.copySecret('secret/foo', 'kv/foo')
+        assert request_history[0].url == 'http://active.vault.service.consul:8200/v1/secret/foo'
+        assert request_history[0].method == 'GET'
+        assert request_history[1].url == 'http://active.vault.service.consul:8200/v1/kv/metadata/foo'
+        assert request_history[1].method == 'GET'
+        assert request_history[2].url == 'http://active.vault.service.consul:8200/v1/kv/data/foo'
+        assert request_history[2].method == 'POST'
+        assert request_history[2].data.toString() == '{"data":{"test":"data"},"options":{"cas":2}}'
+    }
+    @Test public void test_VaultService_copySecret_v2_to_v1() {
+        myvault.mountVersions = [kv: '2', secret: '1']
+        myvault.copySecret('kv/foo', 'secret/foo')
+        assert request_history[0].url == 'http://active.vault.service.consul:8200/v1/kv/data/foo?version=0'
+        assert request_history[0].method == 'GET'
+        assert request_history[1].url == 'http://active.vault.service.consul:8200/v1/secret/foo'
+        assert request_history[1].method == 'POST'
+        assert request_history[1].data.toString() == '{"another":"secret","hello":"world"}'
+    }
+    @Test public void test_VaultService_setSecret_v1() {
+        myvault.mountVersions = [secret: '1']
+        myvault.setSecret('secret/foo', [another: 'secret', hello: 'world'])
+    }
+    @Test public void test_VaultService_copySecret_v2_to_v1_version_1() {
+        myvault.mountVersions = [kv: '2', secret: '1']
+        myvault.copySecret('kv/foo', 'secret/foo', 1)
+        assert request_history[0].url == 'http://active.vault.service.consul:8200/v1/kv/data/foo?version=1'
+        assert request_history[0].method == 'GET'
+        assert request_history[1].url == 'http://active.vault.service.consul:8200/v1/secret/foo'
+        assert request_history[1].method == 'POST'
+        assert request_history[1].data.toString() == '{"hello":"world"}'
+    }
+    @Test public void test_VaultService_copySecret_v2_to_v2() {
+        myvault.mountVersions = [kv: '2', secret: '1']
+        myvault.copySecret('kv/foo', 'kv/foo/bar')
+        assert request_history[0].url == 'http://active.vault.service.consul:8200/v1/kv/data/foo?version=0'
+        assert request_history[0].method == 'GET'
+        assert request_history[1].url == 'http://active.vault.service.consul:8200/v1/kv/metadata/foo/bar'
+        assert request_history[1].method == 'GET'
+        assert request_history[2].url == 'http://active.vault.service.consul:8200/v1/kv/data/foo/bar'
+        assert request_history[2].method == 'POST'
+        assert request_history[2].data.toString() == '{"data":{"another":"secret","hello":"world"},"options":{"cas":1}}'
     }
 }

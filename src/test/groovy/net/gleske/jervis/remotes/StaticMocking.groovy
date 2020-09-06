@@ -64,7 +64,7 @@ class StaticMocking {
         http://flyingtomoon.com/tag/mocking/
         http://groovy.329449.n5.nabble.com/Groovy-metaclass-invokeConstructor-td5716360.html
      */
-    static def mockStaticUrl(String mockedUrl, Class<URL> clazz, Map request_meta = [:], Boolean checksumMocks = false, String checksumAlgorithm = 'SHA-256') {
+    static def mockStaticUrl(String mockedUrl, Class<URL> clazz, Map request_meta = [:], Boolean checksumMocks = false, String checksumAlgorithm = 'SHA-256', List request_history = []) {
         def mc = clazz.metaClass
         mc.invokeMethod = { String name, args ->
             mc.getMetaMethod(name, args).invoke(delegate, args)
@@ -78,7 +78,9 @@ class StaticMocking {
             constructor.newInstance(url)
         }
         mc.newReader = {
-            //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
+            // create a file from the URL including the domain and path with
+            // all special characters and path separators replaced with an
+            // underscore
             String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
             try {
                 URL resource_url = this.getClass().getResource("/mocks/${file}");
@@ -95,7 +97,7 @@ class StaticMocking {
             }
         }
         mc.newReader = { Map parameters ->
-            //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
+            // create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
             String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
             try {
                 URL resource_url = this.getClass().getResource("/mocks/${file}");
@@ -141,7 +143,11 @@ class StaticMocking {
                                 URL resource_url = this.getClass().getResource("/mocks/${file}");
                                 def resource = new File(resource_url.getFile())
                                 if(resource.isFile()) {
-                                    return resource.text
+                                    Map temp_request_meta = request_meta.clone()
+                                    temp_request_meta['response'] = resource.text
+                                    temp_request_meta['url'] = mockedUrl
+                                    request_history << temp_request_meta
+                                    return temp_request_meta['response']
                                 }
                                 else {
                                     throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
