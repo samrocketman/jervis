@@ -76,11 +76,11 @@ sub-bullet.
 * Developers are challenged with integrating work, building often, and even
   deploying often.
   * Jenkins was invented.
-* Jenkins infrastructure is strained when too many slaves are in one master and
-  too many jobs are queued up on a daily basis.  A single master struggles to
-  perform all requested builds in a timely manner.  Jenkins also suffers from
-  single point of failure as a lone master.
-  * Multi-master Jenkins was invented. This provides redundancy for the master.
+* Jenkins infrastructure is strained when too many agents are in one server and
+  too many jobs are queued up on a daily basis.  A single Jenkins server
+  struggles to perform all requested builds in a timely manner.  Jenkins also
+  suffers from single point of failure as a lone server.
+  * Multi-master Jenkins was invented. This provides redundancy for the server.
     Throughput for daily build capacity is improved.
 * Jenkins jobs suffer from a lot of duplicate code.  It is difficult to fix a
   bug in one job and have it propagate to other jobs.
@@ -216,8 +216,8 @@ See [SonarQube README](sonarqube/README.md).
 [maven-release]: https://search.maven.org/search?q=g:net.gleske%20AND%20a:jervis&core=gav
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
 [pipeline]: https://jenkins.io/doc/book/pipeline/shared-libraries/
-[status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=master
-[status-coverage]: https://coveralls.io/repos/github/samrocketman/jervis/badge.svg?branch=master
+[status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=main
+[status-coverage]: https://coveralls.io/repos/github/samrocketman/jervis/badge.svg?branch=main
 [status-release]: https://maven-badges.herokuapp.com/maven-central/net.gleske/jervis/badge.svg
 [travis-yaml]: http://docs.travis-ci.com/user/build-configuration/
 [travis]: https://travis-ci.org/

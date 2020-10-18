@@ -118,7 +118,7 @@ Boolean call() {
 [jenkins-blog-matrix]: https://jenkins.io/blog/2019/12/02/matrix-building-with-scripted-pipeline/
 [plugin-sf-bpr]: https://plugins.jenkins.io/scm-filter-branch-pr
 [plugin-sf-jervis]: https://plugins.jenkins.io/scm-filter-jervis
-[regenerate-jobs-script]: https://github.com/samrocketman/jenkins-script-console-scripts/blob/master/generate-all-jervis-jobs.groovy
+[regenerate-jobs-script]: https://github.com/samrocketman/jenkins-script-console-scripts/blob/main/generate-all-jervis-jobs.groovy
 [safeconst-java]: https://www.javadoc.io/doc/org.yaml/snakeyaml/1.19/org/yaml/snakeyaml/constructor/SafeConstructor.html
 [safeconst]: https://bitbucket.org/asomov/snakeyaml/wiki/Documentation
 
@@ -587,5 +587,5 @@ not declare the type of matrix.  [See wiki for details][wiki-toolchains-spec].
 [mig-01-ex]: https://github.com/samrocketman/jervis/commit/1d7ff1417c642d959f467c11eca7b16cb3e3ef3c
 [wiki-stronger-rsa]: https://github.com/samrocketman/jervis/wiki/Secure-secrets-in-repositories#enforcing-stronger-rsa-keys
 [wiki-toolchains-spec]: https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file
-[fs-migrate-1]: https://github.com/samrocketman/jenkins-script-console-scripts/blob/master/disable-freestyle-jobs.groovy
-[fs-migrate-2]: https://github.com/samrocketman/jenkins-script-console-scripts/blob/master/delete-freestyle-jobs.groovy
+[fs-migrate-1]: https://github.com/samrocketman/jenkins-script-console-scripts/blob/main/disable-freestyle-jobs.groovy
+[fs-migrate-2]: https://github.com/samrocketman/jenkins-script-console-scripts/blob/main/delete-freestyle-jobs.groovy

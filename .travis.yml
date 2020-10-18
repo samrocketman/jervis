@@ -31,7 +31,7 @@ matrix:
 
 branches:
   only:
-    - master
+    - main
     - jervis_simple
 
 jenkins:
