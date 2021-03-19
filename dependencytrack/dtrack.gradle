@@ -1,0 +1,17 @@
+//https://discuss.gradle.org/t/invoking-tasks-provided-by-a-plugin-without-altering-the-build-file/27235
+//https://github.com/gradle/gradle/issues/1322
+initscript {
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+    dependencies {
+        classpath 'org.cyclonedx:cyclonedx-gradle-plugin:1.2.1'
+    }
+}
+
+rootProject {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: org.cyclonedx.gradle.CycloneDxPlugin
+}
