@@ -31,18 +31,46 @@
 
 import java.util.regex.Pattern
 
-// if admins have a default credential ID (e.g. read-only, then it return here
-// instead of empty string.
 @NonCPS
-String resolveCredentialsId(Map settings) {
-    settings.credentials_id?.trim() ?: ''
+String getUserCredentialsId(Map settings) {
+    settings.credentials_id?.trim()
 }
 
-// if admins have a different default branch other than main, then update this
-// return.
+// if admins have a default credential ID (e.g. read-only, then it define a var
+// in your shared pipeline library named
+// adminDefaultUserSharedLibraryCredentials.groovy which returns a String when
+// called.
+String resolveCredentialsId(Map settings) {
+    if(getCredentialsId(settings)) {
+        getCredentialsId(settings)
+    }
+    else if(hasGlobalVar('adminDefaultUserSharedLibraryCredentials')) {
+        adminDefaultUserSharedLibraryCredentials()
+    }
+    else {
+        ''
+    }
+}
+
+// if admins have a different default branch other than main, then define a
+// global variable in your own shared library named
+// adminDefaultUserSharedLibraryBranch.groovy which returns String meant to be
+// a default branch for most of your organization projects.
 @NonCPS
+String getUserDefinedBranch(Map settings) {
+    settings.branch?.trim()
+}
+
 String resolveBranch(Map settings) {
-    settings.branch?.trim() ?: 'main'
+    if(getUserDefinedBranch(settings)) {
+        getUserDefinedBranch(settings)
+    }
+    else if(hasGlobalVar('adminDefaultUserSharedLibraryBranch')) {
+        adminDefaultUserSharedLibraryBranch()
+    }
+    else {
+        'main'
+    }
 }
 
 // determines the shared library name based on the remote Git repository URL.
