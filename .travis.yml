@@ -10,7 +10,7 @@ jdk: openjdk8
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
 install: ./assemble.sh
 script: |
-  if grep -rl 'new Yaml()' jobs src vars; then
+  if grep -rlF -- 'new Yaml()' jobs src vars; then
     echo 'ERROR: insecure usage of SnakeYAML detected.' >&2
     exit 1
   fi
