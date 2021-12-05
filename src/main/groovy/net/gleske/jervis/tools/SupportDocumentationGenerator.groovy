@@ -46,11 +46,35 @@ class SupportDocumentationGenerator {
 
     static SimpleTemplateEngine engine = new SimpleTemplateEngine()
 
+    /**
+      Contains the parsed content of all Jervis JSON files such as platforms,
+      lifecycles, and toolchains for every OS.  Each key is the name of the
+      JSON file but without <tt>.json</tt> extension, without
+      <tt>-stable.json</tt>, or without <tt>-unstable.json</tt> depending on
+      default stability.
+      */
     Map jsonFiles = [:]
     Map supportByOS = [:]
 
-    Map docByLanguage = [:]
-    File outputDir
+    /**
+      Groovy templates for generating documenation.
+
+      <p>The following templates are supported.</p>
+      <ul>
+          <li>
+              <tt>lifecycle-introduction</tt> contains the contents of
+              <tt>lifecycle-introduction.tmpl.md</tt>.  This is the documentation
+              at the top of each language for its lifecycles documentation.  For
+              each build tool supported for default lifecycles refer to the
+              <tt>lifecycle</tt> template.
+          </li>
+          <li>
+              <tt>lifecycle</tt> contains the contents of <tt>lifecycle.tmpl.md</tt>.
+          </li>
+      </ul>
+      */
+    Map templates = [:]
+
 
     String serviceName = 'Jenkins'
 
