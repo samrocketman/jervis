@@ -8,6 +8,7 @@
     "supported_platforms": {
         "docker": {
             "ubuntu1604": {
+                "friendlyName": "Ubuntu 16.04",
                 "language": [
                     "groovy",
                     "java",
