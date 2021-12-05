@@ -17,8 +17,8 @@
 package net.gleske.jervis.tools
 
 import net.gleske.jervis.exceptions.JervisException
+import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
 
-import groovy.text.SimpleTemplateEngine
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
 
@@ -44,8 +44,6 @@ println docs.supportByOS
   */
 class SupportDocumentationGenerator {
 
-    static SimpleTemplateEngine engine = new SimpleTemplateEngine()
-
     /**
       Contains the parsed content of all Jervis JSON files such as platforms,
       lifecycles, and toolchains for every OS.  Each key is the name of the
@@ -69,7 +67,10 @@ class SupportDocumentationGenerator {
               <tt>lifecycle</tt> template.
           </li>
           <li>
-              <tt>lifecycle</tt> contains the contents of <tt>lifecycle.tmpl.md</tt>.
+              <tt>lifecycle</tt> contains the contents of
+              <tt>lifecycle.tmpl.md</tt>.  This template is for documenting
+              file detection and fallback behavior for different build tools in
+              the lifecycle phase of a supported language.
           </li>
       </ul>
       */
@@ -87,19 +88,32 @@ class SupportDocumentationGenerator {
 
     def SupportDocumentationGenerator(Map args) {
         if(this.validateArgs(args)) {
-            throw new JervisException('\nERRORS with SupportDocumentationGenerator arguments:\n    ' + this.validateArgs(args).join('\n    '))
+            throw new JervisException('\n\nERRORS with SupportDocumentationGenerator arguments:\n    ' + this.validateArgs(args).join('\n    ') + '\n\n')
         }
         this.parseJsonFiles(args.jsonDir -~ '/$')
+        this.parseTemplates((args.templateDir ?: '') -~ '/$')
+    }
+
+    /**
+      */
+    private void parseTemplates(String templateDir) {
+        ['lifecycle.tmpl.md', 'lifecycle-introduction.tmpl.md'].each {
+            templates[(it -~ '\\.tmpl\\.md$').toString()] = new File(templateDir + "/${it}").text
+        }
     }
 
     /**
       Validates the argument list provided to the constructor.
       */
     private List validateArgs(Map args) {
-        []
+        List errors = []
+        if(!(new File((args?.jsonDir -~ '/$') + '/platforms.json' ).exists())) {
+            errors << '- jsonDir: The directory must contain a platforms.json file and its associated lifecycles and toolchains JSON files.'
+        }
+        errors
     }
 
-    void parseJsonFiles(String jsonDir) {
+    private void parseJsonFiles(String jsonDir) {
         def yaml = new Yaml(new SafeConstructor())
         this.jsonFiles['platforms'] = yaml.load(new File(jsonDir + '/platforms.json').text)
         String stability = this.jsonFiles.platforms.defaults.stability
@@ -123,25 +137,53 @@ class SupportDocumentationGenerator {
         if(!os) {
             os = this.jsonFiles.platforms.defaults.os
         }
-        this.supportedByOS[os].languages.collect { language ->
+        this.supportByOS[os].languages.collect { language ->
             this.getLifecycleDocumentation(os, language)
-        }*.trim().join('\n\n')
+        }.join('\n\n')
     }
 
     /**
       Return markdown documentation for a given OS supporting a language.
       */
     String getLifecycleDocumentation(String os, String language) {
-        if(!(language in supportedByOS[os].languages)) {
+        if(!(language in supportByOS[os].languages)) {
             throw new JervisException("Language ${language} is not supported by ${os}.")
         }
         Map binding = [
+            defaultKey: this.jsonFiles."lifecycles-${os}"."${language}".defaultKey,
             friendlyName: this.jsonFiles."lifecycles-${os}"."${language}".friendlyName,
             jsonFiles: this.jsonFiles,
             language: language,
+            lifecycle: this.jsonFiles."lifecycles-${os}"."${language}",
             os: os,
-            supportedByOS: this.supportedByOS
+            serviceName: serviceName,
+            supportByOS: this.supportByOS
         ]
+        List documentation = [getScriptFromTemplate(templates.'lifecycle-introduction', binding).trim()]
+
+        // get all lifecycles sorted by their order in which Jervis will detect
+        // build tools and fall back.
+        binding.lifecycle.findAll { k, v ->
+            v instanceof Map
+        }.sort { a, b ->
+            if(a.key == binding.defaultKey || b.key == a.value?.fallbackKey) {
+                -1
+            } else {
+                1
+            }
+        }.each { k, v ->
+            String nextFile = (binding.lifecycle."${v.fallbackKey}"?.fileExistsCondition) ?: ''
+            Boolean onlyEntry = (!nextFile && !v.fallbackKey && k == binding.defaultKey)
+            Boolean lastEntry = (!v.fallbackKey)
+            Map secondBinding = [
+                buildtool: v,
+                lastEntry: lastEntry,
+                nextFile: nextFile,
+                onlyEntry: onlyEntry
+            ]
+            documentation << getScriptFromTemplate(templates.'lifecycle', binding + secondBinding).trim()
+        }
+        documentation.join('\n\n')
     }
 
     /**
