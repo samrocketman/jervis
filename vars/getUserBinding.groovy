@@ -41,5 +41,3 @@ def getBuildBinding(Run run, String bindingVar) {
 def call(String bindingVar) {
     getBuildBinding(currentBuild.rawBuild, bindingVar)
 }
-
-def foo(
