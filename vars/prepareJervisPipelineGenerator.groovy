@@ -14,7 +14,6 @@
    limitations under the License.
    */
 
-import net.gleske.jervis.lang.lifecycleGenerator
 import net.gleske.jervis.lang.pipelineGenerator
 
 /**

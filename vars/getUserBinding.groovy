@@ -42,3 +42,4 @@ def call(String bindingVar) {
     getBuildBinding(currentBuild.rawBuild, bindingVar)
 }
 
+def foo(

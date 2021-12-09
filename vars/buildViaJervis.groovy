@@ -14,15 +14,7 @@
    limitations under the License.
    */
 
-if(hasGlobalVar('adminInjectEnvironment')) {
-    adminInjectEnvironment()
-}
-else {
-    injectEnvironment()
-}
-
 import net.gleske.jervis.lang.lifecycleGenerator
-import net.gleske.jervis.lang.pipelineGenerator
 
 /**
   call() is the main method of buildViaJervis()

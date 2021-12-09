@@ -118,5 +118,7 @@ List<Map> call(Map user_settings = [:], Map matrix_axes, Closure c) {
     axes
 }
 List<Map> call(Map user_settings = [:], Map matrix_axes) {
-    call(user_settings, matrix_axes, { m -> true})
+    call(user_settings, matrix_axes) {
+        true
+    }
 }

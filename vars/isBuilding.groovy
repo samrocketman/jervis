@@ -53,7 +53,6 @@ import hudson.model.Cause
 import hudson.model.Job
 import hudson.model.Run
 import hudson.triggers.TimerTrigger
-import jenkins.model.Jenkins
 import jenkins.plugins.git.GitTagSCMHead
 import jenkins.scm.api.SCMHead
 import org.jenkinsci.plugins.github_branch_source.PullRequestSCMHead

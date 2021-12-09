@@ -14,6 +14,8 @@
    limitations under the License.
    */
 
+// static imports always first according to CodeNarc
+import static jenkins.bouncycastle.api.PEMEncodable.decode
 
 import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.lifecycleGenerator
@@ -23,7 +25,6 @@ import hudson.console.HyperlinkNote
 import hudson.util.Secret
 import jenkins.bouncycastle.api.PEMEncodable
 import jenkins.model.Jenkins
-import static jenkins.bouncycastle.api.PEMEncodable.decode
 
 /**
   Gets GitHub API token from the global credential store.
