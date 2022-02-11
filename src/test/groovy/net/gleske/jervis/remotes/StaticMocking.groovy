@@ -83,31 +83,17 @@ class StaticMocking {
             // underscore
             String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
             try {
-                URL resource_url = this.getClass().getResource("/mocks/${file}");
-                def resource = new File(resource_url.getFile())
-                if(resource.isFile()) {
-                    return resource.newReader()
-                }
-                else {
-                    throw new RuntimeException("[404] Not Found - test/resources/mocks/${file}")
-                }
+                return new File("src/test/resources/mocks/${file}").newReader()
             }
             catch(Exception e) {
-                throw new RuntimeException("[404] Not Found - test/resources/mocks/${file}")
+                throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
             }
         }
         mc.newReader = { Map parameters ->
             // create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
             String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
             try {
-                URL resource_url = this.getClass().getResource("/mocks/${file}");
-                def resource = new File(resource_url.getFile())
-                if(resource.isFile()) {
-                    return resource.newReader()
-                }
-                else {
-                    throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
-                }
+                return new File("src/test/resources/mocks/${file}").newReader()
             }
             catch(Exception e) {
                 throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
@@ -140,18 +126,11 @@ class StaticMocking {
                             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
                             String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_') + ((checksum) ? '_' + checksum : '')
                             try {
-                                URL resource_url = this.getClass().getResource("/mocks/${file}");
-                                def resource = new File(resource_url.getFile())
-                                if(resource.isFile()) {
-                                    Map temp_request_meta = request_meta.clone()
-                                    temp_request_meta['response'] = resource.text
-                                    temp_request_meta['url'] = mockedUrl
-                                    request_history << temp_request_meta
-                                    return temp_request_meta['response']
-                                }
-                                else {
-                                    throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
-                                }
+                                Map temp_request_meta = request_meta.clone()
+                                temp_request_meta['response'] = new File("src/test/resources/mocks/${file}").text
+                                temp_request_meta['url'] = mockedUrl
+                                request_history << temp_request_meta
+                                return temp_request_meta['response']
                             }
                             catch(Exception e) {
                                 throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")

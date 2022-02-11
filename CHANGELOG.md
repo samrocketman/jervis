@@ -5,6 +5,12 @@ full change log see the commit log.
 
 # jervis 1.8
 
+### Warnings:
+
+- Builds are switching to OpenJDK11.  Target source compatibility is JDK1.8.  In
+  the future, JDK1.8 will be dropped in favor of OpenJDK11 following Java
+  supported by Jenkins project.
+
 ### New features:
 
 - [`net.gleske.jervis.remotes.GitHubGraphQL`][GitHubGraphQL] has a new `sendGQL`
