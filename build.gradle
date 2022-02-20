@@ -30,7 +30,7 @@ version = "${version}"
 ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.15'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
-ext.snakeYamlVersion = '1.26'
+ext.snakeYamlVersion = '1.29'
 
 //Apparently cobertura is only accurate at Java 1.6 byte code and earlier
 //However, this caused a bug that if this library is used on JDK7+ and then
