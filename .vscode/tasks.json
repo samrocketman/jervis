@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Update VSCode",
+			"type": "shell",
+			"command": [
+				"./gradlew",
+				"update_vscode"
+			],
+			"problemMatcher": []
+		}
+	]
+}
