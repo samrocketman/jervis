@@ -95,11 +95,10 @@ task( console, dependsOn: "classes", type: JavaExec ) {
 
 task( update_vscode, dependsOn: "classes" ) {
     doLast {
-        HashMap launch = (new groovy.json.JsonSlurper()).parseText(new File('.vscode/launch.json').text) as HashMap
-        launch.configurations[0].classPaths = (sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath).asPath.toString().tokenize(':').toList()
+        Map launch = (new groovy.json.JsonSlurper()).parseText(new File('.vscode/launch.json').text)
+        launch.configurations[0].classPaths = (sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath).asPath.toString().tokenize(':')
 
         new File('.vscode/launch.json').withWriter('UTF-8') { writer ->
-            //writer << groovy.json.JsonOutput.prettyPrint(launch)
             writer << groovy.json.JsonOutput.prettyPrint((launch as groovy.json.JsonBuilder).toString())
         }
     }

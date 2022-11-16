@@ -2,9 +2,8 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "preLaunchTask": "Update VSCode",
             "type": "java",
-            "name": "Launch Groovy REPL",
+            "name": "Groovy Console",
             "request": "launch",
             "mainClass": "groovy.ui.Console",
             "classPaths": [

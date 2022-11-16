@@ -33,7 +33,9 @@
 				"2gua.rainbow-brackets",
 				"vscjava.vscode-gradle",
 				"formulahendry.code-runner",
-				"naco-siren.gradle-language"
+				"naco-siren.gradle-language",
+				"Gruntfuggly.todo-tree",
+				"davehart.quick-run-panel"
 			]
 		}
 	},
