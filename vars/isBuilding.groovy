@@ -77,7 +77,7 @@ Boolean isMatchedTagBuild(Job build_parent, String expression) {
 
 @NonCPS
 Boolean isMatchedPRBuild(Job build_parent) {
-    SCMHead head = build_parent.getProperty(BranchJobProperty).branch.head
+    SCMHead head = build_parent?.getProperty(BranchJobProperty)?.branch?.head
     (head instanceof PullRequestSCMHead) ?: false
 }
 
