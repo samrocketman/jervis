@@ -95,8 +95,9 @@ task( console, dependsOn: "classes", type: JavaExec ) {
 
 task( update_vscode, dependsOn: "classes" ) {
     doLast {
+        String classpath = (sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath).asPath
         Map launch = (new groovy.json.JsonSlurper()).parseText(new File('.vscode/launch.json').text)
-        launch.configurations[0].classPaths = (sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath).asPath.toString().tokenize(':')
+        launch.configurations[0].classPaths = classpath.tokenize(':')
 
         new File('.vscode/launch.json').withWriter('UTF-8') { writer ->
             writer << groovy.json.JsonOutput.prettyPrint((launch as groovy.json.JsonBuilder).toString())
