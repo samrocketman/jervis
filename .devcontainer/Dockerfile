@@ -4,10 +4,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN set -ex; \
   apt-get update; \
-  apt-get install -y openjdk-11-jdk dumb-init git; \
+  apt-get install -y openjdk-11-jdk git; \
   yes | adduser vscode
 
-ENTRYPOINT [ "/usr/bin/dumb-init", "--" ]
 USER vscode
 WORKDIR /home/vscode
 ENV USER=vscode HOME=/home/vscode
+CMD ["/bin/bash", "-c", "while sleep 1000;do true;done"]

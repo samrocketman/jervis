@@ -1,0 +1,46 @@
+version: '2.2'
+volumes:
+  sonar-conf:
+  sonar-extensions:
+  sonar-data:
+  database-data:
+
+networks:
+  internal:
+    driver: bridge
+
+services:
+  jervis:
+    init: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # run with indefinite sleep for vscode connection persistence
+    command: /bin/bash -c 'while sleep 1000;do true;done'
+    volumes:
+      - ..:/workspace/jervis
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /run/user/${UID:-1000}/pulse/native:/run/user/${UID:-1000}/pulse/native
+    devices:
+      - /dev/dri
+      - /dev/snd
+    environment:
+      DISPLAY: $DISPLAY
+      PULSE_SERVER: unix:/run/user/${UID:-1000}/pulse/native
+    depends_on:
+      - sonarqube
+  sonarqube:
+    init: true
+    # https://hub.docker.com/_/sonarqube/
+    image: sonarqube:7.9.1-community
+    environment:
+      sonar.forceAuthentication: false
+      sonar.web.host: 0.0.0.0
+    depends_on:
+      - dbhost
+    volumes:
+      - sonar-conf:/opt/sonarqube/conf
+      - sonar-extensions:/opt/sonarqube/extensions
+      - sonar-data:/opt/sonarqube/data
+    networks:
+      - internal

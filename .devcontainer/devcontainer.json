@@ -1,47 +1,25 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.245.2/containers/java
 {
-	"name": "Jervis",
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
-
-	"mounts": [
-		{
-			"source": "/tmp/.X11-unix",
-			"target": "/tmp/.X11-unix",
-			"type": "bind"
-		}
-	],
-	"containerEnv": {
-		"DISPLAY": ":1"
-	},
-
-	// Configure tool-specific properties.
-	"customizations": {
-		// Configure properties specific to VS Code.
-		"vscode": {
-			// Set *default* container specific settings.json values on container create.
-			"settings": { 
-			},
-			
-			"extensions": [
-				"vscjava.vscode-java-pack",
-				"marlon407.code-groovy",
-				"vscodevim.vim",
-				"oderwat.indent-rainbow",
-				"2gua.rainbow-brackets",
-				"vscjava.vscode-gradle",
-				"formulahendry.code-runner",
-				"naco-siren.gradle-language",
-				"Gruntfuggly.todo-tree",
-				"davehart.quick-run-panel"
-			]
-		}
-	},
-
-	"remoteUser": "vscode",
-	"features": {
-		"git": "os-provided"
-	}
+    "name": "Jervis",
+    "dockerComposeFile": ["docker-compose.yml"],
+    "workspaceFolder": "/workspace/jervis",
+    "service": "jervis",
+    "extensions": [
+        "2gua.rainbow-brackets",
+        "Gruntfuggly.todo-tree",
+        "davehart.quick-run-panel",
+        "marlon407.code-groovy",
+        "mhutchie.git-graph",
+        "naco-siren.gradle-language",
+        "oderwat.indent-rainbow",
+        "shardulm94.trailing-spaces",
+        "vscjava.vscode-gradle",
+        "vscjava.vscode-java-pack",
+        "vscodevim.vim"
+    ],
+    "settings": {
+        "trailing-spaces.deleteModifiedLinesOnly": true
+    },
+    "features": {
+        "git": "os-provided"
+    }
 }
