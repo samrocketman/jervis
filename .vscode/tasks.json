@@ -2,22 +2,31 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Publish Code Coverage to SonarQube",
+			"label": "Test: Publish to SonarQube",
 			"type": "shell",
 			"command": [
 				"./gradlew",
 				"-Dsonar.host.url=http://sonarqube:9000",
+				"-Dsonar.projectKey=jervis",
+				"-Dsonar.projectName=jervis",
 				"clean",
 				"sonar"
 			],
 			"problemMatcher": []
 		},
 		{
-			"label": "Open SonarQube in Web Browser",
+			"label": "Generate API Docs",
 			"type": "shell",
 			"command": [
-				"firefox",
-				"http://sonarqube:9000/projects?sort=-analysis_date"
+				"/bin/bash -exc './gradlew groovydoc; rm -rf ~/groovydoc; cp -r build/docs/groovydoc ~/'"
+			],
+			"problemMatcher": []
+		},
+		{
+			"label": "Browser: Open SonarQube and Vault",
+			"type": "shell",
+			"command": [
+				"/bin/bash -exc 'pgrep -f firefox || firefox & firefox http://sonarqube:9000/projects?sort=-analysis_date http://vault:8200/ /home/vscode/groovydoc/index.html'"
 			],
 			"problemMatcher": []
 		},

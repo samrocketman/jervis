@@ -6,6 +6,7 @@
     "extensions": [
         "2gua.rainbow-brackets",
         "Gruntfuggly.todo-tree",
+        "adisreyaj.sonarqube-status",
         "davehart.quick-run-panel",
         "marlon407.code-groovy",
         "mhutchie.git-graph",

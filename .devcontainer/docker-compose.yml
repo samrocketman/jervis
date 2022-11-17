@@ -4,6 +4,7 @@ volumes:
   sonar-extensions:
   sonar-data:
   database-data:
+  vault-data:
 
 networks:
   internal:
@@ -21,12 +22,14 @@ services:
       - ..:/workspace/jervis
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /run/user/${UID:-1000}/pulse/native:/run/user/${UID:-1000}/pulse/native
+      - /run/user/${UID:-1000}/bus:/run/user/${UID:-1000}/bus
     devices:
       - /dev/dri
       - /dev/snd
     environment:
       DISPLAY: $DISPLAY
       PULSE_SERVER: unix:/run/user/${UID:-1000}/pulse/native
+      DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/${UID:-1000}/bus
     networks:
       - internal
     depends_on:
@@ -44,5 +47,41 @@ services:
       - sonar-conf:/opt/sonarqube/conf
       - sonar-extensions:/opt/sonarqube/extensions
       - sonar-data:/opt/sonarqube/data
+    networks:
+      - internal
+  vault:
+    image: vault
+    init: true
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -ex
+        export IP=$$(ip -o ro get $$(ip ro | awk '$$1 == "default" { print $$3 }') | awk '{print $$5}')
+        export VAULT_API_ADDR="http://$${IP}:8200" VAULT_CLUSTER_ADDR="https://$${IP}:8201"
+        exec vault server -config=/vault/config
+    volumes:
+      - vault-data:/vault
+    environment:
+      VAULT_ADDR: 'http://vault:8200'
+      VAULT_LOCAL_CONFIG: >-
+        {
+            "ui": true,
+            "backend": {
+                "file": {
+                    "path": "/vault/file"
+                }
+            },
+            "default_lease_ttl": "168h",
+            "listener": {
+                "tcp": {
+                    "address": "0.0.0.0:8200",
+                    "tls_disable": "1"
+                }
+            },
+            "max_lease_ttl": "720h"
+        }
+    cap_add:
+      - IPC_LOCK
     networks:
       - internal

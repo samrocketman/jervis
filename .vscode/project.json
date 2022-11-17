@@ -1,0 +1,8 @@
+{
+    "project": "jervis",
+    "sonarURL": "http://sonarqube:9000",
+    "auth": {
+        "username": "admin",
+        "password": "admin"
+    }
+}
