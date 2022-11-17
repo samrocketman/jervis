@@ -1,0 +1,47 @@
+version: '2.2'
+volumes:
+  conf:
+  extensions:
+  data:
+  database-data:
+
+networks:
+  internal:
+    driver: bridge
+
+services:
+  sonarqube:
+    init: true
+    # https://hub.docker.com/_/sonarqube/
+    image: sonarqube:7.9.1-community
+    environment:
+      sonar.forceAuthentication: false
+      sonar.jdbc.username: sonarqube
+      sonar.jdbc.password: sonarqube
+      sonar.jdbc.url: jdbc:postgresql://dbhost/sonarqube
+      sonar.web.host: 0.0.0.0
+    depends_on:
+      - dbhost
+    volumes:
+      - conf:/opt/sonarqube/conf
+      - extensions:/opt/sonarqube/extensions
+      - data:/opt/sonarqube/data
+    ports:
+      - 9000:9000
+    networks:
+      - internal
+  dbhost:
+    init: true
+    # https://hub.docker.com/_/postgres
+    image: postgres
+    volumes:
+      - 'database-data:/var/lib/postgresql/data'
+    environment:
+      # using POSTGRES_HOST_AUTH_METHOD instead of POSTGRES_HOST_AUTH_METHOD
+      POSTGRES_USER: sonarqube
+      POSTGRES_PASSWORD: sonarqube
+      # POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: sonarqube
+      POSTGRES_INITDB_ARGS: "-E 'UTF-8' --lc-collate='en_US.UTF-8' --lc-ctype='en_US.UTF-8'"
+    networks:
+      - internal
