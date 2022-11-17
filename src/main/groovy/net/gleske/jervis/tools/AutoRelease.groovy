@@ -214,7 +214,7 @@ class AutoRelease {
                 nextVersion = getNextRelease(currentVersion, git_tags, hotfix_seperator, prefix)
             }
         }
-   }
+    }
 
     /**
         Gets a bumped version with a more loosely formed format.  This
