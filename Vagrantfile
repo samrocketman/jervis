@@ -62,13 +62,38 @@ Vagrant.configure("2") do |config|
     su - vagrant -c 'code --install-extension ms-vscode-remote.remote-containers'
     su - vagrant -c 'code --install-extension ms-azuretools.vscode-docker'
     mkdir -p ~vagrant/.config/autostart
-    echo -e '[Desktop Entry]\nType=Application\nExec=code ~/git/jervis\nHidden=false\nNoDisplay=false\nX-GNOME-Autostart-enabled=true\nName[C]=Open VSCode with Jervis\nName=Open VSCode with Jervis\nComment[C]=\nComment=\n' > ~vagrant/.config/autostart/code.desktop
+    cat > ~vagrant/.config/autostart/code.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Exec=code git/jervis
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[C]=Open VSCode with Jervis
+Name=Open VSCode with Jervis
+Comment[C]=
+Comment=
+EOF
 
     mkdir -p ~vagrant/.config/Code/User/
-    echo -e '{\n"workbench.startupEditor": "none",\n    "telemetry.telemetryLevel": "off",\n    "dev.containers.dockerComposePath": "/usr/local/bin/docker-compose"\n}\n' > ~vagrant/.config/Code/User/settings.json
+    cat > ~vagrant/.config/Code/User/settings.json <<'EOF'
+{
+"workbench.startupEditor": "none",
+    "telemetry.telemetryLevel": "off",
+    "dev.containers.dockerComposePath": "/usr/local/bin/docker-compose"
+}
+EOF
     #auto login for vagrant
     mkdir -p /etc/gdm3/
-    echo '[daemon]\nAutomaticLoginEnable=True\nAutomaticLogin=vagrant\n[security]\n[xdmcp]\n[chooser]\n[debug]\n' > /etc/gdm3/custom.conf
+    cat > /etc/gdm3/custom.conf <<'EOF'
+[daemon]
+AutomaticLoginEnable=True
+AutomaticLogin=vagrant
+[security]
+[xdmcp]
+[chooser]
+[debug]
+EOF
     # Finalize and reboot to show VSCode automatically
     chown -R vagrant: ~vagrant
     apt-get upgrade -y
