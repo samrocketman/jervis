@@ -3,7 +3,6 @@ volumes:
   sonar-conf:
   sonar-extensions:
   sonar-data:
-  database-data:
   vault-data:
 
 networks:
@@ -39,8 +38,8 @@ services:
     # https://hub.docker.com/_/sonarqube/
     image: sonarqube:7.9.1-community
     environment:
-      sonar.forceAuthentication: false
-      sonar.web.host: 0.0.0.0
+      sonar.forceAuthentication: 'false'
+      sonar.web.host: '0.0.0.0'
     depends_on:
       - dbhost
     volumes:
