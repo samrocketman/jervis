@@ -27,6 +27,8 @@ services:
     environment:
       DISPLAY: $DISPLAY
       PULSE_SERVER: unix:/run/user/${UID:-1000}/pulse/native
+    networks:
+      - internal
     depends_on:
       - sonarqube
   sonarqube:

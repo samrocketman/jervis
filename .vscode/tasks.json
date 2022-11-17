@@ -2,6 +2,26 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "Publish Code Coverage to SonarQube",
+			"type": "shell",
+			"command": [
+				"./gradlew",
+				"-Dsonar.host.url=http://sonarqube:9000",
+				"clean",
+				"sonar"
+			],
+			"problemMatcher": []
+		},
+		{
+			"label": "Open SonarQube in Web Browser",
+			"type": "shell",
+			"command": [
+				"firefox",
+				"http://sonarqube:9000/projects?sort=-analysis_date"
+			],
+			"problemMatcher": []
+		},
+		{
 			"label": "Update launch.json classPaths to match Gradle",
 			"type": "shell",
 			"command": [

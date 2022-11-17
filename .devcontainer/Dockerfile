@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN set -ex; \
   apt-get update; \
-  apt-get install -y openjdk-11-jdk git; \
+  apt-get install -y openjdk-11-jdk git firefox; \
   yes | adduser vscode
 
 USER vscode
