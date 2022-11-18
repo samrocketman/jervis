@@ -13,3 +13,5 @@ id_rsa*
 #ignore automatically copied libs
 /lib
 /bin/
+
+/.vagrant
