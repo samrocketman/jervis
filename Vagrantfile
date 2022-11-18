@@ -31,6 +31,7 @@ Vagrant.configure("2") do |config|
     # sleep anywhere between 1 and 9 seconds
     function random_sleep() {
       local interval="$(tr -dc '1-9' < /dev/urandom | head -c1)"
+      sleep "$interval"
     }
     maxretries=300
     count=0
