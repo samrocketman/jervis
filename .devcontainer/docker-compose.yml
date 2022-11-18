@@ -33,6 +33,7 @@ services:
       - internal
     depends_on:
       - sonarqube
+      - vault
   sonarqube:
     init: true
     # https://hub.docker.com/_/sonarqube/
@@ -40,8 +41,6 @@ services:
     environment:
       sonar.forceAuthentication: 'false'
       sonar.web.host: '0.0.0.0'
-    depends_on:
-      - dbhost
     volumes:
       - sonar-conf:/opt/sonarqube/conf
       - sonar-extensions:/opt/sonarqube/extensions
