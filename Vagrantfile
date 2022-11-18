@@ -111,6 +111,22 @@ AutomaticLogin=vagrant
 [chooser]
 [debug]
 EOF
+
+    # Disable Package upgrade notifications
+    mkdir -p etc/update-manager/
+    cat > /etc/update-manager/release-upgrades <<'EOF'
+[DEFAULT]
+Prompt=never
+EOF
+    cat > /etc/apt/apt.conf.d/10periodic <<'EOF'
+APT::Periodic::Update-Package-Lists "0";
+APT::Periodic::Download-Upgradeable-Packages "0";
+APT::Periodic::AutocleanInterval "0";
+APT::Periodic::Unattended-Upgrade "1";
+EOF
+    cp -f /etc/apt/apt.conf.d/10periodic /etc/apt/apt.conf.d/20auto-upgrades
+
+
     # Finalize and reboot to show VSCode automatically
     chown -R vagrant: ~vagrant
     retry apt-get upgrade -y
