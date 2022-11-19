@@ -1,8 +1,9 @@
 version: '2.2'
 volumes:
+  dependency-track:
   sonar-conf:
-  sonar-extensions:
   sonar-data:
+  sonar-extensions:
   vault-data:
 
 networks:
@@ -81,5 +82,29 @@ services:
         }
     cap_add:
       - IPC_LOCK
+    networks:
+      - internal
+  dtrack-apiserver:
+    # https://dependencytrack.org/
+    image: dependencytrack/apiserver
+    # https://docs.dependencytrack.org/getting-started/configuration/
+    environment:
+      ALPINE_ENFORCE_AUTHENTICATION: 'false'
+      ALPINE_ENFORCE_AUTHORIZATION: 'false'
+
+    volumes:
+      - 'dependency-track:/data'
+      - './dependencytrack-application.properties:/data/.dependency-track/application.properties:ro'
+    restart: unless-stopped
+    networks:
+      - internal
+  dependencytrack:
+    image: dependencytrack/frontend
+    depends_on:
+      - dtrack-apiserver
+    environment:
+      API_BASE_URL: 'http://dtrack-apiserver:8080'
+      API_WITH_CREDENTIALS: 'false'
+    restart: unless-stopped
     networks:
       - internal

@@ -7,8 +7,8 @@ REASON='ERROR: This must be run relative to repository root.  '
 [ -d .git ]
 REASON='ERROR: missing bom.json.  '
 [ -f build/reports/bom.json ]
-REASON='ERROR: Missing DT_API_TOKEN env variable.  '
-[ -n "${DT_API_TOKEN:-}" ]
+#REASON='ERROR: Missing DT_API_TOKEN env variable.  '
+#[ -n "${DT_API_TOKEN:-}" ]
 unset REASON
 
 DT_PROJECT="${DT_PROJECT:-jervis}"
@@ -21,8 +21,18 @@ cat > build/reports/payload.json <<EOF
   "bom": "$( openssl enc -base64 -A -in build/reports/bom.json )"
 }
 EOF
+
+if [ -z "${DT_ENDPOINT:-}"]; then
+  DT_ENDPOINT=http://localhost:8081
+fi
+
+headers=( -H 'Content-Type: application/json' )
+if [ -n "${DT_API_TOKEN:-}" ]; then
+  headers+=( -H "X-Api-Key: ${DT_API_TOKEN}" )
+fi
+
+REASON="ERROR: Upload failed is the DT_API_TOKEN or DT_ENDPOINT correct?  DT_ENDPOINT='${DT_ENDPOINT}'.  "
 curl -X PUT \
-  -H 'Content-Type: application/json' \
-  -H "X-Api-Key: ${DT_API_TOKEN}" \
+  "${headers[@]}" \
   -d @build/reports/payload.json \
-  http://localhost:8081/api/v1/bom
+  "${DT_ENDPOINT%/}/api/v1/bom"
