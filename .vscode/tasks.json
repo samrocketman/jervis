@@ -15,6 +15,15 @@
 			"problemMatcher": []
 		},
 		{
+			"label": "Test: Publish to DependencyTrack",
+			"type": "shell",
+			"command": [
+				"export DT_API_TOKEN=;",
+				"/bin/bash -exc './gradlew --init-script ./dependencytrack/dtrack.gradle cyclonedxBom; DT_ENDPOINT=http://dtrack-apiserver:8080 ./dependencytrack/submit-results.sh'"
+			],
+			"problemMatcher": []
+		},
+		{
 			"label": "Generate API Docs",
 			"type": "shell",
 			"command": [

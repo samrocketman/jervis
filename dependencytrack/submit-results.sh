@@ -22,7 +22,7 @@ cat > build/reports/payload.json <<EOF
 }
 EOF
 
-if [ -z "${DT_ENDPOINT:-}"]; then
+if [ -z "${DT_ENDPOINT:-}" ]; then
   DT_ENDPOINT=http://localhost:8081
 fi
 
