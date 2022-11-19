@@ -100,8 +100,7 @@ services:
     networks:
       - internal
   dependencytrack:
-    #image: dependencytrack/frontend
-    image: frontend:snapshot
+    image: dependencytrack/frontend
     depends_on:
       - dtrack-apiserver
     environment:
