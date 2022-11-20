@@ -15,7 +15,7 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Test: Publish to DependencyTrack",
+			"label": "Security: Scan with DependencyTrack",
 			"type": "shell",
 			"command": [
 			//  "if ! grep DT_API_TOKEN ~/.bash_profile; then echo 'ERROR: Must set DT_API_TOKEN in ~/.bash_profile' >&2; exit 1; fi;",
@@ -32,10 +32,10 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Browser: Open SonarQube and Vault",
+			"label": "Browser: SonarQube, DependencyTrack, etc",
 			"type": "shell",
 			"command": [
-				"/bin/bash -exc 'pgrep -f firefox || firefox & firefox http://sonarqube:9000/projects?sort=-analysis_date http://vault:8200/ http://dependencytrack:8080/ /home/vscode/groovydoc/index.html build/reports/codenarc-vars.html build/reports/tests/test/index.html'"
+				"/bin/bash -exc 'pgrep -f firefox || firefox & firefox http://sonarqube:9000/projects?sort=-analysis_date http://dependencytrack:8080/ http://vault:8200/ /home/vscode/groovydoc/index.html build/reports/codenarc-vars.html build/reports/tests/test/index.html'"
 			],
 			"problemMatcher": []
 		},

@@ -1,12 +1,12 @@
 {
     "name": "Jervis",
+    "initializeCommand": "./.devcontainer/build-dependencytrack-snapshot.sh",
     "dockerComposeFile": ["docker-compose.yml"],
     "workspaceFolder": "/workspace/jervis",
     "service": "jervis",
     "extensions": [
         "2gua.rainbow-brackets",
         "Gruntfuggly.todo-tree",
-        "adisreyaj.sonarqube-status",
         "davehart.quick-run-panel",
         "marlon407.code-groovy",
         "mhutchie.git-graph",
