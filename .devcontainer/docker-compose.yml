@@ -33,6 +33,7 @@ services:
     networks:
       - internal
     depends_on:
+      - dependencytrack
       - sonarqube
       - vault
   sonarqube:
@@ -86,27 +87,29 @@ services:
       - internal
   dtrack-apiserver:
     # https://dependencytrack.org/
-    image: dependencytrack/apiserver
+    #image: dependencytrack/apiserver
+    image: apiserver:snapshot
     # https://docs.dependencytrack.org/getting-started/configuration/
     environment:
+      # Depends on https://github.com/DependencyTrack/dependency-track/pull/2169
       ALPINE_ENFORCE_AUTHENTICATION: 'false'
       ALPINE_ENFORCE_AUTHORIZATION: 'false'
 
     volumes:
       - 'dependency-track:/data'
-      # Depends on https://github.com/DependencyTrack/frontend/pull/334
-      #- './dependencytrack-application.properties:/data/.dependency-track/application.properties:ro'
     restart: unless-stopped
     networks:
       - internal
   dependencytrack:
-    image: dependencytrack/frontend
+    #image: dependencytrack/frontend
+    image: frontend:snapshot
     depends_on:
       - dtrack-apiserver
     environment:
       API_BASE_URL: 'http://dtrack-apiserver:8080'
+      API_WITH_CREDENTIALS: 'false'
       # Depends on https://github.com/DependencyTrack/frontend/pull/334
-      #API_NO_LOGIN: 'true'
+      API_NO_LOGIN: 'true'
     restart: unless-stopped
     networks:
       - internal
