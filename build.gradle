@@ -14,8 +14,8 @@ plugins {
     id 'signing'
 }
 
-if(JavaVersion.current() != JavaVersion.VERSION_1_8 && JavaVersion.current() != JavaVersion.VERSION_11) {
-    throw new GradleException("This project requires Java 8, but it's running on "+JavaVersion.current())
+if(JavaVersion.current() != JavaVersion.VERSION_11) {
+    throw new GradleException("This project requires Java 11, but it's running on "+JavaVersion.current())
 }
 compileJava {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -27,10 +27,10 @@ archivesBaseName = 'jervis'
 jar.baseName = 'jervis'
 version = "${version}"
 
-ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.15'
+ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.21'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
-ext.snakeYamlVersion = '1.29'
+ext.snakeYamlVersion = '1.33'
 
 //Apparently cobertura is only accurate at Java 1.6 byte code and earlier
 //However, this caused a bug that if this library is used on JDK7+ and then
@@ -48,6 +48,17 @@ println "Building ${archivesBaseName}-${version}"
 repositories {
     mavenCentral()
 }
+
+// Address security vulnerability identified by DependencyTrack located as a
+// transitive dependency within groovy-ant.
+configurations.all {
+    resolutionStrategy {
+        dependencySubstitution {
+            substitute module('org.apache.ant:ant:1.9.15') with module('org.apache.ant:ant:1.9.16')
+        }
+    }
+}
+
 dependencies {
     //compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
     compile "org.codehaus.groovy:groovy-ant:${groovyVersion}"
@@ -55,7 +66,7 @@ dependencies {
     compile "org.codehaus.groovy:groovy-json:${groovyVersion}"
     compile "org.codehaus.groovy:groovy-templates:${groovyVersion}"
     compile "org.codehaus.groovy:groovy:${groovyVersion}"
-    compile 'org.bouncycastle:bcpkix-jdk15on:1.60'
+    compile 'org.bouncycastle:bcpkix-jdk18on:1.72'
     compile "org.yaml:snakeyaml:${snakeYamlVersion}"
     testCompile 'junit:junit:4.12'
     testCompile "org.codehaus.groovy:groovy-test:${groovyVersion}"
@@ -78,12 +89,12 @@ test {
 
     // listen to events in the test execution lifecycle
     beforeTest { descriptor ->
-       logger.lifecycle('Running test: ' + descriptor)
+        logger.lifecycle('Running test: ' + descriptor)
     }
 
     // listen to standard out and standard error of the test JVM(s)
     onOutput { descriptor, event ->
-       logger.lifecycle('Test: ' + descriptor + ' produced standard out/err: ' + event.message )
+        logger.lifecycle('Test: ' + descriptor + ' produced standard out/err: ' + event.message )
     }
 }
 
