@@ -14,6 +14,8 @@
 #      git checkout jervis-<version number>
 #      ./submit-github-release-notes.sh
 
+set -e
+
 function awk_script() {
   cat <<'EOF'
 BEGIN {
@@ -88,7 +90,7 @@ function check_github_vars() {
     export GITHUB_USER GITHUB_REPO
   fi
 
-  if [ -z "${GITHUB_TOKEN}" -o -z "${GITHUB_USER}" -o -z "${GITHUB_REPO}" ]; then
+  if [[ -z "${GITHUB_TOKEN}" || -z "${GITHUB_USER}" || -z "${GITHUB_REPO}" ]]; then
     echo $'ERROR: Missing required environment variables:\n  - GITHUB_TOKEN\n  - GITHUB_USER\n  - GITHUB_REPO'
     [ -z "${!GITHUB_*}" ] || echo "You have defined: ${!GITHUB_*}"
     exit 1
@@ -136,7 +138,7 @@ function checkGHRbin() {
     curl -LO "${url}"
     "${SHASUM[@]}" -c - <<< "${sha256}  ${url##*/}"
     "${TAR[@]}" -xjf "${url##*/}"
-    \rm "${url##*/}"
+    command rm "${url##*/}"
     popd
   fi
 }
