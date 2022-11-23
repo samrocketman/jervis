@@ -19,6 +19,10 @@
     ],
     "settings": {
         "trailing-spaces.deleteModifiedLinesOnly": true
+        "QuickRunPanel.includeDebugConfigs": false,
+        "QuickRunPanel.taskSources": [
+            "Workspace"
+        ]
     },
     "features": {
         "git": "os-provided"
