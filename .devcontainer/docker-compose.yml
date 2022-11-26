@@ -39,7 +39,7 @@ services:
   sonarqube:
     init: true
     # https://hub.docker.com/_/sonarqube/
-    image: sonarqube:7.9.1-community
+    image: sonarqube:8.9.10-community
     environment:
       sonar.forceAuthentication: 'false'
       sonar.web.host: '0.0.0.0'
