@@ -7,9 +7,9 @@ full change log see the commit log.
 
 ### Warnings:
 
-- Builds are switching to OpenJDK11.  Target source compatibility is JDK1.8.  In
-  the future, JDK1.8 will be dropped in favor of OpenJDK11 following Java
-  supported by Jenkins project.
+- JDK1.8 is dropped.
+- OpenJDK11 is the bytecode compatibility going forward to match the Jenkins
+  project.
 
 ### New features:
 
