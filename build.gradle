@@ -10,16 +10,17 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.8.4'
     id 'groovy'
     id 'jacoco'
-    id 'maven'
+    id 'maven-publish'
     id 'signing'
 }
 
 if(JavaVersion.current() != JavaVersion.VERSION_11) {
     throw new GradleException("This project requires Java 11, but it's running on "+JavaVersion.current())
 }
+
 compileJava {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 group = 'net.gleske'
@@ -61,18 +62,18 @@ configurations.all {
 
 dependencies {
     //compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    compile "org.codehaus.groovy:groovy-ant:${groovyVersion}"
-    compile "org.codehaus.groovy:groovy-groovydoc:${groovyVersion}"
-    compile "org.codehaus.groovy:groovy-json:${groovyVersion}"
-    compile "org.codehaus.groovy:groovy-templates:${groovyVersion}"
-    compile "org.codehaus.groovy:groovy:${groovyVersion}"
-    compile 'org.bouncycastle:bcpkix-jdk18on:1.72'
-    compile "org.yaml:snakeyaml:${snakeYamlVersion}"
-    testCompile 'junit:junit:4.12'
-    testCompile "org.codehaus.groovy:groovy-test:${groovyVersion}"
-    testCompile "org.codehaus.groovy:groovy-console:${groovyVersion}"
-    testCompile 'org.codenarc:CodeNarc:2.2.0'
-    testCompile 'org.slf4j:slf4j-nop:1.7.32'
+    implementation "org.codehaus.groovy:groovy-ant:${groovyVersion}"
+    implementation "org.codehaus.groovy:groovy-groovydoc:${groovyVersion}"
+    implementation "org.codehaus.groovy:groovy-json:${groovyVersion}"
+    implementation "org.codehaus.groovy:groovy-templates:${groovyVersion}"
+    implementation "org.codehaus.groovy:groovy:${groovyVersion}"
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.72'
+    implementation "org.yaml:snakeyaml:${snakeYamlVersion}"
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.codehaus.groovy:groovy-test:${groovyVersion}"
+    testImplementation "org.codehaus.groovy:groovy-console:${groovyVersion}"
+    testImplementation 'org.codenarc:CodeNarc:2.2.0'
+    testImplementation 'org.slf4j:slf4j-nop:1.7.32'
 }
 
 test {
@@ -151,53 +152,58 @@ signing {
     def signingPassword = findProperty("signingPassword")
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign configurations.archives
+    //sign publishing.publications.mavenJava
 }
 
-uploadArchives {
+publishing {
     repositories {
-        mavenDeployer {
-            beforeDeployment {
-                MavenDeployment deployment -> signing.signPom(deployment)
+        maven {
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
             }
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            pom.project {
-                name 'Jervis'
-                packaging 'jar'
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                name = 'Jervis'
+                packaging = 'jar'
                 // optionally artifactId can be defined here
-                description 'Travis-like Jenkins job generation using Jenkins Job DSL plugin groovy scripts. Reads .travis.yml and generates a job in Jenkins.'
-                url 'https://github.com/samrocketman/jervis'
-
-                scm {
-                    connection 'https://github.com/samrocketman/jervis.git'
-                    developerConnection 'git@github.com:samrocketman/jervis.git'
-                    url 'https://github.com/samrocketman/jervis'
-                }
+                description = 'Travis-like Jenkins job generation using Jenkins Job DSL plugin groovy scripts. Reads .travis.yml and generates a job in Jenkins.'
+                url = 'https://github.com/samrocketman/jervis'
 
                 licenses {
                     license {
-                        name 'Apache License, Version 2.0'
-                        url 'https://raw.githubusercontent.com/samrocketman/jervis/master/LICENSE'
+                        name = 'Apache License, Version 2.0'
+                        url  = 'https://raw.githubusercontent.com/samrocketman/jervis/master/LICENSE'
                     }
                 }
 
                 developers {
                     developer {
-                        id 'sag47'
-                        name 'Sam Gleske'
-                        email 'sam.mxracer@gmail.com'
+                        id = 'sag47'
+                        name = 'Sam Gleske'
+                        email = 'sam.mxracer@gmail.com'
                     }
+                }
+
+                scm {
+                    connection = 'https://github.com/samrocketman/jervis.git'
+                    developerConnection = 'git@github.com:samrocketman/jervis.git'
+                    url = 'https://github.com/samrocketman/jervis'
                 }
             }
         }
     }
+}
+
+// disable Gradle metadata in maven publishing
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
 }
 
 //dependencies for building a jar
@@ -209,7 +215,7 @@ gradle.taskGraph.whenReady { graph ->
     if (graph.hasTask(':jacocoTestReport')) {
         compileGroovy.groovyOptions.optimizationOptions.all = false
     }
-    if (graph.hasTask(':uploadArchives')) {
+    if (graph.hasTask(':publish')) {
         if(!(System.getenv('ORG_GRADLE_PROJECT_signingKey') && System.getenv('ORG_GRADLE_PROJECT_signingPassword'))) {
             throw new GradleException("ERROR: Attempting to release without signing key and password.  See RELEASE.md for details.")
         }

@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat
 
 groovydoc {
     use = true
-    groovyClasspath = configurations.compile // http://issues.gradle.org/browse/GRADLE-1391
+    // groovyClasspath = configurations.compile // http://issues.gradle.org/browse/GRADLE-1391
     // Create GroovyDoc for Groovy
     source = [sourceSets.main.groovy, sourceSets.main.java]
     windowTitle = "Jervis API Docs"
