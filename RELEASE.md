@@ -49,7 +49,7 @@ fingerprint is the following.
 2. Tag the current commit: e.g. `jervis-0.2`.
 3. Upload the release.
    ```
-   ./gradlew clean check uploadArchives
+   ./gradlew clean check publish
    ```
 4. Increment plugin version to next snapshot: e.g. `0.3-SNAPSHOT`.  Commit.
 
