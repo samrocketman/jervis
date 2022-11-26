@@ -15,3 +15,5 @@ id_rsa*
 /bin/
 
 /.vagrant
+
+*.swp
