@@ -56,6 +56,8 @@ configurations.all {
     resolutionStrategy {
         dependencySubstitution {
             substitute module('org.apache.ant:ant:1.9.15') with module('org.apache.ant:ant:1.9.16')
+            substitute module('org.apache.ant:ant-antlr:1.9.15') with module('org.apache.ant:ant-antlr:1.9.16')
+            substitute module('org.apache.ant:ant-junit:1.9.15') with module('org.apache.ant:ant-junit:1.9.16')
         }
     }
 }
