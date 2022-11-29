@@ -18,7 +18,7 @@
         "vscodevim.vim"
     ],
     "settings": {
-        "trailing-spaces.deleteModifiedLinesOnly": true
+        "trailing-spaces.deleteModifiedLinesOnly": true,
         "QuickRunPanel.includeDebugConfigs": false,
         "QuickRunPanel.taskSources": [
             "Workspace"
