@@ -22,6 +22,13 @@ import net.gleske.jervis.exceptions.SecurityException
 
 import java.security.KeyPair
 import java.security.Security
+import java.security.KeyFactory
+import java.security.spec.PKCS8EncodedKeySpec
+import java.time.Duration
+import java.time.Instant
+import groovy.json.JsonBuilder
+import java.security.Signature
+
 import org.bouncycastle.crypto.AsymmetricBlockCipher
 import org.bouncycastle.crypto.encodings.PKCS1Encoding
 import org.bouncycastle.crypto.engines.RSAEngine
@@ -100,6 +107,46 @@ println key_pair.public.modulus.bitLength()</tt></pre>
         setKey_pair(private_key_pem)
     }
 
+    // https://www.quickprogrammingtips.com/java/how-to-create-sha256-rsa-signature-using-java.html
+    String signRS256Base64Url(String data) {
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(key_pair.private.encoded)
+        KeyFactory kf = KeyFactory.getInstance("RSA")
+        Signature privateSignature = Signature.getInstance("SHA256withRSA")
+        privateSignature.initSign(kf.generatePrivate(spec))
+        privateSignature.update(data.getBytes("UTF-8"))
+        byte[] signedData = privateSignature.sign()
+        encodeBase64Url(signedData)
+    }
+
+    String getGitHubJWT(String github_app_id, Integer expiration = 10, Integer drift = 30) {
+        // 30 seconds in the past for clock drift
+        Instant issuedAt = Instant.now().minus(Duration.ofSeconds(drift))
+        // 10 minutes is the max limited duration for a GitHub JWT
+        Instant expiration = issuedAt.plus(Duration.ofMinutes(expiration))
+
+        // https://jwt.io/
+        String header = '{"alg":"RS256","typ":"JWT"}'
+        // https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#authenticating-as-a-github-app
+        String payload = ([
+            iat: issuedAt.getEpochSecond(),
+            exp: expiration.getEpochSecond(),
+            iss: github_app_id
+        ] as JsonBuilder).toString()
+        "${encodeBase64Url(header)}.${encodeBase64Url(payload)}".with { String data ->
+            "${data}.${signRS256Base64Url(data)}"
+        }
+    }
+
+    Boolean verifyGitHubJWT(String github_jwt) {
+        List jwt = github_jwt.tokenize('.')
+        String data = jwt[0..1].join('.')
+        String signature = jwt[-1]
+        Signature publicSignature = Signature.getInstance("SHA256withRSA")
+        publicSignature.initVerify(key_pair.public);
+        publicSignature.update(data.bytes)
+        publicSignature.verify(decodeBase64UrlBytes(signature))
+    }
+
     /**
       Sets <tt>{@link #key_pair}</tt> by decoding the <tt>String</tt>.
 
@@ -173,6 +220,14 @@ println key_pair.public.modulus.bitLength()</tt></pre>
         content.trim().decodeBase64()
     }
 
+    public String decodeBase64UrlString(String content) {
+        decodeBase64String(content.tr('-_', '+/'))
+    }
+
+    public byte[] decodeBase64UrlBytes(String content) {
+        decodeBase64Bytes(content.tr('-_', '+/'))
+    }
+
     /**
       Encode a <tt>String</tt> into a base64 <tt>String</tt>.
 
@@ -191,6 +246,14 @@ println key_pair.public.modulus.bitLength()</tt></pre>
      */
     public String encodeBase64(byte[] content) {
         content.encodeBase64().toString()
+    }
+
+    public String encodeBase64Url(String content) {
+        encodeBase64(content).tr('+/', '-_')
+    }
+
+    public String encodeBase64Url(byte[] content) {
+        encodeBase64(content).tr('+/', '-_')
     }
 
     /**
