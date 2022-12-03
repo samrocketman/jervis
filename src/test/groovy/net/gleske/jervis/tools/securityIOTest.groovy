@@ -166,4 +166,40 @@ class securityIOTest extends GroovyTestCase {
         String jwt_like = "junk.junk.${signature}"
         assert false == security.verifyGitHubJWT(jwt_like)
     }
+
+    @Test public void test_securityIO_encodeBase64UrlBytes() {
+        // this data should include both + and / characters
+        byte[] data = '~~?~asdf~~?~asdf'.bytes
+        String base64 = data.encodeBase64().toString()
+        assert base64.contains('+') == true
+        assert base64.contains('/') == true
+        assert base64.tr('+/', '-_') == security.encodeBase64Url(data)
+    }
+
+    @Test public void test_securityIO_encodeBase64UrlString() {
+        // this data should include both + and / characters
+        String data = '~~?~asdf~~?~asdf'
+        String base64 = data.bytes.encodeBase64().toString()
+        assert base64.contains('+') == true
+        assert base64.contains('/') == true
+        assert base64.tr('+/', '-_') == security.encodeBase64Url(data)
+    }
+
+    @Test public void test_securityIO_decodeBase64UrlBytes() {
+        // this data should include both + and / characters
+        byte[] data = '~~?~asdf~~?~asdf'.bytes
+        String base64url = data.encodeBase64().toString().tr('+/', '-_')
+        assert base64url.contains('-') == true
+        assert base64url.contains('_') == true
+        assert data == security.decodeBase64UrlBytes(base64url)
+    }
+
+    @Test public void test_securityIO_decodeBase64UrlString() {
+        // this data should include both + and / characters
+        String data = '~~?~asdf~~?~asdf'
+        String base64url = data.bytes.encodeBase64().toString().tr('+/', '-_')
+        assert base64url.contains('-') == true
+        assert base64url.contains('_') == true
+        assert data == security.decodeBase64UrlString(base64url)
+    }
 }
