@@ -19,3 +19,4 @@ id_rsa*
 /.vagrant
 
 *.swp
+*.hprof
