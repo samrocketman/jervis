@@ -17,6 +17,7 @@ package net.gleske.jervis.tools
 //the securityIOTest() class automatically sees the securityIO() class because they're in the same package
 import java.nio.file.Files
 import java.nio.file.Path
+import java.time.Instant
 import net.gleske.jervis.exceptions.DecryptException
 import net.gleske.jervis.exceptions.EncryptException
 import net.gleske.jervis.exceptions.KeyPairDecodeException
@@ -24,6 +25,8 @@ import net.gleske.jervis.exceptions.SecurityException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.constructor.SafeConstructor
 
 class securityIOTest extends GroovyTestCase {
     def jervis_tmp
@@ -186,7 +189,7 @@ class securityIOTest extends GroovyTestCase {
     }
 
     @Test public void test_securityIO_decodeBase64UrlBytes() {
-        // this data should include both + and / characters
+        // this data should include both - and _ characters
         byte[] data = '~~?~asdf~~?~asdf'.bytes
         String base64url = data.encodeBase64().toString().tr('+/', '-_')
         assert base64url.contains('-') == true
@@ -195,11 +198,59 @@ class securityIOTest extends GroovyTestCase {
     }
 
     @Test public void test_securityIO_decodeBase64UrlString() {
-        // this data should include both + and / characters
+        // this data should include both - and _ characters
         String data = '~~?~asdf~~?~asdf'
         String base64url = data.bytes.encodeBase64().toString().tr('+/', '-_')
         assert base64url.contains('-') == true
         assert base64url.contains('_') == true
         assert data == security.decodeBase64UrlString(base64url)
+    }
+
+    @Test public void test_securityIO_getGitHubJWT() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        String jwt_token = security.getGitHubJWT('1234')
+        assert true == security.verifyGitHubJWT(jwt_token)
+        String header
+        Map payload
+        jwt_token.tokenize('.').with {
+            header = security.decodeBase64String(it[0])
+            payload = (new Yaml(new SafeConstructor())).load(security.decodeBase64String(it[1]))
+        }
+        assert header == '{"alg":"RS256","typ":"JWT"}'
+        assert 'iat' in payload
+        assert 'exp' in payload
+        assert 'iss' in payload
+        assert payload.iss == '1234'
+        // default is 10 minute token duration
+        assert (payload.exp - payload.iat) == 600
+    }
+
+    @Test public void test_securityIO_getGitHubJWT_expire() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        String jwt_token = security.getGitHubJWT('1234', 2, 30)
+        Map payload = (new Yaml(new SafeConstructor())).load(security.decodeBase64String(jwt_token.tokenize('.')[1]))
+        Integer now = Instant.now().getEpochSecond()
+
+        // validate we our JWT is not expired
+        assert now > payload.iat
+        assert now < payload.exp
+        // 2 minute token duration
+        assert (payload.exp - payload.iat) == 120
+    }
+
+    @Test public void test_securityIO_getGitHubJWT_expire_and_drift() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        String jwt_token = security.getGitHubJWT('1234', 1, 120)
+        Map payload = (new Yaml(new SafeConstructor())).load(security.decodeBase64String(jwt_token.tokenize('.')[1]))
+        Integer now = Instant.now().getEpochSecond()
+
+        // Verify due to drift and expiration our JWT is expired
+        assert now > payload.iat
+        assert now > payload.exp
+        // 1 minute token duration
+        assert (payload.exp - payload.iat) == 60
     }
 }

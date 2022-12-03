@@ -20,15 +20,14 @@ import net.gleske.jervis.exceptions.EncryptException
 import net.gleske.jervis.exceptions.KeyPairDecodeException
 import net.gleske.jervis.exceptions.SecurityException
 
+import groovy.json.JsonBuilder
+import java.security.KeyFactory
 import java.security.KeyPair
 import java.security.Security
-import java.security.KeyFactory
+import java.security.Signature
 import java.security.spec.PKCS8EncodedKeySpec
 import java.time.Duration
 import java.time.Instant
-import groovy.json.JsonBuilder
-import java.security.Signature
-
 import org.bouncycastle.crypto.AsymmetricBlockCipher
 import org.bouncycastle.crypto.encodings.PKCS1Encoding
 import org.bouncycastle.crypto.engines.RSAEngine
