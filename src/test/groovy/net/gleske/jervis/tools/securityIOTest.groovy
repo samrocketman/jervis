@@ -150,4 +150,20 @@ class securityIOTest extends GroovyTestCase {
             security.key_pair = url.content.text
         }
     }
+
+    @Test public void test_securityIO_signRS256Base64Url_and_verifyGitHubJWT() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        String signature = security.signRS256Base64Url('data.data')
+        String jwt_like = "data.data.${signature}"
+        assert true == security.verifyGitHubJWT(jwt_like)
+    }
+
+    @Test public void test_securityIO_verifyGitHubJWT_fail_to_verify() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        String signature = security.signRS256Base64Url('data.data')
+        String jwt_like = "junk.junk.${signature}"
+        assert false == security.verifyGitHubJWT(jwt_like)
+    }
 }
