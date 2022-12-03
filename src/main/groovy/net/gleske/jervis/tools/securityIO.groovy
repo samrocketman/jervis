@@ -122,14 +122,14 @@ println key_pair.public.modulus.bitLength()</tt></pre>
         // 30 seconds in the past for clock drift
         Instant issuedAt = Instant.now().minus(Duration.ofSeconds(drift))
         // 10 minutes is the max limited duration for a GitHub JWT
-        Instant expiration = issuedAt.plus(Duration.ofMinutes(expiration))
+        Instant expiresAt = issuedAt.plus(Duration.ofMinutes(expiration))
 
         // https://jwt.io/
         String header = '{"alg":"RS256","typ":"JWT"}'
         // https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#authenticating-as-a-github-app
         String payload = ([
             iat: issuedAt.getEpochSecond(),
-            exp: expiration.getEpochSecond(),
+            exp: expiresAt.getEpochSecond(),
             iss: github_app_id
         ] as JsonBuilder).toString()
         "${encodeBase64Url(header)}.${encodeBase64Url(payload)}".with { String data ->
