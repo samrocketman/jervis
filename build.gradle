@@ -64,31 +64,11 @@ configurations.all {
 
 dependencies {
     //compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    implementation("org.codehaus.groovy:groovy-ant") {
-        version {
-            strictly "${groovyVersion}"
-        }
-    }
-    implementation("org.codehaus.groovy:groovy-groovydoc") {
-        version {
-            strictly "${groovyVersion}"
-        }
-    }
-    implementation("org.codehaus.groovy:groovy-json") {
-        version {
-            strictly "${groovyVersion}"
-        }
-    }
-    implementation("org.codehaus.groovy:groovy-templates") {
-        version {
-            strictly "${groovyVersion}"
-        }
-    }
-    implementation("org.codehaus.groovy:groovy") {
-        version {
-            strictly "${groovyVersion}"
-        }
-    }
+    implementation "org.codehaus.groovy:groovy-ant:${groovyVersion}"
+    implementation "org.codehaus.groovy:groovy-groovydoc:${groovyVersion}"
+    implementation "org.codehaus.groovy:groovy-json:${groovyVersion}"
+    implementation "org.codehaus.groovy:groovy-templates:${groovyVersion}"
+    implementation "org.codehaus.groovy:groovy:${groovyVersion}"
     implementation 'org.bouncycastle:bcpkix-jdk18on:1.72'
     implementation "org.yaml:snakeyaml:${snakeYamlVersion}"
     testImplementation 'junit:junit:4.13.2'
