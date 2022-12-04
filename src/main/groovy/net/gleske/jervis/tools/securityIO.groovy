@@ -38,6 +38,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.constructor.SafeConstructor
 
 /**
   A class to provide cryptographic features to Jervis such as RSA encryption and base64 encoding.
@@ -149,37 +151,25 @@ if(!(new File('/tmp/id_rsa').exists())) {
 def security = new securityIO(new File("/tmp/id_rsa").text)
 // use a fake App ID of 1234
 String jwt = security.getGitHubJWT('1234')
-Boolean verified = security.verifyGitHubJWT(jwt)
-Map payload
-if(verified) {
-    String decoded_payload = security.decodeBase64UrlString(jwt.tokenize('.')[1])
-    Yaml yaml = new Yaml(new SafeConstructor())
-    payload = yaml.load(decoded_payload)
-    Integer time_since_epoc = Instant.now().getEpochSecond()
-    if(payload.iat < time_since_epoc && payload.exp > time_since_epoc) {
-        println('JWT is currently valid.')
-    } else {
-        println('JWT is invalid or expired.')
-    }
+if(security.verifyGithubJWTPayload(jwt)) {
+    println('JWT is currently valid.')
+} else {
+    println('JWT is invalid or expired.')
 }
 
 // Issue a 1 minute duration JWT, using clock drift 2 minutes in the past so that it is expired
 jwt = security.getGitHubJWT('1234', 1, 120)
-if(security.verifyGitHubJWT(jwt)) {
-    payload = (new Yaml(new SafeConstructor())).load(security.decodeBase64UrlString(jwt.tokenize('.')[1]))
-    Integer time_since_epoc = Instant.now().getEpochSecond()
-    if(payload.iat < time_since_epoc && payload.exp > time_since_epoc) {
-        println('JWT is currently valid.')
-    } else {
-        println('JWT is invalid or expired.')
-    }
+if(security.verifyGithubJWTPayload(jwt)) {
+    println('JWT is currently valid.')
+} else {
+    println('JWT is invalid or expired.')
 }</tt></pre>
 
       @param github_app_id The GitHub App ID available when generating a GitHub App.
       @param expiration    The duration of the JWT in minutes before the JWT
                            expires.  The maximum value supported by GitHub is
-                           10 minutes.  You can make this less than 10 minutes.
-                           Default: <tt>10</tt> minutes.
+                           10 minutes.  Minimum expiration is <tt>1</tt>
+                           minute.  Default: <tt>10</tt> minutes.
       @param drift         Number of seconds in the past used as the starting
                            point of the JWT.  This is to account for clock
                            drift between two remote systems as a conservative
@@ -188,8 +178,19 @@ if(security.verifyGitHubJWT(jwt)) {
                            seconds in the future (10 minutes total if you
                            include 30 seconds for clock drift).
                            Default: <tt>30</tt> seconds.
+      @return              Returns a signed JWT.  This does not guarantee a
+                           valid token just that a token is issued and signed.
+                           Use <tt>{@link #verifyGithubJWTPayload(java.lang.String, java.lang.Integer)}</tt>
+                           method to verify the token is valid given the
+                           current time.
       */
     String getGitHubJWT(String github_app_id, Integer expiration = 10, Integer drift = 30) {
+        if(expiration < 1) {
+            expiration = 1
+        }
+        else if(expiration > 10) {
+            expiration = 10
+        }
         // 30 seconds in the past for clock drift
         Instant issuedAt = Instant.now().minus(Duration.ofSeconds(drift))
         // 10 minutes is the max limited duration for a GitHub JWT
@@ -224,6 +225,31 @@ if(security.verifyGitHubJWT(jwt)) {
         publicSignature.initVerify(key_pair.public);
         publicSignature.update(data.bytes)
         publicSignature.verify(decodeBase64UrlBytes(signature))
+    }
+
+    /**
+      Verify a GitHub JWT is not expired by checking the signature and
+      ensuring current time falls within issued at and expiration.  This does
+      both signature checking and decoding the payload to check for validity.
+
+      @param github_jwt A JWT meant for use in GitHub App Auth.
+      @param drift      Add seconds into the future in order to account for
+                        clock drift.  If <tt>30</tt> seconds are added that
+                        means this will assume a token expires 30 seconds
+                        before it really expires.  If you issue a token with a
+                        30 second drift and verify the token with a 30 second
+                        drift then the maximum duration for a token is
+                        <tt>9</tt> minutes.
+                        Default: <tt>30</tt> seconds.
+      */
+    Boolean verifyGithubJWTPayload(String github_jwt, Integer drift = 30) {
+        if(!verifyGitHubJWT(github_jwt)) {
+            return false
+        }
+        Map payload = (new Yaml(new SafeConstructor())).load(decodeBase64UrlString(github_jwt.tokenize('.')[1]))
+        // add seconds into the future to account for clock drift
+        Integer time_since_epoch = Instant.now().getEpochSecond() + drift
+        payload.iat < time_since_epoch && payload.exp > time_since_epoch
     }
 
     /**
