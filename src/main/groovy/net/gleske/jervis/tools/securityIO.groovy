@@ -106,7 +106,15 @@ println key_pair.public.modulus.bitLength()</tt></pre>
         setKey_pair(private_key_pem)
     }
 
-    // https://www.quickprogrammingtips.com/java/how-to-create-sha256-rsa-signature-using-java.html
+    /**
+      Creates a URL safe base64 string of a signature using algorithm RS256.
+      This data signature is meant for use in <a href="https://jwt.io/">JSON
+      Web Tokens</a>.
+
+      @param data Any data meant to be signed with RS256 algorithm.
+      @return     Returns a URL safe base64 encoded <tt>String</tt> of the
+                  signature.
+      */
     String signRS256Base64Url(String data) {
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(key_pair.private.encoded)
         KeyFactory kf = KeyFactory.getInstance("RSA")
@@ -117,6 +125,70 @@ println key_pair.public.modulus.bitLength()</tt></pre>
         encodeBase64Url(signedData)
     }
 
+    /**
+      Get a <a href="https://jwt.io/">JSON Web Token</a> (JWT) meant for use with
+      <a href="https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#authenticating-as-a-github-app">GitHub App Authentication</a>.
+      This assumes the <tt>securityIO</tt> class was loaded with an RSA private
+      key provided by GitHub App Authentication setup.
+
+      <h2>Sample usage</h2>
+
+      The following code will generate a JWT, verify it, and extract its
+      payload contents.
+
+<pre><tt>import net.gleske.jervis.tools.securityIO
+
+import java.time.Instant
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.constructor.SafeConstructor
+
+if(!(new File('/tmp/id_rsa').exists())) {
+    'openssl genrsa -out /tmp/id_rsa 2048'.execute().waitFor()
+    'openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub'.execute().waitFor()
+}
+def security = new securityIO(new File("/tmp/id_rsa").text)
+// use a fake App ID of 1234
+String jwt = security.getGitHubJWT('1234')
+Boolean verified = security.verifyGitHubJWT(jwt)
+Map payload
+if(verified) {
+    String decoded_payload = security.decodeBase64UrlString(jwt.tokenize('.')[1])
+    Yaml yaml = new Yaml(new SafeConstructor())
+    payload = yaml.load(decoded_payload)
+    Integer time_since_epoc = Instant.now().getEpochSecond()
+    if(payload.iat < time_since_epoc && payload.exp > time_since_epoc) {
+        println('JWT is currently valid.')
+    } else {
+        println('JWT is invalid or expired.')
+    }
+}
+
+// Issue a 1 minute duration JWT, using clock drift 2 minutes in the past so that it is expired
+jwt = security.getGitHubJWT('1234', 1, 120)
+if(security.verifyGitHubJWT(jwt)) {
+    payload = (new Yaml(new SafeConstructor())).load(security.decodeBase64UrlString(jwt.tokenize('.')[1]))
+    Integer time_since_epoc = Instant.now().getEpochSecond()
+    if(payload.iat < time_since_epoc && payload.exp > time_since_epoc) {
+        println('JWT is currently valid.')
+    } else {
+        println('JWT is invalid or expired.')
+    }
+}</tt></pre>
+
+      @param github_app_id The GitHub App ID available when generating a GitHub App.
+      @param expiration    The duration of the JWT in minutes before the JWT
+                           expires.  The maximum value supported by GitHub is
+                           10 minutes.  You can make this less than 10 minutes.
+                           Default: <tt>10</tt> minutes.
+      @param drift         Number of seconds in the past used as the starting
+                           point of the JWT.  This is to account for clock
+                           drift between two remote systems as a conservative
+                           measure.  If the drift is set for 30 seconds that
+                           means the issues JWT will expire in 9 minutes, 30
+                           seconds in the future (10 minutes total if you
+                           include 30 seconds for clock drift).
+                           Default: <tt>30</tt> seconds.
+      */
     String getGitHubJWT(String github_app_id, Integer expiration = 10, Integer drift = 30) {
         // 30 seconds in the past for clock drift
         Instant issuedAt = Instant.now().minus(Duration.ofSeconds(drift))
@@ -136,6 +208,14 @@ println key_pair.public.modulus.bitLength()</tt></pre>
         }
     }
 
+    /**
+      Use the loaded public key to verify the provided JSON web token (JWT).
+
+      @param github_jwt A JSON Web Token meant for <a href="https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#authenticating-as-a-github-app">GitHub App Authentication</a>.
+      @return           Returns <tt>true</tt> if the signature was successfully
+                        verified or <tt>false</tt> if signature verification
+                        failed.
+      */
     Boolean verifyGitHubJWT(String github_jwt) {
         List jwt = github_jwt.tokenize('.')
         String data = jwt[0..1].join('.')
@@ -219,10 +299,22 @@ println key_pair.public.modulus.bitLength()</tt></pre>
         content.trim().decodeBase64()
     }
 
+    /**
+      Decode a URL safe base64 <tt>String</tt> into a <tt>String</tt>.
+
+      @param  content A URL safe base64 encoded <tt>String</tt>.
+      @return         A decoded <tt>String</tt>.
+     */
     public String decodeBase64UrlString(String content) {
         decodeBase64String(content.tr('-_', '+/'))
     }
 
+    /**
+      Decode a URL safe base64 <tt>String</tt> into <tt>{@link java.lang.Byte}s</tt>.
+
+      @param  content URL safe base64 encoded <tt>String</tt>.
+      @return         Decoded raw <tt>Bytes</tt>.
+     */
     public byte[] decodeBase64UrlBytes(String content) {
         decodeBase64Bytes(content.tr('-_', '+/'))
     }
@@ -247,10 +339,22 @@ println key_pair.public.modulus.bitLength()</tt></pre>
         content.encodeBase64().toString()
     }
 
+    /**
+      Encode raw <tt>{@link java.lang.Byte}s</tt> into a URL safe base64 <tt>String</tt>.
+
+      @param  content A plain <tt>String</tt>.
+      @return         A URL safe Base64 encoded <tt>String</tt>.
+     */
     public String encodeBase64Url(String content) {
         encodeBase64(content).tr('+/', '-_')
     }
 
+    /**
+      Encode raw <tt>{@link java.lang.Byte}s</tt> into a URL safe base64 <tt>String</tt>.
+
+      @param  content Raw <tt>Bytes</tt>.
+      @return         A URL safe Base64 encoded <tt>String</tt>.
+     */
     public String encodeBase64Url(byte[] content) {
         encodeBase64(content).tr('+/', '-_')
     }
