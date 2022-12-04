@@ -14,7 +14,7 @@ groovydoc {
     docTitle = "Jervis ${version} API"
     header = '<a href="https://github.com/samrocketman/jervis" target="_blank">github.com/samrocketman/jervis</a>'
     footer = '<a href="https://github.com/samrocketman/jervis" target="_blank">Jervis</a> API documentation.'
-    link 'http://download.oracle.com/javase/8/docs/api/', 'java.'
+    link 'https://docs.oracle.com/en/java/javase/11/docs/api/java.base/', 'java.'
     link 'http://docs.groovy-lang.org/latest/html/gapi/', 'groovy.', 'org.codehaus.groovy.'
     link 'https://javadoc.jenkins-ci.org/', 'hudson.', 'jenkins.'
     doLast {
