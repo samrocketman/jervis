@@ -225,6 +225,24 @@ class securityIOTest extends GroovyTestCase {
         // default is 10 minute token duration
         assert (payload.exp - payload.iat) == 600
     }
+    @Test public void test_securityIO_getGitHubJWT_min_expire() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        String jwt_token = security.getGitHubJWT('1234', -1, 20)
+        assert true == security.verifyGitHubJWTPayload(jwt_token)
+    }
+
+    @Test public void test_securityIO_getGitHubJWT_max_expire() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        // Request a 20 minute token but we're only issued a 10 minute token
+        // 10 minute and 1 second drift set
+        String jwt_token = security.getGitHubJWT('1234', 20, 601)
+        // Verify the payload is expired with no payload drift.  If 20 minutes
+        // were allowed then the token would be valid but because the max is 10
+        // minutes, then this should show expired.
+        assert false == security.verifyGitHubJWTPayload(jwt_token, 0)
+    }
 
     @Test public void test_securityIO_getGitHubJWT_expire() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
@@ -252,5 +270,40 @@ class securityIOTest extends GroovyTestCase {
         assert now > payload.exp
         // 1 minute token duration
         assert (payload.exp - payload.iat) == 60
+    }
+
+    @Test public void test_securityIO_verifyGitHubJWTPayload_bad_signature() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        String signature = security.signRS256Base64Url('data.data')
+        String jwt_like = "junk.junk.${signature}"
+        assert false == security.verifyGitHubJWTPayload(jwt_like)
+    }
+
+    @Test public void test_securityIO_verifyGitHubJWTPayload_valid() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        String jwt = security.getGitHubJWT('1234')
+        assert true == security.verifyGitHubJWTPayload(jwt)
+    }
+
+    @Test public void test_securityIO_verifyGitHubJWTPayload_expired_with_drift() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        String jwt = security.getGitHubJWT('1234', 1, 40)
+        assert false == security.verifyGitHubJWTPayload(jwt)
+    }
+
+    @Test public void test_securityIO_verifyGitHubJWTPayload_valid_without_drift() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        String jwt = security.getGitHubJWT('1234', 1, 40)
+        assert true == security.verifyGitHubJWTPayload(jwt, 0)
+    }
+    @Test public void test_securityIO_verifyGitHubJWTPayload_invalid_with_negative_drift() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new securityIO(url.content.text)
+        String jwt = security.getGitHubJWT('1234', 1, 40)
+        assert false == security.verifyGitHubJWTPayload(jwt, -60)
     }
 }

@@ -151,7 +151,7 @@ if(!(new File('/tmp/id_rsa').exists())) {
 def security = new securityIO(new File("/tmp/id_rsa").text)
 // use a fake App ID of 1234
 String jwt = security.getGitHubJWT('1234')
-if(security.verifyGithubJWTPayload(jwt)) {
+if(security.verifyGitHubJWTPayload(jwt)) {
     println('JWT is currently valid.')
 } else {
     println('JWT is invalid or expired.')
@@ -159,7 +159,7 @@ if(security.verifyGithubJWTPayload(jwt)) {
 
 // Issue a 1 minute duration JWT, using clock drift 2 minutes in the past so that it is expired
 jwt = security.getGitHubJWT('1234', 1, 120)
-if(security.verifyGithubJWTPayload(jwt)) {
+if(security.verifyGitHubJWTPayload(jwt)) {
     println('JWT is currently valid.')
 } else {
     println('JWT is invalid or expired.')
@@ -180,7 +180,7 @@ if(security.verifyGithubJWTPayload(jwt)) {
                            Default: <tt>30</tt> seconds.
       @return              Returns a signed JWT.  This does not guarantee a
                            valid token just that a token is issued and signed.
-                           Use <tt>{@link #verifyGithubJWTPayload(java.lang.String, java.lang.Integer)}</tt>
+                           Use <tt>{@link #verifyGitHubJWTPayload(java.lang.String, java.lang.Integer)}</tt>
                            method to verify the token is valid given the
                            current time.
       */
@@ -242,7 +242,7 @@ if(security.verifyGithubJWTPayload(jwt)) {
                         <tt>9</tt> minutes.
                         Default: <tt>30</tt> seconds.
       */
-    Boolean verifyGithubJWTPayload(String github_jwt, Integer drift = 30) {
+    Boolean verifyGitHubJWTPayload(String github_jwt, Integer drift = 30) {
         if(!verifyGitHubJWT(github_jwt)) {
             return false
         }
