@@ -15,8 +15,6 @@
    */
 package net.gleske.jervis.remotes.creds
 
-import groovy.json.JsonBuilder
-import java.io.IOException
 import java.time.Instant
 import net.gleske.jervis.remotes.SimpleRestServiceSupport
 import net.gleske.jervis.remotes.interfaces.VaultCredential

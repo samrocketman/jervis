@@ -60,6 +60,7 @@ trait ReadonlyTokenCredential implements TokenCredential {
 
        @param token Does not matter because it will be discarded.
       */
+    @Override
     void setToken(String token) {
         // does nothing
     }

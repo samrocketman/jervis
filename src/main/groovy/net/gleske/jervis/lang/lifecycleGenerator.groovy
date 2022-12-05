@@ -20,9 +20,6 @@ import net.gleske.jervis.exceptions.PlatformValidationException
 import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.exceptions.UnsupportedLanguageException
 import net.gleske.jervis.exceptions.UnsupportedToolException
-import net.gleske.jervis.lang.lifecycleValidator
-import net.gleske.jervis.lang.platformValidator
-import net.gleske.jervis.lang.toolchainValidator
 import net.gleske.jervis.tools.securityIO
 
 import java.util.regex.Pattern
@@ -510,28 +507,27 @@ env:
                     temp = "!${temp}"
                 }
                 matrix[filterType][i].each { k, v ->
-                    if(k in yaml_matrix_axes) {
-                        if(first_in_expr) {
-                            first_in_expr = false
-                        }
-                        else {
-                            temp += " && "
-                        }
-                        if(('env' == k) && (jervis_yaml[k] instanceof Map)) {
-                            temp += "${k} == '${k}${jervis_yaml[k]['matrix'].indexOf(v)}'"
-                        }
-                        else {
-                            if(toolchain_obj.isFriendlyLabel(k)) {
-                                temp += "${k} == '${k}:${v}'"
-                            }
-                            else {
-                                temp += "${k} == '${k}${jervis_yaml[k].indexOf(v)}'"
-                            }
-                        }
-                    }
-                    else {
+                    if(!(k in yaml_matrix_axes)) {
                         //discard because something was nil
                         temp = '-1'
+                        return
+                    }
+                    if(first_in_expr) {
+                        first_in_expr = false
+                    }
+                    else {
+                        temp += " && "
+                    }
+                    if(('env' == k) && (jervis_yaml[k] instanceof Map)) {
+                        temp += "${k} == '${k}${jervis_yaml[k]['matrix'].indexOf(v)}'"
+                    }
+                    else {
+                        if(toolchain_obj.isFriendlyLabel(k)) {
+                            temp += "${k} == '${k}:${v}'"
+                        }
+                        else {
+                            temp += "${k} == '${k}${jervis_yaml[k].indexOf(v)}'"
+                        }
                     }
                 }
                 temp += ')'
@@ -715,24 +711,25 @@ env:
                     //because it is an instance of a Map we assume it is an advanced toolchain
                     //special advanced behavior for global and matrix values
                     ['global', 'matrix'].each { key ->
-                        if(key in user_toolchain) {
-                            //convert doubles and integers to strings fixing bug #85
-                            if(user_toolchain[key] instanceof Number) {
-                                user_toolchain[key] = user_toolchain[key].toString()
-                            }
-                            if(user_toolchain[key] instanceof String) {
-                                user_toolchain[key] = [user_toolchain[key]]
-                            }
+                        if(!(key in user_toolchain)) {
+                            return
+                        }
+                        //convert doubles and integers to strings fixing bug #85
+                        if(user_toolchain[key] instanceof Number) {
+                            user_toolchain[key] = user_toolchain[key].toString()
+                        }
+                        if(user_toolchain[key] instanceof String) {
+                            user_toolchain[key] = [user_toolchain[key]]
+                        }
 
-                            if(user_toolchain[key] instanceof List) {
-                                output += toolchainBuilder(toolchain,
-                                                           toolchain_keys,
-                                                           user_toolchain[key]*.toString(),
-                                                           (key == 'global')? false : matrix_toolchain)
-                            }
-                            else {
-                                throw new UnsupportedToolException("${toolchain}: ${key}.${user_toolchain[key]}")
-                            }
+                        if(user_toolchain[key] instanceof List) {
+                            output += toolchainBuilder(toolchain,
+                                                       toolchain_keys,
+                                                       user_toolchain[key]*.toString(),
+                                                       (key == 'global')? false : matrix_toolchain)
+                        }
+                        else {
+                            throw new UnsupportedToolException("${toolchain}: ${key}.${user_toolchain[key]}")
                         }
                     }
                 }
@@ -958,24 +955,17 @@ env:
 
         //try returning the value casted as the same type as defaultValue
         try {
-            if(object.get(key) != null) {
-                if((defaultValue instanceof String) && ((object.get(key) instanceof Map) || (object.get(key) instanceof List))) {
-                    return defaultValue
-                }
-                else {
-                    if((defaultValue instanceof Boolean) && (object.get(key) == 'false')) {
-                        return false
-                    }
-                    else {
-                        return object.get(key).asType(defaultValue.getClass())
-                    }
-                }
+            if(object.get(key) == null || ((defaultValue instanceof String) && ((object.get(key) instanceof Map) || (object.get(key) instanceof List)))) {
+                return defaultValue
             }
+            if((defaultValue instanceof Boolean) && (object.get(key) == 'false')) {
+                return false
+            }
+            return object.get(key).asType(defaultValue.getClass())
         }
-        catch(Exception e) {}
-
-        //nothing worked so just return default value
-        return defaultValue
+        catch(IllegalArgumentException|ClassCastException ignored) {
+            return defaultValue
+        }
     }
 
 

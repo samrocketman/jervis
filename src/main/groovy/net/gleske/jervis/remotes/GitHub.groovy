@@ -15,7 +15,6 @@
    */
 package net.gleske.jervis.remotes
 
-import net.gleske.jervis.remotes.interfaces.JervisCredential
 import net.gleske.jervis.remotes.interfaces.JervisRemote
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.tools.securityIO

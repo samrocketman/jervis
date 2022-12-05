@@ -68,9 +68,6 @@ new File('/tmp/id_rsa.pub').delete()</tt></pre>
  */
 class securityIO implements Serializable {
 
-    private static String deprecation_link = 'http://sam.gleske.net/jervis-api/0.13/net/gleske/jervis/tools/securityIO.html'
-    private static String release_notes = 'https://github.com/samrocketman/jervis/blob/master/CHANGELOG.md#jervis-013'
-
     /**
       Shortcut to getting the key size of <tt>{@link #key_pair}</tt>.
 

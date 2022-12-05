@@ -214,6 +214,7 @@ class AutoRelease {
                 nextVersion = getNextRelease(currentVersion, git_tags, hotfix_seperator, prefix)
             }
         }
+        nextVersion
     }
 
     /**

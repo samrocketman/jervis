@@ -16,8 +16,6 @@
 package net.gleske.jervis.remotes
 
 
-import net.gleske.jervis.exceptions.JervisException
-
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
 

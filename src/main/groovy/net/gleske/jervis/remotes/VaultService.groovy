@@ -339,7 +339,9 @@ vault.mountVersions = versions</tt></pre>
             Map secretMeta = [:]
             try {
                 secretMeta = apiFetch("${mount}/metadata/${subpath}")
-            } catch(IOException e) {}
+            } catch(IOException ignore) {
+                // 40X exceptions for invalid paths ignored
+            }
             if(secretMeta?.data?.cas_required) {
                 enableCas = true
             }
