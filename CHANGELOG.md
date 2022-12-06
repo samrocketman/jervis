@@ -36,12 +36,19 @@ full change log see the commit log.
     credential resolver can be implented on
     [`VaultRoleIdCredential`][VaultRoleIdCredential] interface.
 
-### Bug fixes
+### Bug fixes:
 
 - Bugfix: Groovy 3.0.5 YAML `additional_toolchains` order was not preserved.
   This change makes Jervis compatible with Groovy 2.4, 2.5, and 3.0 series of
   releases.  Jenkins LTS currently uses Groovy 2.4.21 so this is more of a
   future-proofing fix than a bug for existing usage.
+
+### Other notes:
+
+- Upgraded to Gradle 7.6
+- Added support for building on OpenJDK 11 and OpenJDK 17.  OpenJDK 17 requires
+  Gradle 3 or higher.
+- Added support for building on Groovy versions 2.4 through 4.0.
 
 [TokenCredential]: src/main/groovy/net/gleske/jervis/remotes/interfaces/TokenCredential.groovy
 [VaultAppRoleCredential]: src/main/groovy/net/gleske/jervis/remotes/creds/VaultAppRoleCredential.groovy
@@ -52,7 +59,7 @@ full change log see the commit log.
 
 # jervis 1.7 - Apr 14th, 2020
 
-### Bug fixes
+### Bug fixes:
 
 - Bugfix: Additional toolchains loaded into a matrix build did not properly
   matrix.  This bug has been fixed and tests added to avoid it.
