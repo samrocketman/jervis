@@ -45,6 +45,11 @@ full change log see the commit log.
 
 ### Other notes:
 
+- Added support for [VSCode dev containers][vscode-devc] to ease with portable
+  development environments going forward.  Due to tight integration with X11 and
+  other Linux APIs the development host must be Linux in order to use VSCode dev
+  containers.  Fine for me since all of my computers are Linux but an important
+  note for would-be contributors.
 - Upgraded to Gradle 7.6
 - Added support for building on OpenJDK 11 and OpenJDK 17.  OpenJDK 17 requires
   Gradle 3 or higher.
@@ -56,6 +61,7 @@ full change log see the commit log.
 [VaultRoleIdCredential]: src/main/groovy/net/gleske/jervis/remotes/interfaces/VaultRoleIdCredential.groovy
 [VaultService]: src/main/groovy/net/gleske/jervis/remotes/VaultService.groovy
 [vault.io]: https://www.vaultproject.io/
+[vscode-devc]: https://code.visualstudio.com/docs/devcontainers/containers
 
 # jervis 1.7 - Apr 14th, 2020
 
