@@ -14,7 +14,7 @@ plugins {
     id 'signing'
 }
 
-if(JavaVersion.current() != JavaVersion.VERSION_11) {
+if(JavaVersion.current() != JavaVersion.VERSION_11 && JavaVersion.current() != JavaVersion.VERSION_17) {
     throw new GradleException("This project requires Java 11, but it's running on "+JavaVersion.current())
 }
 
@@ -32,6 +32,10 @@ ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.21'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
 ext.snakeYamlVersion = '1.33'
+
+if(JavaVersion.current() == JavaVersion.VERSION_17 && Integer.parseInt(ext.groovyVersion.tokenize('.').first()) < 3) {
+    throw new GradleException("When using Java 17 you must use Groovy 3 or higher.  Found Groovy " + ext.groovyVersion)
+}
 
 //Apparently cobertura is only accurate at Java 1.6 byte code and earlier
 //However, this caused a bug that if this library is used on JDK7+ and then

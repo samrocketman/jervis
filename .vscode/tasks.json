@@ -8,7 +8,7 @@
 				// https://github.com/jacoco/jacoco/issues/884#issuecomment-556936697
 				// Groovy 2.5.9 is the first version code coverage is accurately
 				// reported on Java 11 with Jacoco
-				"GROOVY_VERSION=2.5.9",
+				"GROOVY_VERSION=3.0.13",
 				"./gradlew",
 				"-Dsonar.host.url=http://sonarqube:9000",
 				"-Dsonar.projectKey=jervis",

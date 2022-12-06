@@ -1,10 +1,13 @@
 # [Choice] Java version (use -bullseye variants on local arm64/Apple Silicon): 11, 17, 11-bullseye, 17-bullseye, 11-buster, 17-buster
 FROM ubuntu:20.04
 
+# JDK 11 or JDK 17
+ARG JDK=11
+
 RUN set -ex; \
   export DEBIAN_FRONTEND=noninteractive; \
   apt-get update; \
-  apt-get install -y openjdk-11-jdk git firefox curl unzip zip; \
+  apt-get install -y openjdk-"${JDK}"-jdk git firefox curl unzip zip; \
   yes | adduser vscode
 
 USER vscode
