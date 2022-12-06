@@ -44,19 +44,19 @@ class GitHubGraphQLTest extends GroovyTestCase {
     /**
       * This test uses the following files.
       *
-      * src/test/resources/mocks/api.github.com_graphql_91f268dcf471848f80d36e05737b84afc598385d72c8e406d8f736bf1521eba0
+      * src/test/resources/mocks/api.github.com_graphql_4dd006f5da3f86694db573aa66cece0650601e750299f969034e9b07cd2d7512
       */
     @Test public void test_GitHubGraphQL_sendGQL() {
         String graphql = '''
             |query {
             |  repository(owner: "samrocketman", name: "jervis") {
-            |    jervisYaml:object(expression: "master:.jervis.yml") {
+            |    jervisYaml:object(expression: "main:.jervis.yml") {
             |      ...file
             |    }
-            |    travisYaml:object(expression: "master:.travis.yml") {
+            |    travisYaml:object(expression: "main:.travis.yml") {
             |      ...file
             |    }
-            |    rootFolder:object(expression: "master:") {
+            |    rootFolder:object(expression: "main:") {
             |      ...file
             |    }
             |  }
@@ -149,7 +149,7 @@ class GitHubGraphQLTest extends GroovyTestCase {
     /**
       * This test uses the following files.
       *
-      * src/test/resources/mocks/api.github.com_graphql_b75ff858a22fbd23792195e57a65ec3d080ff241ced1f1d5ea2792c2ff004dbe
+      * src/test/resources/mocks/api.github.com_graphql_0f186475e5335fe3ff3cd4c7566ff0e66629ee234cf618c6cfec504f444d9f83
       */
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_defaults() {
         Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock response data'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'README.md', 'type':'blob']]]]]
@@ -164,11 +164,11 @@ class GitHubGraphQLTest extends GroovyTestCase {
     /**
       * This test uses the following files.
       *
-      * src/test/resources/mocks/api.github.com_graphql_ecf2f324248af2eec5d8a52bdf0cc60ccaef1cc887bfe3d64a4f319339a53f1a
+      * src/test/resources/mocks/api.github.com_graphql_11d22ccb4e46c2bee006552cb7634b0ed8a50ba0ad5b5f20a3ef4c7310d43b32
       */
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_two_branches_defaults() {
         Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 1'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'README.md', 'type':'blob']]]], 'gitRef1':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 2'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'CHANGELOG.md', 'type':'blob'], ['name':'README.md', 'type':'blob']]]]]
-        Map response = mygh.getJervisYamlFiles('samrocketman', 'jervis', ['refs/heads/master', 'refs/heads/jervis_simple'])
+        Map response = mygh.getJervisYamlFiles('samrocketman', 'jervis', ['refs/heads/main', 'refs/heads/jervis_simple'])
         assert shouldRespond['gitRef0'].keySet() == response['gitRef0'].keySet()
         assert shouldRespond['gitRef0']['jervisYaml0'] == response['gitRef0']['jervisYaml0']
         assert shouldRespond['gitRef0']['jervisYaml1'] == response['gitRef0']['jervisYaml1']
@@ -183,7 +183,7 @@ class GitHubGraphQLTest extends GroovyTestCase {
     /**
       * This test uses the following files.
       *
-      * src/test/resources/mocks/api.github.com_graphql_b069551c0494f802a3da00dcac288d41172ce79e2dfaa0e71ae662d51d61475f
+      * src/test/resources/mocks/api.github.com_graphql_ba375a80eda41359695b8003af9b7e13c6af250396d1dd5f843090459533063a
       */
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_invalid() {
         Map response = mygh.getJervisYamlFiles('invalid', 'invalid')
@@ -193,7 +193,7 @@ class GitHubGraphQLTest extends GroovyTestCase {
     /**
       * This test uses the following files.
       *
-      * src/test/resources/mocks/api.github.com_graphql_b75ff858a22fbd23792195e57a65ec3d080ff241ced1f1d5ea2792c2ff004dbe
+      * src/test/resources/mocks/api.github.com_graphql_0f186475e5335fe3ff3cd4c7566ff0e66629ee234cf618c6cfec504f444d9f83
       */
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_repositoryWithOwner_defaults() {
         Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock response data'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'README.md', 'type':'blob']]]]]
@@ -208,11 +208,11 @@ class GitHubGraphQLTest extends GroovyTestCase {
     /**
       * This test uses the following files.
       *
-      * src/test/resources/mocks/api.github.com_graphql_ecf2f324248af2eec5d8a52bdf0cc60ccaef1cc887bfe3d64a4f319339a53f1a
+      * src/test/resources/mocks/api.github.com_graphql_11d22ccb4e46c2bee006552cb7634b0ed8a50ba0ad5b5f20a3ef4c7310d43b32
       */
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_repositoryWithOwner_two_branches_defaults() {
         Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 1'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'README.md', 'type':'blob']]]], 'gitRef1':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 2'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'CHANGELOG.md', 'type':'blob'], ['name':'README.md', 'type':'blob']]]]]
-        Map response = mygh.getJervisYamlFiles('samrocketman/jervis', ['refs/heads/master', 'refs/heads/jervis_simple'])
+        Map response = mygh.getJervisYamlFiles('samrocketman/jervis', ['refs/heads/main', 'refs/heads/jervis_simple'])
         assert shouldRespond['gitRef0'].keySet() == response['gitRef0'].keySet()
         assert shouldRespond['gitRef0']['jervisYaml0'] == response['gitRef0']['jervisYaml0']
         assert shouldRespond['gitRef0']['jervisYaml1'] == response['gitRef0']['jervisYaml1']
@@ -227,7 +227,7 @@ class GitHubGraphQLTest extends GroovyTestCase {
     /**
       * This test uses the following files.
       *
-      * src/test/resources/mocks/api.github.com_graphql_b069551c0494f802a3da00dcac288d41172ce79e2dfaa0e71ae662d51d61475f
+      * src/test/resources/mocks/api.github.com_graphql_ba375a80eda41359695b8003af9b7e13c6af250396d1dd5f843090459533063a
       */
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_repositoryWithOwner_invalid_apiErr() {
         Map response = mygh.getJervisYamlFiles('invalid/invalid')

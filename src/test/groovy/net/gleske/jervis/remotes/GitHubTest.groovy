@@ -92,7 +92,7 @@ class GitHubTest extends GroovyTestCase {
     }
     @Test public void test_GitHub_set3Gh_token() {
         mygh.gh_token = 'a'
-        assert 'language: groovy\n' == mygh.getFile('samrocketman/jervis', '.travis.yml', 'master')
+        assert 'language: groovy\n' == mygh.getFile('samrocketman/jervis', '.travis.yml', 'main')
         assert request_meta['headers']['Authorization'] == 'token a'
     }
     //test GitHub().getWebUrl()
@@ -122,17 +122,17 @@ class GitHubTest extends GroovyTestCase {
         assert mygh.toString() == 'GitHub Enterprise'
     }
     @Test public void test_GitHub_branches() {
-        assert ['gh-pages', 'master'] == mygh.branches('samrocketman/jervis')
+        assert ['gh-pages', 'main'] == mygh.branches('samrocketman/jervis')
     }
     @Test public void test_GitHub_getFile() {
-        assert 'language: groovy\n' == mygh.getFile('samrocketman/jervis', '.travis.yml', 'master')
+        assert 'language: groovy\n' == mygh.getFile('samrocketman/jervis', '.travis.yml', 'main')
     }
     @Test public void test_GitHub_getFile_default() {
         assert 'language: groovy\n' == mygh.getFile('samrocketman/jervis', '.travis.yml')
     }
     @Test public void test_GitHub_getFolderListing() {
-        assert ['.gitignore', '.travis.yml', 'LICENSE', 'README.md', 'build.gradle', 'src'] == mygh.getFolderListing('samrocketman/jervis', '/', 'master')
-        assert ['main', 'resources', 'test'] == mygh.getFolderListing('samrocketman/jervis', 'src', 'master')
+        assert ['.gitignore', '.travis.yml', 'LICENSE', 'README.md', 'build.gradle', 'src'] == mygh.getFolderListing('samrocketman/jervis', '/', 'main')
+        assert ['main', 'resources', 'test'] == mygh.getFolderListing('samrocketman/jervis', 'src', 'main')
     }
     @Test public void test_GitHub_getFolderListing_default() {
         assert ['.gitignore', '.travis.yml', 'LICENSE', 'README.md', 'build.gradle', 'src'] == mygh.getFolderListing('samrocketman/jervis', '/')

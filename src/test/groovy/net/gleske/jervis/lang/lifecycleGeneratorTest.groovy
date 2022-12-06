@@ -343,14 +343,14 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert '#\n# INSTALL SECTION\n#\nset +x\necho \'# INSTALL SECTION\'\nset -x\ntrue\ntrue\n' == generator.generateSection('install')
     }
     @Test public void test_lifecycleGenerator_isGenerateBranch() {
-        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - master')
-        assert true == generator.isGenerateBranch('master')
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - main')
+        assert true == generator.isGenerateBranch('main')
         assert false == generator.isGenerateBranch('development')
-        generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - master')
-        assert false == generator.isGenerateBranch('master')
+        generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - main')
+        assert false == generator.isGenerateBranch('main')
         assert true == generator.isGenerateBranch('development')
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - development\n    - /^ma.*$/')
-        assert true == generator.isGenerateBranch('master')
+        assert true == generator.isGenerateBranch('main')
         assert true == generator.isGenerateBranch('development')
         generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - development\n    - /^ma.*$/')
         assert false == generator.isGenerateBranch('many')
@@ -363,11 +363,11 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert true == generator.isGenerateBranch('3')
     }
     @Test public void test_lifecycleGenerator_isGenerateBranch_invalid_type() {
-        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    master: "test"')
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    main: "test"')
         //invalid type defaults to no filter
-        assert true == generator.isGenerateBranch('master')
+        assert true == generator.isGenerateBranch('main')
         //string
-        generator.loadYamlString('language: ruby\nbranches:\n  only: "master"')
+        generator.loadYamlString('language: ruby\nbranches:\n  only: "main"')
         assert true == generator.isGenerateBranch('hello')
         //numbers
         generator.loadYamlString('language: ruby\nbranches:\n  only: 3')
@@ -384,8 +384,8 @@ class lifecycleGeneratorTest extends GroovyTestCase {
     @Test public void test_lifecycleGenerator_getFullBranchRegexString() {
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - /.*-pre$/\n    - /^ma.*$/\n    - development')
         assert '.*-pre$|^ma.*$|\\Qdevelopment\\E' == generator.getFullBranchRegexString(generator.getFilteredBranchesList())
-        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - master\n    - development')
-        assert '\\Qmaster\\E|\\Qdevelopment\\E' == generator.getFullBranchRegexString(generator.getFilteredBranchesList())
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - main\n    - development')
+        assert '\\Qmain\\E|\\Qdevelopment\\E' == generator.getFullBranchRegexString(generator.getFilteredBranchesList())
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - development')
         assert '\\Qdevelopment\\E' == generator.getFullBranchRegexString(generator.getFilteredBranchesList())
         generator.loadYamlString('language: ruby\n')
@@ -398,7 +398,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert 'only' == generator.filter_type
     }
     @Test public void test_lifecycleGenerator_filter_type_reset() {
-        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - master')
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - main')
         assert 'only' == generator.filter_type
         //loading YAML into an aleady loaded generator object should clear the filter_type (this is testing for a bug)
         generator.loadYamlString('language: ruby\n')
@@ -429,17 +429,17 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert ['/'] == generator.getFilteredBranchesList()
     }
     @Test public void test_lifecycleGenerator_isFilteredByRegex() {
-        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - master')
-        assert false == generator.isFilteredByRegex('master')
+        generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - main')
+        assert false == generator.isFilteredByRegex('main')
         generator.loadYamlString('language: ruby\n')
-        assert false == generator.isFilteredByRegex('master')
+        assert false == generator.isFilteredByRegex('main')
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - development\n    - /^ma.*$/')
         assert true == generator.isFilteredByRegex('many')
-        assert true == generator.isFilteredByRegex('master')
+        assert true == generator.isFilteredByRegex('main')
         assert false == generator.isFilteredByRegex('development')
         generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - development\n    - /^ma.*$/')
         assert true == generator.isFilteredByRegex('many')
-        assert true == generator.isFilteredByRegex('master')
+        assert true == generator.isFilteredByRegex('main')
         assert false == generator.isFilteredByRegex('development')
     }
     @Test public void test_lifecycleGenerator_setLabal_stability() {

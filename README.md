@@ -80,8 +80,8 @@ sub-bullet.
   too many jobs are queued up on a daily basis.  A single Jenkins server
   struggles to perform all requested builds in a timely manner.  Jenkins also
   suffers from single point of failure as a lone server.
-  * Multi-master Jenkins was invented. This provides redundancy for the server.
-    Throughput for daily build capacity is improved.
+  * Multi-controller Jenkins was invented. This provides redundancy for the
+    server.  Throughput for daily build capacity is improved.
 * Jenkins jobs suffer from a lot of duplicate code.  It is difficult to fix a
   bug in one job and have it propagate to other jobs.
   * Jenkins Job DSL plugin was invented.  Configuration through code is now

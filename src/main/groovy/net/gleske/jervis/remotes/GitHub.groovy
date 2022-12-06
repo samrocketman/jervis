@@ -32,8 +32,8 @@ import net.gleske.jervis.tools.securityIO
 def x = new GitHub()
 println 'Print each branch.'
 x.branches('samrocketman/jervis').each{ println it }
-println 'Print the contents of .travis.yml from the master branch.'
-println x.getFile('samrocketman/jervis','.travis.yml','master')</tt></pre><br>
+println 'Print the contents of .travis.yml from the main branch.'
+println x.getFile('samrocketman/jervis','.travis.yml','main')</tt></pre><br>
  */
 class GitHub implements JervisRemote, SimpleRestServiceSupport {
 
@@ -205,7 +205,7 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
 
       @param   project    A GitHub project including the org.  e.g. <tt>"samrocketman/jervis"</tt>
       @param   file_path  A path to a file relative to the root of the Git repository.  e.g. <tt>".travis.yml"</tt>
-      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>"master"</tt>.  This option is optional.  If not specified the default branch is selected.
+      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>"main"</tt>.  This option is optional.  If not specified the default branch is selected.
       @returns            A <tt>String</tt> which contains the contents of the file requested.
     */
     public String getFile(String project, String file_path, String ref = '') {
@@ -226,7 +226,7 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
 
       @param   project    A GitHub project including the org.  e.g. <tt>samrocketman/jervis</tt>
       @param   dir_path   A path to a directory relative to the root of the Git repository.  This is optional.  By default is <tt>/</tt> (the repository root).
-      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>master</tt>.  This option is optional.
+      @param   ref        A git reference such as a branch, tag, or SHA1 hash.  e.g. <tt>main</tt>.  This option is optional.
       @returns            An <tt>ArrayList</tt> which contains the contents of the file requested.
     */
     public ArrayList getFolderListing(String project, String dir_path = '/', String ref = '') {

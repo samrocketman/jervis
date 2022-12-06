@@ -35,13 +35,13 @@ github.token = 'GitHub personal access token here with no scopes necessary'
 String graphql = '''
 query {
   repository(owner: "samrocketman", name: "jervis") {
-    jervisYaml:object(expression: "master:.jervis.yml") {
+    jervisYaml:object(expression: "main:.jervis.yml") {
       ...file
     }
-    travisYaml:object(expression: "master:.travis.yml") {
+    travisYaml:object(expression: "main:.travis.yml") {
       ...file
     }
-    rootFolder:object(expression: "master:") {
+    rootFolder:object(expression: "main:") {
       ...file
     }
   }
@@ -233,7 +233,7 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
                         <a href="https://github.com/samrocketman/jervis" target="_blank"><tt>jervis</tt></a>.
       @param gitRefs    A list of get references (branches, tags, commits, etc)
                         in order to retrieve files.  By default, the value
-                        <tt>['refs/heads/master']</tt>.
+                        <tt>['refs/heads/main']</tt>.
       @param yamlFiles  A list of YAML files to try getting the Jervis YAML
                         contents from.  By default, the value is
                         <tt>['.jervis.yml', '.travis.yml']</tt>.
@@ -283,7 +283,7 @@ Map response = github.getJervisYamlFiles('samrocketman', 'jervis')</tt></pre>
       */
     public Map getJervisYamlFiles(String owner,
             String repository,
-            List gitRefs = ['refs/heads/master'],
+            List gitRefs = ['refs/heads/main'],
             List yamlFiles = ['.jervis.yml', '.travis.yml']) {
 
         Map binding = [
@@ -305,7 +305,7 @@ Map response = github.getJervisYamlFiles('samrocketman', 'jervis')</tt></pre>
                        <tt>samrocketman/jervis</tt>.
       @param gitRefs   A list of get references (branches, tags, commits, etc)
                        in order to retrieve files.  By default, the value
-                       <tt>['refs/heads/master']</tt>.
+                       <tt>['refs/heads/main']</tt>.
       @param yamlFiles A list of YAML files to try getting the Jervis YAML
                        contents from.  By default, the value is
                        <tt>['.jervis.yml', '.travis.yml']</tt>.
@@ -314,7 +314,7 @@ Map response = github.getJervisYamlFiles('samrocketman', 'jervis')</tt></pre>
               the other.
       */
     public Map getJervisYamlFiles(String repositoryWithOwner,
-            List gitRefs = ['refs/heads/master'],
+            List gitRefs = ['refs/heads/main'],
             List yamlFiles = ['.jervis.yml', '.travis.yml']) {
         if(!repositoryWithOwner.contains('/') || (repositoryWithOwner.tokenize('/').size() > 2)) {
             throw new JervisException("ERROR: getJervisYamlFiles recieved a malformated repositoryWithOwner ${repositoryWithOwner}.")

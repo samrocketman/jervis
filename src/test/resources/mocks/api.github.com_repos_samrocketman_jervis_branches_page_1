@@ -7,7 +7,7 @@
     }
   },
   {
-    "name": "master",
+    "name": "main",
     "commit": {
       "sha": "c14e6f80e61b6bcb5ff8c7c1137f28d6e3391db7",
       "url": "https://api.github.com/repos/samrocketman/jervis/commits/c14e6f80e61b6bcb5ff8c7c1137f28d6e3391db7"
