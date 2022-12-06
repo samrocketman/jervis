@@ -15,13 +15,16 @@
    */
 package net.gleske.jervis.tools
 //the securityIOTest() class automatically sees the securityIO() class because they're in the same package
-import java.nio.file.Files
-import java.nio.file.Path
-import java.time.Instant
+
 import net.gleske.jervis.exceptions.DecryptException
 import net.gleske.jervis.exceptions.EncryptException
 import net.gleske.jervis.exceptions.KeyPairDecodeException
 import net.gleske.jervis.exceptions.SecurityException
+
+import groovy.test.GroovyTestCase;
+import java.nio.file.Files
+import java.nio.file.Path
+import java.time.Instant
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

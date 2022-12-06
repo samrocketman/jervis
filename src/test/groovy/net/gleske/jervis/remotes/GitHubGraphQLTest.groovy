@@ -15,11 +15,14 @@
    */
 package net.gleske.jervis.remotes
 //the GitHubGraphQLTest() class automatically sees the GitHub() class because they're in the same package
+import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
+
 import net.gleske.jervis.exceptions.JervisException
+
+import groovy.test.GroovyTestCase;
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 
 class GitHubGraphQLTest extends GroovyTestCase {
     def mygh

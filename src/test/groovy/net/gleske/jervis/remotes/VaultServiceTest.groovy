@@ -15,13 +15,16 @@
    */
 package net.gleske.jervis.remotes
 //the VaultServiceTest() class automatically sees the VaultService() class because they're in the same package
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
+
 import net.gleske.jervis.exceptions.JervisException
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.interfaces.VaultCredential
-import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
+
+import groovy.test.GroovyTestCase;
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 class VaultServiceTest extends GroovyTestCase {
     def myvault

@@ -16,13 +16,15 @@
 package net.gleske.jervis.lang
 
 // classes necessary for Groovy parse syntax check
+import groovy.ant.AntBuilder
 import groovy.io.GroovyPrintWriter
+import groovy.test.GroovyTestCase;
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.Janitor
 import org.codehaus.groovy.control.SourceUnit
-
 import org.junit.Test
+
 class lintJenkinsVarsTest extends GroovyTestCase {
     private static final GROOVY_FILES = '**/*.groovy'
     private static final RULESET_FILES = [

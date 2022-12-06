@@ -37,6 +37,14 @@ if(JavaVersion.current() == JavaVersion.VERSION_17 && Integer.parseInt(ext.groov
     throw new GradleException("When using Java 17 you must use Groovy 3 or higher.  Found Groovy " + ext.groovyVersion)
 }
 
+if(Integer.parseInt(ext.groovyVersion.tokenize('.').first()) > 3) {
+    // Groovy 4 and higher
+    ext.groovyPackage = 'org.apache.groovy'
+} else {
+    ext.groovyPackage = 'org.codehaus.groovy'
+}
+
+
 //Apparently cobertura is only accurate at Java 1.6 byte code and earlier
 //However, this caused a bug that if this library is used on JDK7+ and then
 //throws a groovy exception.  Instead, an IncompatibleClassChangeError is thrown.
@@ -68,17 +76,22 @@ configurations.all {
 
 dependencies {
     //compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    implementation "org.codehaus.groovy:groovy-ant:${groovyVersion}"
-    implementation "org.codehaus.groovy:groovy-groovydoc:${groovyVersion}"
-    implementation "org.codehaus.groovy:groovy-json:${groovyVersion}"
-    implementation "org.codehaus.groovy:groovy-templates:${groovyVersion}"
-    implementation "org.codehaus.groovy:groovy:${groovyVersion}"
+    implementation "${groovyPackage}:groovy-ant:${groovyVersion}"
+    implementation "${groovyPackage}:groovy-groovydoc:${groovyVersion}"
+    implementation "${groovyPackage}:groovy-json:${groovyVersion}"
+    implementation "${groovyPackage}:groovy-templates:${groovyVersion}"
+    implementation "${groovyPackage}:groovy:${groovyVersion}"
     implementation 'org.bouncycastle:bcpkix-jdk18on:1.72'
     implementation "org.yaml:snakeyaml:${snakeYamlVersion}"
+
     testImplementation 'junit:junit:4.13.2'
-    testImplementation "org.codehaus.groovy:groovy-test:${groovyVersion}"
-    testImplementation "org.codehaus.groovy:groovy-console:${groovyVersion}"
-    testImplementation 'org.codenarc:CodeNarc:3.1.0'
+    testImplementation "${groovyPackage}:groovy-test:${groovyVersion}"
+    testImplementation "${groovyPackage}:groovy-console:${groovyVersion}"
+    if(groovyVersion.tokenize('.').first() == '4') {
+        testImplementation 'org.codenarc:CodeNarc:3.1.0-groovy-4.0'
+    } else {
+        testImplementation 'org.codenarc:CodeNarc:3.1.0'
+    }
     // CodeNarc throws stderr messages about SLF4J so this dependency makes the
     // stderr go away.
     testImplementation 'org.slf4j:slf4j-nop:2.0.5'

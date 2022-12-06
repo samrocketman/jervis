@@ -16,6 +16,7 @@
 package net.gleske.jervis.remotes
 //the SimpleRestServiceTest() class automatically sees the SimpleRestService() class because they're in the same package
 
+import groovy.test.GroovyTestCase;
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

@@ -24,6 +24,8 @@ import net.gleske.jervis.lang.lifecycleValidator
 import net.gleske.jervis.lang.platformValidator
 import net.gleske.jervis.lang.toolchainValidator
 import net.gleske.jervis.tools.securityIO
+
+import groovy.test.GroovyTestCase;
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

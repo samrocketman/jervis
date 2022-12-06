@@ -17,6 +17,8 @@ package net.gleske.jervis.lang
 //the toolchainValidatorTest() class automatically sees the lifecycleValidator() class because they're in the same package
 import net.gleske.jervis.exceptions.ToolchainBadValueInKeyException
 import net.gleske.jervis.exceptions.ToolchainMissingKeyException
+
+import groovy.test.GroovyTestCase;
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
