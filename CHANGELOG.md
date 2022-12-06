@@ -7,9 +7,15 @@ full change log see the commit log.
 
 ### Warnings:
 
-- JDK1.8 is dropped.
+- JDK 1.8 is dropped.
 - OpenJDK11 is the bytecode compatibility going forward to match the Jenkins
   project.
+- Function `getJervisYamlFiles(String owner, String repository)` within class
+  `net.gleske.jervis.remotes.GitHubGraphQL` used to default to `master` branch.
+  It now defaults to `main` branch.
+- Function `getJervisYamlFiles(String repositoryWithOwner)` within class
+  `net.gleske.jervis.remotes.GitHubGraphQL` used to default to `master` branch.
+  It now defaults to `main` branch.
 
 ### New features:
 
