@@ -41,6 +41,11 @@ class GitHubGraphQLTest extends GroovyTestCase {
         super.tearDown()
     }
     //test GitHubGraphQL().sendGQL()
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_91f268dcf471848f80d36e05737b84afc598385d72c8e406d8f736bf1521eba0
+      */
     @Test public void test_GitHubGraphQL_sendGQL() {
         String graphql = '''
             |query {
@@ -74,23 +79,48 @@ class GitHubGraphQLTest extends GroovyTestCase {
         assert request_meta['headers']['Authorization'] == 'bearer foo'
         assert request_meta['method'] == 'POST'
     }
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_f5adbe19c74682353244cd4d03bfa5ad5fdc2d98d385f45ef881dd9c544124f6
+      */
     @Test public void test_GitHubGraphQL_sendGQL_custom() {
         mygh.sendGQL('query { foo }')
         assert request_meta['data'].toString() == '{"query":"query { foo }"}'
     }
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_8d979296f2b89c1ca8394223195177dbb0e7fdf63d4b06a02a0a61ffedbb6552
+      */
     @Test public void test_GitHubGraphQL_sendGQL_custom_with_quotes() {
         mygh.sendGQL('query { foo(expr: "hello") }')
         assert request_meta['data'].toString() == '{"query":"query { foo(expr: \\"hello\\") }"}'
     }
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_37be24e4888e054916321189967ef4e5f42fe14569f5ee45229a27661e692618
+      */
     @Test public void test_GitHubGraphQL_sendGQL_custom_with_variables() {
         mygh.sendGQL('query { foo }', 'variables { bar }')
         assert request_meta['data'].toString() == '{"query":"query { foo }","variables":"variables { bar }"}'
     }
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_a163c471d4cdb6f7aa30f1540a27da77a2dbf6f9358137ac9fc42c380305008a
+      */
     @Test public void test_GitHubGraphQL_sendGQL_custom_with_variables_Map() {
         Map variables = [ myvar: 3 ]
         mygh.sendGQL('query { foo(expr: "hello") }', variables)
         assert request_meta['data'].toString() == '{"query":"query { foo(expr: \\"hello\\") }","variables":"{\\"myvar\\":3}"}'
     }
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_62903ca59bbd9758c8226d190b8b4e98960a39b20a3e93a511f9633aa4712f3e
+      */
     @Test public void test_GitHubGraphQL_credentials_read() {
         mygh.credential = new CredentialsInterfaceHelper.ROCreds()
         assert mygh.token == 'ro secret'
@@ -101,6 +131,11 @@ class GitHubGraphQLTest extends GroovyTestCase {
         mygh.sendGQL('stuff')
         assert request_meta['headers']['Authorization'] == 'bearer ro secret'
     }
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_62903ca59bbd9758c8226d190b8b4e98960a39b20a3e93a511f9633aa4712f3e
+      */
     @Test public void test_GitHubGraphQL_credentials_write() {
         mygh.credential = new CredentialsInterfaceHelper.RWCreds()
         assert mygh.token == 'rw secret'
@@ -111,6 +146,11 @@ class GitHubGraphQLTest extends GroovyTestCase {
         mygh.sendGQL('stuff')
         assert request_meta['headers']['Authorization'] == 'bearer foo'
     }
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_b75ff858a22fbd23792195e57a65ec3d080ff241ced1f1d5ea2792c2ff004dbe
+      */
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_defaults() {
         Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock response data'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'README.md', 'type':'blob']]]]]
         Map response = mygh.getJervisYamlFiles('samrocketman', 'jervis')
@@ -121,6 +161,11 @@ class GitHubGraphQLTest extends GroovyTestCase {
         assert shouldRespond['gitRef0']['rootFolder']['file']*.name == response['gitRef0']['rootFolder']['file']*.name
         assert shouldRespond['gitRef0']['rootFolder']['file']*.type == response['gitRef0']['rootFolder']['file']*.type
     }
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_ecf2f324248af2eec5d8a52bdf0cc60ccaef1cc887bfe3d64a4f319339a53f1a
+      */
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_two_branches_defaults() {
         Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 1'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'README.md', 'type':'blob']]]], 'gitRef1':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 2'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'CHANGELOG.md', 'type':'blob'], ['name':'README.md', 'type':'blob']]]]]
         Map response = mygh.getJervisYamlFiles('samrocketman', 'jervis', ['refs/heads/master', 'refs/heads/jervis_simple'])
@@ -135,11 +180,21 @@ class GitHubGraphQLTest extends GroovyTestCase {
         assert shouldRespond['gitRef1']['rootFolder']['file']*.name == response['gitRef1']['rootFolder']['file']*.name
         assert shouldRespond['gitRef1']['rootFolder']['file']*.type == response['gitRef1']['rootFolder']['file']*.type
     }
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_b069551c0494f802a3da00dcac288d41172ce79e2dfaa0e71ae662d51d61475f
+      */
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_invalid() {
         Map response = mygh.getJervisYamlFiles('invalid', 'invalid')
         assert response instanceof Map
         assert response == [:]
     }
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_b75ff858a22fbd23792195e57a65ec3d080ff241ced1f1d5ea2792c2ff004dbe
+      */
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_repositoryWithOwner_defaults() {
         Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock response data'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'README.md', 'type':'blob']]]]]
         Map response = mygh.getJervisYamlFiles('samrocketman/jervis')
@@ -150,6 +205,11 @@ class GitHubGraphQLTest extends GroovyTestCase {
         assert shouldRespond['gitRef0']['rootFolder']['file']*.name == response['gitRef0']['rootFolder']['file']*.name
         assert shouldRespond['gitRef0']['rootFolder']['file']*.type == response['gitRef0']['rootFolder']['file']*.type
     }
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_ecf2f324248af2eec5d8a52bdf0cc60ccaef1cc887bfe3d64a4f319339a53f1a
+      */
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_repositoryWithOwner_two_branches_defaults() {
         Map shouldRespond = ['gitRef0':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 1'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'README.md', 'type':'blob']]]], 'gitRef1':['jervisYaml0':null, 'jervisYaml1':['text':'mock data 2'], 'rootFolder':['file':[['name':'.travis.yml', 'type':'blob'], ['name':'CHANGELOG.md', 'type':'blob'], ['name':'README.md', 'type':'blob']]]]]
         Map response = mygh.getJervisYamlFiles('samrocketman/jervis', ['refs/heads/master', 'refs/heads/jervis_simple'])
@@ -164,6 +224,11 @@ class GitHubGraphQLTest extends GroovyTestCase {
         assert shouldRespond['gitRef1']['rootFolder']['file']*.name == response['gitRef1']['rootFolder']['file']*.name
         assert shouldRespond['gitRef1']['rootFolder']['file']*.type == response['gitRef1']['rootFolder']['file']*.type
     }
+    /**
+      * This test uses the following files.
+      *
+      * src/test/resources/mocks/api.github.com_graphql_b069551c0494f802a3da00dcac288d41172ce79e2dfaa0e71ae662d51d61475f
+      */
     @Test public void test_GitHubGraphQL_getJervisYamlFiles_repositoryWithOwner_invalid_apiErr() {
         Map response = mygh.getJervisYamlFiles('invalid/invalid')
         assert response instanceof Map
