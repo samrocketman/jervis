@@ -233,10 +233,13 @@ jar.dependsOn tasks.findAll { task -> task.name.endsWith('Jar') }
 //disable optimizations for accurate branch coverage
 //http://pbetkier.blogspot.com/2014/08/groovy-code-coverage-issues.html
 gradle.taskGraph.whenReady { graph ->
-    if (graph.hasTask(':jacocoTestReport')) {
+    if(graph.hasTask(':test')) {
+        compileTestGroovy.groovyOptions.configurationScript = file('gradle/groovyTestCompilerConfig.groovy')
+    }
+    if(graph.hasTask(':jacocoTestReport')) {
         compileGroovy.groovyOptions.optimizationOptions.all = false
     }
-    if (graph.hasTask(':publish')) {
+    if(graph.hasTask(':publish')) {
         if(!(System.getenv('ORG_GRADLE_PROJECT_signingKey') && System.getenv('ORG_GRADLE_PROJECT_signingPassword'))) {
             throw new GradleException("ERROR: Attempting to release without signing key and password.  See RELEASE.md for details.")
         }

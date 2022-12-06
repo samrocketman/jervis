@@ -21,7 +21,6 @@ import net.gleske.jervis.exceptions.EncryptException
 import net.gleske.jervis.exceptions.KeyPairDecodeException
 import net.gleske.jervis.exceptions.SecurityException
 
-import groovy.test.GroovyTestCase;
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Instant

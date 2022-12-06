@@ -17,7 +17,6 @@ package net.gleske.jervis.remotes
 //the GitHubTest() class automatically sees the GitHub() class because they're in the same package
 import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 
-import groovy.test.GroovyTestCase;
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

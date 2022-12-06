@@ -17,7 +17,6 @@ package net.gleske.jervis.tools
 //the AutoReleaseTest() class automatically sees the securityIO() class because they're in the same package
 import net.gleske.jervis.exceptions.JervisException
 
-import groovy.test.GroovyTestCase;
 import java.text.SimpleDateFormat
 import org.junit.After
 import org.junit.Before

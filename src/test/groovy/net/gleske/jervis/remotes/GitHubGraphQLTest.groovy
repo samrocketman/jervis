@@ -19,7 +19,6 @@ import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 
 import net.gleske.jervis.exceptions.JervisException
 
-import groovy.test.GroovyTestCase;
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

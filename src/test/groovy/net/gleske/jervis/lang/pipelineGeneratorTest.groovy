@@ -17,7 +17,6 @@ package net.gleske.jervis.lang
 //the pipelineGeneratorTest() class automatically sees the pipelineGenerator() class because they're in the same package
 import net.gleske.jervis.exceptions.PipelineGeneratorException
 
-import groovy.test.GroovyTestCase;
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

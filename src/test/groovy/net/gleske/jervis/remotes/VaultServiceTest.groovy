@@ -21,7 +21,6 @@ import net.gleske.jervis.exceptions.JervisException
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.interfaces.VaultCredential
 
-import groovy.test.GroovyTestCase;
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

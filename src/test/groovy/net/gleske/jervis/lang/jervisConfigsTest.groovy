@@ -21,7 +21,6 @@ package net.gleske.jervis.lang
 
 import net.gleske.jervis.exceptions.JervisException
 
-import groovy.test.GroovyTestCase;
 import org.junit.Test
 
 /**

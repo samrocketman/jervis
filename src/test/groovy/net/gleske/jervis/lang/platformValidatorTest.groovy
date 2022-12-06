@@ -19,7 +19,6 @@ import net.gleske.jervis.exceptions.PlatformBadValueInKeyException
 import net.gleske.jervis.exceptions.PlatformMissingKeyException
 import net.gleske.jervis.exceptions.PlatformValidationException
 
-import groovy.test.GroovyTestCase;
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

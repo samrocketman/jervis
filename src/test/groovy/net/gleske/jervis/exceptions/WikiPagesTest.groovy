@@ -15,7 +15,7 @@
    */
 package net.gleske.jervis.exceptions
 //the LifecycleBadValueInKeyExceptionTest() class automatically sees the LifecycleBadValueInKeyException() class because they're in the same package
-import groovy.test.GroovyTestCase;
+
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

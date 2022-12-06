@@ -18,7 +18,6 @@ package net.gleske.jervis.lang
 import net.gleske.jervis.exceptions.ToolchainBadValueInKeyException
 import net.gleske.jervis.exceptions.ToolchainMissingKeyException
 
-import groovy.test.GroovyTestCase;
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
