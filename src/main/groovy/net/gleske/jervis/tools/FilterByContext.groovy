@@ -196,6 +196,23 @@ class FilterByContext {
     }
 
     private Boolean checkFilter(List filters) {
+        Boolean result = false
+        Boolean inverse = ('inverse' in filters)
+        Boolean combined = ('combined' in filters)
+        filters -= ['combined', 'inverse']
+
+        if(combined) {
+            result = filters.every {
+                checkFilter(it)
+            }
+        }
+        else {
+            result = (filters - ['inverse']).any {
+                checkFilter(it)
+            }
+        }
+        // Use XOR logic to optionally inverse the result.
+        inverse ^ result
     }
 
     Boolean allowBuild() {
