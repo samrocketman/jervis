@@ -113,7 +113,10 @@ Map call() {
     // auto could mean a build was pushed or a pull request was opened.  It
     // just means it didn't match other known trigger types.
     if(!context.trigger) {
-        context.trigger = 'auto'
+        context.trigger = 'push'
+        context.metadata.push = true
+    } else {
+        context.metadata.push = false
     }
 
     // Determine the context
