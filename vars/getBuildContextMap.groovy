@@ -88,6 +88,7 @@ Map call() {
             pr: false,
             branch: ''
             tag: '',
+            push: false,
             cron: false,
             manually: '',
             pr_comment: ''

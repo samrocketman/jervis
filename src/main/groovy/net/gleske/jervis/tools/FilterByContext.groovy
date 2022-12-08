@@ -47,7 +47,7 @@ import net.gleske.jervis.exceptions.FilterByContextException
     metadata: [:]
 ]</tt></pre>
 
-  Valid values for trigger include: manually, cron, pr_comment, auto.
+  Valid values for trigger include: manually, cron, pr_comment, push.
 
   Valid values for context include: pr, branch, tag.
 
@@ -56,12 +56,13 @@ import net.gleske.jervis.exceptions.FilterByContextException
   <a target=_blank href="https://github.com/samrocketman/jervis/blob/main/vars/getBuildContextMap.groovy"><tt>getBuildContextMap()</tt></a>
   Jenkins pipeline step.
 <pre><tt>Map context = [
-    trigger: 'auto',
+    trigger: 'push',
     context: 'pr',
     metadata: [
         pr: false,
         branch: ''
         tag: '',
+        push: false,
         cron: false,
         manually: '',
         pr_comment: ''
@@ -72,9 +73,8 @@ import net.gleske.jervis.exceptions.FilterByContextException
 
   <ul>
     <li>
-      <tt>pr</tt>: A <tt>Boolean</tt>.  It is redundant with the
-      <tt>trigger</tt> root key being set to <tt>pr</tt> and is not normally
-      read during filtering.
+      <tt>pr</tt>: A <tt>Boolean</tt>.  <tt>true</tt> if the current build is happening
+      from a pull request.
     </li>
     <li>
       <tt>branch</tt>: A <tt>String</tt>.  If the <tt>context</tt> root key is
@@ -87,9 +87,15 @@ import net.gleske.jervis.exceptions.FilterByContextException
       evaluating filters.
     </li>
     <li>
-      <tt>cron</tt>: A <tt>Boolean</tt>.  It is redundant with the
-      <tt>trigger</tt> root key being set to <tt>cron</tt> and is not normally
-      read during filtering.
+      <tt>push</tt>: A <tt>Boolean</tt>.  A build by webhook or any other event
+      which does not match other trigger types. Examples of other event types
+      include: opening a pull request, pushing a tag.
+    </li>
+    <li>
+      <tt>cron</tt>: A <tt>Boolean</tt>.  A periodic build by schedule
+      configured in job triggers.  It is redundant with the <tt>trigger</tt>
+      root key being set to <tt>cron</tt> and is not normally read during
+      filtering.
     </li>
     <li>
       <tt>manually</tt>: A <tt>String</tt>.  If the <tt>trigger</tt> root key
