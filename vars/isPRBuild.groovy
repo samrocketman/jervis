@@ -18,6 +18,7 @@
    tag.  Designed for multibranch pipeline jobs.
  */
 
+@NonCPS
 Boolean call() {
-    isBuilding('pr')
+    isBuilding(['pr'])
 }
