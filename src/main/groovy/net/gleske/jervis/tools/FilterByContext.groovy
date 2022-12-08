@@ -102,6 +102,27 @@ import net.gleske.jervis.exceptions.FilterByContextException
       contents of the comment.
     </li>
   </ul>
+
+  <h2>Sample Usage</tt>
+
+<pre><tt>import net.gleske.jervis.tools.FilterByContext
+
+Map context = [
+    trigger: 'push',
+    context: 'pr',
+    metadata: [
+        push: true,
+        pr: true, 
+        branch: false,
+        tag: false
+    ]
+]
+
+def filters = 'pr'
+FilterByContext filterShould = new FilterByContext(context, filters)
+
+// returns true because it is a pull request build
+filterShould.allowBuild</tt></pre>
   */
 class FilterByContext {
     /**
@@ -139,7 +160,7 @@ class FilterByContext {
     public FilterByContext(Map context, List filters) {
         List requiredArgs = ['trigger', 'context', 'metadata'] - context.keySet().toList()
         if(requiredArgs) {
-            throw new FilterByContextException("Context is missing required keys provided by admin: ${requiredArgs.join('\n')}")
+            throw new FilterByContextException("Context is missing required keys provided by admin: ${requiredArgs.join(', ')}")
         }
         if(!(context.trigger in String)) {
             throw new FilterByContextException("context.trigger must be a String and is a bug introduced by the admin.  Found type: ${context.trigger.getClass()}")
@@ -165,7 +186,7 @@ class FilterByContext {
     }
 
     public FilterByContext(Map context, String filter) {
-        this(context, [[(filter): '/.*/']])
+        this(context, [filter])
     }
 
     public FilterByContext(Map context, Map filter) {
@@ -190,7 +211,9 @@ class FilterByContext {
             return
         }
         if(filter in String) {
-            if(!(filter in ((this.context.metadata.keySet().toList() + ['combined', 'inverse', 'never']))))
+            if(!(filter in allowedKeys)) {
+                throw new FilterByContextException("Unknown filter encountered.  Found ${filter} but must be one of the following: ${allowedKeys.join(', ')}")
+            }
             return
         }
         if(!(filter in Map)) {
@@ -198,7 +221,7 @@ class FilterByContext {
         }
 
         // From this point onward validaing the contents of a filter map.
-        List invalidKeys = filter.keySet().toList() - (this.context.metadata.keySet().toList() + ['combined', 'inverse', 'never'])
+        List invalidKeys = filter.keySet().toList() - allowedKeys
         if(invalidKeys) {
             throw new FilterByContextException("Unknown filters have been encountered: ${invalidKeys.join(', ')}")
         }
@@ -217,14 +240,14 @@ class FilterByContext {
     }
 
     private Boolean checkEntry(String filterKey, String context, def userExpression) {
-        if((this.context.metadata[filterKey] in Boolean) || (userExpression in Boolean)) {
-            return (userExpression == (context == k))
+        if(userExpression == null) {
+            return (context == filterKey)
         }
-        else if(context != k) {
+        else if((this.context.metadata[filterKey] in Boolean) || (userExpression in Boolean)) {
+            return (userExpression == (context == filterKey))
+        }
+        else if(context != filterKey) {
             return false
-        }
-        else if(userExpression == null) {
-            return true
         }
         // String is the only other case
         return isMatched(userExpression, this.context.metadata[filterKey])
@@ -249,7 +272,7 @@ class FilterByContext {
         }
 
         Boolean combined = filter?.combined ?: false
-        Boolean inverse = filter?.
+        Boolean inverse = filter?.inverse ?: false
         Map results = [:]
         filter.each { k, v ->
             if(k in ['combined', 'inverse']) {
