@@ -51,6 +51,9 @@ import net.gleske.jervis.tools.FilterByContext
       Check for a tag, but only if it matches semantic versioning.
           isBuilding(tag: '/([0-9]+\\.){2}[0-9]+(-.*)?$/')
 
+      Match pull requests or tags.
+          isBuilding(main['pr', 'tag'])
+
   If the String 'combined' is in the List then it will require that all items
   in the List match the filter.  Otherwise, if any item is true it will return
   true.
@@ -58,9 +61,6 @@ import net.gleske.jervis.tools.FilterByContext
   Examples:
       Check for only manually built tags.
           isBuilding(['combined', 'tag', 'manually'])
-
-      Match branches or pull requests.
-          isBuilding(['pr', 'tag'])
 
       Match manually built pull requests or manually built tags.
           isBuilding([['combined', 'tag', 'manually'], ['combined', 'pr', 'manually']])

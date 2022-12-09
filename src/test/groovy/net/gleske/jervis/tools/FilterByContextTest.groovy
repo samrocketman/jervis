@@ -603,4 +603,35 @@ class FilterByContextTest extends GroovyTestCase {
         shouldFilter.context.metadata.tag = ''
         assert shouldFilter.allowBuild == false
     }
+    @Test public void test_FilterByContext_isBuilding_pr_or_tag() {
+        // isBuilding(['pr', 'tag'])
+        List filter = ['pr', 'tag']
+        Map branchContext = [
+            trigger: 'push',
+            context: 'tag',
+            metadata: [
+                pr: false,
+                branch: '',
+                tag: '1.2.3',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        // pushed tag
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == true
+        // pushed pr
+        shouldFilter.context.context = 'pr'
+        shouldFilter.context.metadata.pr = true
+        shouldFilter.context.metadata.tag = ''
+        assert shouldFilter.allowBuild == true
+        // pushed branch
+        shouldFilter.context.context = 'branch'
+        shouldFilter.context.metadata.branch = 'main'
+        shouldFilter.context.metadata.pr = false
+        shouldFilter.context.metadata.tag = ''
+        assert shouldFilter.allowBuild == false
+    }
 }
