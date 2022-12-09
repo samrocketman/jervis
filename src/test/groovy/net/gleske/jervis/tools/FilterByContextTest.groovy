@@ -823,4 +823,27 @@ class FilterByContextTest extends GroovyTestCase {
         shouldFilter.context.metadata.manually = 'someuser'
         assert shouldFilter.allowBuild == false
     }
+    @Test public void test_FilterByContext_isBuilding_matrix_on_pr_comment() {
+        // matrix on pr_comment: '/.*[Bb]uild +[Pp](ull +)?[Rr](equest)? +[Mm]atrix.*/'
+        Map filter = [pr_comment: '/.*[Bb]uild +[Pp](ull +)?[Rr](equest)? +[Mm]atrix.*/']
+        Map prCommentContext = [
+            trigger: 'pr_comment',
+            context: 'pr',
+            metadata: [
+                pr: true,
+                branch: '',
+                tag: '',
+                push: false,
+                cron: false,
+                manually: '',
+                pr_comment: 'build pr matrix'
+            ]
+        ]
+        shouldFilter = new FilterByContext(prCommentContext, filter)
+        assert shouldFilter.allowBuild == true
+        shouldFilter.context.metadata.pr_comment = 'Build Pull Request matrix'
+        assert shouldFilter.allowBuild == true
+        shouldFilter.context.metadata.pr_comment = 'retest this please'
+        assert shouldFilter.allowBuild == false
+    }
 }
