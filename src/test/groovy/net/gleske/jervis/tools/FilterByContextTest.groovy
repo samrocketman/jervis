@@ -1088,6 +1088,46 @@ class FilterByContextTest extends GroovyTestCase {
             context.metadata.pr = 4
             new FilterByContext(context)
         }
+        // no branch
+        shouldFail(FilterByContextException) {
+            context = [
+                trigger: 'push',
+                context: 'pr',
+                metadata: [
+                    push: true,
+                    pr: true,
+                    tag: ''
+                ]
+            ]
+            new FilterByContext(context)
+        }
+        // no tag
+        shouldFail(FilterByContextException) {
+            context = [
+                trigger: 'push',
+                context: 'pr',
+                metadata: [
+                    push: true,
+                    pr: true,
+                    branch: '',
+                ]
+            ]
+            new FilterByContext(context)
+        }
+        // no pr
+        shouldFail(FilterByContextException) {
+            context = [
+                trigger: 'push',
+                context: 'branch',
+                metadata: [
+                    push: true,
+                    branch: 'main',
+                    tag: ''
+                ]
+            ]
+            new FilterByContext(context)
+        }
+
     }
     @Test public void test_FilterByContext_validate_filter_failures() {
         shouldFail(FilterByContextException) {

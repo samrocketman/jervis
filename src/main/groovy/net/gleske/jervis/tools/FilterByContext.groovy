@@ -198,8 +198,12 @@ class FilterByContext {
                 throw new FilterByContextException("All context.metadata values must be a String or Boolean.  Found type: ${v.getClass()}")
             }
         }
+        List allowedKeys = (context.metadata.keySet().toList() + ['combined', 'inverse', 'never']).sort()
+        if(!(['pr', 'branch', 'tag'].every { it in allowedKeys})) {
+            throw new FilterByContextException('context.metadata must have pr, branch, and tag as a metadata key with an entry.')
+        }
         this.context = context
-        this.allowedKeys = (this.context.metadata.keySet().toList() + ['combined', 'inverse', 'never']).sort()
+        this.allowedKeys = allowedKeys
         setFilters(filters)
     }
 
@@ -227,11 +231,6 @@ class FilterByContext {
     private void validateFilters(def filter, int depth = 0) throws FilterByContextException {
         if(depth > maxRecursionDepth) {
             throw new FilterByContextException('When trying to read filters the recursion limit was reached.')
-        }
-        if(depth == 0) {
-            if(!(['pr', 'branch', 'tag'].every { it in allowedKeys})) {
-                throw new FilterByContextException('context.metadata must have pr, branch, and tag as a metadata key with an entry.')
-            }
         }
         if(filter in List) {
             filter.each { validateFilters(it, depth + 1) }
