@@ -548,4 +548,31 @@ class FilterByContextTest extends GroovyTestCase {
         shouldFilter.context.metadata.branch = 'myfeature'
         assert shouldFilter.allowBuild == false
     }
+    @Test public void test_FilterByContext_isBuilding_semver_tag() {
+        // isBuilding(tag: '/([0-9]+\\.){2}[0-9]+(-.*)?$/')
+        Map filter = [tag: '/([0-9]+\\.){2}[0-9]+(-.*)?$/']
+        Map branchContext = [
+            trigger: 'push',
+            context: 'tag',
+            metadata: [
+                pr: false,
+                branch: '',
+                tag: '1.2.3',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == true
+        shouldFilter.context.metadata.tag = '1.2.3-hotfix'
+        assert shouldFilter.allowBuild == true
+        shouldFilter.context.metadata.tag = '0.1'
+        assert shouldFilter.allowBuild == false
+        shouldFilter.context.metadata.tag = '0.1.0'
+        assert shouldFilter.allowBuild == true
+        shouldFilter.context.metadata.tag = 'v0.1.0'
+        assert shouldFilter.allowBuild == false
+    }
 }
