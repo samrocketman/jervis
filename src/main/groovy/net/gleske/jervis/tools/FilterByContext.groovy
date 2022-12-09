@@ -333,7 +333,6 @@ class FilterByContext {
         Boolean result = false
         Boolean inverse = ('inverse' in filters)
         Boolean combined = ('combined' in filters)
-        filters -= ['combined', 'inverse']
 
         if(combined) {
             result = filters.every {
@@ -345,7 +344,7 @@ class FilterByContext {
         }
         else {
             result = filters.any {
-                if(it in ['combined', 'inverse']) {
+                if(it == 'inverse') {
                     return false
                 }
                 checkFilter(it)
