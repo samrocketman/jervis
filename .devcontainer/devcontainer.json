@@ -23,8 +23,5 @@
         "QuickRunPanel.taskSources": [
             "Workspace"
         ]
-    },
-    "features": {
-        "git": "os-provided"
     }
 }
