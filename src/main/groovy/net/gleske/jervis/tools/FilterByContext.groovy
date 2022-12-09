@@ -225,7 +225,7 @@ class FilterByContext {
       Ensure filters are valid for before attempting to process them.
       */
     private void validateFilters(def filter, int depth = 0) throws FilterByContextException {
-        if(depth >= maxRecursionDepth) {
+        if(depth > maxRecursionDepth) {
             throw new FilterByContextException('When trying to read filters the recursion limit was reached.')
         }
         if(depth == 0) {

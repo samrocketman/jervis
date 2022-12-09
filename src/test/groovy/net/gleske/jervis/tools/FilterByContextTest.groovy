@@ -1089,4 +1089,16 @@ class FilterByContextTest extends GroovyTestCase {
             new FilterByContext(context)
         }
     }
+    @Test public void test_FilterByContext_validate_filter_failures() {
+        shouldFail(FilterByContextException) {
+            shouldFilter.filters = [[[[[[[[[[['never']]]]]]]]]]]
+        }
+        // do not fail
+        shouldFilter.filters = [[[[[[[[[['never']]]]]]]]]]
+        shouldFilter.maxRecursionDepth = 3
+        shouldFail(FilterByContextException) {
+            shouldFilter.filters = [[[[[[[[[['never']]]]]]]]]]
+        }
+        shouldFilter.filters = [[['never']]]
+    }
 }
