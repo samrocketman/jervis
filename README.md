@@ -14,7 +14,9 @@
 * What is Jervis? A library for [Job DSL plugin][jenkins-plugin-job-dsl]
   scripts and [shared Jenkins pipeline libraries][pipeline].  It is used to
   augment the automation of generating Jenkins jobs.
-* What is Jervis not? Jervis is not a Jenkins plugin.
+* [SCM Filter Jervis plugin][scm-filter-jervis] is available for multibranch
+  pipline filtering.  Installing this plugin also makes the Jervis library
+  available for import in shared pipeline libraries.
 
 # Documentation
 
@@ -216,6 +218,7 @@ See [SonarQube README](sonarqube/README.md).
 [maven-release]: https://search.maven.org/search?q=g:net.gleske%20AND%20a:jervis&core=gav
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
 [pipeline]: https://jenkins.io/doc/book/pipeline/shared-libraries/
+[scm-filter-jervis]: https://plugins.jenkins.io/scm-filter-jervis/
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=main
 [status-coverage]: https://coveralls.io/repos/github/samrocketman/jervis/badge.svg?branch=main
 [status-release]: https://maven-badges.herokuapp.com/maven-central/net.gleske/jervis/badge.svg

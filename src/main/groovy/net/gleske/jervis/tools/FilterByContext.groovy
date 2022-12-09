@@ -118,9 +118,9 @@ Map context = [
     context: 'pr',
     metadata: [
         push: true,
-        pr: true, 
-        branch: false,
-        tag: false
+        pr: true,
+        branch: '',
+        tag: ''
     ]
 ]
 
@@ -156,11 +156,23 @@ class FilterByContext {
     int maxRecursionDepth = 10
 
     /**
+      These filters will force the getAllowBuild method to always return true.
+      */
+    private static List alwaysAllowFilters = ['pr', 'branch', 'tag']
+
+    /**
       It is an error to instantiate this class without a build environment
       context and a user-provided filter.
       */
     public FilterByContext() {
         throw new FilterByContextException('Must provide a build environment context and a user-provided filter.  This is likely a bug introduced by the admin and should be fixed by admin.')
+    }
+
+    /**
+      Instantiate a default FilterByContext instance which will always allow
+      */
+    public FilterByContext(Map context) {
+        this(context, alwaysAllowFilters)
     }
 
     public FilterByContext(Map context, List filters) {
@@ -186,9 +198,8 @@ class FilterByContext {
             }
         }
         this.context = context
-        this.filters = filters
         this.allowedKeys = (this.context.metadata.keySet().toList() + ['combined', 'inverse', 'never']).sort()
-        validateFilters(this.filters)
+        setFilters(filters)
     }
 
     public FilterByContext(Map context, String filter) {
@@ -197,6 +208,15 @@ class FilterByContext {
 
     public FilterByContext(Map context, Map filter) {
         this(context, [filter])
+    }
+
+    /**
+      Sets a filter to be evaluated against a context.  Provides filter
+      validation and throws an exception if validation fails.
+      */
+    public void setFilters(def filters) throws FilterByContextException {
+        this.filters = (filters in List) ? filters : [filters]
+        validateFilters(this.filters)
     }
 
 
@@ -339,8 +359,8 @@ class FilterByContext {
       <tt>true</tt>.  This can return any valid object which could be found in
       a parsed YAML object.  Example types could be Map, List, String, Boolean.
       */
-    def getAlwaysBuildExpression() {
-        ['pr', 'branch', 'tag']
+    static List getAlwaysBuildExpression() {
+        return alwaysAllowFilters
     }
 
     /**
