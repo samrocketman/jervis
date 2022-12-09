@@ -733,4 +733,37 @@ class FilterByContextTest extends GroovyTestCase {
         shouldFilter.context.metadata.branch = 'main'
         assert shouldFilter.allowBuild == false
     }
+    @Test public void test_FilterByContext_isBuilding_inverse_branch() {
+        // isBuilding(['inverse', 'branch'])
+        List filter = ['inverse', 'branch']
+        Map branchContext = [
+            trigger: 'push',
+            context: 'tag',
+            metadata: [
+                pr: false,
+                branch: '',
+                tag: '1.2.3',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        // pushed tag
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == true
+        // manual tag
+        shouldFilter.context.trigger = 'manually'
+        assert shouldFilter.allowBuild == true
+        // manual pr
+        shouldFilter.context.context = 'pr'
+        shouldFilter.context.metadata.pr = true
+        shouldFilter.context.metadata.tag = ''
+        assert shouldFilter.allowBuild == true
+        // manual branch
+        shouldFilter.context.context = 'branch'
+        shouldFilter.context.metadata.pr = false
+        shouldFilter.context.metadata.branch = 'main'
+        assert shouldFilter.allowBuild == false
+    }
 }

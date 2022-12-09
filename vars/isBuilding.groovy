@@ -80,7 +80,7 @@ import net.gleske.jervis.tools.FilterByContext
 
   Examples:
       Build a tag or PR.
-          isBuilding(['inverse', 'branch']
+          isBuilding(['inverse', 'branch'])
 
       On a pull request, match any build trigger type except for webhook
       pushed.  e.g. matches cron, manually, pr_comment but does not match when
