@@ -1140,5 +1140,17 @@ class FilterByContextTest extends GroovyTestCase {
             shouldFilter.filters = [[[[[[[[[['never']]]]]]]]]]
         }
         shouldFilter.filters = [[['never']]]
+        shouldFail(FilterByContextException) {
+            shouldFilter.filters = 'foo'
+        }
+        shouldFail(FilterByContextException) {
+            shouldFilter.filters = 20
+        }
+        shouldFail(FilterByContextException) {
+            shouldFilter.filters = [hello: 'world', pr: true]
+        }
+        shouldFail(FilterByContextException) {
+            shouldFilter.filters = [pr: 3]
+        }
     }
 }
