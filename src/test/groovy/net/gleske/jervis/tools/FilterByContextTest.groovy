@@ -575,4 +575,32 @@ class FilterByContextTest extends GroovyTestCase {
         shouldFilter.context.metadata.tag = 'v0.1.0'
         assert shouldFilter.allowBuild == false
     }
+    @Test public void test_FilterByContext_isBuilding_manual_tag() {
+        // isBuilding(['combined', 'tag', 'manually'])
+        List filter = ['combined', 'tag', 'manually']
+        Map branchContext = [
+            trigger: 'push',
+            context: 'tag',
+            metadata: [
+                pr: false,
+                branch: '',
+                tag: '1.2.3',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        // pushed tag
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == false
+        // manual tag
+        shouldFilter.context.trigger = 'manually'
+        assert shouldFilter.allowBuild == true
+        // manual pr
+        shouldFilter.context.context = 'pr'
+        shouldFilter.context.metadata.pr = true
+        shouldFilter.context.metadata.tag = ''
+        assert shouldFilter.allowBuild == false
+    }
 }
