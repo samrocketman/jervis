@@ -19,6 +19,7 @@ package net.gleske.jervis.tools
 import net.gleske.jervis.exceptions.JervisException
 import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
 
+import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
 
@@ -114,7 +115,7 @@ class SupportDocumentationGenerator {
     }
 
     private void parseJsonFiles(String jsonDir) {
-        def yaml = new Yaml(new SafeConstructor())
+        def yaml = new Yaml(new SafeConstructor(new LoaderOptions()))
         this.jsonFiles['platforms'] = yaml.load(new File(jsonDir + '/platforms.json').text)
         String stability = this.jsonFiles.platforms.defaults.stability
         this.jsonFiles.platforms.supported_platforms.each { k, platform ->

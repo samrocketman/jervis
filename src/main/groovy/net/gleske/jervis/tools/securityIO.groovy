@@ -38,6 +38,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
+import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
 
@@ -136,10 +137,6 @@ println key_pair.public.modulus.bitLength()</tt></pre>
       payload contents.
 
 <pre><tt>import net.gleske.jervis.tools.securityIO
-
-import java.time.Instant
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.SafeConstructor
 
 if(!(new File('/tmp/id_rsa').exists())) {
     'openssl genrsa -out /tmp/id_rsa 2048'.execute().waitFor()
@@ -243,7 +240,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
         if(!verifyGitHubJWT(github_jwt)) {
             return false
         }
-        Map payload = (new Yaml(new SafeConstructor())).load(decodeBase64UrlString(github_jwt.tokenize('.')[1]))
+        Map payload = (new Yaml(new SafeConstructor(new LoaderOptions()))).load(decodeBase64UrlString(github_jwt.tokenize('.')[1]))
         // add seconds into the future to account for clock drift
         Integer time_since_epoch = Instant.now().getEpochSecond() + drift
         payload.iat < time_since_epoch && payload.exp > time_since_epoch

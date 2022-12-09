@@ -27,6 +27,7 @@ import java.time.Instant
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
 
@@ -217,7 +218,7 @@ class securityIOTest extends GroovyTestCase {
         Map payload
         jwt_token.tokenize('.').with {
             header = security.decodeBase64String(it[0])
-            payload = (new Yaml(new SafeConstructor())).load(security.decodeBase64String(it[1]))
+            payload = (new Yaml(new SafeConstructor(new LoaderOptions()))).load(security.decodeBase64String(it[1]))
         }
         assert header == '{"alg":"RS256","typ":"JWT"}'
         assert 'iat' in payload
@@ -250,7 +251,7 @@ class securityIOTest extends GroovyTestCase {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         security = new securityIO(url.content.text)
         String jwt_token = security.getGitHubJWT('1234', 2, 30)
-        Map payload = (new Yaml(new SafeConstructor())).load(security.decodeBase64String(jwt_token.tokenize('.')[1]))
+        Map payload = (new Yaml(new SafeConstructor(new LoaderOptions()))).load(security.decodeBase64String(jwt_token.tokenize('.')[1]))
         Integer now = Instant.now().getEpochSecond()
 
         // validate we our JWT is not expired
@@ -264,7 +265,7 @@ class securityIOTest extends GroovyTestCase {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         security = new securityIO(url.content.text)
         String jwt_token = security.getGitHubJWT('1234', 1, 120)
-        Map payload = (new Yaml(new SafeConstructor())).load(security.decodeBase64String(jwt_token.tokenize('.')[1]))
+        Map payload = (new Yaml(new SafeConstructor(new LoaderOptions()))).load(security.decodeBase64String(jwt_token.tokenize('.')[1]))
         Integer now = Instant.now().getEpochSecond()
 
         // Verify due to drift and expiration our JWT is expired

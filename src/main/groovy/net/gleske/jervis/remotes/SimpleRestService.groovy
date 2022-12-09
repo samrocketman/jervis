@@ -15,7 +15,7 @@
    */
 package net.gleske.jervis.remotes
 
-
+import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
 
@@ -48,7 +48,7 @@ class SimpleRestService {
     static def apiFetch(URL api_url, Map http_headers = [:], String http_method = 'GET', String data = '') {
         http_headers['Content-Type'] = http_headers['Content-Type'] ?: 'application/json'
         Boolean parse_json = http_headers['Content-Type'] == 'application/json'
-        def yaml = new Yaml(new SafeConstructor())
+        def yaml = new Yaml(new SafeConstructor(new LoaderOptions()))
 
         //data_response could be either a List or Map depending on the JSON
         def data_response

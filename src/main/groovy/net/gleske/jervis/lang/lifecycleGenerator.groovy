@@ -23,6 +23,7 @@ import net.gleske.jervis.exceptions.UnsupportedToolException
 import net.gleske.jervis.tools.securityIO
 
 import java.util.regex.Pattern
+import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
 
@@ -365,7 +366,7 @@ class lifecycleGenerator implements Serializable {
       @param raw_yaml A <tt>String</tt> which contains Jervis YAML to be parsed.
      */
     public void loadYamlString(String raw_yaml) throws JervisException, UnsupportedLanguageException {
-        def yaml = new Yaml(new SafeConstructor())
+        def yaml = new Yaml(new SafeConstructor(new LoaderOptions()))
         jervis_yaml = yaml.load(raw_yaml)?: [:]
         //remove any empty YAML keys to fix null key bug
         def iterator = jervis_yaml.entrySet().iterator()
@@ -1026,7 +1027,7 @@ env:
         if(!platform_obj) {
             throw new PlatformValidationException('Must load the platforms file first.')
         }
-        def yaml = new Yaml(new SafeConstructor())
+        def yaml = new Yaml(new SafeConstructor(new LoaderOptions()))
         jervis_yaml = yaml.load(raw_yaml)?: [:]
         this.label_platform = getObjectValue(jervis_yaml, 'jenkins.platform', platform_obj.platforms['defaults']['platform'])
         this.label_os = getObjectValue(jervis_yaml, 'jenkins.os', platform_obj.platforms['defaults']['os'])

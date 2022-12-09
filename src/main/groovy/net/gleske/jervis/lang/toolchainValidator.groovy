@@ -19,6 +19,7 @@ import net.gleske.jervis.exceptions.ToolchainBadValueInKeyException
 import net.gleske.jervis.exceptions.ToolchainMissingKeyException
 import net.gleske.jervis.exceptions.ToolchainValidationException
 
+import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
 
@@ -94,7 +95,7 @@ class toolchainValidator implements Serializable {
       @param json A <tt>String</tt> the contents of a toolchains file.
      */
     public void load_JSONString(String json) {
-        def yaml = new Yaml(new SafeConstructor())
+        def yaml = new Yaml(new SafeConstructor(new LoaderOptions()))
         toolchains = yaml.load(json)?: [:]
         toolchain_list = toolchains.keySet() as String[]
         matrix_toolchain_list = toolchain_list.findAll { String toolchain ->
