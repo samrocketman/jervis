@@ -86,7 +86,7 @@ Map call() {
         context: '',
         metadata: [
             pr: false,
-            branch: ''
+            branch: '',
             tag: '',
             push: false,
             cron: false,
