@@ -198,4 +198,254 @@ class FilterByContextTest extends GroovyTestCase {
         shouldFilter.filters = FilterByContext.getAlwaysBuildExpression()
         assert shouldFilter.allowBuild == true
     }
+    @Test public void test_FilterByContext_isBuilding_branch() {
+        // isBuilding('branch')
+        String filter = 'branch'
+        Map branchContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        Map tagContext = branchContext + [context: 'tag']
+        tagContext.metadata.branch = ''
+        tagContext.metadata.tag = '1.2.3'
+        Map prContext = branchContext + [context: 'pr']
+        prContext.metadata.branch = ''
+        prContext.metadata.pr = true
+        // check values across full git workflow
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == true
+        shouldFilter = new FilterByContext(tagContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(prContext, filter)
+        assert shouldFilter.allowBuild == false
+    }
+    @Test public void test_FilterByContext_isBuilding_pr() {
+        // isBuilding('pr')
+        String filter = 'pr'
+        Map branchContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        Map tagContext = branchContext + [context: 'tag']
+        tagContext.metadata.branch = ''
+        tagContext.metadata.tag = '1.2.3'
+        Map prContext = branchContext + [context: 'pr']
+        prContext.metadata.branch = ''
+        prContext.metadata.pr = true
+        // check values across full git workflow
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(tagContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(prContext, filter)
+        assert shouldFilter.allowBuild == true
+    }
+    @Test public void test_FilterByContext_isBuilding_tag() {
+        // isBuilding('tag')
+        String filter = 'tag'
+        Map branchContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        Map tagContext = branchContext + [context: 'tag']
+        tagContext.metadata.branch = ''
+        tagContext.metadata.tag = '1.2.3'
+        Map prContext = branchContext + [context: 'pr']
+        prContext.metadata.branch = ''
+        prContext.metadata.pr = true
+        // check values across full git workflow
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(tagContext, filter)
+        assert shouldFilter.allowBuild == true
+        shouldFilter = new FilterByContext(prContext, filter)
+        assert shouldFilter.allowBuild == false
+    }
+    @Test public void test_FilterByContext_isBuilding_pr_comment() {
+        // isBuilding('pr_comment')
+        String filter = 'pr_comment'
+        Map pushContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        // pr_comment
+        Map prCommentContext = pushContext + [trigger: 'pr_comment']
+        prCommentContext.metadata.push = false
+        prCommentContext.context = 'pr'
+        prCommentContext.metadata.pr = true
+        prCommentContext.metadata.pr_comment = 'retest this please'
+        // manually
+        Map manuallyContext = pushContext + [trigger: 'manually']
+        manuallyContext.metadata.push = false
+        manuallyContext.metadata.manually = 'someuser'
+        // cron
+        Map cronContext = pushContext + [trigger: 'cron']
+        cronContext.metadata.push = false
+        cronContext.metadata.cron = true
+        // check triggers
+        shouldFilter = new FilterByContext(cronContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(manuallyContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(prCommentContext, filter)
+        assert shouldFilter.allowBuild == true
+        shouldFilter = new FilterByContext(pushContext, filter)
+        assert shouldFilter.allowBuild == false
+    }
+    @Test public void test_FilterByContext_isBuilding_cron() {
+        // isBuilding('cron')
+        String filter = 'cron'
+        Map pushContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        // pr_comment
+        Map prCommentContext = pushContext + [trigger: 'pr_comment']
+        prCommentContext.metadata.push = false
+        prCommentContext.context = 'pr'
+        prCommentContext.metadata.pr = true
+        prCommentContext.metadata.pr_comment = 'retest this please'
+        // manually
+        Map manuallyContext = pushContext + [trigger: 'manually']
+        manuallyContext.metadata.push = false
+        manuallyContext.metadata.manually = 'someuser'
+        // cron
+        Map cronContext = pushContext + [trigger: 'cron']
+        cronContext.metadata.push = false
+        cronContext.metadata.cron = true
+        // check triggers
+        shouldFilter = new FilterByContext(cronContext, filter)
+        assert shouldFilter.allowBuild == true
+        shouldFilter = new FilterByContext(manuallyContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(prCommentContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(pushContext, filter)
+        assert shouldFilter.allowBuild == false
+    }
+    @Test public void test_FilterByContext_isBuilding_manually() {
+        // isBuilding('manually')
+        String filter = 'manually'
+        Map pushContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        // pr_comment
+        Map prCommentContext = pushContext + [trigger: 'pr_comment']
+        prCommentContext.metadata.push = false
+        prCommentContext.context = 'pr'
+        prCommentContext.metadata.pr = true
+        prCommentContext.metadata.pr_comment = 'retest this please'
+        // manually
+        Map manuallyContext = pushContext + [trigger: 'manually']
+        manuallyContext.metadata.push = false
+        manuallyContext.metadata.manually = 'someuser'
+        // cron
+        Map cronContext = pushContext + [trigger: 'cron']
+        cronContext.metadata.push = false
+        cronContext.metadata.cron = true
+        // check triggers
+        shouldFilter = new FilterByContext(cronContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(manuallyContext, filter)
+        assert shouldFilter.allowBuild == true
+        shouldFilter = new FilterByContext(prCommentContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(pushContext, filter)
+        assert shouldFilter.allowBuild == false
+    }
+    @Test public void test_FilterByContext_isBuilding_push() {
+        // isBuilding('push')
+        String filter = 'push'
+        Map pushContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        // pr_comment
+        Map prCommentContext = pushContext + [trigger: 'pr_comment']
+        prCommentContext.metadata.push = false
+        prCommentContext.context = 'pr'
+        prCommentContext.metadata.pr = true
+        prCommentContext.metadata.pr_comment = 'retest this please'
+        // manually
+        Map manuallyContext = pushContext + [trigger: 'manually']
+        manuallyContext.metadata.push = false
+        manuallyContext.metadata.manually = 'someuser'
+        // cron
+        Map cronContext = pushContext + [trigger: 'cron']
+        cronContext.metadata.push = false
+        cronContext.metadata.cron = true
+        // check triggers
+        shouldFilter = new FilterByContext(cronContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(manuallyContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(prCommentContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(pushContext, filter)
+        assert shouldFilter.allowBuild == true
+    }
 }

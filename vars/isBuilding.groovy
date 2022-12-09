@@ -21,13 +21,15 @@ import net.gleske.jervis.tools.FilterByContext
 
   Examples:
       Check if building any branch, pull request, tag, or a scheduled timer
-      build (cron)
+      build (cron).  Check if 'push' means no other trigger type such as a
+      webhook created build by scm push.
           isBuilding('branch')
           isBuilding('pr')
           isBuilding('tag')
-          isBuilding('pr_comment')
           isBuilding('cron')
           isBuilding('manually')
+          isBuilding('pr_comment')
+          isBuilding('push')
 
       Abort a pipeline early if it is not a pull request, a matched branch, or
       a tag matching semantic versioning.
