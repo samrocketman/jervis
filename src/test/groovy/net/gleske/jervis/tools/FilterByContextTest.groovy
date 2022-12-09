@@ -846,4 +846,202 @@ class FilterByContextTest extends GroovyTestCase {
         shouldFilter.context.metadata.pr_comment = 'retest this please'
         assert shouldFilter.allowBuild == false
     }
+    @Test public void test_FilterByContext_never_build_string() {
+        String filter = 'never'
+        Map branchContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        Map tagContext = deepcopy(branchContext) + [context: 'tag']
+        tagContext.metadata.branch = ''
+        tagContext.metadata.tag = '1.2.3'
+        Map prContext = deepcopy(branchContext) + [context: 'pr']
+        prContext.metadata.branch = ''
+        prContext.metadata.pr = true
+        // check values across full git workflow
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(tagContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(prContext, filter)
+        assert shouldFilter.allowBuild == false
+
+        Map pushContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        // pr_comment
+        Map prCommentContext = deepcopy(pushContext) + [trigger: 'pr_comment']
+        prCommentContext.metadata.push = false
+        prCommentContext.context = 'pr'
+        prCommentContext.metadata.pr = true
+        prCommentContext.metadata.pr_comment = 'retest this please'
+        // manually
+        Map manuallyContext = deepcopy(pushContext) + [trigger: 'manually']
+        manuallyContext.metadata.push = false
+        manuallyContext.metadata.manually = 'someuser'
+        // cron
+        Map cronContext = deepcopy(pushContext) + [trigger: 'cron']
+        cronContext.metadata.push = false
+        cronContext.metadata.cron = true
+        // check triggers
+        shouldFilter = new FilterByContext(cronContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(manuallyContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(prCommentContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(pushContext, filter)
+        assert shouldFilter.allowBuild == false
+    }
+    @Test public void test_FilterByContext_never_build_list() {
+        List filter = ['never']
+        Map branchContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        Map tagContext = deepcopy(branchContext) + [context: 'tag']
+        tagContext.metadata.branch = ''
+        tagContext.metadata.tag = '1.2.3'
+        Map prContext = deepcopy(branchContext) + [context: 'pr']
+        prContext.metadata.branch = ''
+        prContext.metadata.pr = true
+        // check values across full git workflow
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(tagContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(prContext, filter)
+        assert shouldFilter.allowBuild == false
+
+        Map pushContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        // pr_comment
+        Map prCommentContext = deepcopy(pushContext) + [trigger: 'pr_comment']
+        prCommentContext.metadata.push = false
+        prCommentContext.context = 'pr'
+        prCommentContext.metadata.pr = true
+        prCommentContext.metadata.pr_comment = 'retest this please'
+        // manually
+        Map manuallyContext = deepcopy(pushContext) + [trigger: 'manually']
+        manuallyContext.metadata.push = false
+        manuallyContext.metadata.manually = 'someuser'
+        // cron
+        Map cronContext = deepcopy(pushContext) + [trigger: 'cron']
+        cronContext.metadata.push = false
+        cronContext.metadata.cron = true
+        // check triggers
+        shouldFilter = new FilterByContext(cronContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(manuallyContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(prCommentContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(pushContext, filter)
+        assert shouldFilter.allowBuild == false
+    }
+    @Test public void test_FilterByContext_never_build_map() {
+        Map filter = [never:null]
+        Map branchContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        Map tagContext = deepcopy(branchContext) + [context: 'tag']
+        tagContext.metadata.branch = ''
+        tagContext.metadata.tag = '1.2.3'
+        Map prContext = deepcopy(branchContext) + [context: 'pr']
+        prContext.metadata.branch = ''
+        prContext.metadata.pr = true
+        // check values across full git workflow
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(tagContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(prContext, filter)
+        assert shouldFilter.allowBuild == false
+
+        Map pushContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        // pr_comment
+        Map prCommentContext = deepcopy(pushContext) + [trigger: 'pr_comment']
+        prCommentContext.metadata.push = false
+        prCommentContext.context = 'pr'
+        prCommentContext.metadata.pr = true
+        prCommentContext.metadata.pr_comment = 'retest this please'
+        // manually
+        Map manuallyContext = deepcopy(pushContext) + [trigger: 'manually']
+        manuallyContext.metadata.push = false
+        manuallyContext.metadata.manually = 'someuser'
+        // cron
+        Map cronContext = deepcopy(pushContext) + [trigger: 'cron']
+        cronContext.metadata.push = false
+        cronContext.metadata.cron = true
+        // check triggers
+        shouldFilter = new FilterByContext(cronContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(manuallyContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(prCommentContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter = new FilterByContext(pushContext, filter)
+        assert shouldFilter.allowBuild == false
+    }
 }
