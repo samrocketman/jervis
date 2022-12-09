@@ -46,7 +46,7 @@ import net.gleske.jervis.tools.FilterByContext
 
       Check for main branch or hotfix branches (branch starts with a version
       number and ends with -hotfix)
-          isBuilding(branch: '/^\\Qmain\\E$|^[0-9.]+-hotfix$')
+          isBuilding(branch: '/^\\Qmain\\E$|^[0-9.]+-hotfix$/')
 
       Check for a tag, but only if it matches semantic versioning.
           isBuilding(tag: '/([0-9]+\\.){2}[0-9]+(-.*)?$/')

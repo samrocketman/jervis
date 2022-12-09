@@ -485,7 +485,6 @@ class FilterByContextTest extends GroovyTestCase {
         prContext.metadata.branch = ''
         prContext.metadata.pr = true
         // branch
-        assert branchContext.metadata.branch == 'main'
         shouldFilter = new FilterByContext(branchContext, filter)
         assert shouldFilter.allowBuild == true
         shouldFilter.context.metadata.branch = '1.2.3-hotfix'
@@ -504,5 +503,49 @@ class FilterByContextTest extends GroovyTestCase {
         // pr
         shouldFilter = new FilterByContext(prContext, filter)
         assert shouldFilter.allowBuild == true
+    }
+    @Test public void test_FilterByContext_isBuilding_main_branch() {
+        // isBuilding(branch: 'main')
+        Map filter = [branch: 'main']
+        Map branchContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == true
+        shouldFilter.context.metadata.branch = 'myfeature'
+        assert shouldFilter.allowBuild == false
+    }
+    @Test public void test_FilterByContext_isBuilding_main_or_hotfix_branch() {
+        // isBuilding(branch: '/^\\Qmain\\E$|^[0-9.]+-hotfix$/')
+        Map filter = [branch: '/^\\Qmain\\E$|^[0-9.]+-hotfix$/']
+        Map branchContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == true
+        shouldFilter.context.metadata.branch = '1.2.3-hotfix'
+        assert shouldFilter.allowBuild == true
+        shouldFilter.context.metadata.branch = 'myfeature'
+        assert shouldFilter.allowBuild == false
     }
 }
