@@ -1044,4 +1044,49 @@ class FilterByContextTest extends GroovyTestCase {
         shouldFilter = new FilterByContext(pushContext, filter)
         assert shouldFilter.allowBuild == false
     }
+    @Test public void test_FilterByContext_default_constructor() {
+        shouldFail(FilterByContextException) {
+            new FilterByContext()
+        }
+    }
+    @Test public void test_FilterByContext_validate_context_failures() {
+        Map context
+        shouldFail(FilterByContextException) {
+            new FilterByContext([:])
+        }
+        shouldFail(FilterByContextException) {
+            new FilterByContext([trigger: '', context: ''])
+        }
+        shouldFail(FilterByContextException) {
+            new FilterByContext([trigger: '', metadata: [:]])
+        }
+        shouldFail(FilterByContextException) {
+            new FilterByContext([metadata: [:], context: ''])
+        }
+        shouldFail(FilterByContextException) {
+            context = deepcopy(defaultContext)
+            context.trigger = 1
+            new FilterByContext(context)
+        }
+        shouldFail(FilterByContextException) {
+            context = deepcopy(defaultContext)
+            context.context = 1
+            new FilterByContext(context)
+        }
+        shouldFail(FilterByContextException) {
+            context = deepcopy(defaultContext)
+            context.metadata = ''
+            new FilterByContext(context)
+        }
+        shouldFail(FilterByContextException) {
+            context = deepcopy(defaultContext)
+            context.metadata[3] = ''
+            new FilterByContext(context)
+        }
+        shouldFail(FilterByContextException) {
+            context = deepcopy(defaultContext)
+            context.metadata.pr = 4
+            new FilterByContext(context)
+        }
+    }
 }
