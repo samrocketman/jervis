@@ -294,7 +294,7 @@ class FilterByContext {
       If the filter is a Map then we evaluate all entries based on context.
       */
     private Boolean checkFilter(Map filter) {
-        if('never' in filter) {
+        if('never' in filter.keySet()) {
             return false
         }
 
