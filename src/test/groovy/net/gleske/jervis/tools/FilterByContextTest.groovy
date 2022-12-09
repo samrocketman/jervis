@@ -736,7 +736,7 @@ class FilterByContextTest extends GroovyTestCase {
     @Test public void test_FilterByContext_isBuilding_inverse_branch() {
         // isBuilding(['inverse', 'branch'])
         List filter = ['inverse', 'branch']
-        Map branchContext = [
+        Map tagContext = [
             trigger: 'push',
             context: 'tag',
             metadata: [
@@ -750,7 +750,7 @@ class FilterByContextTest extends GroovyTestCase {
             ]
         ]
         // pushed tag
-        shouldFilter = new FilterByContext(branchContext, filter)
+        shouldFilter = new FilterByContext(tagContext, filter)
         assert shouldFilter.allowBuild == true
         // manual tag
         shouldFilter.context.trigger = 'manually'
@@ -764,6 +764,63 @@ class FilterByContextTest extends GroovyTestCase {
         shouldFilter.context.context = 'branch'
         shouldFilter.context.metadata.pr = false
         shouldFilter.context.metadata.branch = 'main'
+        assert shouldFilter.allowBuild == false
+    }
+    @Test public void test_FilterByContext_isBuilding_inverse_push_pr() {
+        // isBuilding(['combined', 'pr', ['inverse', 'push']])
+        List filter = ['combined', 'pr', ['inverse', 'push']]
+        Map pushContext = [
+            trigger: 'push',
+            context: 'pr',
+            metadata: [
+                pr: true,
+                branch: '',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        shouldFilter = new FilterByContext(pushContext, filter)
+        assert shouldFilter.allowBuild == false
+        // pr_comment
+        Map prCommentContext = deepcopy(pushContext) + [trigger: 'pr_comment']
+        prCommentContext.metadata.push = false
+        prCommentContext.metadata.pr_comment = 'retest this please'
+        shouldFilter = new FilterByContext(prCommentContext, filter)
+        assert shouldFilter.allowBuild == true
+        // manually
+        Map manuallyContext = deepcopy(pushContext) + [trigger: 'manually']
+        manuallyContext.metadata.push = false
+        manuallyContext.metadata.manually = 'someuser'
+        shouldFilter = new FilterByContext(manuallyContext, filter)
+        assert shouldFilter.allowBuild == true
+        // cron
+        Map cronContext = deepcopy(pushContext) + [trigger: 'cron']
+        cronContext.metadata.push = false
+        cronContext.metadata.cron = true
+        shouldFilter = new FilterByContext(cronContext, filter)
+        assert shouldFilter.allowBuild == true
+        // check push and non-push branch
+        Map branchContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == false
+        shouldFilter.context.trigger = 'manually'
+        shouldFilter.context.metadata.push = false
+        shouldFilter.context.metadata.manually = 'someuser'
         assert shouldFilter.allowBuild == false
     }
 }
