@@ -34,19 +34,19 @@ import net.gleske.jervis.tools.FilterByContext
       Abort a pipeline early if it is not a pull request, a matched branch, or
       a tag matching semantic versioning.
           if(!isBuilding(
-                  branch: '/^\\Qmaster\\E$|^[0-9.]+-hotfix$',
+                  branch: '/^\\Qmain\\E$|^[0-9.]+-hotfix$',
                   tag: '/([0-9]+\\.){2}[0-9]+(-.*)?$/',
                   pr: null)) {
               // abort the pipeline
               return
           }
 
-      Check if building the master branch.
-          isBuilding(branch: 'master')
+      Check if building the main branch.
+          isBuilding(branch: 'main')
 
-      Check for master branch or hotfix branches (branch starts with a version
+      Check for main branch or hotfix branches (branch starts with a version
       number and ends with -hotfix)
-          isBuilding(branch: '/^\\Qmaster\\E$|^[0-9.]+-hotfix$')
+          isBuilding(branch: '/^\\Qmain\\E$|^[0-9.]+-hotfix$')
 
       Check for a tag, but only if it matches semantic versioning.
           isBuilding(tag: '/([0-9]+\\.){2}[0-9]+(-.*)?$/')

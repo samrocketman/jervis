@@ -33,6 +33,20 @@ class FilterByContextTest extends GroovyTestCase {
             tag: ''
         ]
     ]
+
+    /**
+        Adding two maps together only creates a shallow copy.  For testing, a
+        deep copy is necessary.  Deep copying is necessary for testing maps of
+        maps like this use case.
+      */
+    Map deepcopy(Map orig) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream()
+        ObjectOutputStream oos = new ObjectOutputStream(bos)
+        oos.writeObject(orig); oos.flush()
+        ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray())
+        ObjectInputStream ois = new ObjectInputStream(bin)
+        return ois.readObject()
+    }
     @Before protected void setUp() {
         shouldFilter = new FilterByContext(defaultContext, 'pr')
     }
@@ -214,10 +228,10 @@ class FilterByContextTest extends GroovyTestCase {
                 pr_comment: ''
             ]
         ]
-        Map tagContext = branchContext + [context: 'tag']
+        Map tagContext = deepcopy(branchContext) + [context: 'tag']
         tagContext.metadata.branch = ''
         tagContext.metadata.tag = '1.2.3'
-        Map prContext = branchContext + [context: 'pr']
+        Map prContext = deepcopy(branchContext) + [context: 'pr']
         prContext.metadata.branch = ''
         prContext.metadata.pr = true
         // check values across full git workflow
@@ -244,10 +258,10 @@ class FilterByContextTest extends GroovyTestCase {
                 pr_comment: ''
             ]
         ]
-        Map tagContext = branchContext + [context: 'tag']
+        Map tagContext = deepcopy(branchContext) + [context: 'tag']
         tagContext.metadata.branch = ''
         tagContext.metadata.tag = '1.2.3'
-        Map prContext = branchContext + [context: 'pr']
+        Map prContext = deepcopy(branchContext) + [context: 'pr']
         prContext.metadata.branch = ''
         prContext.metadata.pr = true
         // check values across full git workflow
@@ -274,10 +288,10 @@ class FilterByContextTest extends GroovyTestCase {
                 pr_comment: ''
             ]
         ]
-        Map tagContext = branchContext + [context: 'tag']
+        Map tagContext = deepcopy(branchContext) + [context: 'tag']
         tagContext.metadata.branch = ''
         tagContext.metadata.tag = '1.2.3'
-        Map prContext = branchContext + [context: 'pr']
+        Map prContext = deepcopy(branchContext) + [context: 'pr']
         prContext.metadata.branch = ''
         prContext.metadata.pr = true
         // check values across full git workflow
@@ -305,17 +319,17 @@ class FilterByContextTest extends GroovyTestCase {
             ]
         ]
         // pr_comment
-        Map prCommentContext = pushContext + [trigger: 'pr_comment']
+        Map prCommentContext = deepcopy(pushContext) + [trigger: 'pr_comment']
         prCommentContext.metadata.push = false
         prCommentContext.context = 'pr'
         prCommentContext.metadata.pr = true
         prCommentContext.metadata.pr_comment = 'retest this please'
         // manually
-        Map manuallyContext = pushContext + [trigger: 'manually']
+        Map manuallyContext = deepcopy(pushContext) + [trigger: 'manually']
         manuallyContext.metadata.push = false
         manuallyContext.metadata.manually = 'someuser'
         // cron
-        Map cronContext = pushContext + [trigger: 'cron']
+        Map cronContext = deepcopy(pushContext) + [trigger: 'cron']
         cronContext.metadata.push = false
         cronContext.metadata.cron = true
         // check triggers
@@ -345,17 +359,17 @@ class FilterByContextTest extends GroovyTestCase {
             ]
         ]
         // pr_comment
-        Map prCommentContext = pushContext + [trigger: 'pr_comment']
+        Map prCommentContext = deepcopy(pushContext) + [trigger: 'pr_comment']
         prCommentContext.metadata.push = false
         prCommentContext.context = 'pr'
         prCommentContext.metadata.pr = true
         prCommentContext.metadata.pr_comment = 'retest this please'
         // manually
-        Map manuallyContext = pushContext + [trigger: 'manually']
+        Map manuallyContext = deepcopy(pushContext) + [trigger: 'manually']
         manuallyContext.metadata.push = false
         manuallyContext.metadata.manually = 'someuser'
         // cron
-        Map cronContext = pushContext + [trigger: 'cron']
+        Map cronContext = deepcopy(pushContext) + [trigger: 'cron']
         cronContext.metadata.push = false
         cronContext.metadata.cron = true
         // check triggers
@@ -385,17 +399,17 @@ class FilterByContextTest extends GroovyTestCase {
             ]
         ]
         // pr_comment
-        Map prCommentContext = pushContext + [trigger: 'pr_comment']
+        Map prCommentContext = deepcopy(pushContext) + [trigger: 'pr_comment']
         prCommentContext.metadata.push = false
         prCommentContext.context = 'pr'
         prCommentContext.metadata.pr = true
         prCommentContext.metadata.pr_comment = 'retest this please'
         // manually
-        Map manuallyContext = pushContext + [trigger: 'manually']
+        Map manuallyContext = deepcopy(pushContext) + [trigger: 'manually']
         manuallyContext.metadata.push = false
         manuallyContext.metadata.manually = 'someuser'
         // cron
-        Map cronContext = pushContext + [trigger: 'cron']
+        Map cronContext = deepcopy(pushContext) + [trigger: 'cron']
         cronContext.metadata.push = false
         cronContext.metadata.cron = true
         // check triggers
@@ -425,17 +439,17 @@ class FilterByContextTest extends GroovyTestCase {
             ]
         ]
         // pr_comment
-        Map prCommentContext = pushContext + [trigger: 'pr_comment']
+        Map prCommentContext = deepcopy(pushContext) + [trigger: 'pr_comment']
         prCommentContext.metadata.push = false
         prCommentContext.context = 'pr'
         prCommentContext.metadata.pr = true
         prCommentContext.metadata.pr_comment = 'retest this please'
         // manually
-        Map manuallyContext = pushContext + [trigger: 'manually']
+        Map manuallyContext = deepcopy(pushContext) + [trigger: 'manually']
         manuallyContext.metadata.push = false
         manuallyContext.metadata.manually = 'someuser'
         // cron
-        Map cronContext = pushContext + [trigger: 'cron']
+        Map cronContext = deepcopy(pushContext) + [trigger: 'cron']
         cronContext.metadata.push = false
         cronContext.metadata.cron = true
         // check triggers
@@ -446,6 +460,49 @@ class FilterByContextTest extends GroovyTestCase {
         shouldFilter = new FilterByContext(prCommentContext, filter)
         assert shouldFilter.allowBuild == false
         shouldFilter = new FilterByContext(pushContext, filter)
+        assert shouldFilter.allowBuild == true
+    }
+    @Test public void test_FilterByContext_isBuilding_abort_pipeline_expression() {
+        // isBuilding(branch: '/^\\Qmain\\E$|^[0-9.]+-hotfix$/', tag: '/([0-9]+\\.){2}[0-9]+(-.*)?$/', pr: null)
+        Map filter = [branch: '/^\\Qmain\\E$|^[0-9.]+-hotfix$/', tag: '/([0-9]+\\.){2}[0-9]+(-.*)?$/', pr: null]
+        Map branchContext = [
+            trigger: 'push',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: true,
+                cron: false,
+                manually: '',
+                pr_comment: ''
+            ]
+        ]
+        Map tagContext = deepcopy(branchContext) + [context: 'tag']
+        tagContext.metadata.branch = ''
+        tagContext.metadata.tag = '1.2.3'
+        Map prContext = deepcopy(branchContext) + [context: 'pr']
+        prContext.metadata.branch = ''
+        prContext.metadata.pr = true
+        // branch
+        assert branchContext.metadata.branch == 'main'
+        shouldFilter = new FilterByContext(branchContext, filter)
+        assert shouldFilter.allowBuild == true
+        shouldFilter.context.metadata.branch = '1.2.3-hotfix'
+        assert shouldFilter.allowBuild == true
+        shouldFilter.context.metadata.branch = 'myfeature'
+        assert shouldFilter.allowBuild == false
+        // tag
+        shouldFilter = new FilterByContext(tagContext, filter)
+        assert shouldFilter.allowBuild == true
+        shouldFilter.context.metadata.tag = '1.2.3.4'
+        assert shouldFilter.allowBuild == false
+        shouldFilter.context.metadata.tag = '1.2.3-suffix'
+        assert shouldFilter.allowBuild == true
+        shouldFilter.context.metadata.tag = 'mytag'
+        assert shouldFilter.allowBuild == false
+        // pr
+        shouldFilter = new FilterByContext(prContext, filter)
         assert shouldFilter.allowBuild == true
     }
 }

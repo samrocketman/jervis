@@ -16,6 +16,7 @@
 
 package net.gleske.jervis.tools
 
+import static net.gleske.jervis.tools.AutoRelease.isMatched
 import net.gleske.jervis.exceptions.FilterByContextException
 
 /**
