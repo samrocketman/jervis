@@ -34,7 +34,7 @@ import net.gleske.jervis.tools.FilterByContext
       Abort a pipeline early if it is not a pull request, a matched branch, or
       a tag matching semantic versioning.
           if(!isBuilding(
-                  branch: '/^\\Qmain\\E$|^[0-9.]+-hotfix$',
+                  branch: '/^\\Qmain\\E$|^[0-9.]+-hotfix$/',
                   tag: '/([0-9]+\\.){2}[0-9]+(-.*)?$/',
                   pr: null)) {
               // abort the pipeline
