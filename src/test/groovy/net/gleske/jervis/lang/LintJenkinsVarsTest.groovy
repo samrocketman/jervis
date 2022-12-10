@@ -35,7 +35,7 @@ class LintJenkinsVarsTest extends GroovyTestCase {
     void test_vars_RunCodeNarc() {
         def ant = new AntBuilder()
         ant.taskdef(name: 'codenarc', classname: 'org.codenarc.ant.CodeNarcTask')
-        ant.codenarc(ruleSetFiles: RULESET_FILES, maxPriority1Violations: 0, maxPriority2Violations: 0, maxPriority3Violations: 0) {
+        ant.codenarc(ruleSetFiles: RULESET_FILES, maxPriority1Violations: 0, maxPriority2Violations: 1, maxPriority3Violations: 0) {
            fileset(dir: 'vars') {
                include(name:GROOVY_FILES)
            }
