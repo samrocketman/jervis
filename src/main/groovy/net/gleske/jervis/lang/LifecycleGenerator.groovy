@@ -391,11 +391,13 @@ class LifecycleGenerator implements Serializable {
         def cipherobj = getObjectValue(jervis_yaml, 'jenkins.secrets', new Object())
         if(cipherobj instanceof List) {
             //load encrypted properties
-            cipherlist = cipherobj
-            cipherlist.each { c ->
+            cipherobj.each { c ->
                 if(c instanceof Map && 'key' in c && 'secret' in c) {
                     ciphermap[c['key']] = c['secret']
                 }
+            }
+            cipherlist = ciphermap.collect { k, v ->
+                [key: k, secret: v]
             }
         }
         else if (cipherobj instanceof Map) {

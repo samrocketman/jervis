@@ -851,4 +851,19 @@ class LifecycleGeneratorTest extends GroovyTestCase {
             '''.stripMargin().trim()
         assert generator.generateAll().trim() == result
     }
+    @Test public void test_LifecycleGenerator_empty_yaml() {
+        shouldFail(UnsupportedLanguageException) {
+            generator.loadYamlString('')
+        }
+    }
+    @Test public void test_LifecycleGenerator_empty_list_secrets() {
+        generator.loadYamlString('language: shell\njenkins:\n  secrets: []')
+        assert generator.cipherlist == []
+        assert generator.ciphermap == [:]
+    }
+    @Test public void test_LifecycleGenerator_secrets_list_without_secrets() {
+        generator.loadYamlString('language: shell\njenkins:\n  secrets: [hello]')
+        assert generator.cipherlist == []
+        assert generator.ciphermap == [:]
+    }
 }
