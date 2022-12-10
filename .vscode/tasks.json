@@ -42,7 +42,7 @@
 			"label": "Browser: SonarQube, DependencyTrack, etc",
 			"type": "shell",
 			"command": [
-				"/bin/bash -exc 'pgrep -f firefox || firefox & firefox http://sonarqube:9000/projects?sort=-analysis_date http://dependencytrack:8080/ http://vault:8200/ /home/vscode/groovydoc/index.html build/reports/codenarc-vars.html build/reports/tests/test/index.html'"
+				"/bin/bash -exc 'pgrep -f firefox || firefox & firefox http://sonarqube:9000/projects?sort=-analysis_date http://dependencytrack:8080/ http://vault:8200/ file:///home/vscode/groovydoc/index.html file://${workspaceFolder}/build/reports/codenarc-vars.html ${workspaceFolder}/build/reports/tests/test/index.html'"
 			],
 			"problemMatcher": []
 		},
