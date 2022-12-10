@@ -3,7 +3,52 @@
 This file contains all of the notable changes from Jervis releases.  For the
 full change log see the commit log.
 
-# jervis 1.8
+# jervis 2.0
+
+This is a new major release.  From an end user perspective, all behavior for 1.x
+and 0.x YAML files is still supported.  However, there are major API changes
+which warrant bumping the major to warn integrators who may be using code.
+
+### Migrating code
+
+You can use GNU `sed` to migrate code.  The following is a `sedfile` of
+expressions.
+
+```
+s/pipelineGeneratorTest/PipelineGeneratorTest/g
+s/platformValidatorTest/PlatformValidatorTest/g
+s/lifecycleGeneratorTest/LifecycleGeneratorTest/g
+s/toolchainValidatorTest/ToolchainValidatorTest/g
+s/jervisConfigsTest/JervisConfigsTest/g
+s/lifecycleValidatorTest/LifecycleValidatorTest/g
+s/lintJenkinsVarsTest/LintJenkinsVarsTest/g
+s/securityIOTest/SecurityIOTest/g
+s/pipelineGenerator/PipelineGenerator/g
+s/lifecycleValidator/LifecycleValidator/g
+s/toolchainValidator/ToolchainValidator/g
+s/lifecycleGenerator/LifecycleGenerator/g
+s/platformValidator/PlatformValidator/g
+s/securityIO/SecurityIO/g
+```
+
+Usage of the sedfile is the following.
+
+```bash
+find * -type f -name '*.groovy' -exec sed -i -f ../sedfile {} +
+```
+
+### Major API changes
+
+The following classes have been renamed.
+
+| Old name for imports                        | New name for imports                        |
+| ------------------------------------------- | ------------------------------------------- |
+| `net.gleske.jervis.lang.lifecycleGenerator` | `net.gleske.jervis.lang.LifecycleGenerator` |
+| `net.gleske.jervis.lang.lifecycleValidator` | `net.gleske.jervis.lang.LifecycleValidator` |
+| `net.gleske.jervis.lang.pipelineGenerator`  | `net.gleske.jervis.lang.PipelineGenerator`  |
+| `net.gleske.jervis.lang.platformValidator`  | `net.gleske.jervis.lang.PlatformValidator`  |
+| `net.gleske.jervis.lang.toolchainValidator` | `net.gleske.jervis.lang.ToolchainValidator` |
+| `net.gleske.jervis.tools.securityIO`        | `net.gleske.jervis.tools.SecurityIO`        |
 
 ### Warnings:
 
