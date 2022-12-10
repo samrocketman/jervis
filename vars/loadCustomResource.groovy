@@ -39,13 +39,12 @@ String loadConfigFileResource(String resource) {
     }
 }
 
+@NonCPS
 String call(String resource) {
     if(hasGlobalVar('adminLibraryResource')) {
-        echo "Load resource ${resource} from adminLibraryResource."
         adminLibraryResource(resource)
     }
     else if(loadConfigFileResource(resource)) {
-        echo "Load resource ${resource} from global config files."
         loadConfigFileResource(resource)
     }
     else {
