@@ -7,7 +7,7 @@ ARG JDK=11
 RUN set -ex; \
   export DEBIAN_FRONTEND=noninteractive; \
   apt-get update; \
-  apt-get install -y openjdk-"${JDK}"-jdk git firefox curl unzip zip; \
+  apt-get install -y openjdk-"${JDK}"-jdk git firefox curl unzip zip gpg; \
   yes | adduser vscode
 
 USER vscode
