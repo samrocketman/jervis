@@ -18,7 +18,7 @@
   sets and masks decrypted properties from .jervis.yml.
  */
 
-import net.gleske.jervis.lang.pipelineGenerator
+import net.gleske.jervis.lang.PipelineGenerator
 
 def withEnvSecretWrapper(List envList, List secretPairs = [], Closure body) {
     if(secretPairs) {
@@ -66,7 +66,7 @@ List<Map> getSecretPairs(Map secrets) {
     }
 }
 
-def call(pipelineGenerator generator, List envList = [], Closure body) {
+def call(PipelineGenerator generator, List envList = [], Closure body) {
     List spe = generator.secretPairsEnv
     List secretPairs = spe[0]
     List secretEnv = spe[1]

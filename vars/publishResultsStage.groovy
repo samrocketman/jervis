@@ -18,8 +18,8 @@
    publish them.
  */
 
-import net.gleske.jervis.lang.lifecycleGenerator
-import net.gleske.jervis.lang.pipelineGenerator
+import net.gleske.jervis.lang.LifecycleGenerator
+import net.gleske.jervis.lang.PipelineGenerator
 
 /**
   Process default publishable items provided by this script.
@@ -67,7 +67,7 @@ def processDefaultPublishable(def item, String publishable) {
     }
 }
 
-def call(lifecycleGenerator generator, pipelineGenerator pipeline_generator) {
+def call(LifecycleGenerator generator, PipelineGenerator pipeline_generator) {
     List publishableItems = pipeline_generator.publishableItems
     if(publishableItems) {
         stage("Publish results") {

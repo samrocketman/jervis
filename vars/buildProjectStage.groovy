@@ -18,10 +18,10 @@
    build.  It assumes a node for building is already provisioned for it.
  */
 
-import net.gleske.jervis.lang.lifecycleGenerator
-import net.gleske.jervis.lang.pipelineGenerator
+import net.gleske.jervis.lang.LifecycleGenerator
+import net.gleske.jervis.lang.PipelineGenerator
 
-def call(def global_scm, lifecycleGenerator generator, pipelineGenerator pipeline_generator, String script_header, String script_footer) {
+def call(def global_scm, LifecycleGenerator generator, PipelineGenerator pipeline_generator, String script_header, String script_footer) {
     Map stashMap = pipeline_generator.stashMap
     stage("Build Project") {
         checkout global_scm

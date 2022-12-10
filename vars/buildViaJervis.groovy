@@ -14,7 +14,7 @@
    limitations under the License.
    */
 
-import net.gleske.jervis.lang.lifecycleGenerator
+import net.gleske.jervis.lang.LifecycleGenerator
 
 @NonCPS
 void setupJervisEnvironment() {
@@ -56,7 +56,7 @@ def call() {
     /*
        Jenkins pipeline stages for a build pipeline.
      */
-    def generator = new lifecycleGenerator()
+    def generator = new LifecycleGenerator()
     generator.is_pr = isBuilding('pr')
     def pipeline_generator
     String script_header

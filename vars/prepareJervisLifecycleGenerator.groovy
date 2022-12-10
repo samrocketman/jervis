@@ -18,7 +18,7 @@
 import static jenkins.bouncycastle.api.PEMEncodable.decode
 
 import net.gleske.jervis.exceptions.SecurityException
-import net.gleske.jervis.lang.lifecycleGenerator
+import net.gleske.jervis.lang.LifecycleGenerator
 import net.gleske.jervis.remotes.GitHub
 
 import hudson.console.HyperlinkNote
@@ -80,7 +80,7 @@ String getFolderRSAKeyCredentials(String folder, String credentials_id) {
           list of files in the root of the repository.
  */
 @NonCPS
-List initializeGenerator(lifecycleGenerator generator, String project, String JERVIS_BRANCH, String credentials_id) {
+List initializeGenerator(LifecycleGenerator generator, String project, String JERVIS_BRANCH, String credentials_id) {
     String jervis_yaml
     def git_service = new GitHub()
     git_service.gh_token = getGitHubAPIToken(credentials_id).toString()
@@ -107,7 +107,7 @@ List initializeGenerator(lifecycleGenerator generator, String project, String JE
   platform and stability.
  */
 @NonCPS
-void finalizeGenerator(lifecycleGenerator generator, String lifecycles_json, String toolchains_json, String jervis_yaml, List folder_listing, String jenkins_folder) {
+void finalizeGenerator(LifecycleGenerator generator, String lifecycles_json, String toolchains_json, String jervis_yaml, List folder_listing, String jenkins_folder) {
     generator.loadLifecyclesString(lifecycles_json)
     generator.loadToolchainsString(toolchains_json)
     generator.loadYamlString(jervis_yaml)
@@ -123,7 +123,7 @@ void finalizeGenerator(lifecycleGenerator generator, String lifecycles_json, Str
     }
 }
 
-void call(lifecycleGenerator generator, String github_credentials) {
+void call(LifecycleGenerator generator, String github_credentials) {
     /*
        Initialize generator object from GitHub API.
      */

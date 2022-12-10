@@ -14,14 +14,14 @@
    limitations under the License.
    */
 
-import net.gleske.jervis.lang.pipelineGenerator
+import net.gleske.jervis.lang.PipelineGenerator
 
 /**
   Define supported report collection by offloading most of the logic work to
-  pipelineGenerator class.
+  PipelineGenerator class.
  */
 @NonCPS
-void initializeGenerator(pipelineGenerator pipeline_generator) {
+void initializeGenerator(PipelineGenerator pipeline_generator) {
     // what collections are supported?
     pipeline_generator.supported_collections = [
         'artifacts',
@@ -103,6 +103,6 @@ void initializeGenerator(pipelineGenerator pipeline_generator) {
     ]
 }
 
-void call(pipelineGenerator pipeline_generator) {
+void call(PipelineGenerator pipeline_generator) {
     initializeGenerator(pipeline_generator)
 }
