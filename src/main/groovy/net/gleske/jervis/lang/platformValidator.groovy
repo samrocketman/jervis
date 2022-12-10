@@ -37,9 +37,9 @@ import org.yaml.snakeyaml.constructor.SafeConstructor
   where your DSL scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
-<pre><tt>import net.gleske.jervis.lang.platformValidator
+<pre><tt>import net.gleske.jervis.lang.PlatformValidator
 
-def platforms = new platformValidator()
+def platforms = new PlatformValidator()
 platforms.load_JSON('resources/platforms.json')
 println 'Does the file validate? ' + platforms.validate()
 //List supported platforms and operating systems
@@ -51,7 +51,7 @@ platforms.platforms['supported_platforms'].sort { k, v -> k }.each { platform, o
 }
 null</tt></pre>
  */
-class platformValidator implements Serializable {
+class PlatformValidator implements Serializable {
 
     /**
       A <tt>{@link Map}</tt> of the parsed platforms file.

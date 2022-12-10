@@ -14,7 +14,7 @@
    limitations under the License.
    */
 package net.gleske.jervis.tools
-//the securityIOTest() class automatically sees the securityIO() class because they're in the same package
+//the SecurityIOTest() class automatically sees the SecurityIO() class because they're in the same package
 
 import net.gleske.jervis.exceptions.DecryptException
 import net.gleske.jervis.exceptions.EncryptException
@@ -31,12 +31,12 @@ import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
 
-class securityIOTest extends GroovyTestCase {
+class SecurityIOTest extends GroovyTestCase {
     def jervis_tmp
     def security
     //set up before every test
     @Before protected void setUp() {
-        security = new securityIO()
+        security = new SecurityIO()
     }
     //tear down after every test
     @After protected void tearDown() {
@@ -52,35 +52,35 @@ class securityIOTest extends GroovyTestCase {
         jervis_tmp = null
         security = null
     }
-    @Test public void test_securityIO_init_default() {
-        security = new securityIO()
+    @Test public void test_SecurityIO_init_default() {
+        security = new SecurityIO()
         assert !security.key_pair
     }
-    @Test public void test_securityIO_init_private_pem() {
+    @Test public void test_SecurityIO_init_private_pem() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         assert security.id_rsa_keysize == 2048
     }
-    //test securityIO().decodeBase64()
-    @Test public void test_securityIO_decodeBase64String() {
+    //test SecurityIO().decodeBase64()
+    @Test public void test_SecurityIO_decodeBase64String() {
         def s = 'data'
         String encoded = s.bytes.encodeBase64().toString()
         assert 'ZGF0YQ==' == encoded
         assert security.decodeBase64String(encoded) == s
     }
-    @Test public void test_securityIO_decodeBase64Bytes() {
+    @Test public void test_SecurityIO_decodeBase64Bytes() {
         def s = 'data'
         String encoded = s.bytes.encodeBase64().toString()
         assert 'ZGF0YQ==' == encoded
         assert security.decodeBase64Bytes(encoded) == s.bytes
     }
-    @Test public void test_securityIO_encodeBase64String() {
+    @Test public void test_SecurityIO_encodeBase64String() {
         assert 'ZGF0YQ==' == security.encodeBase64('data')
     }
-    @Test public void test_securityIO_encodeBase64Bytes() {
+    @Test public void test_SecurityIO_encodeBase64Bytes() {
         assert 'ZGF0YQ==' == security.encodeBase64('data'.bytes)
     }
-    @Test public void test_securityIO_rsaEncrypt_rsaDecrypt() {
+    @Test public void test_SecurityIO_rsaEncrypt_rsaDecrypt() {
         String plaintext = 'secret message'
         String ciphertext
         String decodedtext
@@ -91,30 +91,30 @@ class securityIOTest extends GroovyTestCase {
         decodedtext = security.rsaDecrypt(ciphertext)
         assert plaintext == decodedtext
     }
-    @Test public void test_securityIO_fail_rsaEncrypt() {
+    @Test public void test_SecurityIO_fail_rsaEncrypt() {
         shouldFail(EncryptException) {
             def ciphertext = security.rsaEncrypt('some text')
         }
     }
-    @Test public void test_securityIO_fail_rsaDecrypt() {
+    @Test public void test_SecurityIO_fail_rsaDecrypt() {
         shouldFail(DecryptException) {
             def decodedtext = security.rsaDecrypt('some text')
         }
     }
-    @Test public void test_securityIO_isSecureField_map_nonsecure() {
+    @Test public void test_SecurityIO_isSecureField_map_nonsecure() {
         Map myobj = new HashMap()
         myobj.put('someprop', 'somevalue')
         assert false == security.isSecureField(myobj)
     }
-    @Test public void test_securityIO_isSecureField_nonmap() {
+    @Test public void test_SecurityIO_isSecureField_nonmap() {
         assert false == security.isSecureField([])
     }
-    @Test public void test_securityIO_isSecureField_map_secure() {
+    @Test public void test_SecurityIO_isSecureField_map_secure() {
         Map myobj = new HashMap()
         myobj.put('secure', 'somevalue')
         assert true == security.isSecureField(myobj)
     }
-    @Test public void test_securityIO_load_key_pair() {
+    @Test public void test_SecurityIO_load_key_pair() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         assert !security.key_pair
         security.key_pair = url.content.text
@@ -124,18 +124,18 @@ class securityIOTest extends GroovyTestCase {
         security.key_pair = url.content.text
         assert security.id_rsa_keysize == 4096
     }
-    @Test public void test_securityIO_bad_key_pair() {
+    @Test public void test_SecurityIO_bad_key_pair() {
         shouldFail(KeyPairDecodeException) {
             security.key_pair = "bad RSA key"
         }
     }
-    @Test public void test_securityIO_unsupported_key_pair() {
+    @Test public void test_SecurityIO_unsupported_key_pair() {
         shouldFail(KeyPairDecodeException) {
             URL url = this.getClass().getResource('/rsa_keys/unsupported_crt_pair');
             security.key_pair = url.content.text
         }
     }
-    @Test public void test_securityIO_serialization() {
+    @Test public void test_SecurityIO_serialization() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         assert !security.key_pair
         security.key_pair = url.content.text
@@ -144,12 +144,12 @@ class securityIOTest extends GroovyTestCase {
         def plaintext = security.rsaDecrypt(ciphertext)
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(security)
     }
-    @Test public void test_securityIO_setId_rsa_keysize() {
+    @Test public void test_SecurityIO_setId_rsa_keysize() {
         shouldFail(SecurityException) {
             security.id_rsa_keysize = 1024
         }
     }
-    @Test public void test_securityIO_fail_on_weak_keys() {
+    @Test public void test_SecurityIO_fail_on_weak_keys() {
         URL url = this.getClass().getResource('/rsa_keys/bad_id_rsa_1024')
         assert !security.key_pair
         shouldFail(SecurityException) {
@@ -157,23 +157,23 @@ class securityIOTest extends GroovyTestCase {
         }
     }
 
-    @Test public void test_securityIO_signRS256Base64Url_and_verifyGitHubJWT() {
+    @Test public void test_SecurityIO_signRS256Base64Url_and_verifyGitHubJWT() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         String signature = security.signRS256Base64Url('data.data')
         String jwt_like = "data.data.${signature}"
         assert true == security.verifyGitHubJWT(jwt_like)
     }
 
-    @Test public void test_securityIO_verifyGitHubJWT_fail_to_verify() {
+    @Test public void test_SecurityIO_verifyGitHubJWT_fail_to_verify() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         String signature = security.signRS256Base64Url('data.data')
         String jwt_like = "junk.junk.${signature}"
         assert false == security.verifyGitHubJWT(jwt_like)
     }
 
-    @Test public void test_securityIO_encodeBase64UrlBytes() {
+    @Test public void test_SecurityIO_encodeBase64UrlBytes() {
         // this data should include both + and / characters
         byte[] data = '~~?~asdf~~?~asdf'.bytes
         String base64 = data.encodeBase64().toString()
@@ -182,7 +182,7 @@ class securityIOTest extends GroovyTestCase {
         assert base64.tr('+/', '-_') == security.encodeBase64Url(data)
     }
 
-    @Test public void test_securityIO_encodeBase64UrlString() {
+    @Test public void test_SecurityIO_encodeBase64UrlString() {
         // this data should include both + and / characters
         String data = '~~?~asdf~~?~asdf'
         String base64 = data.bytes.encodeBase64().toString()
@@ -191,7 +191,7 @@ class securityIOTest extends GroovyTestCase {
         assert base64.tr('+/', '-_') == security.encodeBase64Url(data)
     }
 
-    @Test public void test_securityIO_decodeBase64UrlBytes() {
+    @Test public void test_SecurityIO_decodeBase64UrlBytes() {
         // this data should include both - and _ characters
         byte[] data = '~~?~asdf~~?~asdf'.bytes
         String base64url = data.encodeBase64().toString().tr('+/', '-_')
@@ -200,7 +200,7 @@ class securityIOTest extends GroovyTestCase {
         assert data == security.decodeBase64UrlBytes(base64url)
     }
 
-    @Test public void test_securityIO_decodeBase64UrlString() {
+    @Test public void test_SecurityIO_decodeBase64UrlString() {
         // this data should include both - and _ characters
         String data = '~~?~asdf~~?~asdf'
         String base64url = data.bytes.encodeBase64().toString().tr('+/', '-_')
@@ -209,9 +209,9 @@ class securityIOTest extends GroovyTestCase {
         assert data == security.decodeBase64UrlString(base64url)
     }
 
-    @Test public void test_securityIO_getGitHubJWT() {
+    @Test public void test_SecurityIO_getGitHubJWT() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         String jwt_token = security.getGitHubJWT('1234')
         assert true == security.verifyGitHubJWT(jwt_token)
         String header
@@ -228,16 +228,16 @@ class securityIOTest extends GroovyTestCase {
         // default is 10 minute token duration
         assert (payload.exp - payload.iat) == 600
     }
-    @Test public void test_securityIO_getGitHubJWT_min_expire() {
+    @Test public void test_SecurityIO_getGitHubJWT_min_expire() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         String jwt_token = security.getGitHubJWT('1234', -1, 20)
         assert true == security.verifyGitHubJWTPayload(jwt_token)
     }
 
-    @Test public void test_securityIO_getGitHubJWT_max_expire() {
+    @Test public void test_SecurityIO_getGitHubJWT_max_expire() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         // Request a 20 minute token but we're only issued a 10 minute token
         // 10 minute and 1 second drift set
         String jwt_token = security.getGitHubJWT('1234', 20, 601)
@@ -247,9 +247,9 @@ class securityIOTest extends GroovyTestCase {
         assert false == security.verifyGitHubJWTPayload(jwt_token, 0)
     }
 
-    @Test public void test_securityIO_getGitHubJWT_expire() {
+    @Test public void test_SecurityIO_getGitHubJWT_expire() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         String jwt_token = security.getGitHubJWT('1234', 2, 30)
         Map payload = (new Yaml(new SafeConstructor(new LoaderOptions()))).load(security.decodeBase64String(jwt_token.tokenize('.')[1]))
         Integer now = Instant.now().getEpochSecond()
@@ -261,9 +261,9 @@ class securityIOTest extends GroovyTestCase {
         assert (payload.exp - payload.iat) == 120
     }
 
-    @Test public void test_securityIO_getGitHubJWT_expire_and_drift() {
+    @Test public void test_SecurityIO_getGitHubJWT_expire_and_drift() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         String jwt_token = security.getGitHubJWT('1234', 1, 120)
         Map payload = (new Yaml(new SafeConstructor(new LoaderOptions()))).load(security.decodeBase64String(jwt_token.tokenize('.')[1]))
         Integer now = Instant.now().getEpochSecond()
@@ -275,37 +275,37 @@ class securityIOTest extends GroovyTestCase {
         assert (payload.exp - payload.iat) == 60
     }
 
-    @Test public void test_securityIO_verifyGitHubJWTPayload_bad_signature() {
+    @Test public void test_SecurityIO_verifyGitHubJWTPayload_bad_signature() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         String signature = security.signRS256Base64Url('data.data')
         String jwt_like = "junk.junk.${signature}"
         assert false == security.verifyGitHubJWTPayload(jwt_like)
     }
 
-    @Test public void test_securityIO_verifyGitHubJWTPayload_valid() {
+    @Test public void test_SecurityIO_verifyGitHubJWTPayload_valid() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         String jwt = security.getGitHubJWT('1234')
         assert true == security.verifyGitHubJWTPayload(jwt)
     }
 
-    @Test public void test_securityIO_verifyGitHubJWTPayload_expired_with_drift() {
+    @Test public void test_SecurityIO_verifyGitHubJWTPayload_expired_with_drift() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         String jwt = security.getGitHubJWT('1234', 1, 40)
         assert false == security.verifyGitHubJWTPayload(jwt)
     }
 
-    @Test public void test_securityIO_verifyGitHubJWTPayload_valid_without_drift() {
+    @Test public void test_SecurityIO_verifyGitHubJWTPayload_valid_without_drift() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         String jwt = security.getGitHubJWT('1234', 1, 40)
         assert true == security.verifyGitHubJWTPayload(jwt, 0)
     }
-    @Test public void test_securityIO_verifyGitHubJWTPayload_invalid_with_negative_drift() {
+    @Test public void test_SecurityIO_verifyGitHubJWTPayload_invalid_with_negative_drift() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
-        security = new securityIO(url.content.text)
+        security = new SecurityIO(url.content.text)
         String jwt = security.getGitHubJWT('1234', 1, 40)
         assert false == security.verifyGitHubJWTPayload(jwt, -60)
     }

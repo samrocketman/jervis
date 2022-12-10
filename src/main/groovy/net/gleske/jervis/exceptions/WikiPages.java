@@ -55,9 +55,9 @@ package net.gleske.jervis.exceptions;
 <pre><tt>import net.gleske.jervis.exceptions.WikiPages
 WikiPages.metaClass.static.getLifecyclesSpec = {->'https://wiki.example.com/lifecycle_explanation.html'}
 
-import net.gleske.jervis.lang.lifecycleValidator
+import net.gleske.jervis.lang.LifecycleValidator
 
-def x = new lifecycleValidator()
+def x = new LifecycleValidator()
 x.load_JSONString("""
 {
     "ruby": {
@@ -84,12 +84,12 @@ x.validate()</tt></pre>
 <pre><tt>import net.gleske.jervis.exceptions.WikiPages
 WikiPages.metaClass.static.getLifecyclesSpec = {->'https://wiki.example.com/lifecycle_explanation.html'}
 
-import net.gleske.jervis.lang.lifecycleValidator</tt></pre>
+import net.gleske.jervis.lang.LifecycleValidator</tt></pre>
 
   What is important is that we modified the <tt>WikiPages</tt> class
-  <strong>before</strong> we imported the <tt>{@link net.gleske.jervis.lang.lifecycleValidator}</tt> class.
+  <strong>before</strong> we imported the <tt>{@link net.gleske.jervis.lang.LifecycleValidator}</tt> class.
   This is important because the class can't be statically modified from within the
-  <tt>lifecycleValidator</tt> after it is imported.
+  <tt>LifecycleValidator</tt> after it is imported.
 
   Here's an example error message from the above sample.
 
@@ -100,9 +100,9 @@ See wiki page:
 https://wiki.example.com/lifecycle_explanation.html
 
 
-    at net.gleske.jervis.lang.lifecycleValidator$_validate_closure1.doCall(lifecycleValidator.groovy:118)
-    at net.gleske.jervis.lang.lifecycleValidator.validate(lifecycleValidator.groovy:112)
-    at net.gleske.jervis.lang.lifecycleValidator$validate$0.call(Unknown Source)</tt></pre>
+    at net.gleske.jervis.lang.LifecycleValidator$_validate_closure1.doCall(LifecycleValidator.groovy:118)
+    at net.gleske.jervis.lang.LifecycleValidator.validate(LifecycleValidator.groovy:112)
+    at net.gleske.jervis.lang.LifecycleValidator$validate$0.call(Unknown Source)</tt></pre>
  */
 public class WikiPages {
 

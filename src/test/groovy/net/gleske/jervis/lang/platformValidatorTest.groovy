@@ -14,7 +14,7 @@
    limitations under the License.
    */
 package net.gleske.jervis.lang
-//the platformValidatorTest() class automatically sees the platformValidator() class because they're in the same package
+//the PlatformValidatorTest() class automatically sees the PlatformValidator() class because they're in the same package
 import net.gleske.jervis.exceptions.PlatformBadValueInKeyException
 import net.gleske.jervis.exceptions.PlatformMissingKeyException
 import net.gleske.jervis.exceptions.PlatformValidationException
@@ -23,26 +23,26 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class platformValidatorTest extends GroovyTestCase {
+class PlatformValidatorTest extends GroovyTestCase {
     def platforms
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
-        platforms = new platformValidator()
+        platforms = new PlatformValidator()
     }
     //tear down after every test
     @After protected void tearDown() {
         platforms = null
         super.tearDown()
     }
-    @Test public void test_platformValidator_load_JSON() {
+    @Test public void test_PlatformValidator_load_JSON() {
         assert platforms.platforms == null
         URL url = this.getClass().getResource('/good_platforms_simple.json')
         platforms.load_JSON(url.getFile())
         assert platforms.platforms instanceof Map
         assert platforms.platforms['defaults']['platform'] == 'docker'
     }
-    @Test public void test_platformValidator_load_JSONString() {
+    @Test public void test_PlatformValidator_load_JSONString() {
         assert platforms.platforms == null
         URL url = this.getClass().getResource('/good_platforms_simple.json')
         String contents = new File(url.getFile()).getText()
@@ -51,7 +51,7 @@ class platformValidatorTest extends GroovyTestCase {
         assert platforms.platforms instanceof Map
         assert platforms.platforms['defaults']['platform'] == 'docker'
     }
-    @Test public void test_platformValidator_bad_platforms_missing_root_defaults() {
+    @Test public void test_PlatformValidator_bad_platforms_missing_root_defaults() {
         URL url = this.getClass().getResource('/bad_platforms_missing_root_defaults.json')
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformMissingKeyException) {
@@ -59,7 +59,7 @@ class platformValidatorTest extends GroovyTestCase {
         }
         assert false == platforms.validate_asBool()
     }
-    @Test public void test_platformValidator_bad_platforms_missing_root_supported_platforms() {
+    @Test public void test_PlatformValidator_bad_platforms_missing_root_supported_platforms() {
         URL url = this.getClass().getResource('/bad_platforms_missing_root_supported_platforms.json')
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformMissingKeyException) {
@@ -67,7 +67,7 @@ class platformValidatorTest extends GroovyTestCase {
         }
         assert false == platforms.validate_asBool()
     }
-    @Test public void test_platformValidator_bad_platforms_missing_root_restrictions() {
+    @Test public void test_PlatformValidator_bad_platforms_missing_root_restrictions() {
         URL url = this.getClass().getResource('/bad_platforms_missing_root_restrictions.json')
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformMissingKeyException) {
@@ -75,7 +75,7 @@ class platformValidatorTest extends GroovyTestCase {
         }
         assert false == platforms.validate_asBool()
     }
-    @Test public void test_platformValidator_bad_platforms_rootkey_defaults() {
+    @Test public void test_PlatformValidator_bad_platforms_rootkey_defaults() {
         URL url = this.getClass().getResource('/bad_platforms_rootkey_defaults.json')
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
@@ -83,7 +83,7 @@ class platformValidatorTest extends GroovyTestCase {
         }
         assert false == platforms.validate_asBool()
     }
-    @Test public void test_platformValidator_bad_platforms_rootkey_supported_platforms() {
+    @Test public void test_PlatformValidator_bad_platforms_rootkey_supported_platforms() {
         URL url = this.getClass().getResource('/bad_platforms_rootkey_supported_platforms.json')
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
@@ -91,7 +91,7 @@ class platformValidatorTest extends GroovyTestCase {
         }
         assert false == platforms.validate_asBool()
     }
-    @Test public void test_platformValidator_bad_platforms_rootkey_restrictions() {
+    @Test public void test_PlatformValidator_bad_platforms_rootkey_restrictions() {
         URL url = this.getClass().getResource('/bad_platforms_rootkey_restrictions.json')
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
@@ -99,18 +99,18 @@ class platformValidatorTest extends GroovyTestCase {
         }
         assert false == platforms.validate_asBool()
     }
-    @Test public void test_platformValidator_good_platforms_simple() {
+    @Test public void test_PlatformValidator_good_platforms_simple() {
         URL url = this.getClass().getResource('/good_platforms_simple.json');
         platforms.load_JSON(url.getFile())
         assert true == platforms.validate()
         assert true == platforms.validate_asBool()
     }
-    @Test public void test_platformValidator_main_platforms_json() {
+    @Test public void test_PlatformValidator_main_platforms_json() {
         URL url = this.getClass().getResource('/platforms.json');
         platforms.load_JSON(url.getFile())
         assert true == platforms.validate()
     }
-    @Test public void test_platformValidator_bad_missing_defaults() {
+    @Test public void test_PlatformValidator_bad_missing_defaults() {
         ['platform', 'os', 'stability', 'sudo'].each {
             URL url = this.getClass().getResource("/bad_platforms_missing_defaults_${it}.json");
             platforms.load_JSON(url.getFile())
@@ -124,139 +124,139 @@ class platformValidatorTest extends GroovyTestCase {
             }
         }
     }
-    @Test public void test_platformValidator_bad_supported_platforms_empty() {
+    @Test public void test_PlatformValidator_bad_supported_platforms_empty() {
         URL url = this.getClass().getResource('/bad_platforms_supported_platforms_empty.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformMissingKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_value_supported_platforms() {
+    @Test public void test_PlatformValidator_bad_value_supported_platforms() {
         URL url = this.getClass().getResource('/bad_platforms_value_supported_platforms.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_value_defaults_platform() {
+    @Test public void test_PlatformValidator_bad_value_defaults_platform() {
         URL url = this.getClass().getResource('/bad_platforms_value_defaults_platform.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformMissingKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_value_defaults_os() {
+    @Test public void test_PlatformValidator_bad_value_defaults_os() {
         URL url = this.getClass().getResource('/bad_platforms_value_defaults_os.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformMissingKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_value_sudo() {
+    @Test public void test_PlatformValidator_bad_value_sudo() {
         URL url = this.getClass().getResource('/bad_platforms_value_defaults_sudo.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_value_stability() {
+    @Test public void test_PlatformValidator_bad_value_stability() {
         URL url = this.getClass().getResource('/bad_platforms_value_defaults_stability.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_type_supported_platforms_defaults_platform() {
+    @Test public void test_PlatformValidator_bad_type_supported_platforms_defaults_platform() {
         URL url = this.getClass().getResource('/bad_platforms_type_supported_platforms_defaults_platform.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_missing_supported_platforms_platform_os_language() {
+    @Test public void test_PlatformValidator_bad_missing_supported_platforms_platform_os_language() {
         URL url = this.getClass().getResource('/bad_platforms_missing_supported_platforms_platform_os_language.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformMissingKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_missing_supported_platforms_platform_os_toolchain() {
+    @Test public void test_PlatformValidator_bad_missing_supported_platforms_platform_os_toolchain() {
         URL url = this.getClass().getResource('/bad_platforms_missing_supported_platforms_platform_os_toolchain.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformMissingKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_type_supported_platforms_platform() {
+    @Test public void test_PlatformValidator_bad_type_supported_platforms_platform() {
         URL url = this.getClass().getResource('/bad_platforms_type_supported_platforms_platform.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_type_supported_platforms_platform_os() {
+    @Test public void test_PlatformValidator_bad_type_supported_platforms_platform_os() {
         URL url = this.getClass().getResource('/bad_platforms_type_supported_platforms_platform_os.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_type_supported_platforms_platform_os_language() {
+    @Test public void test_PlatformValidator_bad_type_supported_platforms_platform_os_language() {
         URL url = this.getClass().getResource('/bad_platforms_type_supported_platforms_platform_os_language.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_type_supported_platforms_platform_os_toolchain() {
+    @Test public void test_PlatformValidator_bad_type_supported_platforms_platform_os_toolchain() {
         URL url = this.getClass().getResource('/bad_platforms_type_supported_platforms_platform_os_toolchain.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_value_supported_platforms_platform() {
+    @Test public void test_PlatformValidator_bad_value_supported_platforms_platform() {
         URL url = this.getClass().getResource('/bad_platforms_value_supported_platforms_platform.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_type_restrictions_platform() {
+    @Test public void test_PlatformValidator_bad_type_restrictions_platform() {
         URL url = this.getClass().getResource('/bad_platforms_type_restrictions_platform.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_type_restrictions_platform_only_organizations() {
+    @Test public void test_PlatformValidator_bad_type_restrictions_platform_only_organizations() {
         URL url = this.getClass().getResource('/bad_platforms_type_restrictions_platform_only_organizations.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_type_restrictions_platform_only_projects() {
+    @Test public void test_PlatformValidator_bad_type_restrictions_platform_only_projects() {
         URL url = this.getClass().getResource('/bad_platforms_type_restrictions_platform_only_projects.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformBadValueInKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_bad_missing_restrictions_platform() {
+    @Test public void test_PlatformValidator_bad_missing_restrictions_platform() {
         URL url = this.getClass().getResource('/bad_platforms_missing_restrictions_platform.json');
         platforms.load_JSON(url.getFile())
         shouldFail(PlatformMissingKeyException) {
             platforms.validate()
         }
     }
-    @Test public void test_platformValidator_good_platforms_optional() {
+    @Test public void test_PlatformValidator_good_platforms_optional() {
         URL url = this.getClass().getResource('/good_platforms_optional.json');
         platforms.load_JSON(url.getFile())
         assert true == platforms.validate()
         assert true == platforms.validate_asBool()
     }
-    @Test public void test_platformValidator_serialization() {
+    @Test public void test_PlatformValidator_serialization() {
         URL url = this.getClass().getResource('/good_platforms_simple.json')
         platforms.load_JSON(url.getFile())
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(platforms)

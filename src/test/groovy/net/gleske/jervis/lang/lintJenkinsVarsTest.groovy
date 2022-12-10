@@ -23,7 +23,7 @@ import org.codehaus.groovy.control.Janitor
 import org.codehaus.groovy.control.SourceUnit
 import org.junit.Test
 
-class lintJenkinsVarsTest extends GroovyTestCase {
+class LintJenkinsVarsTest extends GroovyTestCase {
     private static final GROOVY_FILES = '**/*.groovy'
     private static final RULESET_FILES = [
         'rulesets/basic.xml',

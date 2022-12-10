@@ -20,7 +20,7 @@ import net.gleske.jervis.exceptions.PlatformValidationException
 import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.exceptions.UnsupportedLanguageException
 import net.gleske.jervis.exceptions.UnsupportedToolException
-import net.gleske.jervis.tools.securityIO
+import net.gleske.jervis.tools.SecurityIO
 
 import java.util.regex.Pattern
 import org.yaml.snakeyaml.LoaderOptions
@@ -39,7 +39,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor
   where your DSL scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
-<pre><tt>import net.gleske.jervis.lang.lifecycleGenerator
+<pre><tt>import net.gleske.jervis.lang.LifecycleGenerator
 
 String yaml = """
 language: ruby
@@ -61,7 +61,7 @@ jenkins:
     sudo: false
 """
 
-def generator = new lifecycleGenerator()
+def generator = new LifecycleGenerator()
 generator.loadPlatforms('resources/platforms.json')
 generator.preloadYamlString(yaml)
 //os_stability requires preloadYamlString() to be called
@@ -79,7 +79,7 @@ println generator.generateAll()
 print 'Labels: '
 println generator.getLabels()</tt></pre>
  */
-class lifecycleGenerator implements Serializable {
+class LifecycleGenerator implements Serializable {
 
     /**
       Contains the Jervis YAML loaded as an object.
@@ -122,17 +122,17 @@ class lifecycleGenerator implements Serializable {
     List yaml_matrix_axes
 
     /**
-      An instance of the <tt>{@link net.gleske.jervis.lang.lifecycleValidator}</tt> class which has loaded a lifecycles file.
+      An instance of the <tt>{@link net.gleske.jervis.lang.LifecycleValidator}</tt> class which has loaded a lifecycles file.
      */
     def lifecycle_obj
 
     /**
-      An instance of the <tt>{@link net.gleske.jervis.lang.toolchainValidator}</tt> class which has loaded a toolchains file.
+      An instance of the <tt>{@link net.gleske.jervis.lang.ToolchainValidator}</tt> class which has loaded a toolchains file.
      */
     def toolchain_obj
 
     /**
-      An instance of the <tt>{@link net.gleske.jervis.lang.platformValidator}</tt> class which as loaded a platforms file.
+      An instance of the <tt>{@link net.gleske.jervis.lang.PlatformValidator}</tt> class which as loaded a platforms file.
      */
     def platform_obj
 
@@ -206,7 +206,7 @@ class lifecycleGenerator implements Serializable {
 
     /**
       A utility for decrypting RSA encrypted strings in YAML files.  This is an
-      instance of the <tt>{@link net.gleske.jervis.tools.securityIO}</tt>.
+      instance of the <tt>{@link net.gleske.jervis.tools.SecurityIO}</tt>.
      */
     def secret_util
 
@@ -309,7 +309,7 @@ class lifecycleGenerator implements Serializable {
       @param file A path to a lifecycles file.
      */
     public void loadLifecycles(String file) {
-        this.lifecycle_obj = new lifecycleValidator()
+        this.lifecycle_obj = new LifecycleValidator()
         this.lifecycle_obj.load_JSON(file)
         this.lifecycle_obj.validate()
     }
@@ -323,7 +323,7 @@ class lifecycleGenerator implements Serializable {
       @param json A <tt>String</tt> containing JSON which is from a lifecycles file.
      */
     public void loadLifecyclesString(String json) {
-        this.lifecycle_obj = new lifecycleValidator()
+        this.lifecycle_obj = new LifecycleValidator()
         this.lifecycle_obj.load_JSONString(json)
         this.lifecycle_obj.validate()
     }
@@ -338,7 +338,7 @@ class lifecycleGenerator implements Serializable {
       @param file A path to a toolchains file.
      */
     public void loadToolchains(String file) {
-        this.toolchain_obj = new toolchainValidator()
+        this.toolchain_obj = new ToolchainValidator()
         this.toolchain_obj.load_JSON(file)
         this.toolchain_obj.validate()
     }
@@ -353,7 +353,7 @@ class lifecycleGenerator implements Serializable {
       @param json A <tt>String</tt> containing JSON which is from a toolchains file.
      */
     public void loadToolchainsString(String json) {
-        this.toolchain_obj = new toolchainValidator()
+        this.toolchain_obj = new ToolchainValidator()
         this.toolchain_obj.load_JSONString(json)
         this.toolchain_obj.validate()
     }
@@ -380,10 +380,10 @@ class lifecycleGenerator implements Serializable {
             yaml_language = jervis_yaml['language']
         }
         if(!lifecycle_obj) {
-            throw new JervisException('ERROR: Must call lifecycleGenerator.loadLifecycles() or lifecycleGenerator.loadLifecyclesString() first.')
+            throw new JervisException('ERROR: Must call LifecycleGenerator.loadLifecycles() or LifecycleGenerator.loadLifecyclesString() first.')
         }
         if(!toolchain_obj) {
-            throw new JervisException('ERROR: Must call lifecycleGenerator.loadToolchains() or lifecycleGenerator.loadToolchainsString() first.')
+            throw new JervisException('ERROR: Must call LifecycleGenerator.loadToolchains() or LifecycleGenerator.loadToolchainsString() first.')
         }
         if(!lifecycle_obj.supportedLanguage(this.yaml_language) || !toolchain_obj.supportedLanguage(this.yaml_language)) {
             throw new UnsupportedLanguageException(this.yaml_language)
@@ -993,7 +993,7 @@ env:
       @param file A path to a platforms file.
      */
     public void loadPlatforms(String file) {
-        this.platform_obj = new platformValidator()
+        this.platform_obj = new PlatformValidator()
         this.platform_obj.load_JSON(file)
         this.platform_obj.validate()
     }
@@ -1010,7 +1010,7 @@ env:
       @param json A <tt>String</tt> containing JSON which is from a platforms file.
      */
     public void loadPlatformsString(String json) {
-        this.platform_obj = new platformValidator()
+        this.platform_obj = new PlatformValidator()
         this.platform_obj.load_JSONString(json)
         this.platform_obj.validate()
     }
@@ -1146,7 +1146,7 @@ env:
                  private key.
      */
     public void setPrivateKey(String pem) {
-        secret_util = new securityIO()
+        secret_util = new SecurityIO()
         secret_util.key_pair = pem
     }
 

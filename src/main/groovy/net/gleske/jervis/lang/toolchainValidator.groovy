@@ -37,9 +37,9 @@ import org.yaml.snakeyaml.constructor.SafeConstructor
   where your DSL scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
-<pre><tt>import net.gleske.jervis.lang.toolchainValidator
+<pre><tt>import net.gleske.jervis.lang.ToolchainValidator
 
-def toolchains = new toolchainValidator()
+def toolchains = new ToolchainValidator()
 toolchains.load_JSON('resources/toolchains-ubuntu1604-stable.json')
 println 'Does the file validate? ' + toolchains.validate()
 println 'Supported build matrices by language include:'
@@ -51,7 +51,7 @@ toolchains.languages.each { language ->
 }
 null</tt></pre>
  */
-class toolchainValidator implements Serializable {
+class ToolchainValidator implements Serializable {
 
     /**
       A <tt>{@link Map}</tt> of the parsed toolchains file.

@@ -15,8 +15,8 @@
    */
 
 package net.gleske.jervis.lang
-//lifecycleGenerator, lifecycleValidator, toolchainValidator, and
-//platformValidator don't have to be imported because they're in the same
+//LifecycleGenerator, LifecycleValidator, ToolchainValidator, and
+//PlatformValidator don't have to be imported because they're in the same
 //package.
 
 import net.gleske.jervis.exceptions.JervisException
@@ -27,13 +27,13 @@ import org.junit.Test
   Tests user supplied configurations from the resources directory in the root
   of this repository.
   */
-class jervisConfigsTest extends GroovyTestCase {
+class JervisConfigsTest extends GroovyTestCase {
     /**
       Abstracted validateLifecyclesString in case an admin needs to test
       multiple files.
       */
     private void validateLifecyclesString(String json) {
-        def lifecycle_obj = new lifecycleValidator()
+        def lifecycle_obj = new LifecycleValidator()
         lifecycle_obj.load_JSONString(json)
         lifecycle_obj.validate()
     }
@@ -42,7 +42,7 @@ class jervisConfigsTest extends GroovyTestCase {
       multiple files.
       */
     private void validateToolchainsString(String json) {
-        def toolchain_obj = new toolchainValidator()
+        def toolchain_obj = new ToolchainValidator()
         toolchain_obj.load_JSONString(json)
         toolchain_obj.validate()
     }
@@ -51,15 +51,15 @@ class jervisConfigsTest extends GroovyTestCase {
       multiple files.
       */
     private void validatePlatformsString(String json) {
-        def platform_obj = new platformValidator()
+        def platform_obj = new PlatformValidator()
         platform_obj.load_JSONString(json)
         platform_obj.validate()
     }
     /**
       A function for linting all toolchains bash scripts in a
-      lifecycleGenerator object.
+      LifecycleGenerator object.
      */
-    private void validateLifecycleGeneratorBashSyntax(lifecycleGenerator generator) {
+    private void validateLifecycleGeneratorBashSyntax(LifecycleGenerator generator) {
         List skip_keys = ['default_ivalue', 'secureSupport', 'friendlyLabel', 'comment', 'matrix']
         //cycle through all permutations of the toolchains file and check bash syntax
         generator.toolchain_obj.languages.each {
@@ -99,21 +99,21 @@ class jervisConfigsTest extends GroovyTestCase {
     /**
       Test and validate production lifecycles.json.
      */
-    @Test public void test_jervisConfigsTest_validate_lifecycles_ubuntu1604_stable_config() {
+    @Test public void test_JervisConfigsTest_validate_lifecycles_ubuntu1604_stable_config() {
         URL url = this.getClass().getResource('/lifecycles-ubuntu1604-stable.json');
         validateLifecyclesString(url.content.text)
     }
     /**
       Test and validate production toolchains.json.
      */
-    @Test public void test_jervisConfigsTest_validate_toolchains_ubuntu1604_stable_config() {
+    @Test public void test_JervisConfigsTest_validate_toolchains_ubuntu1604_stable_config() {
         URL url = this.getClass().getResource('/toolchains-ubuntu1604-stable.json');
         validateToolchainsString(url.content.text)
     }
     /**
       Test and validate production platforms.json.
      */
-    @Test public void test_jervisConfigsTest_validate_platforms_config() {
+    @Test public void test_JervisConfigsTest_validate_platforms_config() {
         URL url = this.getClass().getResource('/platforms.json');
         validatePlatformsString(url.content.text)
     }
@@ -121,8 +121,8 @@ class jervisConfigsTest extends GroovyTestCase {
       Runs through every toolchain configuration to ensure there's no bash
       syntax errors.
      */
-    @Test public void test_jervisConfigsTest_toolchains_ubuntu1604_stable_bash_syntax_check() {
-        def generator = new lifecycleGenerator()
+    @Test public void test_JervisConfigsTest_toolchains_ubuntu1604_stable_bash_syntax_check() {
+        def generator = new LifecycleGenerator()
         URL url = this.getClass().getResource('/lifecycles-ubuntu1604-stable.json');
         generator.loadLifecyclesString(url.content.text)
         url = this.getClass().getResource('/toolchains-ubuntu1604-stable.json');

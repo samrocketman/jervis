@@ -17,7 +17,7 @@ package net.gleske.jervis.lang
 
 import java.util.regex.Pattern
 import net.gleske.jervis.exceptions.PipelineGeneratorException
-import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
+import static net.gleske.jervis.lang.LifecycleGenerator.getObjectValue
 
 /**
   This class offers helper forunctions for using Jervis in the context of a
@@ -28,10 +28,10 @@ import static net.gleske.jervis.lang.lifecycleGenerator.getObjectValue
   to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
   with the classpath set up.</p>
 
-<pre><tt>import net.gleske.jervis.lang.lifecycleGenerator
-import net.gleske.jervis.lang.pipelineGenerator
+<pre><tt>import net.gleske.jervis.lang.LifecycleGenerator
+import net.gleske.jervis.lang.PipelineGenerator
 
-def generator = new lifecycleGenerator()
+def generator = new LifecycleGenerator()
 generator.loadLifecyclesString(new File('resources/lifecycles-ubuntu1604-stable.json').text)
 generator.loadToolchainsString(new File('resources/toolchains-ubuntu1604-stable.json').text)
 
@@ -52,7 +52,7 @@ jenkins:
   collect:
     artifacts: build/lib/*.jar
 '''.trim())
-def pipeline_generator = new pipelineGenerator(generator)
+def pipeline_generator = new PipelineGenerator(generator)
 pipeline_generator.supported_collections = ['artifacts']
 pipeline_generator.getBuildableMatrixAxes().each { axis ->
     if(pipeline_generator.getStashMap(axis)) {
@@ -61,7 +61,7 @@ pipeline_generator.getBuildableMatrixAxes().each { axis ->
 }
 println "Buildable matrices: " + pipeline_generator.getBuildableMatrixAxes().size()</tt></pre>
  */
-class pipelineGenerator implements Serializable {
+class PipelineGenerator implements Serializable {
 
     /**
       A lifecycle generator which has already been instantiated and processed
@@ -123,8 +123,8 @@ class pipelineGenerator implements Serializable {
       keys must be a String.  All values must be a Closure which takes a single
       argument that is a Map.  The following is an example.
 
-      <pre><tt>import net.gleske.jervis.lang.lifecycleGenerator
-import net.gleske.jervis.lang.pipelineGenerator
+      <pre><tt>import net.gleske.jervis.lang.LifecycleGenerator
+import net.gleske.jervis.lang.PipelineGenerator
 
 String yaml = '''
 language: groovy
@@ -133,12 +133,12 @@ jenkins:
     html: build/docs/groovydoc
 '''.trim()
 
-def generator = new lifecycleGenerator()
+def generator = new LifecycleGenerator()
 generator.loadLifecyclesString(new File('resources/lifecycles-ubuntu1604-stable.json').text)
 generator.loadToolchainsString(new File('resources/toolchains-ubuntu1604-stable.json').text)
 
 generator.loadYamlString(yaml)
-def pipeline_generator = new pipelineGenerator(generator)
+def pipeline_generator = new PipelineGenerator(generator)
 pipeline_generator.supported_collections = ['html']
 pipeline_generator.collect_settings_filesets = [html: ['includes']]
 pipeline_generator.collect_settings_defaults = [html: [includes: 'foo']]
@@ -182,11 +182,11 @@ pipeline_generator.stashMap['html']['includes']</tt></pre>
     private Map user_defined_collect_settings = [:]
 
     /**
-      Instantiates this class with a <tt>{@link lifecycleGenerator}</tt> which
+      Instantiates this class with a <tt>{@link LifecycleGenerator}</tt> which
       is used for helper functions when creating a pipeline job designed to
       support Jervis.
      */
-    def pipelineGenerator(lifecycleGenerator generator) {
+    def PipelineGenerator(LifecycleGenerator generator) {
         this.generator = generator
         def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', [])) ?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
         if(stashes) {

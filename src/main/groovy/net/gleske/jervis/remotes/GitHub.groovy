@@ -17,7 +17,7 @@ package net.gleske.jervis.remotes
 
 import net.gleske.jervis.remotes.interfaces.JervisRemote
 import net.gleske.jervis.remotes.interfaces.TokenCredential
-import net.gleske.jervis.tools.securityIO
+import net.gleske.jervis.tools.SecurityIO
 
 /**
    A simple class to interact with the GitHub v3 API for only the parts I need.
@@ -217,7 +217,7 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
             path = "repos/${project}/contents/${file_path}"
         }
         def response = this.fetch(path)
-        def security = new securityIO()
+        def security = new SecurityIO()
         return security.decodeBase64String(response['content'])
     }
 

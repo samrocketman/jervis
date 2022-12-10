@@ -14,27 +14,27 @@
    limitations under the License.
    */
 package net.gleske.jervis.lang
-//the lifecycleGeneratorTest() class automatically sees the lifecycleGenerator() class because they're in the same package
+//the LifecycleGeneratorTest() class automatically sees the LifecycleGenerator() class because they're in the same package
 import net.gleske.jervis.exceptions.JervisException
 import net.gleske.jervis.exceptions.PlatformValidationException
 import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.exceptions.UnsupportedLanguageException
 import net.gleske.jervis.exceptions.UnsupportedToolException
-import net.gleske.jervis.lang.lifecycleValidator
-import net.gleske.jervis.lang.platformValidator
-import net.gleske.jervis.lang.toolchainValidator
-import net.gleske.jervis.tools.securityIO
+import net.gleske.jervis.lang.LifecycleValidator
+import net.gleske.jervis.lang.PlatformValidator
+import net.gleske.jervis.lang.ToolchainValidator
+import net.gleske.jervis.tools.SecurityIO
 
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class lifecycleGeneratorTest extends GroovyTestCase {
+class LifecycleGeneratorTest extends GroovyTestCase {
     def generator
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
-        generator = new lifecycleGenerator()
+        generator = new LifecycleGenerator()
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
         generator.loadLifecycles(url.getFile())
         url = this.getClass().getResource('/good_toolchains_simple.json');
@@ -46,42 +46,42 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         super.tearDown()
     }
     //loadLifecycles() tests
-    @Test public void test_lifecycleGenerator_loadLifecycles_isNull_instantiate() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_loadLifecycles_isNull_instantiate() {
+        generator = new LifecycleGenerator()
         assert generator.lifecycle_obj == null
     }
-    @Test public void test_lifecycleGenerator_loadLifecycles_type_checking() {
+    @Test public void test_LifecycleGenerator_loadLifecycles_type_checking() {
         assert generator.lifecycle_obj != null
-        assert generator.lifecycle_obj.class == lifecycleValidator
+        assert generator.lifecycle_obj.class == LifecycleValidator
     }
-    @Test public void test_lifecycleGenerator_loadLifecycles_simple_query() {
+    @Test public void test_LifecycleGenerator_loadLifecycles_simple_query() {
         assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
     }
-    @Test public void test_lifecycleGenerator_loadLifecycles_throws_exception() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_loadLifecycles_throws_exception() {
+        generator = new LifecycleGenerator()
         URL url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
         shouldFail(JervisException) {
             generator.loadLifecycles(url.getFile())
         }
     }
     //loadLifecyclesString() tests
-    @Test public void test_lifecycleGenerator_loadLifecyclesString_type_checking() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_loadLifecyclesString_type_checking() {
+        generator = new LifecycleGenerator()
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
         String contents = new File(url.getFile()).getText()
         generator.loadLifecyclesString(contents)
         assert generator.lifecycle_obj != null
-        assert generator.lifecycle_obj.class == lifecycleValidator
+        assert generator.lifecycle_obj.class == LifecycleValidator
     }
-    @Test public void test_lifecycleGenerator_loadLifecyclesString_simple_query() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_loadLifecyclesString_simple_query() {
+        generator = new LifecycleGenerator()
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
         String contents = new File(url.getFile()).getText()
         generator.loadLifecyclesString(contents)
         assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
     }
-    @Test public void test_lifecycleGenerator_loadLifecyclesString_throws_exception() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_loadLifecyclesString_throws_exception() {
+        generator = new LifecycleGenerator()
         URL url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
         String contents = new File(url.getFile()).getText()
         shouldFail(JervisException) {
@@ -89,42 +89,42 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         }
     }
     //loadToolchains() tests
-    @Test public void test_lifecycleGenerator_loadToolchains_isNull_instantiate() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_loadToolchains_isNull_instantiate() {
+        generator = new LifecycleGenerator()
         assert generator.toolchain_obj == null
     }
-    @Test public void test_lifecycleGenerator_loadToolchains_type_checking() {
+    @Test public void test_LifecycleGenerator_loadToolchains_type_checking() {
         assert generator.toolchain_obj != null
-        assert generator.toolchain_obj.class == toolchainValidator
+        assert generator.toolchain_obj.class == ToolchainValidator
     }
-    @Test public void test_lifecycleGenerator_loadToolchains_simple_query() {
+    @Test public void test_LifecycleGenerator_loadToolchains_simple_query() {
         assert generator.toolchain_obj.toolchains['jdk']['default_ivalue'] == 'openjdk7'
     }
-    @Test public void test_lifecycleGenerator_loadToolchains_throws_exception() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_loadToolchains_throws_exception() {
+        generator = new LifecycleGenerator()
         URL url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json');
         shouldFail(JervisException) {
             generator.loadToolchains(url.getFile())
         }
     }
     //loadToolchainsString() tests
-    @Test public void test_lifecycleGenerator_loadToolchainsString_type_checking() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_loadToolchainsString_type_checking() {
+        generator = new LifecycleGenerator()
         URL url = this.getClass().getResource('/good_toolchains_simple.json');
         String contents = new File(url.getFile()).getText()
         generator.loadToolchainsString(contents)
         assert generator.toolchain_obj != null
-        assert generator.toolchain_obj.class == toolchainValidator
+        assert generator.toolchain_obj.class == ToolchainValidator
     }
-    @Test public void test_lifecycleGenerator_loadToolchainsString_simple_query() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_loadToolchainsString_simple_query() {
+        generator = new LifecycleGenerator()
         URL url = this.getClass().getResource('/good_toolchains_simple.json');
         String contents = new File(url.getFile()).getText()
         generator.loadToolchainsString(contents)
         assert generator.toolchain_obj.toolchains['jdk']['default_ivalue'] == 'openjdk7'
     }
-    @Test public void test_lifecycleGenerator_loadToolchainsString_throws_exception() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_loadToolchainsString_throws_exception() {
+        generator = new LifecycleGenerator()
         URL url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json');
         String contents = new File(url.getFile()).getText()
         shouldFail(JervisException) {
@@ -132,58 +132,58 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         }
     }
     //loadYaml() tests
-    @Test public void test_lifecycleGenerator_loadYaml_exception_no_lifecycles__loaded() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_loadYaml_exception_no_lifecycles__loaded() {
+        generator = new LifecycleGenerator()
         shouldFail(JervisException) {
             generator.loadYamlString('language: ruby')
         }
     }
-    @Test public void test_lifecycleGenerator_loadYaml_exception_no_toolchains_loaded() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_loadYaml_exception_no_toolchains_loaded() {
+        generator = new LifecycleGenerator()
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
         generator.loadLifecycles(url.getFile())
         shouldFail(JervisException) {
             generator.loadYamlString('language: ruby')
         }
     }
-    @Test public void test_lifecycleGenerator_loadYaml_supportedLanguage_yes() {
+    @Test public void test_LifecycleGenerator_loadYaml_supportedLanguage_yes() {
         generator.loadYamlString('language: ruby')
         assert 'ruby' == generator.yaml_language
     }
-    @Test public void test_lifecycleGenerator_loadYaml_unsupportedLanguage_none() {
+    @Test public void test_LifecycleGenerator_loadYaml_unsupportedLanguage_none() {
         //not in lifecycles and not in toolchains
         shouldFail(UnsupportedLanguageException) {
             generator.loadYamlString('language: derp')
         }
     }
-    @Test public void test_lifecycleGenerator_loadYaml_unsupportedLanguage_toolchains() {
+    @Test public void test_LifecycleGenerator_loadYaml_unsupportedLanguage_toolchains() {
         //in lifecycles but not in toolchains
         shouldFail(UnsupportedLanguageException) {
             generator.loadYamlString('language: groovy')
         }
     }
-    @Test public void test_lifecycleGenerator_setfolder_listing_throws_exception() {
+    @Test public void test_LifecycleGenerator_setfolder_listing_throws_exception() {
         //did not call loadYamlString() first
         shouldFail(JervisException) {
             generator.folder_listing = ['Gemfile.lock', 'Gemfile']
         }
     }
-    @Test public void test_lifecycleGenerator_setfolder_listing_ruby_gemfile_lock() {
+    @Test public void test_LifecycleGenerator_setfolder_listing_ruby_gemfile_lock() {
         generator.loadYamlString('language: ruby')
         generator.folder_listing = ['Gemfile.lock', 'Gemfile']
         assert 'rake1' == generator.lifecycle_key
     }
-    @Test public void test_lifecycleGenerator_setfolder_listing_ruby_gemfile() {
+    @Test public void test_LifecycleGenerator_setfolder_listing_ruby_gemfile() {
         generator.loadYamlString('language: ruby')
         generator.folder_listing = ['Gemfile']
         assert 'rake2' == generator.lifecycle_key
     }
-    @Test public void test_lifecycleGenerator_setfolder_listing_java_ant_fallback() {
+    @Test public void test_LifecycleGenerator_setfolder_listing_java_ant_fallback() {
         generator.loadYamlString('language: java')
         generator.folder_listing = []
         assert 'ant' == generator.lifecycle_key
     }
-    @Test public void test_lifecycleGenerator_isMatrixBuild_false() {
+    @Test public void test_LifecycleGenerator_isMatrixBuild_false() {
         generator.loadYamlString('language: ruby\nenv: foo=bar')
         assert false == generator.isMatrixBuild()
         generator.loadYamlString('language: ruby\nenv:\n  - foo=bar')
@@ -191,13 +191,13 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nenv:\n  matrix:\n    - foo=bar')
         assert false == generator.isMatrixBuild()
     }
-    @Test public void test_lifecycleGenerator_isMatrixBuild_true() {
+    @Test public void test_LifecycleGenerator_isMatrixBuild_true() {
         generator.loadYamlString('language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar')
         assert true == generator.isMatrixBuild()
         generator.loadYamlString('language: ruby\nenv:\n  matrix:\n    - foobar=foo\n    - foobar=bar')
         assert true == generator.isMatrixBuild()
     }
-    @Test public void test_lifecycleGenerator_matrixExcludeFilter() {
+    @Test public void test_LifecycleGenerator_matrixExcludeFilter() {
         generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  exclude:\n    - env: world=goodbye\n      rvm: "2.1"')
         assert '!(env == \'env1\' && rvm == \'rvm2\')' == generator.matrixExcludeFilter()
         generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  include:\n    - env: world=goodbye\n      rvm: "2.1"')
@@ -224,26 +224,26 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  include:\n    - rvm: 1.9.3\n      env: world=hello\n  exclude:\n    - rvm: "1.9.3"\n    - rvm: "2.1"')
         assert '!(rvm == \'rvm:1.9.3\') && !(rvm == \'rvm:2.1\') && (rvm == \'rvm:1.9.3\' && env == \'env0\')' == generator.matrixExcludeFilter()
     }
-    @Test public void test_lifecycleGenerator_matrixGetAxisValue1() {
+    @Test public void test_LifecycleGenerator_matrixGetAxisValue1() {
         generator.loadYamlString('language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar')
         assert 'env0 env1' == generator.matrixGetAxisValue('env')
     }
-    @Test public void test_lifecycleGenerator_matrixGetAxisValue2() {
+    @Test public void test_LifecycleGenerator_matrixGetAxisValue2() {
         generator.loadYamlString('language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar')
         assert '' == generator.matrixGetAxisValue('rvm')
     }
-    @Test public void test_lifecycleGenerator_matrixGetAxisValue3() {
+    @Test public void test_LifecycleGenerator_matrixGetAxisValue3() {
         generator.loadYamlString('language: ruby\nenv:\n  matrix:\n    - foobar=foo\n    - foobar=bar')
         assert 'env0 env1' == generator.matrixGetAxisValue('env')
     }
-    @Test public void test_lifecycleGenerator_matrixGetAxisValue_friendly() {
+    @Test public void test_LifecycleGenerator_matrixGetAxisValue_friendly() {
         URL url = this.getClass().getResource('/good_toolchains_friendly.json');
         generator.loadToolchains(url.getFile())
         generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]')
         assert 'env0 env1' == generator.matrixGetAxisValue('env')
         assert 'rvm:1.9.3 rvm:2.0.0 rvm:2.1' == generator.matrixGetAxisValue('rvm')
     }
-    @Test public void test_lifecycleGenerator_generateToolchainSection_matrix() {
+    @Test public void test_LifecycleGenerator_generateToolchainSection_matrix() {
         //basic env matrix
         generator.loadYamlString('language: ruby\nenv: [world=hello, world=goodbye]')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\ncase ${env} in\n  env0)\n    export world=hello\n    ;;\n  env1)\n    export world=goodbye\n    ;;\nesac\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
@@ -277,7 +277,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\njdk: [openjdk6, openjdk7]')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\ncase ${jdk} in\n  jdk:openjdk6)\n    more commands\n    ;;\n  jdk:openjdk7)\n    some commands\n    ;;\nesac\n' == generator.generateToolchainSection()
     }
-    @Test public void test_lifecycleGenerator_generateToolchainSection_nonmatrix() {
+    @Test public void test_LifecycleGenerator_generateToolchainSection_nonmatrix() {
         //basic language test
         generator.loadYamlString('language: ruby')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
@@ -317,7 +317,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
             generator.generateToolchainSection()
         }
     }
-    @Test public void test_lifecycleGenerator_generateSection_beforeInstall() {
+    @Test public void test_LifecycleGenerator_generateSection_beforeInstall() {
         generator.loadYamlString('language: ruby')
         assert '' == generator.generateSection('before_install')
         generator.loadYamlString('language: ruby\nbefore_install: some code')
@@ -325,7 +325,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nbefore_install:\n - some code\n - more code')
         assert '#\n# BEFORE_INSTALL SECTION\n#\nset +x\necho \'# BEFORE_INSTALL SECTION\'\nset -x\nsome code\nmore code\n' == generator.generateSection('before_install')
     }
-    @Test public void test_lifecycleGenerator_generateSection_install() {
+    @Test public void test_LifecycleGenerator_generateSection_install() {
         generator.loadYamlString('language: ruby')
         assert '#\n# INSTALL SECTION\n#\nset +x\necho \'# INSTALL SECTION\'\nset -x\nbundle install --jobs=3 --retry=3\n' == generator.generateSection('install')
         generator.loadYamlString('language: ruby\ninstall: some code')
@@ -333,17 +333,17 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\ninstall:\n - some code\n - more code')
         assert '#\n# INSTALL SECTION\n#\nset +x\necho \'# INSTALL SECTION\'\nset -x\nsome code\nmore code\n' == generator.generateSection('install')
     }
-    @Test public void test_lifecycleGenerator_generateAll() {
+    @Test public void test_LifecycleGenerator_generateAll() {
         generator.loadYamlString('language: ruby')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n\n#\n# INSTALL SECTION\n#\nset +x\necho \'# INSTALL SECTION\'\nset -x\nbundle install --jobs=3 --retry=3\n\n#\n# SCRIPT SECTION\n#\nset +x\necho \'# SCRIPT SECTION\'\nset -x\nbundle exec rake\n' == generator.generateAll()
     }
-    @Test public void test_lifecycleGenerator_boolean_bug() {
+    @Test public void test_LifecycleGenerator_boolean_bug() {
         generator.loadYamlString('language: ruby\ninstall: true')
         assert '#\n# INSTALL SECTION\n#\nset +x\necho \'# INSTALL SECTION\'\nset -x\ntrue\n' == generator.generateSection('install')
         generator.loadYamlString('language: ruby\ninstall: [true,true]')
         assert '#\n# INSTALL SECTION\n#\nset +x\necho \'# INSTALL SECTION\'\nset -x\ntrue\ntrue\n' == generator.generateSection('install')
     }
-    @Test public void test_lifecycleGenerator_isGenerateBranch() {
+    @Test public void test_LifecycleGenerator_isGenerateBranch() {
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - main')
         assert true == generator.isGenerateBranch('main')
         assert false == generator.isGenerateBranch('development')
@@ -363,7 +363,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - 3')
         assert true == generator.isGenerateBranch('3')
     }
-    @Test public void test_lifecycleGenerator_isGenerateBranch_invalid_type() {
+    @Test public void test_LifecycleGenerator_isGenerateBranch_invalid_type() {
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    main: "test"')
         //invalid type defaults to no filter
         assert true == generator.isGenerateBranch('main')
@@ -376,13 +376,13 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nbranches:\n  only: 3.3')
         assert true == generator.isGenerateBranch('hello')
     }
-    @Test public void test_lifecycleGenerator_getBranchRegexString() {
+    @Test public void test_LifecycleGenerator_getBranchRegexString() {
         generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - development\n    - /^ma.*$/')
         assert '^ma.*$' == generator.getBranchRegexString()
         generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - /.*-pre$/\n    - /^ma.*$/')
         assert '.*-pre$|^ma.*$' == generator.getBranchRegexString()
     }
-    @Test public void test_lifecycleGenerator_getFullBranchRegexString() {
+    @Test public void test_LifecycleGenerator_getFullBranchRegexString() {
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - /.*-pre$/\n    - /^ma.*$/\n    - development')
         assert '.*-pre$|^ma.*$|\\Qdevelopment\\E' == generator.getFullBranchRegexString(generator.getFilteredBranchesList())
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - main\n    - development')
@@ -392,20 +392,20 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\n')
         assert '.*' == generator.getFullBranchRegexString(generator.getFilteredBranchesList())
     }
-    @Test public void test_lifecycleGenerator_filter_type_only() {
+    @Test public void test_LifecycleGenerator_filter_type_only() {
         generator.loadYamlString('language: ruby\nbranches:\n  - development\n  - /^ma.*$/')
         assert 'only' == generator.filter_type
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - development\n    - /^ma.*$/')
         assert 'only' == generator.filter_type
     }
-    @Test public void test_lifecycleGenerator_filter_type_reset() {
+    @Test public void test_LifecycleGenerator_filter_type_reset() {
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - main')
         assert 'only' == generator.filter_type
         //loading YAML into an aleady loaded generator object should clear the filter_type (this is testing for a bug)
         generator.loadYamlString('language: ruby\n')
         assert '' == generator.filter_type
     }
-    @Test public void test_lifecycleGenerator_hasRegexFilter() {
+    @Test public void test_LifecycleGenerator_hasRegexFilter() {
         generator.loadYamlString('language: ruby\n')
         assert false == generator.hasRegexFilter()
         generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - /.*-pre$/\n    - /^ma.*$/')
@@ -413,15 +413,15 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - /.*-pre$/\n    - /^ma.*$/')
         assert true == generator.hasRegexFilter()
     }
-    @Test public void test_lifecycleGenerator_filter_type_except() {
+    @Test public void test_LifecycleGenerator_filter_type_except() {
         generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - development\n    - /^ma.*$/')
         assert 'except' == generator.filter_type
     }
-    @Test public void test_lifecycleGenerator_getFilteredBranchesList_nofilters() {
+    @Test public void test_LifecycleGenerator_getFilteredBranchesList_nofilters() {
         generator.loadYamlString('language: ruby\n')
         assert [] == generator.getFilteredBranchesList()
     }
-    @Test public void test_lifecycleGenerator_getFilteredBranchesList() {
+    @Test public void test_LifecycleGenerator_getFilteredBranchesList() {
         generator.loadYamlString('language: ruby\nbranches:\n  except:\n    - development\n    - /^ma.*$/')
         assert ['development'] == generator.getFilteredBranchesList()
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - development\n    - /^ma.*$/')
@@ -429,7 +429,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - /\n    - /^ma.*$/')
         assert ['/'] == generator.getFilteredBranchesList()
     }
-    @Test public void test_lifecycleGenerator_isFilteredByRegex() {
+    @Test public void test_LifecycleGenerator_isFilteredByRegex() {
         generator.loadYamlString('language: ruby\nbranches:\n  only:\n    - main')
         assert false == generator.isFilteredByRegex('main')
         generator.loadYamlString('language: ruby\n')
@@ -443,7 +443,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert true == generator.isFilteredByRegex('main')
         assert false == generator.isFilteredByRegex('development')
     }
-    @Test public void test_lifecycleGenerator_setLabal_stability() {
+    @Test public void test_LifecycleGenerator_setLabal_stability() {
         generator.label_stability = 'derp'
         assert 'stable'.equals(generator.label_stability)
         generator.label_stability = 'unstable'
@@ -453,7 +453,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.label_stability = 'stable'
         assert 'stable'.equals(generator.label_stability)
     }
-    @Test public void test_lifecycleGenerator_setLabal_sudo() {
+    @Test public void test_LifecycleGenerator_setLabal_sudo() {
         generator.label_sudo = 'derp'
         assert 'nosudo'.equals(generator.label_sudo)
         generator.label_sudo = 'nosudo'
@@ -465,38 +465,38 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.label_sudo = 'required'
         assert 'sudo'.equals(generator.label_sudo)
     }
-    @Test public void test_lifecycleGenerator_getObjectValue() {
+    @Test public void test_LifecycleGenerator_getObjectValue() {
         Map example = [key1: [subkey1: 'string']]
         assert 'string'.equals(generator.getObjectValue(example, 'key1.subkey1', 'default'))
         assert 'default'.equals(generator.getObjectValue(example, 'key2.subkey1', 'default'))
         assert 2.equals(generator.getObjectValue(example, 'key1.subkey1', 2))
     }
-    @Test public void test_lifecycleGenerator_getObjectValue_false_bug() {
+    @Test public void test_LifecycleGenerator_getObjectValue_false_bug() {
         Map example = [key1: [subkey1: 'false']]
         assert false == generator.getObjectValue(example, 'key1.subkey1', false)
         assert false == generator.getObjectValue(example, 'key1.subkey1', true)
     }
-    @Test public void test_lifecycleGenerator_getObjectValue_type_bug() {
+    @Test public void test_LifecycleGenerator_getObjectValue_type_bug() {
         Map example = [key1: [subkey1: 'string'],key2: ["a", "b"]]
         assert 'default'.equals(generator.getObjectValue(example, 'key1', 'default'))
         assert 'default'.equals(generator.getObjectValue(example, 'key2', 'default'))
     }
-    @Test public void test_lifecycleGenerator_loadPlatforms() {
+    @Test public void test_LifecycleGenerator_loadPlatforms() {
         assert null.equals(generator.platform_obj)
         URL url = this.getClass().getResource('/good_platforms_simple.json');
         generator.loadPlatforms(url.getFile())
         assert !null.equals(generator.platform_obj)
-        assert generator.platform_obj.class == platformValidator
+        assert generator.platform_obj.class == PlatformValidator
     }
-    @Test public void test_lifecycleGenerator_loadPlatformsString() {
+    @Test public void test_LifecycleGenerator_loadPlatformsString() {
         assert null.equals(generator.platform_obj)
         URL url = this.getClass().getResource('/good_platforms_simple.json');
         String contents = new File(url.getFile()).getText()
         generator.loadPlatformsString(contents)
         assert !null.equals(generator.platform_obj)
-        assert generator.platform_obj.class == platformValidator
+        assert generator.platform_obj.class == PlatformValidator
     }
-    @Test public void test_lifecycleGenerator_preloadYamlString() {
+    @Test public void test_LifecycleGenerator_preloadYamlString() {
         String yaml = 'language: ruby'
         shouldFail(PlatformValidationException) {
             generator.preloadYamlString(yaml)
@@ -509,7 +509,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert 'stable'.equals(generator.label_stability)
         assert 'sudo'.equals(generator.label_sudo)
     }
-    @Test public void test_lifecycleGenerator_getLabels() {
+    @Test public void test_LifecycleGenerator_getLabels() {
         String yaml = 'language: ruby'
         generator.loadYamlString(yaml)
         assert 'language:ruby && gemfile && env && rvm && jdk'.equals(generator.getLabels())
@@ -519,7 +519,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString(yaml)
         assert 'stable && docker && ubuntu1404 && sudo && language:ruby && gemfile && env && rvm && jdk'.equals(generator.getLabels())
     }
-    @Test public void test_lifecycleGenerator_getLabels_additional_labels() {
+    @Test public void test_LifecycleGenerator_getLabels_additional_labels() {
         String yaml = 'language: ruby\njenkins:\n  additional_labels: foo'
         generator.loadYamlString(yaml)
         assert 'language:ruby && gemfile && env && rvm && jdk && foo'.equals(generator.getLabels())
@@ -527,7 +527,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString(yaml)
         assert 'language:ruby && gemfile && env && rvm && jdk && foo && bar'.equals(generator.getLabels())
     }
-    @Test public void test_lifecycleGenerator_isRestricted() {
+    @Test public void test_LifecycleGenerator_isRestricted() {
         String yaml = 'language: ruby'
         URL url = this.getClass().getResource('/good_platforms_simple.json');
         generator.loadPlatforms(url.getFile())
@@ -536,7 +536,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert !generator.isRestricted('samrocketman/jervis')
         assert generator.isRestricted('org/project')
     }
-    @Test public void test_lifecycleGenerator_isSupportedPlatform() {
+    @Test public void test_LifecycleGenerator_isSupportedPlatform() {
         assert true == generator.isSupportedPlatform()
         String yaml = 'language: ruby'
         URL url = this.getClass().getResource('/good_platforms_simple.json');
@@ -561,14 +561,14 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.preloadYamlString(yaml)
         assert false == generator.isSupportedPlatform()
     }
-    @Test public void test_lifecycleGenerator_setPrivateKey() {
+    @Test public void test_LifecycleGenerator_setPrivateKey() {
         assert generator.secret_util == null
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
         generator.setPrivateKey(url.content.text)
-        assert generator.secret_util instanceof securityIO
+        assert generator.secret_util instanceof SecurityIO
         assert generator.secret_util.key_pair
     }
-    @Test public void test_lifecycleGenerator_decryptSecrets_list() {
+    @Test public void test_LifecycleGenerator_decryptSecrets_list() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
         URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_test.yml')
         generator.loadYamlString(file_url.content.text)
@@ -584,7 +584,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         //decrypted plain text
         assert generator.plainlist[0]['secret'] == 'plaintext'
     }
-    @Test public void test_lifecycleGenerator_decryptSecrets_map() {
+    @Test public void test_LifecycleGenerator_decryptSecrets_map() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
         URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_map_test.yml')
         generator.loadYamlString(file_url.content.text)
@@ -600,7 +600,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         //decrypted plain text
         assert generator.plainmap['JERVIS_SECRETS_TEST'] == 'plaintext'
     }
-    @Test public void test_lifecycleGenerator_decryptSecrets_list_to_map() {
+    @Test public void test_LifecycleGenerator_decryptSecrets_list_to_map() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
         URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_test.yml')
         generator.loadYamlString(file_url.content.text)
@@ -616,7 +616,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         //decrypted plain text
         assert generator.plainmap['JERVIS_SECRETS_TEST'] == 'plaintext'
     }
-    @Test public void test_lifecycleGenerator_decryptSecrets_map_to_list() {
+    @Test public void test_LifecycleGenerator_decryptSecrets_map_to_list() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
         URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_map_test.yml')
         generator.loadYamlString(file_url.content.text)
@@ -632,13 +632,13 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         //decrypted plain text
         assert generator.plainlist[0]['secret'] == 'plaintext'
     }
-    @Test public void test_lifecycleGenerator_null_env_key() {
+    @Test public void test_LifecycleGenerator_null_env_key() {
         //this should not generate an exception
         generator.loadYamlString('language: java\njdk:')
         generator.generateAll()
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#env toolchain section\n#jdk toolchain section\nsome commands\n'.equals(generator.generateToolchainSection())
     }
-    @Test public void test_lifecycleGenerator_isInstanceFromList() {
+    @Test public void test_LifecycleGenerator_isInstanceFromList() {
         assert true == generator.isInstanceFromList("hello", [Number, String, List])
         assert true == generator.isInstanceFromList(3.5, [Number, String, List])
         assert true == generator.isInstanceFromList(3, [Number, String, List])
@@ -646,14 +646,14 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert false == generator.isInstanceFromList([:], [Number, String, List])
         assert true == generator.isInstanceFromList([:], [Number, String, Map])
     }
-    @Test public void test_lifecycleGenerator_good_toolchains_disabled_env() {
+    @Test public void test_LifecycleGenerator_good_toolchains_disabled_env() {
         URL url = this.getClass().getResource('/good_toolchains_disabled_env.json');
         generator.loadToolchains(url.getFile())
         generator.loadYamlString('language: ruby\nenv:\n  - foo=bar\n  - hello=world')
         assert 'disabled' == generator.toolchain_obj.toolchainType('env')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\nexport hello=world\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
     }
-    @Test public void test_lifecycleGenerator_good_lifecycles_python_number() {
+    @Test public void test_LifecycleGenerator_good_lifecycles_python_number() {
         URL url = this.getClass().getResource('/good_lifecycles_python_number.json');
         generator.loadLifecycles(url.getFile())
         String compare_string = '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#env toolchain section\n#python toolchain section\nsome commands\n'
@@ -674,7 +674,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: python\npython:\n  matrix:\n    - 2.7')
         assert compare_string == generator.generateToolchainSection()
     }
-    @Test public void test_lifecycleGenerator_bad_advanced_toolchain_when_not_supported() {
+    @Test public void test_LifecycleGenerator_bad_advanced_toolchain_when_not_supported() {
         URL url = this.getClass().getResource('/good_toolchains_disabled_env.json');
         generator.loadToolchains(url.getFile())
         generator.loadYamlString('language: ruby\nenv:\n  global:\n    - foo=bar\n    - hello=world')
@@ -683,15 +683,15 @@ class lifecycleGeneratorTest extends GroovyTestCase {
             generator.generateToolchainSection()
         }
     }
-    @Test public void test_lifecycleGenerator_bad_null_entry() {
+    @Test public void test_LifecycleGenerator_bad_null_entry() {
         generator.loadYamlString('language: shell\nscript:\n  - "some command"\n  -\n  - "another command"')
         assert '#\n# SCRIPT SECTION\n#\nset +x\necho \'# SCRIPT SECTION\'\nset -x\nsome command\n\nanother command\n' == generator.generateSection('script')
     }
-    @Test public void test_lifecycleGenerator_bad_null_entry_with_false() {
+    @Test public void test_LifecycleGenerator_bad_null_entry_with_false() {
         generator.loadYamlString('language: shell\nscript:\n  - "some command"\n  -\n  - false')
         assert '#\n# SCRIPT SECTION\n#\nset +x\necho \'# SCRIPT SECTION\'\nset -x\nsome command\n\nfalse\n' == generator.generateSection('script')
     }
-    @Test public void test_lifecycleGenerator_good_additional_toolchains_dedup() {
+    @Test public void test_LifecycleGenerator_good_additional_toolchains_dedup() {
         //should discard duplicate
         generator.loadYamlString('language: ruby\nadditional_toolchains: jdk')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
@@ -700,7 +700,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nadditional_toolchains:\n  - jdk\n  - compiler')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
     }
-    @Test public void test_lifecycleGenerator_good_additional_toolchains_discard_nonexisting() {
+    @Test public void test_LifecycleGenerator_good_additional_toolchains_discard_nonexisting() {
         //discard non-existing additional toolchain
         generator.loadYamlString('language: ruby\nadditional_toolchains: foo')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
@@ -709,13 +709,13 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nadditional_toolchains:\n  - foo\n  - compiler')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
     }
-    @Test public void test_lifecycleGenerator_good_additional_toolchains_inline() {
+    @Test public void test_LifecycleGenerator_good_additional_toolchains_inline() {
         generator.loadYamlString('language: ruby\ncompiler: gcc')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
         generator.loadYamlString('language: ruby\ncompiler: clang')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="clang++"\nexport CC="clang"\n' == generator.generateToolchainSection()
     }
-    @Test public void test_lifecycleGenerator_good_additional_toolchains_ordered() {
+    @Test public void test_LifecycleGenerator_good_additional_toolchains_ordered() {
         generator.loadYamlString('language: ruby\nadditional_toolchains:\n  - python\n  - compiler')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#python toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
         //reset toolchains for reverse order
@@ -725,7 +725,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nadditional_toolchains:\n  - compiler\n  - python')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n#python toolchain section\nsome commands\n' == generator.generateToolchainSection()
     }
-    @Test public void test_lifecycleGenerator_good_additional_toolchains_inline_ordered() {
+    @Test public void test_LifecycleGenerator_good_additional_toolchains_inline_ordered() {
         generator.loadYamlString('language: ruby\npython: "2.7"\ncompiler: gcc')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#python toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
         //reset toolchains for reverse order
@@ -735,22 +735,22 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\ncompiler: gcc\npython: "2.7"')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n#python toolchain section\nsome commands\n' == generator.generateToolchainSection()
     }
-    @Test public void test_lifecycleGenerator_good_additional_toolchains_string() {
+    @Test public void test_LifecycleGenerator_good_additional_toolchains_string() {
         generator.loadYamlString('language: ruby\nadditional_toolchains: compiler')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
     }
-    @Test public void test_lifecycleGenerator_good_toolchains_cleanup() {
+    @Test public void test_LifecycleGenerator_good_toolchains_cleanup() {
         URL url = this.getClass().getResource('/good_toolchains_cleanup.json');
         generator.loadToolchains(url.getFile())
         generator.loadYamlString('language: ruby')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#cleanup toolchain section\nfunction rvm_cleanup_on() {\n  set +x\n  some cleanup command\n}\ntrap rvm_cleanup_on EXIT\n' == generator.generateToolchainSection()
     }
-    @Test public void test_lifecycleGenerator_serialization() {
+    @Test public void test_LifecycleGenerator_serialization() {
         URL url = this.getClass().getResource('/good_platforms_simple.json');
         generator.loadPlatforms(url.getFile())
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(generator)
     }
-    @Test public void test_lifecycleGenerator_matrix_fullName_by_friendly() {
+    @Test public void test_LifecycleGenerator_matrix_fullName_by_friendly() {
         generator.loadYamlString('language: ruby\nenv:\n  - foo=hello\n  - bar=world\n  - baz=goodbye')
         //generator.generateToolchainSection()
         assert true == generator.isMatrixBuild()
@@ -766,7 +766,7 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         assert false == generator.isMatrixBuild()
         assert !generator.matrix_fullName_by_friendly
     }
-    @Test public void test_lifecycleGenerator_isPipelineJob() {
+    @Test public void test_LifecycleGenerator_isPipelineJob() {
         generator.loadYamlString('language: ruby\njenkins:\n  pipeline_jenkinsfile: path/Jenkinsfile')
         assert true == generator.isPipelineJob()
         generator.loadYamlString('language: ruby')
@@ -774,24 +774,24 @@ class lifecycleGeneratorTest extends GroovyTestCase {
         generator.folder_listing = ['Jenkinsfile']
         assert true == generator.isPipelineJob()
     }
-    @Test public void test_lifecycleGenerator_getJenkinsfile() {
+    @Test public void test_LifecycleGenerator_getJenkinsfile() {
         generator.loadYamlString('language: ruby')
         assert 'Jenkinsfile' == generator.getJenkinsfile()
         generator.loadYamlString('language: ruby\njenkins:\n  pipeline_jenkinsfile: path/Jenkinsfile')
         assert 'path/Jenkinsfile' == generator.getJenkinsfile()
     }
-    @Test public void test_lifecycleGenerator_is_pr() {
+    @Test public void test_LifecycleGenerator_is_pr() {
         assert generator.is_pr == false
         generator.is_pr = true
         assert generator.is_pr == true
     }
-    @Test public void test_lifecycleGenerator_is_tag() {
+    @Test public void test_LifecycleGenerator_is_tag() {
         assert generator.is_tag == false
         generator.is_tag = true
         assert generator.is_tag == true
     }
-    @Test public void test_lifecycleGenerator_matrix_additional_toolchain() {
-        generator = new lifecycleGenerator()
+    @Test public void test_LifecycleGenerator_matrix_additional_toolchain() {
+        generator = new LifecycleGenerator()
         URL url = this.getClass().getResource('/good_lifecycles_matrix_added_toolchain.json')
         generator.loadLifecycles(url.getFile())
         url = this.getClass().getResource('/good_toolchains_matrix_added_toolchain.json')

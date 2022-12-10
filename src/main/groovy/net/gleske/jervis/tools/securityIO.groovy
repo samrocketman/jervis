@@ -50,13 +50,13 @@ import org.yaml.snakeyaml.constructor.SafeConstructor
   to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
   with the classpath set up.</p>
 
-<pre><tt>import net.gleske.jervis.tools.securityIO
+<pre><tt>import net.gleske.jervis.tools.SecurityIO
 
 if(!(new File('/tmp/id_rsa').exists())) {
     'openssl genrsa -out /tmp/id_rsa 2048'.execute().waitFor()
     'openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub'.execute().waitFor()
 }
-def security = new securityIO(new File("/tmp/id_rsa").text)
+def security = new SecurityIO(new File("/tmp/id_rsa").text)
 println 'Key size: ' + security.id_rsa_keysize.toString()
 def s = security.rsaEncrypt('hello friend')
 println 'Length of encrypted output: ' + s.length()
@@ -67,7 +67,7 @@ println security.rsaDecrypt(s)
 new File('/tmp/id_rsa').delete()
 new File('/tmp/id_rsa.pub').delete()</tt></pre>
  */
-class securityIO implements Serializable {
+class SecurityIO implements Serializable {
 
     /**
       Shortcut to getting the key size of <tt>{@link #key_pair}</tt>.
@@ -92,7 +92,7 @@ println key_pair.public.modulus.bitLength()</tt></pre>
       <tt>{@link #setKey_pair(java.lang.String)}</tt> to properly use this
       class.
      */
-    def securityIO() { }
+    def SecurityIO() { }
 
     /**
       Instantiates the class and configures a private key for decryption.
@@ -102,7 +102,7 @@ println key_pair.public.modulus.bitLength()</tt></pre>
       @param private_key_pem The contents of an X.509 PEM encoded RSA private key.
       @see #setKey_pair(java.lang.String)
      */
-    def securityIO(String private_key_pem) {
+    def SecurityIO(String private_key_pem) {
         setKey_pair(private_key_pem)
     }
 
@@ -128,7 +128,7 @@ println key_pair.public.modulus.bitLength()</tt></pre>
     /**
       Get a <a href="https://jwt.io/">JSON Web Token</a> (JWT) meant for use with
       <a href="https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#authenticating-as-a-github-app">GitHub App Authentication</a>.
-      This assumes the <tt>securityIO</tt> class was loaded with an RSA private
+      This assumes the <tt>SecurityIO</tt> class was loaded with an RSA private
       key provided by GitHub App Authentication setup.
 
       <h2>Sample usage</h2>
@@ -136,13 +136,13 @@ println key_pair.public.modulus.bitLength()</tt></pre>
       The following code will generate a JWT, verify it, and extract its
       payload contents.
 
-<pre><tt>import net.gleske.jervis.tools.securityIO
+<pre><tt>import net.gleske.jervis.tools.SecurityIO
 
 if(!(new File('/tmp/id_rsa').exists())) {
     'openssl genrsa -out /tmp/id_rsa 2048'.execute().waitFor()
     'openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub'.execute().waitFor()
 }
-def security = new securityIO(new File("/tmp/id_rsa").text)
+def security = new SecurityIO(new File("/tmp/id_rsa").text)
 // use a fake App ID of 1234
 String jwt = security.getGitHubJWT('1234')
 if(security.verifyGitHubJWTPayload(jwt)) {
