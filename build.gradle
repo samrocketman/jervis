@@ -25,7 +25,6 @@ compileJava {
 
 group = 'net.gleske'
 archivesBaseName = 'jervis'
-jar.baseName = 'jervis'
 version = "${version}"
 
 ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.21'
@@ -122,7 +121,7 @@ test {
 
 //http://swalsh.org/blog/2014/07/17/running-the-groovy-console-from-gradle/
 task( console, dependsOn: "classes", type: JavaExec ) {
-    main = "groovy.ui.Console"
+    mainClass = "groovy.ui.Console"
     classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
 }
 
@@ -248,12 +247,12 @@ gradle.taskGraph.whenReady { graph ->
 
 jacocoTestReport {
     reports {
-        csv.enabled false
+        csv.required = false
         xml {
-            enabled true
-            destination file("${buildDir}/test-results/jacoco.xml")
+            required = true
+            outputLocation = file("${buildDir}/test-results/jacoco.xml")
         }
-        html.destination file("${buildDir}/reports/jacoco")
+        html.outputLocation = file("${buildDir}/reports/jacoco")
     }
     if(!findProperty('betaCoverage')) {
         afterEvaluate {
