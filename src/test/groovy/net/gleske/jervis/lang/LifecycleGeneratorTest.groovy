@@ -866,4 +866,12 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert generator.cipherlist == []
         assert generator.ciphermap == [:]
     }
+    @Test public void test_LifecycleGenerator_secrets_incomplete_list() {
+        generator.loadYamlString('language: shell\njenkins:\n  secrets:\n    -  secret: hello')
+        assert generator.cipherlist == []
+        assert generator.ciphermap == [:]
+        generator.loadYamlString('language: shell\njenkins:\n  secrets:\n    -  key: hello')
+        assert generator.cipherlist == []
+        assert generator.ciphermap == [:]
+    }
 }
