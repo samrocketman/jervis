@@ -255,6 +255,13 @@ jacocoTestReport {
         }
         html.destination file("${buildDir}/reports/jacoco")
     }
+    if(!findProperty('betaCoverage')) {
+        afterEvaluate {
+            classDirectories.from = files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: '**/beta/**')
+            })
+        }
+    }
 }
 
 coveralls {
@@ -265,6 +272,9 @@ coveralls {
 sonarqube {
     properties {
         property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/test-results/jacoco.xml"
+        if(!findProperty('betaCoverage')) {
+            property "sonar.coverage.exclusions", "**/beta/**"
+        }
     }
 }
 project.tasks["sonarqube"].dependsOn "check"

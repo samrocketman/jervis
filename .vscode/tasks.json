@@ -13,6 +13,9 @@
 				"-Dsonar.host.url=http://sonarqube:9000",
 				"-Dsonar.projectKey=jervis",
 				"-Dsonar.projectName=jervis",
+				// Uncomment this to enable code coverage analysis on beta
+				// packages.
+				// "-PbetaCoverage=1",
 				"clean",
 				"sonar"
 			],
