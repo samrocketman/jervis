@@ -14,10 +14,10 @@
    limitations under the License.
   */
 
-package net.gleske.jervis.tools
+package net.gleske.jervis.beta
 
-import net.gleske.jervis.exceptions.JervisException
 import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
+import net.gleske.jervis.exceptions.JervisException
 
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
