@@ -13,8 +13,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
+package net.gleske.jervis.remotes.creds
+
 import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
 
+/**
+  A simple credential for instantiating a vault approle credentials.
+  */
 class VaultRoleIdCredentialImpl implements VaultRoleIdCredential {
     private final String role_id
     private final String secret_id
@@ -23,11 +28,11 @@ class VaultRoleIdCredentialImpl implements VaultRoleIdCredential {
         this.secret_id = secret_id
     }
 
-    String getRole_id() {
+    final String getRole_id() {
         this.role_id
     }
 
-    String getSecret_id() {
+    final String getSecret_id() {
         this.secret_id
     }
 }
