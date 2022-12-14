@@ -87,6 +87,8 @@ The following classes have been renamed.
   This change makes Jervis compatible with Groovy 2.4, 2.5, and 3.0 series of
   releases.  Jenkins LTS currently uses Groovy 2.4.21 so this is more of a
   future-proofing fix than a bug for existing usage.
+- Minor bugfix around cipherlist loading in LifecycleGenerator.  Discovered via
+  100% test coverage goal.
 
 ### Other notes:
 
