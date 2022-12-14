@@ -64,6 +64,18 @@ The following classes have been renamed.
 
 ### New features:
 
+#### Pipeline DSL scripts changes in the `vars/` folder
+
+- New `hasGlobalResource()` step which can be used to conditionally load
+  resources from `libraryResource` step.  Allows a pipeline developer to only
+  call `librarResource` if it exists.  Normally `libraryResource` step will
+  throw an exception if the step doesn't exist.  This is a fully `NonCPS` step
+  and can be called from other `NonCPS` code blocks.
+- `hasGlobalVar` is now a full `NonCPS` step and can be called from within other
+  `NonCPS` code blocks.
+
+#### Jervis API changes in `src/` folder
+
 - [`net.gleske.jervis.remotes.GitHubGraphQL`][GitHubGraphQL] has a new `sendGQL`
   method.  `variables` are now supported as a Map in addition to a String.  The
   Map will be automatically converted to a String before being sent to GitHub as
