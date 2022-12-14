@@ -73,14 +73,15 @@ class StaticMocking {
             mc.getMetaProperty(name).getProperty(delegate)
         }
         mc.constructor = { String url ->
+            request_meta['url'] = url
             mockedUrl = url
             def constructor = delegate.getConstructor([String] as Class[])
             constructor.newInstance(url)
         }
         mc.newReader = {
-            // create a file from the URL including the domain and path with
+            // Create a file from the URL including the domain and path with
             // all special characters and path separators replaced with an
-            // underscore
+            // underscore.
             String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
             try {
                 return new File("src/test/resources/mocks/${file}").newReader()
@@ -125,6 +126,131 @@ class StaticMocking {
                             }
                             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
                             String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_') + ((checksum) ? '_' + checksum : '')
+                            try {
+                                Map temp_request_meta = request_meta.clone()
+                                temp_request_meta['response'] = new File("src/test/resources/mocks/${file}").text
+                                temp_request_meta['url'] = mockedUrl
+                                request_history << temp_request_meta
+                                return temp_request_meta['response']
+                            }
+                            catch(Exception e) {
+                                throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    /**
+      Intercepts java.lang.URL calls for opening network connections with
+      <tt>{@link net.gleske.jervis.remotes.SimpleRestServiceSupport}</tt> classes.
+
+      <p>This is very useful for recording mocks while writing mocked tests for
+      API classes communicating with real services.</p>
+
+      <p>See also:
+          https://blog.mrhaki.com/2009/12/groovy-goodness-override-and-use-old_21.html
+
+<h2>Sample Usage</h2>
+
+<pre><tt>import static net.gleske.jervis.remotes.StaticMocking.recordMockUrls
+import net.gleske.jervis.remotes.SimpleRestServiceSupport
+
+if(!binding.hasVariable('url')) {
+    String persistStr
+    url = persistStr
+}
+if(binding.hasVariable('request_meta')) {
+    request_meta.clear()
+} else {
+    request_meta = [:]
+}
+
+if(binding.hasVariable('request_history')) {
+    request_history.clear()
+} else {
+    request_history = []
+}
+//if(URL.class.metaClass.metaMethods*.name.sort().unique().join('\n')
+recordMockUrls(url, URL, request_meta, true, 'SHA-256', request_history)
+
+//return URL.metaClass.methods*.name.sort().unique().join('\n')
+class MyApi implements SimpleRestServiceSupport {
+    String baseUrl() {
+        'https://www.example.com'
+    }
+    Map header(Map http_headers = [:]) {
+        http_headers['Content-Type'] = 'text/html'
+        http_headers
+    }
+}
+
+new MyApi().apiFetch('')
+
+// return full request history of the request_meta
+request_history</tt></pre>
+      */
+    static def recordMockUrls(String mockedUrl, Class<URL> clazz, Map request_meta = [:], Boolean checksumMocks = false, String checksumAlgorithm = 'SHA-256', List request_history = []) {
+        def mc = clazz.metaClass
+        if('jervisMocked' in mc.methods*.name.sort().unique()) {
+            return
+        }
+        def oldInvokeMethod = mc.invokeMethod
+        def oldGetProperty = mc.getProperty
+        // preserve old methods for calling later while overriding them
+        def savedOpenConnection = mc.getMetaMethod('openConnection', [] as Class[])
+
+        mc.jervisMocked = {->}
+        mc.invokeMethod = { String name, args ->
+            mc.getMetaMethod(name, args).invoke(delegate, args)
+        }
+        mc.getProperty = {String name  ->
+            mc.getMetaProperty(name).getProperty(delegate)
+        }
+        mc.constructor = { String url ->
+            request_meta['url'] = url
+            mockedUrl = url
+            def constructor = delegate.getConstructor([String] as Class[])
+            constructor.newInstance(url)
+        }
+        mc.openConnection = { ->
+            def conn = savedOpenConnection.invoke(delegate)
+            request_meta['data'] = new StringWriter()
+            // return URLConnection Class-like object
+            [
+                setDoOutput: { Boolean val ->
+                    conn.setDoOutput(val)
+                    if(val) {
+                        request_meta['data'] = new StringWriter(conn.outputStream)
+                    }
+                },
+                setRequestMethod: { String method ->
+                    conn.setRequestMethod(method)
+                    request_meta['method'] = method
+                    null
+                },
+                setRequestProperty: { String key, String value ->
+                    conn.setRequestProperty(key, value)
+                    if(!request_meta['headers']) {
+                        request_meta['headers'] = [:]
+                    }
+                    request_meta['headers'][key] = value
+                    null
+                },
+                outputStream: request_meta['data'],
+                getContent: { ->
+                    [
+                        getText: { ->
+                            String checksum = ''
+                            if(checksumMocks) {
+                                checksum = checksumString(request_meta['data'].toString(), checksumAlgorithm)
+                            }
+                            //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
+                            String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_') + ((checksum) ? '_' + checksum : '')
+                            new File("src/test/resources/mocks/${file}").withWriter('UTF-8') { Writer w ->
+                                w << conn.content.text
+                            }
                             try {
                                 Map temp_request_meta = request_meta.clone()
                                 temp_request_meta['response'] = new File("src/test/resources/mocks/${file}").text

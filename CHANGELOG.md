@@ -52,7 +52,7 @@ The following classes have been renamed.
 
 ### Warnings:
 
-- JDK 1.8 is dropped.
+- All vendors of JDK 1.8 is dropped in this release.
 - OpenJDK11 is the bytecode compatibility going forward to match the Jenkins
   project.
 - Function `getJervisYamlFiles(String owner, String repository)` within class
@@ -92,6 +92,8 @@ The following classes have been renamed.
     [`VaultRoleIdCredentialImpl`][VaultRoleIdCredentialImpl], but custom
     credential resolver can be implented on
     [`VaultRoleIdCredential`][VaultRoleIdCredential] interface.
+- Extend [`net.gleske.jervis.remotes.StaticMocking`][StaticMocking] test class
+  to support recording mock API responses while calling Jervis dependent code.
 
 ### Bug fixes:
 
@@ -114,6 +116,7 @@ The following classes have been renamed.
   Gradle 3 or higher.
 - Added support for building on Groovy versions 2.4 through 4.0.
 
+[StaticMocking]: src/test/groovy/net/gleske/jervis/remotes/StaticMocking.groovy
 [TokenCredential]: src/main/groovy/net/gleske/jervis/remotes/interfaces/TokenCredential.groovy
 [VaultAppRoleCredential]: src/main/groovy/net/gleske/jervis/remotes/creds/VaultAppRoleCredential.groovy
 [VaultRoleIdCredentialImpl]: src/main/groovy/net/gleske/jervis/remotes/creds/VaultRoleIdCredentialImpl.groovy
