@@ -34,7 +34,7 @@
 			"label": "Generate API Docs",
 			"type": "shell",
 			"command": [
-				"/bin/bash -exc './gradlew groovydoc; rm -rf ~/groovydoc; cp -r build/docs/groovydoc ~/'"
+				"/bin/bash -exc './gradlew -PtestGroovydoc=1 groovydoc; rm -rf ~/groovydoc; cp -r build/docs/groovydoc ~/'"
 			],
 			"problemMatcher": []
 		},
