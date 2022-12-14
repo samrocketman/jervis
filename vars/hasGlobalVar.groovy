@@ -15,7 +15,7 @@
    */
 /**
   hasGlobalVar will check to see if a global variable exists which is possible
-  loaded by anotehr pipeline library.  This is useful for optionally detecting
+  loaded by another pipeline library.  This is useful for optionally detecting
   and calling variables provided by other pipelines.  It gives a means of
   gracefully falling back if the variables provided by other pipelines are not
   loaded or do not exist.
@@ -29,10 +29,11 @@ import org.jenkinsci.plugins.workflow.libs.LibraryAdder
   functionality provided by other global libraries (only if they are defined).
  */
 @NonCPS
-boolean hasGlobalVar(String var) {
+Boolean hasGlobalVar(String var) {
     var in  ExtensionList.lookup(LibraryAdder.GlobalVars.class)[0].forRun(currentBuild.rawBuild)*.name
 }
 
-def call(String var) {
+@NonCPS
+Boolean call(String var) {
     hasGlobalVar(var)
 }
