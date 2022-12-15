@@ -54,6 +54,18 @@
 				"update_vscode"
 			],
 			"problemMatcher": []
+		},
+		{
+			"label": "Compile Groovy Classes",
+			"type": "shell",
+			"hide": true,
+			"command": [
+				"./gradlew",
+				"clean",
+				"classes",
+				"testClasses",
+			],
+			"problemMatcher": []
 		}
 	]
 }

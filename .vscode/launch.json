@@ -6,6 +6,7 @@
             "name": "Groovy Console",
             "request": "launch",
             "mainClass": "groovy.ui.Console",
+            "preLaunchTask": "Compile Groovy Classes",
             "classPaths": [
                 "/workspace/jervis/build/classes/java/main",
                 "/workspace/jervis/build/classes/groovy/main",
