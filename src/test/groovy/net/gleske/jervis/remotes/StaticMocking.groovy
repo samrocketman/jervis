@@ -104,6 +104,10 @@ class StaticMocking {
             request_meta['data'] = new StringWriter()
             [
                 setDoOutput: { Boolean val ->
+                    request_meta['doOutput'] = val
+                },
+                getDoOutput: { ->
+                    request_meta['doOutput']
                 },
                 setRequestMethod: { String method ->
                     request_meta['method'] = method
@@ -117,25 +121,33 @@ class StaticMocking {
                     null
                 },
                 outputStream: request_meta['data'],
+                getContentLengthLong: {->
+                    String checksum = ''
+                    if(checksumMocks) {
+                        checksum = checksumString(request_meta['data'].toString(), checksumAlgorithm)
+                    }
+                    String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_') + ((checksum) ? '_' + checksum : '')
+                    1
+                    new File("src/test/resources/mocks/${file}").text.size()
+                },
                 getContent: { ->
+                    String checksum = ''
+                    if(checksumMocks) {
+                        checksum = checksumString(request_meta['data'].toString(), checksumAlgorithm)
+                    }
+                    String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_') + ((checksum) ? '_' + checksum : '')
+                    File responseFile = new File("src/test/resources/mocks/${file}")
+                    if(!responseFile.exists()) {
+                        throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
+                    }
                     [
                         getText: { ->
-                            String checksum = ''
-                            if(checksumMocks) {
-                                checksum = checksumString(request_meta['data'].toString(), checksumAlgorithm)
-                            }
                             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
-                            String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_') + ((checksum) ? '_' + checksum : '')
-                            try {
-                                Map temp_request_meta = request_meta.clone()
-                                temp_request_meta['response'] = new File("src/test/resources/mocks/${file}").text
-                                temp_request_meta['url'] = mockedUrl
-                                request_history << temp_request_meta
-                                return temp_request_meta['response']
-                            }
-                            catch(Exception e) {
-                                throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
-                            }
+                            Map temp_request_meta = request_meta.clone()
+                            temp_request_meta['response'] = responseFile.text
+                            temp_request_meta['url'] = mockedUrl
+                            request_history << temp_request_meta
+                            return temp_request_meta['response']
                         }
                     ]
                 }
@@ -215,23 +227,30 @@ request_history</tt></pre>
             constructor.newInstance(url)
         }
         mc.openConnection = { ->
-            def conn = savedOpenConnection.invoke(delegate)
+            request_meta['conn'] = savedOpenConnection.invoke(delegate)
             request_meta['data'] = new StringWriter()
             // return URLConnection Class-like object
             [
                 setDoOutput: { Boolean val ->
-                    conn.setDoOutput(val)
+                    request_meta.conn.setDoOutput(val)
+                    /*
                     if(val) {
-                        request_meta['data'] = new StringWriter(conn.outputStream)
-                    }
+                        request_meta['data'] = new StringWriter(request_meta.conn.outputStream)
+                    }*/
+                },
+                getContentLengthLong: {->
+                    request_meta.conn.getContentLengthLong()
+                },
+                getDoOutput: { ->
+                    request_meta.conn.getDoOutput()
                 },
                 setRequestMethod: { String method ->
-                    conn.setRequestMethod(method)
+                    request_meta.conn.setRequestMethod(method)
                     request_meta['method'] = method
                     null
                 },
                 setRequestProperty: { String key, String value ->
-                    conn.setRequestProperty(key, value)
+                    request_meta.conn.setRequestProperty(key, value)
                     if(!request_meta['headers']) {
                         request_meta['headers'] = [:]
                     }
@@ -248,19 +267,23 @@ request_history</tt></pre>
                             }
                             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
                             String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_') + ((checksum) ? '_' + checksum : '')
+                            println(request_meta)
+                            request_meta.data = request_meta.data.toString()
                             new File("src/test/resources/mocks/${file}").withWriter('UTF-8') { Writer w ->
-                                w << conn.content.text
+                                if(request_meta.method != 'GET' && request_meta.data.size()) {
+                                    request_meta.conn.getOutputStream().withWriter { writer ->
+                                        writer << request_meta.data
+                                    }
+                                }
+                                println(request_meta.conn.getRequestProperty('X-Vault-Token'))
+                                w << request_meta.conn.content.text
                             }
-                            try {
-                                Map temp_request_meta = request_meta.clone()
-                                temp_request_meta['response'] = new File("src/test/resources/mocks/${file}").text
-                                temp_request_meta['url'] = mockedUrl
-                                request_history << temp_request_meta
-                                return temp_request_meta['response']
-                            }
-                            catch(Exception e) {
-                                throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
-                            }
+                            Map temp_request_meta = request_meta.clone()
+                            temp_request_meta.remove('conn')
+                            temp_request_meta['response'] = new File("src/test/resources/mocks/${file}").text
+                            temp_request_meta['url'] = mockedUrl
+                            request_history << temp_request_meta
+                            return temp_request_meta['response']
                         }
                     ]
                 }
