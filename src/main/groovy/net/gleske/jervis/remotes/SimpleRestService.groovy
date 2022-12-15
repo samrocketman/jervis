@@ -48,22 +48,37 @@ class SimpleRestService {
     static def apiFetch(URL api_url, Map http_headers = [:], String http_method = 'GET', String data = '') {
         http_headers['Content-Type'] = http_headers['Content-Type'] ?: 'application/json'
         Boolean parse_json = http_headers['Content-Type'] == 'application/json'
+        /*
+        if('Parse-JSON' in http_headers) {
+            parse_json = http_headers['Parse-JSON']
+            http_headers.remove('Parse-JSON')
+        }
+        */
         def yaml = new Yaml(new SafeConstructor(new LoaderOptions()))
 
         //data_response could be either a List or Map depending on the JSON
         def data_response
         String response = api_url.openConnection().with { conn ->
-            conn.doOutput = true
+            if(http_method.toUpperCase() != 'GET' && data.size()) {
+                conn.setDoOutput(true)
+            }
             conn.setRequestMethod(http_method.toUpperCase())
             http_headers.each { k, v ->
                 conn.setRequestProperty(k, v)
             }
-            if(http_method.toUpperCase() != 'GET') {
+            if(conn.getDoOutput()) {
                 conn.outputStream.withWriter { writer ->
                     writer << data
                 }
             }
             conn.getContent().getText()
+            /*
+            conn.getContent().with {
+                if(conn.getContentLengthLong()) {
+                    return it.getText()
+                }
+                ''
+            }*/
         }
         data_response = (parse_json)? yaml.load(response ?: '{}') : response
         data_response
