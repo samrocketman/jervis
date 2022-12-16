@@ -94,6 +94,16 @@ The following classes have been renamed.
     [`VaultRoleIdCredential`][VaultRoleIdCredential] interface.
 - Extend [`net.gleske.jervis.remotes.StaticMocking`][StaticMocking] test class
   to support recording mock API responses while calling Jervis dependent code.
+- SimpleRestServiceSupport class changes.  All REST services provided in
+  `net.gleske.jervis.remotes.*` have new behaviors.
+  - New HTTP header available on all REST services.  Setting the `Parse-JSON`
+    HTTP header on any REST service will override its default behavior.  It can
+    force-parse JSON or it can force returning plain text for JSON APIs instead
+    of parsed JSON objects.
+  - The default API response for SimpleRestService ias changed from a `Map` to a
+    `String`.  This means if there's no content response an empty `String` will
+    be returned regardless of JSON parsing for the API.  This used to return an
+    empty `HashMap`.
 
 ### Bug fixes:
 

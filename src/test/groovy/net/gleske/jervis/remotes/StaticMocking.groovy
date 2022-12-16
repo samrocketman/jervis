@@ -53,6 +53,14 @@ class StaticMocking {
         digest.digest().encodeHex().toString()
     }
 
+    static String urlToMockFileName(String mockedUrl, String data = '', Boolean checksumMocks = false, String checksumAlgorithm = 'SHA-256') {
+        String checksum
+        if(checksumMocks) {
+            checksum = checksumString(data, checksumAlgorithm)
+        }
+        mockedUrl.toString().replaceAll(/[:&?=]/,'_').split('/')[2..-1].join('_') + ((checksum) ? '_' + checksum : '')
+    }
+
     /**
       Mock the HTTP calls to any API and use resources files, instead.  Under
       the hood, URL will utilize a file reader rather than attempting to
@@ -82,7 +90,7 @@ class StaticMocking {
             // Create a file from the URL including the domain and path with
             // all special characters and path separators replaced with an
             // underscore.
-            String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
+            String file = urlToMockFileName(mockedUrl)
             try {
                 return new File("src/test/resources/mocks/${file}").newReader()
             }
@@ -92,7 +100,7 @@ class StaticMocking {
         }
         mc.newReader = { Map parameters ->
             // create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
-            String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_')
+            String file = urlToMockFileName(mockedUrl)
             try {
                 return new File("src/test/resources/mocks/${file}").newReader()
             }
@@ -120,34 +128,30 @@ class StaticMocking {
                     request_meta['headers'][key] = value
                     null
                 },
-                outputStream: request_meta['data'],
+                getOutputStream: {->
+                    request_meta.data
+                },
                 getContentLengthLong: {->
-                    String checksum = ''
-                    if(checksumMocks) {
-                        checksum = checksumString(request_meta['data'].toString(), checksumAlgorithm)
-                    }
-                    String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_') + ((checksum) ? '_' + checksum : '')
-                    1
-                    new File("src/test/resources/mocks/${file}").text.size()
+                    String file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
+                    new File("src/test/resources/mocks/${file}").text.trim().size()
                 },
                 getContent: { ->
-                    String checksum = ''
-                    if(checksumMocks) {
-                        checksum = checksumString(request_meta['data'].toString(), checksumAlgorithm)
-                    }
-                    String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_') + ((checksum) ? '_' + checksum : '')
+                    request_meta.data = request_meta.data.toString()
+                    String file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
                     File responseFile = new File("src/test/resources/mocks/${file}")
                     if(!responseFile.exists()) {
                         throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
                     }
+                    // return content like object
+                    Map temp_request_meta = request_meta.clone()
+                    temp_request_meta['response'] = ''
+                    temp_request_meta['url'] = mockedUrl
+                    request_history << temp_request_meta
                     [
                         getText: { ->
                             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
-                            Map temp_request_meta = request_meta.clone()
-                            temp_request_meta['response'] = responseFile.text
-                            temp_request_meta['url'] = mockedUrl
-                            request_history << temp_request_meta
-                            return temp_request_meta['response']
+                            request_history[-1].response = responseFile.text
+                            return request_history[-1].response
                         }
                     ]
                 }
@@ -208,8 +212,6 @@ request_history</tt></pre>
         if('jervisMocked' in mc.methods*.name.sort().unique()) {
             return
         }
-        def oldInvokeMethod = mc.invokeMethod
-        def oldGetProperty = mc.getProperty
         // preserve old methods for calling later while overriding them
         def savedOpenConnection = mc.getMetaMethod('openConnection', [] as Class[])
 
@@ -233,13 +235,6 @@ request_history</tt></pre>
             [
                 setDoOutput: { Boolean val ->
                     request_meta.conn.setDoOutput(val)
-                    /*
-                    if(val) {
-                        request_meta['data'] = new StringWriter(request_meta.conn.outputStream)
-                    }*/
-                },
-                getContentLengthLong: {->
-                    request_meta.conn.getContentLengthLong()
                 },
                 getDoOutput: { ->
                     request_meta.conn.getDoOutput()
@@ -257,33 +252,40 @@ request_history</tt></pre>
                     request_meta['headers'][key] = value
                     null
                 },
-                outputStream: request_meta['data'],
+                getOutputStream: {->
+                    request_meta.data
+                },
+                getContentLengthLong: {->
+                    request_meta.conn.getContentLengthLong()
+                },
                 getContent: { ->
+                    // finalize writer
+                    request_meta.data = request_meta.data.toString()
+                    // write output to connection request
+                    if(request_meta.conn.getDoOutput()) {
+                        request_meta.conn.outputStream.withWriter { writer ->
+                            writer << request_meta.data
+                        }
+                    }
+                    Map temp_request_meta = request_meta.clone()
+                    temp_request_meta.remove('conn')
+                    temp_request_meta['response'] = ''
+                    temp_request_meta['url'] = mockedUrl
+                    request_history << temp_request_meta
+                    // call for real network content
+                    request_meta.conn.content
+                    // return content like object
                     [
                         getText: { ->
-                            String checksum = ''
-                            if(checksumMocks) {
-                                checksum = checksumString(request_meta['data'].toString(), checksumAlgorithm)
-                            }
                             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
-                            String file = mockedUrl.toString().replaceAll(/[:?=]/,'_').split('/')[2..-1].join('_') + ((checksum) ? '_' + checksum : '')
-                            println(request_meta)
-                            request_meta.data = request_meta.data.toString()
-                            new File("src/test/resources/mocks/${file}").withWriter('UTF-8') { Writer w ->
-                                if(request_meta.method != 'GET' && request_meta.data.size()) {
-                                    request_meta.conn.getOutputStream().withWriter { writer ->
-                                        writer << request_meta.data
-                                    }
-                                }
-                                println(request_meta.conn.getRequestProperty('X-Vault-Token'))
+                            String file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
+                            File  responseFile = new File("src/test/resources/mocks/${file}")
+                            //println(request_meta)
+                            responseFile.withWriter('UTF-8') { Writer w ->
                                 w << request_meta.conn.content.text
                             }
-                            Map temp_request_meta = request_meta.clone()
-                            temp_request_meta.remove('conn')
-                            temp_request_meta['response'] = new File("src/test/resources/mocks/${file}").text
-                            temp_request_meta['url'] = mockedUrl
-                            request_history << temp_request_meta
-                            return temp_request_meta['response']
+                            request_history[-1].response = responseFile.text
+                            return request_history[-1].response
                         }
                     ]
                 }

@@ -94,9 +94,31 @@ class SimpleRestServiceTest extends GroovyTestCase {
         Map http_headers = ['Content-Type': 'text/plain']
         assert '[]\n' == apiFetch(new URL('https://api.github.com/repos/samrocketman/emptyList/contents'), http_headers)
     }
-    @Test public void test_SimpleRestService_apiFetch_no_empty_response_default_to_map() {
+    @Test public void test_SimpleRestService_apiFetch_no_empty_response_default_to_string() {
         Map http_headers = ['Content-Type': 'text/plain']
-        assert [:] == apiFetch(new URL('https://api.github.com/repos/samrocketman/empty/contents'))
+        assert '' == apiFetch(new URL('https://api.github.com/repos/samrocketman/empty/contents'))
         assert '' == apiFetch(new URL('https://api.github.com/repos/samrocketman/empty/contents'), http_headers)
+    }
+    @Test public void test_SimpleRestService_apiFetch_get_response_json_parse() {
+        Map parse_http_headers = ['Parse-JSON': true]
+        def response = apiFetch(new URL('https://api.github.com/users/samrocketman'), parse_http_headers)
+        assert response in Map
+        assert response['login'] == 'samrocketman'
+        assert !('Parse-JSON' in request_meta.headers.keySet())
+        parse_http_headers = ['Parse-JSON': 'true']
+        response = apiFetch(new URL('https://api.github.com/users/samrocketman'), parse_http_headers)
+        assert response in Map
+        assert response['login'] == 'samrocketman'
+        assert !('Parse-JSON' in request_meta.headers.keySet())
+    }
+    @Test public void test_SimpleRestService_apiFetch_get_response_json_no_parse() {
+        Map parse_http_headers = ['Parse-JSON': false]
+        def response = apiFetch(new URL('https://api.github.com/users/samrocketman'), parse_http_headers)
+        assert response in String
+        assert !('Parse-JSON' in request_meta.headers.keySet())
+        parse_http_headers = ['Parse-JSON': 'false']
+        response = apiFetch(new URL('https://api.github.com/users/samrocketman'), parse_http_headers)
+        assert response in String
+        assert !('Parse-JSON' in request_meta.headers.keySet())
     }
 }

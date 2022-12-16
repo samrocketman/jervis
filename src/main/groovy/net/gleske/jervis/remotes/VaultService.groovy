@@ -338,7 +338,7 @@ vault.mountVersions = versions</tt></pre>
         if(isKeyValueV2(mount)) {
             Map secretMeta = [:]
             try {
-                secretMeta = apiFetch("${mount}/metadata/${subpath}")
+                secretMeta = apiFetch("${mount}/metadata/${subpath}") ?: [:]
             } catch(IOException ignore) {
                 // 40X exceptions for invalid paths ignored
             }

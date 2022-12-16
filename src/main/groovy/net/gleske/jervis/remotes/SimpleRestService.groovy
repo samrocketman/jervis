@@ -48,39 +48,41 @@ class SimpleRestService {
     static def apiFetch(URL api_url, Map http_headers = [:], String http_method = 'GET', String data = '') {
         http_headers['Content-Type'] = http_headers['Content-Type'] ?: 'application/json'
         Boolean parse_json = http_headers['Content-Type'] == 'application/json'
-        /*
-        if('Parse-JSON' in http_headers) {
-            parse_json = http_headers['Parse-JSON']
-            http_headers.remove('Parse-JSON')
-        }
-        */
-        def yaml = new Yaml(new SafeConstructor(new LoaderOptions()))
+        parse_json = net.gleske.jervis.lang.LifecycleGenerator.getObjectValue(http_headers, 'Parse-JSON', parse_json)
 
         //data_response could be either a List or Map depending on the JSON
-        def data_response
         String response = api_url.openConnection().with { conn ->
             if(http_method.toUpperCase() != 'GET' && data.size()) {
                 conn.setDoOutput(true)
             }
             conn.setRequestMethod(http_method.toUpperCase())
             http_headers.each { k, v ->
+                if(k == 'Parse-JSON') {
+                    return
+                }
                 conn.setRequestProperty(k, v)
             }
             if(conn.getDoOutput()) {
-                conn.outputStream.withWriter { writer ->
+                conn.getOutputStream().withWriter { writer ->
                     writer << data
                 }
             }
-            conn.getContent().getText()
-            /*
             conn.getContent().with {
                 if(conn.getContentLengthLong()) {
                     return it.getText()
                 }
                 ''
-            }*/
+            }
         }
-        data_response = (parse_json)? yaml.load(response ?: '{}') : response
-        data_response
+        if(!response) {
+            return ''
+        }
+        if(parse_json) {
+            def yaml = new Yaml(new SafeConstructor(new LoaderOptions()))
+            yaml.load(response)
+        }
+        else {
+            response
+        }
     }
 }
