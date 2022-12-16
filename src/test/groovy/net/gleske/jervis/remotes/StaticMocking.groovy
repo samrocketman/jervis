@@ -118,6 +118,14 @@ class StaticMocking {
                     request_meta['doOutput']
                 },
                 getHeaderFields: { ->
+                    if(request_meta.response_headers in Map) {
+                        Map header_fields = [:]
+                        request_meta.response_headers.each { k, v ->
+                            header_fields.put(k, (v in List) ? Collections.unmodifiableList(v) : v)
+                        }
+                        return header_fields
+
+                    }
                     Collections.unmodifiableMap([(null): Collections.unmodifiableList(['HTTP/1.1 200 OK'])])
                 },
                 setRequestMethod: { String method ->
