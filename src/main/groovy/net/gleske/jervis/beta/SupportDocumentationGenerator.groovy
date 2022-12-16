@@ -18,10 +18,7 @@ package net.gleske.jervis.beta
 
 import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
 import net.gleske.jervis.exceptions.JervisException
-
-import org.yaml.snakeyaml.LoaderOptions
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.SafeConstructor
+import net.gleske.jervis.tools.YamlOperator
 
 /**
   This is a utility class for Jervis admins to generate documentation on the
@@ -115,13 +112,12 @@ class SupportDocumentationGenerator {
     }
 
     private void parseJsonFiles(String jsonDir) {
-        def yaml = new Yaml(new SafeConstructor(new LoaderOptions()))
-        this.jsonFiles['platforms'] = yaml.load(new File(jsonDir + '/platforms.json').text)
+        this.jsonFiles['platforms'] = YamlOperator.loadYamlFrom(new File(jsonDir + '/platforms.json'))
         String stability = this.jsonFiles.platforms.defaults.stability
         this.jsonFiles.platforms.supported_platforms.each { k, platform ->
             platform.each { os, v ->
-                this.jsonFiles["lifecycles-${os}".toString()] = yaml.load(new File(jsonDir + "/lifecycles-${os}-${stability}.json").text)
-                this.jsonFiles["toolchains-${os}".toString()] = yaml.load(new File(jsonDir + "/toolchains-${os}-${stability}.json").text)
+                this.jsonFiles["lifecycles-${os}".toString()] = YamlOperator.loadYamlFrom(new File(jsonDir + "/lifecycles-${os}-${stability}.json"))
+                this.jsonFiles["toolchains-${os}".toString()] = YamlOperator.loadYamlFrom(new File(jsonDir + "/toolchains-${os}-${stability}.json"))
                 this.supportByOS[os] = [languages: this.getLanguages(os)]
                 this.supportByOS[os]['toolchains'] = this.getToolchains(os)
             }

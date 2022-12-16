@@ -38,9 +38,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
-import org.yaml.snakeyaml.LoaderOptions
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.SafeConstructor
 
 /**
   A class to provide cryptographic features to Jervis such as RSA encryption and base64 encoding.
@@ -240,7 +237,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
         if(!verifyGitHubJWT(github_jwt)) {
             return false
         }
-        Map payload = (new Yaml(new SafeConstructor(new LoaderOptions()))).load(decodeBase64UrlString(github_jwt.tokenize('.')[1]))
+        Map payload = YamlOperator.loadYamlFrom(decodeBase64UrlBytes(github_jwt.tokenize('.')[1]))
         // add seconds into the future to account for clock drift
         Integer time_since_epoch = Instant.now().getEpochSecond() + drift
         payload.iat < time_since_epoch && payload.exp > time_since_epoch

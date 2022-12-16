@@ -15,9 +15,7 @@
    */
 package net.gleske.jervis.remotes
 
-import org.yaml.snakeyaml.LoaderOptions
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.SafeConstructor
+import net.gleske.jervis.tools.YamlOperator
 
 /**
   A simple class which makes using REST services like the GitHub API really
@@ -119,8 +117,7 @@ class SimpleRestService {
             return ''
         }
         if(parse_json) {
-            def yaml = new Yaml(new SafeConstructor(new LoaderOptions()))
-            yaml.load(response)
+            YamlOperator.loadYamlFrom(response)
         }
         else {
             response
