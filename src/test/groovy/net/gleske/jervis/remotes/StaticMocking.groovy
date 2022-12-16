@@ -117,6 +117,9 @@ class StaticMocking {
                 getDoOutput: { ->
                     request_meta['doOutput']
                 },
+                getHeaderFields: { ->
+                    Collections.unmodifiableMap([(null): Collections.unmodifiableList(['HTTP/1.1 200 OK'])])
+                },
                 setRequestMethod: { String method ->
                     request_meta['method'] = method
                     null
@@ -238,6 +241,9 @@ request_history</tt></pre>
                 },
                 getDoOutput: { ->
                     request_meta.conn.getDoOutput()
+                },
+                getHeaderFields: { ->
+                    request_meta.conn.getHeaderFields()
                 },
                 setRequestMethod: { String method ->
                     request_meta.conn.setRequestMethod(method)

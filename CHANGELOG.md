@@ -104,9 +104,13 @@ The following classes have been renamed.
     `String`.  This means if there's no content response an empty `String` will
     be returned regardless of JSON parsing for the API.  This used to return an
     empty `HashMap`.
+- More flexibility has been added to static method
+  `net.gleske.jervis.remotes.SimpleRestService.apiFetch()`.
 
 ### Bug fixes:
 
+- Major bugfix: support for more HTTP methods which have no content in the
+  response.
 - Bugfix: Groovy 3.0.5 YAML `additional_toolchains` order was not preserved.
   This change makes Jervis compatible with Groovy 2.4, 2.5, and 3.0 series of
   releases.  Jenkins LTS currently uses Groovy 2.4.21 so this is more of a

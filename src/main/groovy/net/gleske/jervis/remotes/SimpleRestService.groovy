@@ -30,6 +30,27 @@ class SimpleRestService {
       APIs.  If <tt>http_headers</tt> does not contain a <tt>Content-Type</tt>
       header, then <tt>application/json</tt> is assumed.
 
+      <p>Extra behaviors are provided by special <tt>http_headers</tt>.  These
+      headers are not sent over HTTP but instead change the behavior of the
+      response.</p>
+      <dl>
+      <dt><b>Special HTTP Headers:</b></dt>
+      <dd>
+        <tt>Parse-JSON</tt> - For JSON-based APIs responses are automatically
+        parsed.  This setting can disable automatic parsing if set to
+        <tt>false</tt>.
+      </dd>
+      <dd>
+        <tt>Response-Code</tt> - Return the HTTP response code.
+      </dd>
+      <dd>
+        <tt>Response-Headers</tt> - Return the HTTP response headers as an
+        unmodifiable Map.  The <tt>DELETE</tt> HTTP method requires setting
+        <tt>Response-Code</tt> to <tt>false</tt>.  The <tt>HEAD</tt> HTTP
+        method implies returning response headers.
+      </dd>
+      </dl>
+
       @param api_url A URL of a REST endpoint in which to make an HTTP call.
       @param http_headers HTTP headers to pass as part of the HTTP request.  By
                           default only <tt>Content-Type: application/json</tt>
@@ -49,7 +70,14 @@ class SimpleRestService {
         http_headers['Content-Type'] = http_headers['Content-Type'] ?: 'application/json'
         Boolean parse_json = http_headers['Content-Type'] == 'application/json'
         parse_json = net.gleske.jervis.lang.LifecycleGenerator.getObjectValue(http_headers, 'Parse-JSON', parse_json)
+        Boolean response_code = (http_method == 'DELETE')
+        response_code = net.gleske.jervis.lang.LifecycleGenerator.getObjectValue(http_headers, 'Response-Code', response_code)
+        Boolean only_response_headers = net.gleske.jervis.lang.LifecycleGenerator.getObjectValue(http_headers, 'Response-Headers', response_code)
+        if(http_method == 'HEAD') {
+            only_response_headers = true
+        }
 
+        Map response_headers = [:]
         //data_response could be either a List or Map depending on the JSON
         String response = api_url.openConnection().with { conn ->
             if(http_method.toUpperCase() != 'GET' && data.size()) {
@@ -57,7 +85,7 @@ class SimpleRestService {
             }
             conn.setRequestMethod(http_method.toUpperCase())
             http_headers.each { k, v ->
-                if(k == 'Parse-JSON') {
+                if(k in ['Parse-JSON', 'Response-Code', 'Response-Headers']) {
                     return
                 }
                 conn.setRequestProperty(k, v)
@@ -67,12 +95,25 @@ class SimpleRestService {
                     writer << data
                 }
             }
+            response_headers = conn.getHeaderFields()
+            if(only_response_headers) {
+                return
+            }
+            if(response_headers[null].toList().first().toLowerCase().contains('no content')) {
+                return
+            }
             conn.getContent().with {
                 if(conn.getContentLengthLong()) {
                     return it.getText()
                 }
                 ''
             }
+        }
+        if(response_code) {
+            return Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
+        }
+        if(only_response_headers) {
+            return response_headers
         }
         if(!response) {
             return ''

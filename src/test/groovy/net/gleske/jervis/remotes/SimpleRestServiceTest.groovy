@@ -86,8 +86,8 @@ class SimpleRestServiceTest extends GroovyTestCase {
     }
     @Test public void test_SimpleRestService_apiFetch_delete() {
         Map http_headers = ['Content-Type': 'text/plain']
-        String response = apiFetch(new URL('https://example.com/post/endpoint'), http_headers, 'DELETE').trim()
-        assert response == 'this is mock POST response data'
+        def response = apiFetch(new URL('https://example.com/post/endpoint'), http_headers, 'DELETE')
+        assert response == 200
         assert request_meta['method'] == 'DELETE'
     }
     @Test public void test_SimpleRestService_apiFetch_no_json_parse() {

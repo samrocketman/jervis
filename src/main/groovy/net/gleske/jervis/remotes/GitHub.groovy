@@ -48,7 +48,9 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
 
     @Override
     Map header(Map http_headers = [:]) {
-        http_headers['Accept'] = 'application/vnd.github.v3+json'
+        if(!('Accept' in http_headers.keySet())) {
+            http_headers['Accept'] = 'application/vnd.github.v3+json'
+        }
         if(this.getGh_token()) {
             http_headers['Authorization'] = "token ${this.getGh_token()}".toString()
         }
