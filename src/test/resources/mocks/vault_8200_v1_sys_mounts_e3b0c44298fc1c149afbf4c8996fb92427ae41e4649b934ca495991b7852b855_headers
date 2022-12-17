@@ -1,0 +1,12 @@
+Transfer-Encoding:
+  - chunked
+null:
+  - HTTP/1.1 200 OK
+Strict-Transport-Security:
+  - max-age=31536000; includeSubDomains
+Cache-Control:
+  - no-store
+Date:
+  - Sat, 17 Dec 2022 20:03:19 GMT
+Content-Type:
+  - application/json
