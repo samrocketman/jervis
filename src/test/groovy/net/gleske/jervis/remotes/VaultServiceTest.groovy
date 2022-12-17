@@ -336,7 +336,19 @@ class VaultServiceTest extends GroovyTestCase {
     @Test public void test_VaultService_setSecret_v2_force_cas() {
         myvault.discoverKVMounts()
         myvault.setSecret('kv/v2_force_cas', [test: 'data'], true)
-        myvault.setSecret('kv/v2_force_cas', [test: 'update'], true)
+        List urls = []
+        List methods = []
+        List datas = []
+        List response_codes = []
+        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+        assert request_history*.response_code == response_codes
+    }
+    @Test public void test_VaultService_setSecret_v2_force_cas_update_secret() {
+        myvault.discoverKVMounts()
+        myvault.setSecret('kv/v2_force_cas_update', [test: 'update'], true)
         List urls = []
         List methods = []
         List datas = []
@@ -351,7 +363,19 @@ class VaultServiceTest extends GroovyTestCase {
     @Test public void test_VaultService_setSecret_v2_detect_cas() {
         myvault.discoverKVMounts()
         myvault.setSecret('kv_cas/v2_detect_cas', [another: 'secret', hello: 'world'])
-        myvault.setSecret('kv_cas/v2_detect_cas', [update: 'secret'])
+        List urls = []
+        List methods = []
+        List datas = []
+        List response_codes = []
+        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+        assert request_history*.response_code == response_codes
+    }
+    @Test public void test_VaultService_setSecret_v2_detect_cas_update_secret() {
+        myvault.discoverKVMounts()
+        myvault.setSecret('kv_cas/data_to_update', [update: 'secret'])
         List urls = []
         List methods = []
         List datas = []
