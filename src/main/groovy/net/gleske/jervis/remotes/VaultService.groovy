@@ -270,6 +270,12 @@ vault.mountVersions = versions</tt></pre>
     Map<String, String> mountVersions = [:]
 
     /**
+      A list of KV v2 mounts which enforce cas_required for all write
+      operations.
+      */
+    List cas_required = []
+
+    /**
       Customizable HTTP headers which get sent to Vault in addition to
       authentication headers.
       */
@@ -378,7 +384,7 @@ vault.mountVersions = versions</tt></pre>
             } catch(IOException ignore) {
                 // 40X exceptions for invalid paths ignored
             }
-            if(secretMeta?.data?.cas_required) {
+            if(mount in cas_required) {
                 enableCas = true
             }
             Map data = [data: secret]
@@ -428,6 +434,12 @@ vault.mountVersions = versions</tt></pre>
             throw new VaultException('Vault key-value mounts can only be version "1" or "2".')
         }
         this.mountVersions[mount] = version.toString()
+        if(mountVersions[mount] == '2') {
+            Boolean isCasRequired = apiFetch(mount + '/config').data.cas_required
+            if(isCasRequired) {
+                cas_required << mount
+            }
+        }
     }
 
     /**
