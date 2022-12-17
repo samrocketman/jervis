@@ -118,15 +118,27 @@ class StaticMocking {
                     request_meta['doOutput']
                 },
                 getHeaderFields: { ->
+                    Map header_fields = [(null): Collections.unmodifiableList(['HTTP/1.1 200 OK'])]
+                    String file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
+                    File headersFile = new File("src/test/resources/mocks/${file}_headers")
+                    if(headersFile.exists() && !request_meta.response_headers) {
+                        request_meta.response_headers = net.gleske.jervis.tools.YamlOperator.loadYamlFrom(headersFile)
+                    }
                     if(request_meta.response_headers in Map) {
-                        Map header_fields = [:]
+                        header_fields = [:]
                         request_meta.response_headers.each { k, v ->
                             header_fields.put(k, (v in List) ? Collections.unmodifiableList(v) : v)
                         }
-                        return header_fields
-
                     }
-                    Collections.unmodifiableMap([(null): Collections.unmodifiableList(['HTTP/1.1 200 OK'])])
+                    Map unmodifiableMap = Collections.unmodifiableMap(header_fields)
+                    if(request_meta.method == 'HEAD') {
+                        Map temp_request_meta = request_meta.clone()
+                        temp_request_meta['response'] = ''
+                        temp_request_meta['url'] = mockedUrl
+                        temp_request_meta['response_headers'] = unmodifiableMap
+                        request_history << temp_request_meta
+                    }
+                    unmodifiableMap
                 },
                 setRequestMethod: { String method ->
                     request_meta['method'] = method
@@ -251,7 +263,18 @@ request_history</tt></pre>
                     request_meta.conn.getDoOutput()
                 },
                 getHeaderFields: { ->
-                    request_meta.conn.getHeaderFields()
+                    Map response_headers = request_meta.conn.getHeaderFields()
+                    String file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
+                    File headersFile = new File("src/test/resources/mocks/${file}_headers")
+                    net.gleske.jervis.tools.YamlOperator.writeObjToYaml(headersFile, response_headers)
+                    if(request_meta.method == 'HEAD') {
+                        Map temp_request_meta = request_meta.clone()
+                        temp_request_meta['response'] = ''
+                        temp_request_meta['url'] = mockedUrl
+                        temp_request_meta['response_headers'] = response_headers
+                        request_history << temp_request_meta
+                    }
+                    response_headers
                 },
                 setRequestMethod: { String method ->
                     request_meta.conn.setRequestMethod(method)
@@ -293,7 +316,7 @@ request_history</tt></pre>
                         getText: { ->
                             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
                             String file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
-                            File  responseFile = new File("src/test/resources/mocks/${file}")
+                            File responseFile = new File("src/test/resources/mocks/${file}")
                             //println(request_meta)
                             responseFile.withWriter('UTF-8') { Writer w ->
                                 w << request_meta.conn.content.text
