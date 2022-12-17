@@ -15,7 +15,7 @@
    */
 package net.gleske.jervis.remotes
 
-import net.gleske.jervis.exceptions.JervisException
+import net.gleske.jervis.exceptions.VaultException
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.interfaces.VaultCredential
 
@@ -32,6 +32,37 @@ import net.gleske.jervis.remotes.interfaces.VaultCredential
   <a href="https://www.vaultproject.io/" target="_blank">HashiCorp Vault</a>
   Key-Value secrets engine.  Both KV v1 and KV v2 secrets engines are
   supported.
+
+  <h2>Discovering key-value mounts</h2>
+
+  <p>There are two ways to set up instantiation of this class.  Manually specifying
+  key-value mounts or auto-discovering mounts.  In general, auto-discovery is
+  more reliable and recommended.  Manually specifying mounts is available to
+  reduce API usage.</p>
+
+  <h4>Automatic discover mounts</h4>
+
+<pre><tt>
+import net.gleske.jervis.remotes.interfaces.TokenCredential
+import net.gleske.jervis.remotes.VaultService
+
+VaultService vault = new VaultService('http://active.vault.service.consul:8200/', creds)
+
+// auto-discover mounts
+vault.discoverKVMounts()
+</tt></pre>
+
+  <h4>Manuaully declare mounts</h4>
+
+<pre><tt>
+import net.gleske.jervis.remotes.interfaces.TokenCredential
+import net.gleske.jervis.remotes.VaultService
+
+VaultService vault = new VaultService('http://active.vault.service.consul:8200/', creds)
+
+// specify mounts
+vault.mountVersions = [kv: '2', secret: '1']
+</tt></pre>
 
   <h2>Sample usage</h2>
   <p>To run examples, clone Jervis and execute <tt>./gradlew console</tt> to
@@ -138,9 +169,15 @@ class VaultService implements SimpleRestServiceSupport {
     private final String vault_url
     private final TokenCredential credential
 
-    private static void checkLocationMap(Map location) {
+    private void checkLocationMap(Map location) {
         if(!(('mount' in location) && ('path' in location))) {
-            throw new JervisException('"mount" and "path" must be set when using location Map.')
+            throw new VaultException('"mount" and "path" must be set when using location Map.')
+        }
+        if(!(location.mount in String) || !(location.path in String)) {
+            throw new VaultException('"mount" and "path" must contain String values when using location Map.')
+        }
+        if(!(location.mount in this.mountVersions.keySet())) {
+            throw new VaultException('Location map contains an invalid mount.  It must be a KV v1 or KV v2 mount in Vault.')
         }
     }
 
@@ -179,23 +216,7 @@ class VaultService implements SimpleRestServiceSupport {
       @return <tt>true</tt> if Key-Value v2 or <tt>false</tt> if Key-Value v1.
       */
     private Boolean isKeyValueV2(String mount) {
-        discoverMountVersion(mount)
         this.mountVersions[mount] == '2'
-    }
-
-    /**
-      If the mount is not already in mountVersions, then this will inspect the
-      mount and set whether the mount is a Key-Value secret engine v1 or v2.
-
-      @param mount A Vault secrets engine mount point.  The tune API is called
-                   to discover the KV secrets engine version
-      */
-    // TODO test mounts that have a slash in its name
-    private void discoverMountVersion(String mount) {
-        if(mount in this.mountVersions) {
-            return
-        }
-        setMountVersions(mount, apiFetch("sys/mounts/${mount}/tune")?.options?.version)
     }
 
     /**
@@ -266,6 +287,21 @@ vault.mountVersions = versions</tt></pre>
     VaultService(VaultCredential credential) {
         this(credential.vault_url, credential)
     }
+
+    /**
+      Query Vault to find all of the KV mounts.  This can be called immediately
+      following the constructure to initiate service connectivity.
+      */
+    void discoverKVMounts() throws IOException, VaultException {
+        apiFetch("sys/mounts").with { Map mounts ->
+            mounts.findAll { k, v ->
+                v in Map && v.type == 'kv'
+            }.each { k, v ->
+                setMountVersions(k.replaceAll('/$', ''), v.options.version)
+            }
+        }
+    }
+
 
     /**
       Resolves the API base URL to be used by
@@ -388,10 +424,10 @@ vault.mountVersions = versions</tt></pre>
     // TODO write tests
     // TODO test manual mounts that have a slash in its name
     void setMountVersions(String mount, def version) {
-        if(!(version in ['1', '2'])) {
-            throw new JervisException('Error: Vault key-value mounts can only be version "1" or "2" (String).')
+        if(!(version in ['1', '2', 1, 2])) {
+            throw new VaultException('Vault key-value mounts can only be version "1" or "2".')
         }
-        this.mountVersions[mount] = version
+        this.mountVersions[mount] = version.toString()
     }
 
     /**
@@ -406,6 +442,38 @@ vault.mountVersions = versions</tt></pre>
         mountVersions.each { k, v ->
             this.setMountVersions(k, v)
         }
+    }
+
+    /**
+      Given a path this method will return the Vault secrets mount.
+
+      @param path A path to a secret in Vault.  The path includes the KV v1 or
+                  KV v2 secret engine mount path.
+      @return The key-value mount in Vault where the path is stored.
+      */
+    // TODO write tests
+    String getMountFromPath(String path) {
+        if(!mountVersions) {
+            throw new VaultException('No mounts available.  Did you call discoverKVMounts() method?')
+        }
+        // returns a mount
+        mountVersions.keySet().toList().find { String mount ->
+            path.startsWith(mount)
+        }
+    }
+
+    /**
+      Given a path representing the full path including a mount and secret path,
+      only the location relative to the parent mount is returned.
+
+      @param path A path to a secret in Vault.  The path includes the KV v1 or
+                  KV v2 secret engine mount path.
+      @return Returns a relative location of a secret.  It is relative to the
+              mount and does not include the mount in the return value.
+      */
+    String getLocationFromPath(String path) {
+        String mount = getMountFromPath(path)
+        (path -~ "^\\Q${mount}\\E/")
     }
 
     // TODO: java doc
@@ -434,8 +502,15 @@ vault.mountVersions = versions</tt></pre>
     // TODO write tests
     // TODO support Map location
     List<String> findAllKeys(String path, Integer level = 0) {
+        List additionalKeys = []
+        // check if a key exists instead of a path
+        if(!path.endsWith('/') && path.contains('/')) {
+            if(path in findAllKeys(path.tokenize('/')[0..-2].join('/') + '/', 1)) {
+                additionalKeys << path
+            }
+        }
         path = addTrailingSlash(path)
-        recursiveFindAllKeys(path, level, 1)
+        additionalKeys + recursiveFindAllKeys(path, level, 1)
     }
 
     /**
@@ -453,6 +528,39 @@ vault.mountVersions = versions</tt></pre>
     }
 
     /**
+      If given a full path to a secret in Vault, a location Map is returned.
+
+      @param path A String representing a valid path to a Vault secret including
+                  its secret engine mount.
+      @return A location map with two keys: mount and path.  The mount is a KV
+              mount in Vault and the path is a location of a secret relative to
+              the given mount.
+      */
+    // TODO write tests
+    Map getLocationMapFromPath(String path) {
+        Map location = [
+            mount: getMountFromPath(path),
+            path: getLocationFromPath(path)
+        ]
+        checkLocationMap(location)
+        location
+    }
+
+    /**
+      If given a location Map it will convert it to a String path for Vault APIs.
+
+      @param location A map with two keys: mount and path.  The mount is a KV
+                      mount in Vault and the path is a location of a secret
+                      relative to the given mount.
+      @return Returns a String representing a valid path to a Vault secret including its secret engine mount.
+      */
+    // TODO write tests
+    String getPathFromLocationMap(Map location) {
+        checkLocationMap(location)
+        [location.mount, location.path.replaceAll('^/', '')].join('/')
+    }
+
+    /**
       Recursively copies all secrets from the source path, srcPath, to the
       destination path, destPath.
 
@@ -461,8 +569,13 @@ vault.mountVersions = versions</tt></pre>
     // TODO write tests
     // TODO support Map location for both srcPath and destPath
     void copyAllKeys(String srcPath, String destPath, Integer level = 0) {
+        String srcLocation = getLocationFromPath(srcPath)
+        // TODO support path and path/ for source and destination.
         findAllKeys(srcPath, level).each { String srcKey ->
             String destKey = destPath + (srcKey -~ "^\\Q${srcPath}\\E")
+            if(destPath.endsWith('/')) {
+                destKey = destPath + getLocationFromPath(srcKey)
+            }
             copySecret(srcKey, destKey)
         }
     }
