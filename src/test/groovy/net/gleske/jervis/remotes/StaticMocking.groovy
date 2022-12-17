@@ -130,15 +130,14 @@ class StaticMocking {
                             header_fields.put(k, (v in List) ? Collections.unmodifiableList(v) : v)
                         }
                     }
-                    Map unmodifiableMap = Collections.unmodifiableMap(header_fields)
-                    if(request_meta.method == 'HEAD') {
-                        Map temp_request_meta = request_meta.clone()
-                        temp_request_meta['response'] = ''
-                        temp_request_meta['url'] = mockedUrl
-                        temp_request_meta['response_headers'] = unmodifiableMap
-                        request_history << temp_request_meta
-                    }
-                    unmodifiableMap
+                    Map response_headers = Collections.unmodifiableMap(header_fields)
+                    Map temp_request_meta = request_meta.clone()
+                    temp_request_meta['response'] = ''
+                    temp_request_meta['url'] = mockedUrl
+                    temp_request_meta['response_headers'] = response_headers
+                    temp_request_meta['response_code'] = Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
+                    request_history << temp_request_meta
+                    response_headers
                 },
                 setRequestMethod: { String method ->
                     request_meta['method'] = method
@@ -166,10 +165,6 @@ class StaticMocking {
                         throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
                     }
                     // return content like object
-                    Map temp_request_meta = request_meta.clone()
-                    temp_request_meta['response'] = ''
-                    temp_request_meta['url'] = mockedUrl
-                    request_history << temp_request_meta
                     [
                         getText: { ->
                             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
@@ -254,6 +249,7 @@ request_history</tt></pre>
         mc.openConnection = { ->
             request_meta['conn'] = savedOpenConnection.invoke(delegate)
             request_meta['data'] = new StringWriter()
+            request_meta['id'] = request_history.size() + 1
             // return URLConnection Class-like object
             [
                 setDoOutput: { Boolean val ->
@@ -267,13 +263,13 @@ request_history</tt></pre>
                     String file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
                     File headersFile = new File("src/test/resources/mocks/${file}_headers")
                     net.gleske.jervis.tools.YamlOperator.writeObjToYaml(headersFile, response_headers)
-                    if(request_meta.method == 'HEAD') {
-                        Map temp_request_meta = request_meta.clone()
-                        temp_request_meta['response'] = ''
-                        temp_request_meta['url'] = mockedUrl
-                        temp_request_meta['response_headers'] = response_headers
-                        request_history << temp_request_meta
-                    }
+                    Map temp_request_meta = request_meta.clone()
+                    temp_request_meta.remove('conn')
+                    temp_request_meta['response'] = ''
+                    temp_request_meta['url'] = mockedUrl
+                    temp_request_meta['response_headers'] = response_headers
+                    temp_request_meta['response_code'] = Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
+                    request_history << temp_request_meta
                     response_headers
                 },
                 setRequestMethod: { String method ->
@@ -304,11 +300,6 @@ request_history</tt></pre>
                             writer << request_meta.data
                         }
                     }
-                    Map temp_request_meta = request_meta.clone()
-                    temp_request_meta.remove('conn')
-                    temp_request_meta['response'] = ''
-                    temp_request_meta['url'] = mockedUrl
-                    request_history << temp_request_meta
                     // call for real network content
                     request_meta.conn.content
                     // return content like object
