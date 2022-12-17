@@ -259,6 +259,13 @@ request_history</tt></pre>
                     request_meta.conn.getDoOutput()
                 },
                 getHeaderFields: { ->
+                    // write output to connection request
+                    if(request_meta.conn.getDoOutput()) {
+                        request_meta.conn.outputStream.withWriter { writer ->
+                            writer << request_meta.data
+                        }
+                    }
+                    // Complete the request by getting header fields
                     Map response_headers = request_meta.conn.getHeaderFields()
                     String file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
                     File headersFile = new File("src/test/resources/mocks/${file}_headers")
@@ -294,12 +301,6 @@ request_history</tt></pre>
                 getContent: { ->
                     // finalize writer
                     request_meta.data = request_meta.data.toString()
-                    // write output to connection request
-                    if(request_meta.conn.getDoOutput()) {
-                        request_meta.conn.outputStream.withWriter { writer ->
-                            writer << request_meta.data
-                        }
-                    }
                     // call for real network content
                     request_meta.conn.content
                     // return content like object
