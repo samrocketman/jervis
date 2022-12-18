@@ -121,7 +121,13 @@ class StaticMocking {
                     request_meta['method'] = method
                     null
                 },
-                setRequestProperty: { String key, String value ->
+                setRequestProperty: { String key, def value ->
+                    if(key == 'X-HTTP-Method-Override') {
+                        if(value) {
+                            request_meta['method'] = value
+                        }
+                        return
+                    }
                     if(!request_meta['headers']) {
                         request_meta['headers'] = [:]
                     }
@@ -151,7 +157,7 @@ class StaticMocking {
                         }
                     ]
                 }
-            ]
+            ] as MockURLConnection
         }
     }
     /**
@@ -229,7 +235,7 @@ request_history</tt></pre>
             request_meta['data'] = new StringWriter()
             request_meta['id'] = request_history.size() + 1
             // return URLConnection Class-like object
-            [
+            Map conn = [
                 setDoOutput: { Boolean val ->
                     request_meta.conn.setDoOutput(val)
                 },
@@ -268,7 +274,14 @@ request_history</tt></pre>
                     request_meta['method'] = method
                     null
                 },
-                setRequestProperty: { String key, String value ->
+                setRequestProperty: { String key, def value ->
+                    if(key == 'X-HTTP-Method-Override') {
+                        if(value) {
+                            request_meta.conn.@method = value
+                            request_meta['method'] = value
+                        }
+                        return
+                    }
                     request_meta.conn.setRequestProperty(key, value)
                     if(!request_meta['headers']) {
                         request_meta['headers'] = [:]
@@ -302,7 +315,10 @@ request_history</tt></pre>
                         }
                     ]
                 }
-            ]
+            ] as MockURLConnection
         }
+    }
+    class MockURLConnection extends java.util.LinkedHashMap {
+        def method
     }
 }
