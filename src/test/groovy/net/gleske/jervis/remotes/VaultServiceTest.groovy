@@ -220,11 +220,11 @@ class VaultServiceTest extends GroovyTestCase {
         myvault = new VaultService(DEFAULT_VAULT_URL, cred)
         assert myvault.headers == [:]
         assert 'X-Vault-Token' in myvault.header().keySet()
-        assert myvault.header()['X-Vault-Request'] == true
+        assert myvault.header()['X-Vault-Request'] == 'true'
         myvault.headers = [foo: 'bar']
         assert myvault.headers == [foo: 'bar']
         assert 'X-Vault-Token' in myvault.header().keySet()
-        assert myvault.header()['X-Vault-Request'] == true
+        assert myvault.header()['X-Vault-Request'] == 'true'
         assert myvault.header().foo == 'bar'
         myvault.headers = ['X-Vault-Token': 'hacked', 'X-Vault-Request': 'false']
         assert myvault.headers == ['X-Vault-Token': 'hacked', 'X-Vault-Request': 'false']
@@ -241,6 +241,12 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.getSecret('kv/foo/bar/baz') == [foo: 'bar']
     }
     @Test public void test_VaultService_getSecret_kv_v2_older_version_1() {
+        List urls = []
+        List methods = []
+        List datas = []
+        List response_codes = []
+        myvault.getSecret('kv/foo', 1)
+        assert metaResult() == []
         assert myvault.getSecret('kv/foo', 1) == [hello: 'world']
     }
     @Test public void test_VaultService_discover_mount_versions() {
@@ -345,11 +351,11 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.findAllKeys('secret/', 3) == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
     }
     @Test public void test_VaultService_findAllKeys_v2() {
-        assert myvault.findAllKeys('kv') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
-        assert myvault.findAllKeys('kv/') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
-        assert myvault.findAllKeys('kv/', 1) == ['kv/foo']
-        assert myvault.findAllKeys('kv/', 2) == ['kv/foo', 'kv/foo/bar']
-        assert myvault.findAllKeys('kv/', 3) == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
+        assert myvault.findAllKeys('kv') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
+        assert myvault.findAllKeys('kv/') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
+        assert myvault.findAllKeys('kv/', 1) == ['kv/foo', 'kv/v2_force_cas_update']
+        assert myvault.findAllKeys('kv/', 2) == ['kv/foo', 'kv/foo/bar', 'kv/v2_force_cas_update']
+        assert myvault.findAllKeys('kv/', 3) == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
     }
     @Test public void test_VaultService_listPath_v1() {
         assert myvault.listPath('secret') == ['foo', 'foo/']
@@ -363,8 +369,8 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_listPath_v2() {
-        assert myvault.listPath('kv') == ['foo', 'foo/']
-        assert myvault.listPath('kv/') == ['foo', 'foo/']
+        assert myvault.listPath('kv') == ['foo', 'foo/', 'v2_force_cas_update']
+        assert myvault.listPath('kv/') == ['foo', 'foo/', 'v2_force_cas_update']
         assert myvault.listPath('kv/foo') == ['bar', 'bar/']
         assert myvault.listPath('kv/foo/') == ['bar', 'bar/']
         assert myvault.listPath('kv/foo/bar') == ['baz']
@@ -375,71 +381,55 @@ class VaultServiceTest extends GroovyTestCase {
     }
     @Test public void test_VaultService_copySecret_v1_to_v2() {
         myvault.copySecret('secret/foo', 'kv/v1_to_v2')
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/secret/foo', 'http://vault:8200/v1/kv/metadata/v1_to_v2', 'http://vault:8200/v1/kv/data/v1_to_v2']
+        List methods = ['GET', 'GET', 'POST']
+        List datas = ['', '', '{"data":{"test":"data"},"options":{"cas":0}}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
-        assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_copySecret_v2_to_v1() {
         myvault.copySecret('kv/foo', 'secret/v2_to_v1')
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=0', 'http://vault:8200/v1/secret/v2_to_v1']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"another":"secret","hello":"world"}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
-        assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_copySecret_v2_to_v1_version_1() {
         myvault.copySecret('kv/foo', 'secret/v2_to_v1_version_1', 1)
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=0', 'http://vault:8200/v1/secret/v2_to_v1_version_1']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"another":"secret","hello":"world"}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
-        assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_copySecret_v2_to_v2() {
         myvault.copySecret('kv/foo', 'kv/v2_to_v2/v2_to_v2')
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=0', 'http://vault:8200/v1/kv/metadata/v2_to_v2/v2_to_v2', 'http://vault:8200/v1/kv/data/v2_to_v2/v2_to_v2']
+        List methods = ['GET', 'GET', 'POST']
+        List datas = ['', '', '{"data":{"another":"secret","hello":"world"},"options":{"cas":0}}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
-        assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_copySecret_v2_to_v2_version_1() {
         myvault.copySecret('kv/foo', 'kv/v2_to_v2_version_1', 1)
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=0', 'http://vault:8200/v1/kv/metadata/v2_to_v2_version_1', 'http://vault:8200/v1/kv/data/v2_to_v2_version_1']
+        List methods = ['GET', 'GET', 'POST']
+        List datas = ['', '', '{"data":{"another":"secret","hello":"world"},"options":{"cas":0}}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
-        assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_setSecret_v1() {
         myvault.setSecret('secret/v1_set', [another: 'secret', hello: 'world'])
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/secret/v1_set']
+        List methods = ['POST']
+        List datas = ['{"another":"secret","hello":"world"}']
+        List response_codes = [204]
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -447,11 +437,10 @@ class VaultServiceTest extends GroovyTestCase {
     }
     @Test public void test_VaultService_setSecret_v1_force_cas() {
         myvault.setSecret('secret/v1_set_force_cas', [another: 'secret', hello: 'world'], true)
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/secret/v1_set_force_cas']
+        List methods = ['POST']
+        List datas = ['{"another":"secret","hello":"world"}']
+        List response_codes = [204]
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -459,63 +448,48 @@ class VaultServiceTest extends GroovyTestCase {
     }
     @Test public void test_VaultService_setSecret_v2_no_cas() {
         myvault.setSecret('kv/v2_no_cas', [test: 'data'])
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/kv/data/v2_no_cas']
+        List methods = ['POST']
+        List datas = ['{"data":{"test":"data"}}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
-        assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_setSecret_v2_force_cas() {
         myvault.setSecret('kv/v2_force_cas', [test: 'data'], true)
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/kv/metadata/v2_force_cas', 'http://vault:8200/v1/kv/data/v2_force_cas']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"data":{"test":"data"},"options":{"cas":0}}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
-        assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_setSecret_v2_force_cas_update_secret() {
         myvault.setSecret('kv/v2_force_cas_update', [test: 'update'], true)
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/kv/metadata/v2_force_cas_update', 'http://vault:8200/v1/kv/data/v2_force_cas_update']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"data":{"test":"update"},"options":{"cas":1}}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
-        assert request_history*.response_code == response_codes
     }
 
     @Test public void test_VaultService_setSecret_v2_detect_cas() {
         myvault.setSecret('kv_cas/v2_detect_cas', [another: 'secret', hello: 'world'])
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/kv_cas/metadata/v2_detect_cas', 'http://vault:8200/v1/kv_cas/data/v2_detect_cas']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"data":{"another":"secret","hello":"world"},"options":{"cas":0}}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
-        assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_setSecret_v2_detect_cas_update_secret() {
         myvault.setSecret('kv_cas/data_to_update', [update: 'secret'])
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/kv_cas/metadata/data_to_update', 'http://vault:8200/v1/kv_cas/data/data_to_update']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"data":{"update":"secret"},"options":{"cas":1}}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
-        assert request_history*.response_code == response_codes
     }
 }
