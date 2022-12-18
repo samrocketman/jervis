@@ -93,8 +93,6 @@ TokenCredential creds = [getToken: {-> 'admin token' }] as TokenCredential
 VaultService vault = new VaultService('http://active.vault.service.consul:8200/', creds)
 
 // populate secret mounts with dummy data
-vault.setSecret("kv_cas/data_to_update", ['hello':'world'])
-vault.setSecret("kv/v2_force_cas_update", [test: 'data'], true)
 vault.setSecret("kv/foo", ['hello':'world'])
 vault.setSecret("kv/foo", ['another':'secret', 'hello':'world'])
 vault.setSecret("kv/foo/bar", ['hello':'friend'])
