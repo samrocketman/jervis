@@ -94,9 +94,9 @@ class SimpleRestService {
             // Error checking the verb is not necessary.  For example, HashiCorp
             // Vault has custom HTTP verbs such as LIST.
             // source: https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/net/HttpURLConnection.java
+            conn.@method = http_method.toUpperCase()
             // Necessary for mock interception
             conn.setRequestProperty('X-HTTP-Method-Override', http_method)
-            conn.@method = http_method.toUpperCase()
             conn.setRequestProperty('X-HTTP-Method-Override', null)
 
             if(conn.getDoOutput()) {
