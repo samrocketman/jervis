@@ -110,6 +110,7 @@ class StaticMocking {
                     }
                     Map response_headers = Collections.unmodifiableMap(header_fields)
                     Map temp_request_meta = request_meta.clone()
+                    temp_request_meta['data'] = temp_request_meta['data'].toString() ?: ''
                     temp_request_meta['response'] = ''
                     temp_request_meta['url'] = mockedUrl
                     temp_request_meta['response_headers'] = response_headers
