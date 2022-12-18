@@ -30,6 +30,10 @@ import org.junit.Test
   class.  This uses auto-generated mock data using real API resonses.
 
   <h2>Generate Mock Data</h2>
+
+  Mock data has already been generated.  This is the script which captured mock
+  data.
+
 <pre><tt>import static net.gleske.jervis.remotes.StaticMocking.recordMockUrls
 import net.gleske.jervis.remotes.SimpleRestServiceSupport
 
@@ -76,7 +80,7 @@ if(!('secret' in myvault.mountVersions.keySet())) {
   init_secret = true
 }
 
-// rediscover mounts
+// Discover mounts after potentially adding new secrets engines.
 myvault.discoverKVMounts()
 
 if(init_kv) {
@@ -95,8 +99,15 @@ if(init_secret) {
     myvault.setSecret("secret/foo/bar/baz", ['more':'secrets'])
 }
 
-//Record URL API data to files as mock data
+// Reset discovered mounts in order to capture API responses
+myvault.@mountVersions = [:]
+myvault.@cas_required = []
+
+// Record URL API data to files as mock data
 recordMockUrls(url, URL, request_meta, true, 'SHA-256', request_history)
+
+// Rediscover mounts
+myvault.discoverKVMounts()
 
 // Read operations
 myvault.getSecret('secret/foo')
@@ -152,6 +163,7 @@ myvault.setSecret('kv/v2_force_cas_update', [test: 'update'], true)
 myvault.setSecret('kv_cas/v2_detect_cas', [another: 'secret', hello: 'world'])
 myvault.setSecret('kv_cas/data_to_update', [update: 'secret'])
 println 'Success.'</tt></pre>
+
   */
 class VaultServiceTest extends GroovyTestCase {
     def myvault
