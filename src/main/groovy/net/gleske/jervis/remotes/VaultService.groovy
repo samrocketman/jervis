@@ -524,7 +524,7 @@ vault.mountVersions = versions</tt></pre>
     // TODO write tests
     List listPath(Map location) {
         String mount = location.mount
-        String subpath = (!location.path) ? '' : addTrailingSlash(location.path)
+        String subpath = (location.path) ? addTrailingSlash(location.path) : ''
 
         if(isKeyValueV2(mount)) {
             apiFetch("${mount}/metadata/${subpath}", [:], 'LIST')?.data?.keys
@@ -584,7 +584,6 @@ vault.mountVersions = versions</tt></pre>
     // TODO write tests
     // TODO support Map location for both srcPath and destPath
     void copyAllKeys(String srcPath, String destPath, Integer level = 0) {
-        String srcLocation = getLocationFromPath(srcPath)
         // TODO support path and path/ for source and destination.
         findAllKeys(srcPath, level).each { String srcKey ->
             String destKey = destPath + (srcKey -~ "^\\Q${srcPath}\\E")
