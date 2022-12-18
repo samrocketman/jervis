@@ -170,7 +170,7 @@ class VaultService implements SimpleRestServiceSupport {
     private final TokenCredential credential
 
     private void checkLocationMap(Map location) {
-        if(!(('mount' in location) && ('path' in location))) {
+        if(!(('mount' in location.keySet()) || !('path' in location.keySet()))) {
             throw new VaultException('"mount" and "path" must be set when using location Map.')
         }
         if(!(location.mount in String) || !(location.path in String)) {
@@ -382,11 +382,10 @@ vault.mountVersions = versions</tt></pre>
                 enableCas = true
             }
             if(enableCas) {
-                List tokenized_path = getPathFromLocationMap(location).tokenize('/')
-                List path_list = []
-                if(tokenized_path[-1] in listPath(tokenized_path[0..-2].join('/'))) {
-                    // only fetch mount if it exists i.e. not 404 not found
+                try {
                     secretMeta = apiFetch("${mount}/metadata/${subpath}") ?: [:]
+                } catch(IOException ignore) {
+                    // 40X exceptions for invalid paths ignored
                 }
                 data['options'] = [cas: (secretMeta?.data?.current_version ?: 0)]
             }
@@ -467,7 +466,7 @@ vault.mountVersions = versions</tt></pre>
         }
         // returns a mount
         mountVersions.keySet().toList().find { String mount ->
-            path.startsWith(mount)
+            path.startsWith(mount + '/') || path == mount
         }
     }
 
@@ -482,21 +481,57 @@ vault.mountVersions = versions</tt></pre>
       */
     String getLocationFromPath(String path) {
         String mount = getMountFromPath(path)
+        if(!path.contains('/')) {
+            return ''
+        }
         (path -~ "^\\Q${mount}\\E/")
+    }
+
+    /**
+      If given a full path to a secret in Vault, a location Map is returned.
+
+      @param path A String representing a valid path to a Vault secret including
+                  its secret engine mount.
+      @return A location map with two keys: mount and path.  The mount is a KV
+              mount in Vault and the path is a location of a secret relative to
+              the given mount.
+      */
+    // TODO write tests
+    Map getLocationMapFromPath(String path) {
+        Map location = [
+            mount: getMountFromPath(path),
+            path: getLocationFromPath(path)
+        ]
+        checkLocationMap(location)
+        location
+    }
+
+    /**
+      If given a location Map it will convert it to a String path for Vault APIs.
+
+      @param location A map with two keys: mount and path.  The mount is a KV
+                      mount in Vault and the path is a location of a secret
+                      relative to the given mount.
+      @return Returns a String representing a valid path to a Vault secret including its secret engine mount.
+      */
+    // TODO write tests
+    String getPathFromLocationMap(Map location) {
+        checkLocationMap(location)
+        [location.mount, location.path.replaceAll('^/', '')].join('/')
     }
 
     // TODO: java doc
     // TODO write tests
     List listPath(Map location) {
         String mount = location.mount
-        String subpath = addTrailingSlash(location.path)
+        String subpath = (!location.path) ? '' : addTrailingSlash(location.path)
 
         if(isKeyValueV2(mount)) {
-            apiFetch("${mount}/metadata/${subpath}?list=true")?.data?.keys
+            apiFetch("${mount}/metadata/${subpath}", [:], 'LIST')?.data?.keys
         }
         else {
             // KV v1 API call here
-            apiFetch("${mount}/${subpath}?list=true")?.data?.keys
+            apiFetch("${mount}/${subpath}", [:], 'LIST')?.data?.keys
         }
     }
 
@@ -538,39 +573,6 @@ vault.mountVersions = versions</tt></pre>
     // TODO support Map location
     void copySecret(String srcKey, String destKey, Integer srcVersion = 0) {
         setSecret(destKey, getSecret(srcKey, srcVersion), true)
-    }
-
-    /**
-      If given a full path to a secret in Vault, a location Map is returned.
-
-      @param path A String representing a valid path to a Vault secret including
-                  its secret engine mount.
-      @return A location map with two keys: mount and path.  The mount is a KV
-              mount in Vault and the path is a location of a secret relative to
-              the given mount.
-      */
-    // TODO write tests
-    Map getLocationMapFromPath(String path) {
-        Map location = [
-            mount: getMountFromPath(path),
-            path: getLocationFromPath(path)
-        ]
-        checkLocationMap(location)
-        location
-    }
-
-    /**
-      If given a location Map it will convert it to a String path for Vault APIs.
-
-      @param location A map with two keys: mount and path.  The mount is a KV
-                      mount in Vault and the path is a location of a secret
-                      relative to the given mount.
-      @return Returns a String representing a valid path to a Vault secret including its secret engine mount.
-      */
-    // TODO write tests
-    String getPathFromLocationMap(Map location) {
-        checkLocationMap(location)
-        [location.mount, location.path.replaceAll('^/', '')].join('/')
     }
 
     /**
