@@ -49,7 +49,7 @@ class SimpleRestServiceTest extends GroovyTestCase {
         assert response == 'this is mock POST response data'
     }
     @Test public void test_SimpleRestService_apiFetch_get_fail() {
-        shouldFail(RuntimeException) {
+        shouldFail(IOException) {
             apiFetch(new URL('https://example.com/does/not/exist'))
         }
     }

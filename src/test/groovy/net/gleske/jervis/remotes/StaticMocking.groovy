@@ -235,7 +235,7 @@ request_history</tt></pre>
             request_meta['data'] = new StringWriter()
             request_meta['id'] = request_history.size() + 1
             // return URLConnection Class-like object
-            Map conn = [
+            [
                 setDoOutput: { Boolean val ->
                     request_meta.conn.setDoOutput(val)
                 },
@@ -317,8 +317,5 @@ request_history</tt></pre>
                 }
             ] as MockURLConnection
         }
-    }
-    class MockURLConnection extends java.util.LinkedHashMap {
-        def method
     }
 }
