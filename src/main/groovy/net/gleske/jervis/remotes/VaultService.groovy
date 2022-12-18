@@ -366,9 +366,7 @@ vault.mountVersions = versions</tt></pre>
       */
     // TODO test getting mount with a slash in its name
     Map getSecret(String path, Integer version = 0) {
-        String mount = path -~ '/.*$'
-        String subpath = path -~ '^[^/]+/'
-        getSecret(mount: mount, path: subpath, version)
+        getSecret(getLocationMapFromPath(path))
     }
 
     // TODO test mounts which contain a slash... because Vault allows that
@@ -378,16 +376,18 @@ vault.mountVersions = versions</tt></pre>
         String mount = location.mount
         String subpath = location.path
         if(isKeyValueV2(mount)) {
+            Map data = [data: secret]
             Map secretMeta = [:]
             if(mount in cas_required) {
                 enableCas = true
             }
-            if(enableCas && 400 > apiFetch("${mount}/metadata/${subpath}", ['Response-Code': true], 'HEAD')) {
-                // only fetch mount if it exists i.e. not 404 not found
-                secretMeta = apiFetch("${mount}/metadata/${subpath}") ?: [:]
-            }
-            Map data = [data: secret]
             if(enableCas) {
+                List tokenized_path = getPathFromLocationMap(location).tokenize('/')
+                List path_list = []
+                if(tokenized_path[-1] in listPath(tokenized_path[0..-2].join('/'))) {
+                    // only fetch mount if it exists i.e. not 404 not found
+                    secretMeta = apiFetch("${mount}/metadata/${subpath}") ?: [:]
+                }
                 data['options'] = [cas: (secretMeta?.data?.current_version ?: 0)]
             }
             apiFetch("${mount}/data/${subpath}", [:], 'POST', objToJson(data))
@@ -412,9 +412,7 @@ vault.mountVersions = versions</tt></pre>
       */
     // TODO write tests
     void setSecret(String path, Map secret, Boolean enableCas = false) {
-        String mount = path -~ '/.*$'
-        String subpath = path -~ '^[^/]+/'
-        setSecret(mount: mount, path: subpath, secret, enableCas)
+        setSecret(getLocationMapFromPath(path), secret, enableCas)
     }
 
     /**
@@ -489,11 +487,9 @@ vault.mountVersions = versions</tt></pre>
 
     // TODO: java doc
     // TODO write tests
-    // TODO support Map location
-    List listPath(String path) {
-        path = addTrailingSlash(path)
-        String mount = path -~ '/.*$'
-        String subpath = path -~ '^[^/]+/'
+    List listPath(Map location) {
+        String mount = location.mount
+        String subpath = addTrailingSlash(location.path)
 
         if(isKeyValueV2(mount)) {
             apiFetch("${mount}/metadata/${subpath}?list=true")?.data?.keys
@@ -502,6 +498,12 @@ vault.mountVersions = versions</tt></pre>
             // KV v1 API call here
             apiFetch("${mount}/${subpath}?list=true")?.data?.keys
         }
+    }
+
+    // TODO: java doc
+    // TODO write tests
+    List listPath(String path) {
+        listPath(getLocationMapFromPath(path))
     }
 
     /**
