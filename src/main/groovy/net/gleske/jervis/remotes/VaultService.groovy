@@ -366,7 +366,7 @@ vault.mountVersions = versions</tt></pre>
       */
     // TODO test getting mount with a slash in its name
     Map getSecret(String path, Integer version = 0) {
-        getSecret(getLocationMapFromPath(path))
+        getSecret(getLocationMapFromPath(path), version)
     }
 
     // TODO test mounts which contain a slash... because Vault allows that
