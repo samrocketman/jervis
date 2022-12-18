@@ -81,13 +81,19 @@ class SimpleRestService {
             if(http_method.toUpperCase() != 'GET' && data.size()) {
                 conn.setDoOutput(true)
             }
-            conn.setRequestMethod(http_method.toUpperCase())
             http_headers.each { k, v ->
                 if(k in ['Parse-JSON', 'Response-Code', 'Response-Headers']) {
                     return
                 }
                 conn.setRequestProperty(k, v)
             }
+            // conn.setRequestMethod(request_method) but instead bypass internal
+            // Java error checking by setting private variable directly.  This
+            // is necessary to enable services which have custom HTTP verbs.
+            // Error checking the verb is not necessary.  For example, HashiCorp
+            // Vault has custom HTTP verbs such as LIST.
+            // source: https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/net/HttpURLConnection.java
+            conn.@method = http_method.toUpperCase()
             if(conn.getDoOutput()) {
                 conn.getOutputStream().withWriter { writer ->
                     writer << data
