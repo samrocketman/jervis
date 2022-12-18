@@ -379,13 +379,12 @@ vault.mountVersions = versions</tt></pre>
         String subpath = location.path
         if(isKeyValueV2(mount)) {
             Map secretMeta = [:]
-            try {
-                secretMeta = apiFetch("${mount}/metadata/${subpath}") ?: [:]
-            } catch(IOException ignore) {
-                // 40X exceptions for invalid paths ignored
-            }
             if(mount in cas_required) {
                 enableCas = true
+            }
+            if(enableCas && 400 > apiFetch("${mount}/metadata/${subpath}", ['Response-Code': true], 'HEAD')) {
+                // only fetch mount if it exists i.e. not 404 not found
+                secretMeta = apiFetch("${mount}/metadata/${subpath}") ?: [:]
             }
             Map data = [data: secret]
             if(enableCas) {
