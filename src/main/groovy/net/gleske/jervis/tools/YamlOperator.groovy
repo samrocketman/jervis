@@ -92,8 +92,7 @@ class YamlOperator {
       @return A plain old Java object consisting of standard Java classes.
       */
     static def loadYamlFrom(StringWriter srcString) {
-        String contents = srcString.toString() ?: ''
-        loadYamlFrom(new ByteArrayInputStream(contents.bytes))
+        loadYamlFrom(new ByteArrayInputStream(srcString.toString().bytes)) ?: ''
     }
 
     /**

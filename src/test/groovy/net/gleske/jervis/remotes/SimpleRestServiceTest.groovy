@@ -40,6 +40,11 @@ class SimpleRestServiceTest extends GroovyTestCase {
         request_meta = null
         super.tearDown()
     }
+    @Test public void test_SimpleRestService_fail_instantiation() {
+        shouldFail(IllegalStateException) {
+            new SimpleRestService()
+        }
+    }
     @Test public void test_SimpleRestService_apiFetch_get() {
         Map response = apiFetch(new URL('https://api.github.com/users/samrocketman'))
         assert response['login'] == 'samrocketman'

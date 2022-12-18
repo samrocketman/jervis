@@ -55,6 +55,14 @@ class YamlOperatorTest extends GroovyAssert {
         Map obj = [foo: 'bar', baz: ['hello', 'world']]
         assert YamlOperator.loadYamlFrom(yaml) == obj
     }
+    @Test public void test_YamlOperator_loadYamlFrom_stringwriter() {
+        String yaml = 'foo: bar\nbaz:\n  - hello\n  - world\n'
+        StringWriter sw = new StringWriter()
+        Map obj = [foo: 'bar', baz: ['hello', 'world']]
+        assert YamlOperator.loadYamlFrom(sw) == ''
+        sw << yaml
+        assert YamlOperator.loadYamlFrom(sw) == obj
+    }
     @Test public void test_YamlOperator_loadYamlFrom_bytes() {
         String yaml = 'foo: bar\nbaz:\n  - hello\n  - world\n'
         Map obj = [foo: 'bar', baz: ['hello', 'world']]
