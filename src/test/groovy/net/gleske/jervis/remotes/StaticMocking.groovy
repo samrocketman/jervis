@@ -270,13 +270,21 @@ request_history</tt></pre>
                     String file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
                     File headersFile = new File("src/test/resources/mocks/${file}_headers")
                     net.gleske.jervis.tools.YamlOperator.writeObjToYaml(headersFile, response_headers)
+                    Integer response_code = Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
                     Map temp_request_meta = request_meta.clone()
                     temp_request_meta.remove('conn')
                     temp_request_meta['response'] = ''
                     temp_request_meta['url'] = mockedUrl
                     temp_request_meta['response_headers'] = response_headers
-                    temp_request_meta['response_code'] = Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
+                    temp_request_meta['response_code'] = response_code
                     request_history << temp_request_meta
+                    // create an empty file in case of a No Content response
+                    if(response_code < 300) {
+                        File responseFile = new File("src/test/resources/mocks/${file}")
+                        if(!responseFile.exists()) {
+                            responseFile.createNewFile()
+                        }
+                    }
                     response_headers
                 },
                 setRequestMethod: { String method ->
