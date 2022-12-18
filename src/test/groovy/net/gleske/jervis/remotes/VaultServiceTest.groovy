@@ -183,6 +183,8 @@ class VaultServiceTest extends GroovyTestCase {
         //TokenCredential cred = [getToken: {-> 'fake-token' }] as TokenCredential
         TokenCredential cred = [getToken: {-> 'hvs.CT1912OdOBRWnn1UVQntX9Ld' }] as TokenCredential
         myvault = new VaultService(DEFAULT_VAULT_URL, cred)
+        myvault.@mountVersions = ['kv':'2', 'kv_cas':'2', 'secret':'1']
+        myvault.@cas_required = ['kv_cas']
     }
     //tear down after every test
     @After protected void tearDown() {
@@ -229,28 +231,28 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.header() == ['X-Vault-Token': 'fake-token', 'X-Vault-Request': 'true']
     }
     @Test public void test_VaultService_getSecret_kv_v1() {
-        myvault.discoverKVMounts()
         assert myvault.getSecret('secret/foo') == [test: 'data']
         assert myvault.getSecret('secret/foo/bar') == [someother: 'data']
         assert myvault.getSecret('secret/foo/bar/baz') == [more: 'secrets']
     }
     @Test public void test_VaultService_getSecret_kv_v2() {
-        myvault.discoverKVMounts()
         assert myvault.getSecret('kv/foo') == [another: 'secret', hello: 'world']
         assert myvault.getSecret('kv/foo/bar') == [hello: 'friend']
         assert myvault.getSecret('kv/foo/bar/baz') == [foo: 'bar']
     }
     @Test public void test_VaultService_getSecret_kv_v2_older_version_1() {
-        myvault.discoverKVMounts()
         assert myvault.getSecret('kv/foo', 1) == [hello: 'world']
     }
     @Test public void test_VaultService_discover_mount_versions() {
+        myvault.@mountVersions = [:]
+        myvault.@cas_required = []
         assert myvault.mountVersions == [:]
+        assert myvault.cas_required == []
         myvault.discoverKVMounts()
-        assert myvault.mountVersions == [kv: '2', secret: '1']
+        assert myvault.mountVersions == ['kv':'2', 'kv_cas':'2', 'secret':'1']
+        assert myvault.cas_required == ['kv_cas']
     }
     @Test public void test_VaultService_getSecret_map_kv_v1() {
-        myvault.discoverKVMounts()
         assert myvault.getSecret(mount: 'secret', path: 'foo') == [test: 'data']
         assert myvault.getSecret(mount: 'secret', path: 'foo/bar') == [someother: 'data']
         assert myvault.getSecret(mount: 'secret', path: 'foo/bar/baz') == [more: 'secrets']
@@ -266,7 +268,6 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_getSecret_map_kv_v2() {
-        myvault.discoverKVMounts()
         assert myvault.getSecret(mount: 'kv', path: 'foo') == [another: 'secret', hello: 'world']
         assert myvault.getSecret(mount: 'kv', path: 'foo/bar') == [hello: 'friend']
         assert myvault.getSecret(mount: 'kv', path: 'foo/bar/baz') == [foo: 'bar']
@@ -285,7 +286,6 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_getSecret_map_kv_v2_older_version_1() {
-        myvault.discoverKVMounts()
         assert myvault.getSecret(mount: 'kv', path: 'foo', 1) == [hello: 'world']
         shouldFail(VaultException) {
             myvault.getSecret([:], 1)
@@ -301,6 +301,8 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_setMountVersions_String() {
+        myvault.@mountVersions = [:]
+        myvault.@cas_required = []
         myvault.setMountVersions('kv', '2')
         assert myvault.mountVersions == [kv: '2']
         myvault.setMountVersions('secret', '1')
@@ -316,6 +318,8 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_setMountVersions_Map() {
+        myvault.@mountVersions = [:]
+        myvault.@cas_required = []
         myvault.mountVersions = [kv: '2']
         assert myvault.mountVersions == [kv: '2']
         myvault.mountVersions = [secret: '1']
@@ -334,7 +338,6 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_findAllKeys_v1() {
-        myvault.discoverKVMounts()
         assert myvault.findAllKeys('secret') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
         assert myvault.findAllKeys('secret/') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
         assert myvault.findAllKeys('secret/', 1) == ['secret/foo']
@@ -342,7 +345,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.findAllKeys('secret/', 3) == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
     }
     @Test public void test_VaultService_findAllKeys_v2() {
-        myvault.discoverKVMounts()
         assert myvault.findAllKeys('kv') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
         assert myvault.findAllKeys('kv/') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
         assert myvault.findAllKeys('kv/', 1) == ['kv/foo']
@@ -350,7 +352,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.findAllKeys('kv/', 3) == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
     }
     @Test public void test_VaultService_listPath_v1() {
-        myvault.discoverKVMounts()
         assert myvault.listPath('secret') == ['foo', 'foo/']
         assert myvault.listPath('secret/') == ['foo', 'foo/']
         assert myvault.listPath('secret/foo') == ['bar', 'bar/']
@@ -362,7 +363,6 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_listPath_v2() {
-        myvault.discoverKVMounts()
         assert myvault.listPath('kv') == ['foo', 'foo/']
         assert myvault.listPath('kv/') == ['foo', 'foo/']
         assert myvault.listPath('kv/foo') == ['bar', 'bar/']
@@ -374,7 +374,6 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_copySecret_v1_to_v2() {
-        myvault.discoverKVMounts()
         myvault.copySecret('secret/foo', 'kv/v1_to_v2')
         List urls = []
         List methods = []
@@ -387,7 +386,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_copySecret_v2_to_v1() {
-        myvault.discoverKVMounts()
         myvault.copySecret('kv/foo', 'secret/v2_to_v1')
         List urls = []
         List methods = []
@@ -400,7 +398,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_copySecret_v2_to_v1_version_1() {
-        myvault.discoverKVMounts()
         myvault.copySecret('kv/foo', 'secret/v2_to_v1_version_1', 1)
         List urls = []
         List methods = []
@@ -413,7 +410,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_copySecret_v2_to_v2() {
-        myvault.discoverKVMounts()
         myvault.copySecret('kv/foo', 'kv/v2_to_v2/v2_to_v2')
         List urls = []
         List methods = []
@@ -426,7 +422,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_copySecret_v2_to_v2_version_1() {
-        myvault.discoverKVMounts()
         myvault.copySecret('kv/foo', 'kv/v2_to_v2_version_1', 1)
         List urls = []
         List methods = []
@@ -439,7 +434,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_setSecret_v1() {
-        myvault.discoverKVMounts()
         myvault.setSecret('secret/v1_set', [another: 'secret', hello: 'world'])
         List urls = []
         List methods = []
@@ -452,7 +446,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_setSecret_v1_force_cas() {
-        myvault.discoverKVMounts()
         myvault.setSecret('secret/v1_set_force_cas', [another: 'secret', hello: 'world'], true)
         List urls = []
         List methods = []
@@ -465,7 +458,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_setSecret_v2_no_cas() {
-        myvault.discoverKVMounts()
         myvault.setSecret('kv/v2_no_cas', [test: 'data'])
         List urls = []
         List methods = []
@@ -478,7 +470,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_setSecret_v2_force_cas() {
-        myvault.discoverKVMounts()
         myvault.setSecret('kv/v2_force_cas', [test: 'data'], true)
         List urls = []
         List methods = []
@@ -491,7 +482,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_setSecret_v2_force_cas_update_secret() {
-        myvault.discoverKVMounts()
         myvault.setSecret('kv/v2_force_cas_update', [test: 'update'], true)
         List urls = []
         List methods = []
@@ -505,7 +495,6 @@ class VaultServiceTest extends GroovyTestCase {
     }
 
     @Test public void test_VaultService_setSecret_v2_detect_cas() {
-        myvault.discoverKVMounts()
         myvault.setSecret('kv_cas/v2_detect_cas', [another: 'secret', hello: 'world'])
         List urls = []
         List methods = []
@@ -518,7 +507,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.response_code == response_codes
     }
     @Test public void test_VaultService_setSecret_v2_detect_cas_update_secret() {
-        myvault.discoverKVMounts()
         myvault.setSecret('kv_cas/data_to_update', [update: 'secret'])
         List urls = []
         List methods = []

@@ -15,8 +15,6 @@
    */
 package net.gleske.jervis.remotes
 
-import groovy.json.JsonBuilder
-
 /**
    REST service classes can derive some default implementation from this trait.
   */
@@ -40,7 +38,7 @@ trait SimpleRestServiceSupport {
       TODO better java doc
       */
     static String objToJson(Map obj) {
-        (obj as JsonBuilder).toString()
+        SimpleRestService.objToJson(obj)
     }
 
     // TODO java doc

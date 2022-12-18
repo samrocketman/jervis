@@ -85,6 +85,18 @@ class YamlOperator {
     }
 
     /**
+      Parse YAML from a <tt>StringWriter</tt> which is typically used by Jervis
+      as an in-memory <tt>String</tt> buffer.
+
+      @param srcString A <tt>String</tt> which contains YAML to be parsed.
+      @return A plain old Java object consisting of standard Java classes.
+      */
+    static def loadYamlFrom(StringWriter srcString) {
+        String contents = srcString.toString() ?: ''
+        loadYamlFrom(new ByteArrayInputStream(contents.bytes))
+    }
+
+    /**
       Parse YAML from a <tt>Byte</tt> array.
 
       @param srcBytes A <tt>Byte</tt> array which contains YAML to be parsed.

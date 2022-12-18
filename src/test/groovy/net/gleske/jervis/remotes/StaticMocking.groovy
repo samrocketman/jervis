@@ -96,11 +96,12 @@ class StaticMocking {
                     request_meta['doOutput']
                 },
                 getHeaderFields: { ->
+                    request_meta.data = request_meta.data.toString() ?: ''
                     Map header_fields = [(null): Collections.unmodifiableList(['HTTP/1.1 200 OK'])]
-                    String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta['data'].toString()].join(' '), checksumMocks, checksumAlgorithm)
+                    String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
                     File headersFile = new File("src/test/resources/mocks/${file}_headers")
                     if(!headersFile.exists()) {
-                        file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
+                        file = urlToMockFileName(mockedUrl, request_meta.data, checksumMocks, checksumAlgorithm)
                         headersFile = new File("src/test/resources/mocks/${file}_headers")
                     }
                     if(headersFile.exists() && !request_meta.response_headers) {
@@ -114,7 +115,6 @@ class StaticMocking {
                     }
                     Map response_headers = Collections.unmodifiableMap(header_fields)
                     Map temp_request_meta = request_meta.clone()
-                    temp_request_meta['data'] = temp_request_meta['data'].toString() ?: ''
                     temp_request_meta['response'] = ''
                     temp_request_meta['url'] = mockedUrl
                     temp_request_meta['response_headers'] = response_headers
@@ -143,21 +143,33 @@ class StaticMocking {
                     request_meta.data
                 },
                 getContentLengthLong: {->
-                    String file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
-                    new File("src/test/resources/mocks/${file}").text.trim().size()
+                    request_meta.data = request_meta.data.toString() ?: ''
+                    String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
+                    File responseFile = new File("src/test/resources/mocks/${file}")
+                    if(!responseFile.exists()) {
+                        file = urlToMockFileName(mockedUrl, request_meta.data, checksumMocks, checksumAlgorithm)
+                        responseFile = new File("src/test/resources/mocks/${file}")
+                    }
+                    responseFile.text.trim().size()
                 },
                 getContent: { ->
-                    request_meta.data = request_meta.data.toString()
-                    String file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
+                    request_meta.data = request_meta.data.toString() ?: ''
+                    // Create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
+                    String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
                     File responseFile = new File("src/test/resources/mocks/${file}")
+                    if(!responseFile.exists()) {
+                        file = urlToMockFileName(mockedUrl, request_meta.data, checksumMocks, checksumAlgorithm)
+                        responseFile = new File("src/test/resources/mocks/${file}")
+                    }
                     if(!responseFile.exists()) {
                         throw new IOException("[404] Not Found - src/test/resources/mocks/${file}")
                     }
                     // return content like object
                     [
                         getText: { ->
-                            //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
-                            request_history[-1].response = responseFile.text
+                            // Load cached response from YAML to a minified JSON
+                            // String as an API response.
+                            request_history[-1].response = net.gleske.jervis.remotes.SimpleRestService.objToJson(net.gleske.jervis.tools.YamlOperator.loadYamlFrom(responseFile))
                             return request_history[-1].response
                         }
                     ]
@@ -248,6 +260,7 @@ request_history</tt></pre>
                     request_meta.conn.getDoOutput()
                 },
                 getHeaderFields: { ->
+                    request_meta.data = request_meta.data.toString() ?: ''
                     // write output to connection request
                     if(request_meta.conn.getDoOutput()) {
                         request_meta.conn.outputStream.withWriter { writer ->
@@ -256,7 +269,7 @@ request_history</tt></pre>
                     }
                     // Complete the request by getting header fields
                     Map response_headers = request_meta.conn.getHeaderFields()
-                    String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta['data'].toString()].join(' '), checksumMocks, checksumAlgorithm)
+                    String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
                     File headersFile = new File("src/test/resources/mocks/${file}_headers")
                     net.gleske.jervis.tools.YamlOperator.writeObjToYaml(headersFile, response_headers)
                     Integer response_code = Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
@@ -309,12 +322,15 @@ request_history</tt></pre>
                     [
                         getText: { ->
                             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
-                            String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta['data'].toString()].join(' '), checksumMocks, checksumAlgorithm)
+                            String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
                             File responseFile = new File("src/test/resources/mocks/${file}")
-                            //println(request_meta)
-                            responseFile.withWriter('UTF-8') { Writer w ->
-                                w << request_meta.conn.content.text
-                            }
+                            StringWriter responseBuffer = new StringWriter()
+                            responseBuffer << request_meta.conn.content.text
+                            // serialize the response to disk as YAML for a readable version of the response
+                            net.gleske.jervis.tools.YamlOperator.writeObjToYaml(
+                                responseFile,
+                                net.gleske.jervis.tools.YamlOperator.loadYamlFrom(responseBuffer)
+                            )
                             request_history[-1].response = responseFile.text
                             return request_history[-1].response
                         }

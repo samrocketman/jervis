@@ -93,7 +93,7 @@ class SimpleRestServiceTest extends GroovyTestCase {
     }
     @Test public void test_SimpleRestService_apiFetch_no_json_parse() {
         Map http_headers = ['Content-Type': 'text/plain']
-        assert '[]\n' == apiFetch(new URL('https://api.github.com/repos/samrocketman/emptyList/contents'), http_headers)
+        assert '[]' == apiFetch(new URL('https://api.github.com/repos/samrocketman/emptyList/contents'), http_headers)
     }
     @Test public void test_SimpleRestService_apiFetch_no_empty_response_default_to_string() {
         Map http_headers = ['Content-Type': 'text/plain']
@@ -140,8 +140,8 @@ class SimpleRestServiceTest extends GroovyTestCase {
         assert [some: 'response'] == apiFetch(new URL('https://www.example.com/doesnotexist'), ['Parse-JSON': 'true'], 'POST')
     }
     @Test public void test_SimpleRestService_apiFetch_string_content() {
-        assert '{"some":"response"}\n' == apiFetch(new URL('https://www.example.com/doesnotexist'), ['Parse-JSON': false], 'POST')
-        assert '{"some":"response"}\n' == apiFetch(new URL('https://www.example.com/doesnotexist'), ['Parse-JSON': 'false'], 'POST')
+        assert '{"some":"response"}' == apiFetch(new URL('https://www.example.com/doesnotexist'), ['Parse-JSON': false], 'POST')
+        assert '{"some":"response"}' == apiFetch(new URL('https://www.example.com/doesnotexist'), ['Parse-JSON': 'false'], 'POST')
     }
     @Test public void test_SimpleRestService_apiFetch_no_content() {
         request_meta.response_headers = Collections.unmodifiableMap([(null): Collections.unmodifiableList(['HTTP/1.1 204 No Content'])])

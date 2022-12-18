@@ -17,12 +17,37 @@ package net.gleske.jervis.remotes
 
 import net.gleske.jervis.tools.YamlOperator
 
+import groovy.json.JsonBuilder
+
 /**
   A simple class which makes using REST services like the GitHub API really
   easy.  This utilizes helpful features of Groovy while not relying on any
   heavier external libraries for HTTP communication.
   */
 class SimpleRestService {
+
+    private SimpleRestService() {
+        throw new IllegalStateException('ERROR: This utility class only provides static methods and is not meant for instantiation.  See Java doc for this class for examples.')
+    }
+
+    /**
+      A method for converting an object comprising of standard Java classes
+      <tt>Map</tt> or <tt>List</tt> to a JSON String.
+
+      @param obj Any object.
+      @return A <tt>String</tt> of JSON text which could be later parsed if the
+              <tt>obj</tt> is a <tt>Map</tt> or <tt>List</tt>.  Otherwise, the
+              original object is returned if serialization is not possible.
+      */
+    static String objToJson(def obj) {
+        if([Map, List].any { obj in it}) {
+            (obj as JsonBuilder).toString()
+        }
+        else {
+            obj
+        }
+    }
+
     /**
       <tt>apiFetch()</tt> can be used to submit HTTP commands common to REST
       APIs.  If <tt>http_headers</tt> does not contain a <tt>Content-Type</tt>
