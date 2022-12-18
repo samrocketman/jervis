@@ -1,1 +1,0 @@
-{"request_id":"7c6f3d1b-33d3-3760-1cf2-8aeaf20fde17","lease_id":"","renewable":false,"lease_duration":0,"data":{"data":{"hello":"friend"},"metadata":{"created_time":"2022-12-17T20:00:36.503154706Z","custom_metadata":null,"deletion_time":"","destroyed":false,"version":1}},"wrap_info":null,"warnings":null,"auth":null}

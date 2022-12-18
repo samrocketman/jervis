@@ -1,1 +1,0 @@
-{"request_id":"c5d96ed2-ef2a-bb26-47d5-85577dded9c8","lease_id":"","renewable":false,"lease_duration":0,"data":{"keys":["foo","foo/","v2_force_cas_update"]},"wrap_info":null,"warnings":null,"auth":null}
