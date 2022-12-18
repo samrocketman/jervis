@@ -350,12 +350,36 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.findAllKeys('secret/', 2) == ['secret/foo', 'secret/foo/bar']
         assert myvault.findAllKeys('secret/', 3) == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
     }
+    @Test public void test_VaultService_findAllKeys_v1_subkey() {
+        assert myvault.findAllKeys('secret/foo') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
+        assert myvault.findAllKeys('secret/foo/') == ['secret/foo/bar', 'secret/foo/bar/baz']
+    }
+    @Test public void test_VaultService_findAllKeys_v1_doesnotexist() {
+        shouldFail(IOException) {
+            myvault.findAllKeys('secret/zerg')
+        }
+        shouldFail(IOException) {
+            myvault.findAllKeys('secret/zerg/')
+        }
+    }
     @Test public void test_VaultService_findAllKeys_v2() {
         assert myvault.findAllKeys('kv') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
         assert myvault.findAllKeys('kv/') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
         assert myvault.findAllKeys('kv/', 1) == ['kv/foo', 'kv/v2_force_cas_update']
         assert myvault.findAllKeys('kv/', 2) == ['kv/foo', 'kv/foo/bar', 'kv/v2_force_cas_update']
         assert myvault.findAllKeys('kv/', 3) == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
+    }
+    @Test public void test_VaultService_findAllKeys_v2_subkey() {
+        assert myvault.findAllKeys('kv/foo') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
+        assert myvault.findAllKeys('kv/foo/') == ['kv/foo/bar', 'kv/foo/bar/baz']
+    }
+    @Test public void test_VaultService_findAllKeys_v2_doesnotexist() {
+        shouldFail(IOException) {
+            myvault.findAllKeys('kv/zerg')
+        }
+        shouldFail(IOException) {
+            myvault.findAllKeys('kv/zerg/')
+        }
     }
     @Test public void test_VaultService_listPath_v1() {
         assert myvault.listPath('secret') == ['foo', 'foo/']

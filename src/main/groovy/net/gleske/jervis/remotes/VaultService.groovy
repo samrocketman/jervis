@@ -547,13 +547,12 @@ vault.mountVersions = versions</tt></pre>
 
       TODO better java doc
       */
-    // TODO write tests
     // TODO support Map location
-    List<String> findAllKeys(String path, Integer level = 0) {
+    List<String> findAllKeys(String path, Integer level = 0) throws IOException {
         List additionalKeys = []
         // check if a key exists instead of a path
         if(!path.endsWith('/') && path.contains('/')) {
-            if(path in findAllKeys(path.tokenize('/')[0..-2].join('/') + '/', 1)) {
+            if(path in findAllKeys(path.tokenize('/')[0..-2].join('/'), 1)) {
                 additionalKeys << path
             }
         }
