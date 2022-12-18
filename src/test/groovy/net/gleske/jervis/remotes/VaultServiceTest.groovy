@@ -381,6 +381,58 @@ class VaultServiceTest extends GroovyTestCase {
             myvault.findAllKeys('kv/zerg/')
         }
     }
+    @Test public void test_VaultService_findAllKeys_locaion_map_fail() {
+        shouldFail(VaultException) {
+            myvault.findAllKeys(path: '')
+        }
+        shouldFail(VaultException) {
+            myvault.findAllKeys(mount: 'secret')
+        }
+        shouldFail(VaultException) {
+            myvault.findAllKeys(mount: 'secret', path: 3)
+        }
+        shouldFail(VaultException) {
+            myvault.findAllKeys(mount: 3, path: '')
+        }
+    }
+    @Test public void test_VaultService_findAllKeys_v1_location_map() {
+        assert myvault.findAllKeys(mount: 'secret', path: '') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
+        assert myvault.findAllKeys(mount: 'secret', path: '/') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
+        assert myvault.findAllKeys([mount: 'secret', path: '/'], 1) == ['secret/foo']
+        assert myvault.findAllKeys([mount: 'secret', path: '/'], 2) == ['secret/foo', 'secret/foo/bar']
+        assert myvault.findAllKeys([mount: 'secret', path: '/'], 3) == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
+    }
+    @Test public void test_VaultService_findAllKeys_v1_location_map_subkey() {
+        assert myvault.findAllKeys(mount: 'secret', path: 'foo') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
+        assert myvault.findAllKeys(mount: 'secret', path: 'foo/') == ['secret/foo/bar', 'secret/foo/bar/baz']
+    }
+    @Test public void test_VaultService_findAllKeys_v1_location_map_doesnotexist() {
+        shouldFail(IOException) {
+            myvault.findAllKeys(mount: 'secret', path: 'zerg')
+        }
+        shouldFail(IOException) {
+            myvault.findAllKeys(mount: 'secret', path: 'zerg/')
+        }
+    }
+    @Test public void test_VaultService_findAllKeys_v2_location_map() {
+        assert myvault.findAllKeys(mount: 'kv', path: '') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
+        assert myvault.findAllKeys(mount: 'kv', path: '/') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
+        assert myvault.findAllKeys([mount: 'kv', path: '/'], 1) == ['kv/foo', 'kv/v2_force_cas_update']
+        assert myvault.findAllKeys([mount: 'kv', path: '/'], 2) == ['kv/foo', 'kv/foo/bar', 'kv/v2_force_cas_update']
+        assert myvault.findAllKeys([mount: 'kv', path: '/'], 3) == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
+    }
+    @Test public void test_VaultService_findAllKeys_v2_location_map_subkey() {
+        assert myvault.findAllKeys(mount: 'kv', path: 'foo') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
+        assert myvault.findAllKeys(mount: 'kv', path: 'foo/') == ['kv/foo/bar', 'kv/foo/bar/baz']
+    }
+    @Test public void test_VaultService_findAllKeys_v2_location_map_doesnotexist() {
+        shouldFail(IOException) {
+            myvault.findAllKeys(mount: 'kv', path: 'zerg')
+        }
+        shouldFail(IOException) {
+            myvault.findAllKeys(mount: 'kv', path: 'zerg/')
+        }
+    }
     @Test public void test_VaultService_listPath_v1() {
         assert myvault.listPath('secret') == ['foo', 'foo/']
         assert myvault.listPath('secret/') == ['foo', 'foo/']

@@ -523,6 +523,7 @@ vault.mountVersions = versions</tt></pre>
     // TODO: java doc
     // TODO write tests
     List listPath(Map location) {
+        checkLocationMap(location)
         String mount = location.mount
         String subpath = (location.path) ? addTrailingSlash(location.path) : ''
 
@@ -545,9 +546,64 @@ vault.mountVersions = versions</tt></pre>
       Recursively traverses the path for subkeys.  If level is 0 then there's
       no depth limit.  When level = n, keys are traversed up to the limit.
 
-      TODO better java doc
+      <p>A trailing slash <tt>/</tt> is optional and will have different
+      behavior depending on the existence of keys in Vault. For example, let's
+      say Vault has the following key layout.  <tt>kv</tt> is a KV v2 and
+      <tt>secret</tt> is a KV v1 secrets engine.</p>
+<pre><tt>kv/
+  |- foo
+  |- foo/
+    |- bar
+  |- bar/
+    |- baz
+  |- hello/
+    |- world
+      |- friend
+secret/
+  |- foo
+  |- foo/
+    |- bar</tt></pre>
+
+    <p>findAllKeys operates on both KV v1 and KV v2 secrets engines the same
+    way.</p>
+
+    <ul>
+    <li>
+    Calling <tt>findAllKeys('kv/foo')</tt> will return <tt>['kv/foo', 'kv/foo/bar']</tt>.
+    </li>
+    <li>
+    Calling <tt>findAllKeys('kv/foo/')</tt> will return <tt>['kv/foo/bar']</tt>.
+    </li>
+    <li>
+    Calling <tt>findAllKeys('secret/foo')</tt> will return <tt>['secret/foo', 'secret/foo/bar']</tt>.
+    </li>
+    <li>
+    Calling <tt>findAllKeys('secret/foo/')</tt> will return <tt>['secret/foo/bar']</tt>.
+    </li>
+    </ul>
+      <p>Given <tt>level</tt> parameter and the layout of the <tt>kv</tt> KV v2
+      secrets store from earlier.  You can expect the following behavior when
+      passing different integers of level.</tt>
+      <ul>
+      <li>
+      Calling <tt>myvault.findAllKeys('kv', 0)</tt> returns a list of all keys in the entire keystore.
+      </li>
+      <li>
+      Calling <tt>myvault.findAllKeys('kv', 1)</tt> returns <tt>['foo']</tt>.
+      </li>
+      <li>
+      Calling <tt>myvault.findAllKeys('kv/foo', 1)</tt> returns <tt>['foo', 'foo/bar']</tt>.
+      </li>
+      <li>
+      Calling <tt>myvault.findAllKeys('kv/foo/', 1)</tt> returns <tt>['foo/bar']</tt>.
+      </li>
+      <li>
+      Calling <tt>myvault.findAllKeys('kv', 2)</tt> returns <tt>['foo',
+      'foo/bar', 'bar/baz']</tt>.  Notice that key <tt>hello/world/friend</tt>
+      is not in the list because it is 3 levels deep.
+      </li>
+      </ul>
       */
-    // TODO support Map location
     List<String> findAllKeys(String path, Integer level = 0) throws IOException {
         List additionalKeys = []
         // check if a key exists instead of a path
@@ -558,6 +614,22 @@ vault.mountVersions = versions</tt></pre>
         }
         path = addTrailingSlash(path)
         additionalKeys + recursiveFindAllKeys(path, level, 1)
+    }
+
+    /**
+      Recursively traverses the path for subkeys.  If level is 0 then there's
+      no depth limit.  When level = n, keys are traversed up to the limit.
+
+      <p>To learn more see <tt>{@link #findAllKeys(java.lang.String, java.lang.Integer)}</tt>.</p>
+      @param location A location map contains two keys: mount and path.  The
+                      mount is a KV mount in Vault and the path is a location of
+                      a secret relative to the given mount.
+      @param level When traversing secrets paths <tt>level</tt> limits how deep
+                   the path goes when returning results.
+      */
+    List<String> findAllKeys(Map location, Integer level = 0) throws IOException {
+        checkLocationMap(location)
+        findAllKeys(getPathFromLocationMap(location), level)
     }
 
     /**
