@@ -86,28 +86,6 @@ class StaticMocking {
             def constructor = delegate.getConstructor([String] as Class[])
             constructor.newInstance(url)
         }
-        mc.newReader = {
-            // Create a file from the URL including the domain and path with
-            // all special characters and path separators replaced with an
-            // underscore.
-            String file = urlToMockFileName(mockedUrl)
-            try {
-                return new File("src/test/resources/mocks/${file}").newReader()
-            }
-            catch(Exception e) {
-                throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
-            }
-        }
-        mc.newReader = { Map parameters ->
-            // create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
-            String file = urlToMockFileName(mockedUrl)
-            try {
-                return new File("src/test/resources/mocks/${file}").newReader()
-            }
-            catch(Exception e) {
-                throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
-            }
-        }
         mc.openConnection = { ->
             request_meta['data'] = new StringWriter()
             [
@@ -162,7 +140,7 @@ class StaticMocking {
                     String file = urlToMockFileName(mockedUrl, request_meta['data'].toString(), checksumMocks, checksumAlgorithm)
                     File responseFile = new File("src/test/resources/mocks/${file}")
                     if(!responseFile.exists()) {
-                        throw new RuntimeException("[404] Not Found - src/test/resources/mocks/${file}")
+                        throw new IOException("[404] Not Found - src/test/resources/mocks/${file}")
                     }
                     // return content like object
                     [
