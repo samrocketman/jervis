@@ -241,13 +241,13 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.getSecret('kv/foo/bar/baz') == [foo: 'bar']
     }
     @Test public void test_VaultService_getSecret_kv_v2_older_version_1() {
-        List urls = []
-        List methods = []
-        List datas = []
-        List response_codes = []
-        myvault.getSecret('kv/foo', 1)
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=1']
+        List methods = ['GET']
+        List datas = ['']
         assert myvault.getSecret('kv/foo', 1) == [hello: 'world']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
     }
     @Test public void test_VaultService_discover_mount_versions() {
         myvault.@mountVersions = [:]
@@ -399,9 +399,9 @@ class VaultServiceTest extends GroovyTestCase {
     }
     @Test public void test_VaultService_copySecret_v2_to_v1_version_1() {
         myvault.copySecret('kv/foo', 'secret/v2_to_v1_version_1', 1)
-        List urls = ['http://vault:8200/v1/kv/data/foo?version=0', 'http://vault:8200/v1/secret/v2_to_v1_version_1']
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=1', 'http://vault:8200/v1/secret/v2_to_v1_version_1']
         List methods = ['GET', 'POST']
-        List datas = ['', '{"another":"secret","hello":"world"}']
+        List datas = ['', '{"hello":"world"}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -417,9 +417,9 @@ class VaultServiceTest extends GroovyTestCase {
     }
     @Test public void test_VaultService_copySecret_v2_to_v2_version_1() {
         myvault.copySecret('kv/foo', 'kv/v2_to_v2_version_1', 1)
-        List urls = ['http://vault:8200/v1/kv/data/foo?version=0', 'http://vault:8200/v1/kv/metadata/v2_to_v2_version_1', 'http://vault:8200/v1/kv/data/v2_to_v2_version_1']
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=1', 'http://vault:8200/v1/kv/metadata/v2_to_v2_version_1', 'http://vault:8200/v1/kv/data/v2_to_v2_version_1']
         List methods = ['GET', 'GET', 'POST']
-        List datas = ['', '', '{"data":{"another":"secret","hello":"world"},"options":{"cas":0}}']
+        List datas = ['', '', '{"data":{"hello":"world"},"options":{"cas":0}}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
