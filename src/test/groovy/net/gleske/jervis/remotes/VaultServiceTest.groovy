@@ -32,6 +32,10 @@ class VaultServiceTest extends GroovyTestCase {
     List request_history = []
     private static String DEFAULT_VAULT_URL = 'http://vault:8200/v1/'
 
+    List metaResult() {
+        [request_history*.url.inspect(), request_history*.method.inspect(), request_history*.data.inspect(), request_history*.response_code.inspect()]
+    }
+
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
@@ -236,7 +240,7 @@ class VaultServiceTest extends GroovyTestCase {
         List methods = []
         List datas = []
         List response_codes = []
-        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert metaResult() == []
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -249,7 +253,7 @@ class VaultServiceTest extends GroovyTestCase {
         List methods = []
         List datas = []
         List response_codes = []
-        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert metaResult() == []
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -262,7 +266,7 @@ class VaultServiceTest extends GroovyTestCase {
         List methods = []
         List datas = []
         List response_codes = []
-        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert metaResult() == []
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -275,7 +279,7 @@ class VaultServiceTest extends GroovyTestCase {
         List methods = []
         List datas = []
         List response_codes = []
-        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert metaResult() == []
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -288,7 +292,7 @@ class VaultServiceTest extends GroovyTestCase {
         List methods = []
         List datas = []
         List response_codes = []
-        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert metaResult() == []
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -301,7 +305,7 @@ class VaultServiceTest extends GroovyTestCase {
         List methods = []
         List datas = []
         List response_codes = []
-        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert metaResult() == []
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -314,7 +318,7 @@ class VaultServiceTest extends GroovyTestCase {
         List methods = []
         List datas = []
         List response_codes = []
-        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert metaResult() == []
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -327,7 +331,7 @@ class VaultServiceTest extends GroovyTestCase {
         List methods = []
         List datas = []
         List response_codes = []
-        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert metaResult() == []
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -340,7 +344,7 @@ class VaultServiceTest extends GroovyTestCase {
         List methods = []
         List datas = []
         List response_codes = []
-        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert metaResult() == []
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -353,7 +357,7 @@ class VaultServiceTest extends GroovyTestCase {
         List methods = []
         List datas = []
         List response_codes = []
-        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert metaResult() == []
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -367,7 +371,7 @@ class VaultServiceTest extends GroovyTestCase {
         List methods = []
         List datas = []
         List response_codes = []
-        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert metaResult() == []
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
@@ -380,7 +384,7 @@ class VaultServiceTest extends GroovyTestCase {
         List methods = []
         List datas = []
         List response_codes = []
-        assert [request_history*.url, request_history*.method, request_history*.data, request_history*.response_code] == []
+        assert metaResult() == []
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
