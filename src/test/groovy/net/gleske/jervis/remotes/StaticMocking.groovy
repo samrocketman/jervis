@@ -256,12 +256,10 @@ request_history</tt></pre>
                     temp_request_meta['response_headers'] = response_headers
                     temp_request_meta['response_code'] = response_code
                     request_history << temp_request_meta
-                    // create an empty file in case of a No Content response
-                    if(response_code < 300) {
-                        File responseFile = new File("src/test/resources/mocks/${file}")
-                        if(!responseFile.exists()) {
-                            responseFile.createNewFile()
-                        }
+                    // create an empty file for any API query
+                    File responseFile = new File("src/test/resources/mocks/${file}")
+                    if(!responseFile.exists()) {
+                        responseFile.createNewFile()
                     }
                     response_headers
                 },
