@@ -521,8 +521,15 @@ vault.mountVersions = versions</tt></pre>
         [location.mount, location.path.replaceAll('^/', '')].join('/')
     }
 
-    // TODO: java doc
-    // TODO write tests
+    /**
+      List a path in Vault to find KV secret entries.
+
+      @param location A map with two keys: mount and path.  The mount is a KV
+                      mount in Vault and the path is a location of a secret
+                      relative to the given mount.
+      @return Returns a List of secrets for a given path.  If the entry ends
+              with a slash <tt>/</tt> then it is a subfolder for listing more secrets.
+      */
     List listPath(Map location) {
         checkLocationMap(location)
         String mount = location.mount
@@ -537,8 +544,13 @@ vault.mountVersions = versions</tt></pre>
         }
     }
 
-    // TODO: java doc
-    // TODO write tests
+    /**
+      List a path in Vault to find KV secret entries.
+
+      @param path A path in Vault including the KV store mount.
+      @return Returns a List of secrets for a given path.  If the entry ends
+              with a slash <tt>/</tt> then it is a subfolder for listing more secrets.
+      */
     List listPath(String path) {
         listPath(getLocationMapFromPath(path))
     }
