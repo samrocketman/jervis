@@ -19,13 +19,13 @@ import net.gleske.jervis.exceptions.VaultException
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.interfaces.VaultCredential
 
-// TODO: java doc
-    // TODO document recommended setup and usage (setting up recommended
+// TODO: Enhance java doc
+    // document recommended setup and usage (setting up recommended
     //   policy, AppId, use batch token, manually set mountVersions to cut down
     //   on API calls).  Add a bullet point list of useful methods.  Document
     //   usage of the method within the method itself.
-    // TODO document minimum required role for full functionality
-    // TODO document reducing the role and code changes required (e.g. using
+    // document minimum required role for full functionality
+    // document reducing the role and code changes required (e.g. using
     //   mountVersions or a batch token instead of a service token)
 /**
   Provides easy access to
@@ -282,6 +282,21 @@ vault.mountVersions = versions</tt></pre>
     Map<String, String> headers = [:]
 
     // TODO document constructor
+    /**
+      Authenticate with a Vault instance using a basic token credential.  This
+      constructor is provided for simplicity and testing.  However, AppRole
+      authentication is recommended, instead.
+      <h2>Example usage</h2>
+<pre><tt>import net.gleske.jervis.remotes.interfaces.TokenCredential
+import net.gleske.jervis.remotes.VaultService
+
+TokenCredential creds = [getToken: {-> 'some vault token' }] as TokenCredential
+VaultService vault = new VaultService('http://vault:8200/', creds)
+
+// ready to perform vault operations
+vault.discoverKVMounts()
+vault.mountVersions</tt></pre>
+      */
     VaultService(String vault_url, TokenCredential credential) {
         this.vault_url = addTrailingSlash(vault_url)
         if(!this.vault_url.endsWith('v1/')) {
