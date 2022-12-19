@@ -568,4 +568,26 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
+    @Test public void test_VaultService_getMountFromPath_nonempty_path() {
+        assert myvault.getMountFromPath('kv/foo') == 'kv'
+        assert myvault.getMountFromPath('secret/foo') == 'secret'
+        assert myvault.getMountFromPath('kv_cas/foo') == 'kv_cas'
+    }
+    @Test public void test_VaultService_getMountFromPath_empty_path() {
+        assert myvault.getMountFromPath('kv/') == 'kv'
+        assert myvault.getMountFromPath('secret/') == 'secret'
+        assert myvault.getMountFromPath('kv_cas/') == 'kv_cas'
+        assert myvault.getMountFromPath('kv') == 'kv'
+        assert myvault.getMountFromPath('secret') == 'secret'
+        assert myvault.getMountFromPath('kv_cas') == 'kv_cas'
+    }
+    @Test public void test_VaultService_getMountFromPath_invalid_mount() {
+        shouldFail(VaultException) {
+            myvault.getMountFromPath('some/fake/path')
+        }
+        myvault.@mountVersions = [:]
+        shouldFail(VaultException) {
+            myvault.getMountFromPath('kv')
+        }
+    }
 }

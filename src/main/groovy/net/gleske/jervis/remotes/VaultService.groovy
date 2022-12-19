@@ -459,15 +459,18 @@ vault.mountVersions = versions</tt></pre>
                   KV v2 secret engine mount path.
       @return The key-value mount in Vault where the path is stored.
       */
-    // TODO write tests
-    String getMountFromPath(String path) {
+    String getMountFromPath(String path) throws VaultException {
         if(!mountVersions) {
             throw new VaultException('No mounts available.  Did you call discoverKVMounts() method?')
         }
         // returns a mount
-        mountVersions.keySet().toList().find { String mount ->
+        String mount = mountVersions.keySet().toList().find { String mount ->
             path.startsWith(mount + '/') || path == mount
         }
+        if(mount == null) {
+            throw new VaultException('Provided path does not match any existing mounts.')
+        }
+        mount
     }
 
     /**
