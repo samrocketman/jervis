@@ -526,7 +526,7 @@ vault.mountVersions = versions</tt></pre>
     List listPath(Map location) {
         checkLocationMap(location)
         String mount = location.mount
-        String subpath = (location.path) ? addTrailingSlash(location.path) : ''
+        String subpath = (location.path) ? addTrailingSlash(location.path).replaceAll('^/', '') : ''
 
         if(isKeyValueV2(mount)) {
             apiFetch("${mount}/metadata/${subpath}", [:], 'LIST')?.data?.keys

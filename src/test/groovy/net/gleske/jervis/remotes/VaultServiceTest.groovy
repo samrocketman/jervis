@@ -455,6 +455,42 @@ class VaultServiceTest extends GroovyTestCase {
             myvault.listPath('kv/foo/bar/baz/')
         }
     }
+    @Test public void test_VaultService_listPath_v1_location_map() {
+        assert myvault.listPath(mount: 'secret', path: '') == ['foo', 'foo/']
+        assert myvault.listPath(mount: 'secret', path: '/') == ['foo', 'foo/']
+        assert myvault.listPath(mount: 'secret', path: 'foo') == ['bar', 'bar/']
+        assert myvault.listPath(mount: 'secret', path: '/foo') == ['bar', 'bar/']
+        assert myvault.listPath(mount: 'secret', path: 'foo/') == ['bar', 'bar/']
+        assert myvault.listPath(mount: 'secret', path: '/foo/') == ['bar', 'bar/']
+        assert myvault.listPath(mount: 'secret', path: 'foo/bar') == ['baz']
+        assert myvault.listPath(mount: 'secret', path: '/foo/bar') == ['baz']
+        assert myvault.listPath(mount: 'secret', path: 'foo/bar/') == ['baz']
+        assert myvault.listPath(mount: 'secret', path: '/foo/bar/') == ['baz']
+        shouldFail(IOException) {
+            myvault.listPath(mount: 'secret', path: 'foo/bar/baz/')
+        }
+        shouldFail(IOException) {
+            myvault.listPath(mount: 'secret', path: '/foo/bar/baz/')
+        }
+    }
+    @Test public void test_VaultService_listPath_v2_location_map() {
+        assert myvault.listPath(mount: 'kv', path: '') == ['foo', 'foo/', 'v2_force_cas_update']
+        assert myvault.listPath(mount: 'kv', path: '/') == ['foo', 'foo/', 'v2_force_cas_update']
+        assert myvault.listPath(mount: 'kv', path: 'foo') == ['bar', 'bar/']
+        assert myvault.listPath(mount: 'kv', path: '/foo') == ['bar', 'bar/']
+        assert myvault.listPath(mount: 'kv', path: 'foo/') == ['bar', 'bar/']
+        assert myvault.listPath(mount: 'kv', path: '/foo/') == ['bar', 'bar/']
+        assert myvault.listPath(mount: 'kv', path: 'foo/bar') == ['baz']
+        assert myvault.listPath(mount: 'kv', path: '/foo/bar') == ['baz']
+        assert myvault.listPath(mount: 'kv', path: 'foo/bar/') == ['baz']
+        assert myvault.listPath(mount: 'kv', path: '/foo/bar/') == ['baz']
+        shouldFail(IOException) {
+            myvault.listPath(mount: 'kv', path: 'foo/bar/baz/')
+        }
+        shouldFail(IOException) {
+            myvault.listPath(mount: 'kv', path: '/foo/bar/baz/')
+        }
+    }
     @Test public void test_VaultService_copySecret_v1_to_v2() {
         myvault.copySecret('secret/foo', 'kv/v1_to_v2')
         List urls = ['http://vault:8200/v1/secret/foo', 'http://vault:8200/v1/kv/metadata/v1_to_v2', 'http://vault:8200/v1/kv/data/v1_to_v2']
