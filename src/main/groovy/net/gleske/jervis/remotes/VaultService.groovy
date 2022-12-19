@@ -281,7 +281,6 @@ vault.mountVersions = versions</tt></pre>
       */
     Map<String, String> headers = [:]
 
-    // TODO document constructor
     /**
       Authenticate with a Vault instance using a basic token credential.  This
       constructor is provided for simplicity and testing.  However, AppRole
@@ -304,7 +303,13 @@ vault.mountVersions</tt></pre>
         }
         this.credential = credential
     }
-    // TODO document constructor
+    /**
+      Authenticate with Vault using AppRole authentication via
+      <tt>{@link net.gleske.jervis.remotes.creds.VaultAppRoleCredential}</tt>.
+      Any valid
+      <tt>{@link net.gleske.jervis.remotes.interfaces.VaultCredential}</tt>
+      could be provided.
+      */
     VaultService(VaultCredential credential) {
         this(credential.vault_url, credential)
     }
@@ -352,9 +357,19 @@ vault.mountVersions</tt></pre>
         tempHeaders
     }
 
-    // TODO docs
-    // TODO test alternate syntax
-    // TODO test exception throwing
+    /**
+       Get secret from a KV v1 or KV v2 secret engine.
+
+      @param location A location map contains two keys: mount and path.  The
+                      mount is a KV mount in Vault and the path is a location of
+                      a secret relative to the given mount.
+       @param version Request a specific version of a secret.  If <tt>0</tt>,
+                      then the latest version is returned.  This option is
+                      ignored for KV v1 secrets engine.
+       @return Parsed JSON object content from a secret <tt>path</tt>.  If KV
+               v2 secrets engine and <tt>version</tt> was customized, then the
+               secret at that version is returned (if it exists).
+      */
     Map getSecret(Map location, Integer version = 0) {
         checkLocationMap(location)
         String mount = location.mount
@@ -368,8 +383,7 @@ vault.mountVersions</tt></pre>
     }
 
     /**
-       Get secret from a KV v1 or KV v2 secret engine.  This method will
-       gracefully handle either KV v1 or KV v2.
+       Get secret from a KV v1 or KV v2 secret engine.
 
        @param path    A path to a secret JSON object to read from Vault.
        @param version Request a specific version of a secret.  If <tt>0</tt>,

@@ -15,8 +15,20 @@
    */
 package net.gleske.jervis.remotes.interfaces
 
-// TODO add java doc
+/**
+  A basic credential whose only purpose is to get a Role ID and Secret ID for
+  <a href="https://developer.hashicorp.com/vault/docs/auth/approle" target=_blank>HashCorp Vault AppRole</a>
+  authentication.
+  */
 interface VaultRoleIdCredential extends JervisCredential {
+    /**
+      When implemented, this method should return a role ID used for
+      authenticating with Vault.
+      */
     String getRole_id()
+    /**
+      When implemented, this method should return a secret ID used for
+      authenticating with Vault.
+      */
     String getSecret_id()
 }
