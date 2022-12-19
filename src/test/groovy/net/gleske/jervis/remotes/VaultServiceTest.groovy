@@ -626,4 +626,31 @@ class VaultServiceTest extends GroovyTestCase {
             myvault.getLocationMapFromPath('some/fake/path')
         }
     }
+    @Test public void test_VaultService_getPathFromLocationMap_empty_path() {
+        assert myvault.getPathFromLocationMap([mount: 'kv', path: 'foo']) == 'kv/foo'
+        assert myvault.getPathFromLocationMap([mount: 'secret', path: 'foo']) == 'secret/foo'
+        assert myvault.getPathFromLocationMap([mount: 'kv_cas', path: 'foo']) == 'kv_cas/foo'
+        assert myvault.getPathFromLocationMap([mount: 'kv', path: '/foo']) == 'kv/foo'
+        assert myvault.getPathFromLocationMap([mount: 'secret', path: '/foo']) == 'secret/foo'
+        assert myvault.getPathFromLocationMap([mount: 'kv_cas', path: '/foo']) == 'kv_cas/foo'
+        assert myvault.getPathFromLocationMap([mount: 'kv', path: '/foo/']) == 'kv/foo/'
+        assert myvault.getPathFromLocationMap([mount: 'secret', path: '/foo/']) == 'secret/foo/'
+        assert myvault.getPathFromLocationMap([mount: 'kv_cas', path: '/foo/']) == 'kv_cas/foo/'
+        assert myvault.getPathFromLocationMap([mount: 'kv', path: 'foo/']) == 'kv/foo/'
+        assert myvault.getPathFromLocationMap([mount: 'secret', path: 'foo/']) == 'secret/foo/'
+        assert myvault.getPathFromLocationMap([mount: 'kv_cas', path: 'foo/']) == 'kv_cas/foo/'
+    }
+    @Test public void test_VaultService_getPathFromLocationMap_nonempty_path() {
+        assert myvault.getPathFromLocationMap([mount: 'kv', path: '']) == 'kv/'
+        assert myvault.getPathFromLocationMap([mount: 'secret', path: '']) == 'secret/'
+        assert myvault.getPathFromLocationMap([mount: 'kv_cas', path: '']) == 'kv_cas/'
+        assert myvault.getPathFromLocationMap([mount: 'kv', path: '/']) == 'kv/'
+        assert myvault.getPathFromLocationMap([mount: 'secret', path: '/']) == 'secret/'
+        assert myvault.getPathFromLocationMap([mount: 'kv_cas', path: '/']) == 'kv_cas/'
+    }
+    @Test public void test_VaultService_getPathFromLocationMap_invalid_mount() {
+        shouldFail(VaultException) {
+            myvault.getPathFromLocationMap(mount: 'some', path: 'fake/path')
+        }
+    }
 }

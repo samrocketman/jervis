@@ -516,7 +516,6 @@ vault.mountVersions = versions</tt></pre>
                       relative to the given mount.
       @return Returns a String representing a valid path to a Vault secret including its secret engine mount.
       */
-    // TODO write tests
     String getPathFromLocationMap(Map location) {
         checkLocationMap(location)
         [location.mount, location.path.replaceAll('^/', '')].join('/')
