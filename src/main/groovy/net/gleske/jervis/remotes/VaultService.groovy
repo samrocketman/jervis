@@ -499,7 +499,6 @@ vault.mountVersions = versions</tt></pre>
               mount in Vault and the path is a location of a secret relative to
               the given mount.
       */
-    // TODO write tests
     Map getLocationMapFromPath(String path) {
         Map location = [
             mount: getMountFromPath(path),
