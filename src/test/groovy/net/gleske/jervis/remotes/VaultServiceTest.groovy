@@ -590,4 +590,22 @@ class VaultServiceTest extends GroovyTestCase {
             myvault.getMountFromPath('kv')
         }
     }
+    @Test public void test_VaultService_getLocationFromPath_empty_path() {
+        assert myvault.getLocationFromPath('kv/foo') == 'foo'
+        assert myvault.getLocationFromPath('secret/foo') == 'foo'
+        assert myvault.getLocationFromPath('kv_cas/foo') == 'foo'
+    }
+    @Test public void test_VaultService_getLocationFromPath_nonempty_path() {
+        assert myvault.getLocationFromPath('kv/') == ''
+        assert myvault.getLocationFromPath('secret/') == ''
+        assert myvault.getLocationFromPath('kv_cas/') == ''
+        assert myvault.getLocationFromPath('kv') == ''
+        assert myvault.getLocationFromPath('secret') == ''
+        assert myvault.getLocationFromPath('kv_cas') == ''
+    }
+    @Test public void test_VaultService_getLocationFromPath_invalid_mount() {
+        shouldFail(VaultException) {
+            myvault.getLocationFromPath('some/fake/path')
+        }
+    }
 }
