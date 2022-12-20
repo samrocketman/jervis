@@ -398,8 +398,23 @@ vault.mountVersions</tt></pre>
         getSecret(getLocationMapFromPath(path), version)
     }
 
+    /**
+      Set a secret in a KV v1 or KV v2 secret engine.
+
+      @param location A location map contains two keys: mount and path.  The
+                      mount is a KV mount in Vault and the path is a location of
+                      a secret relative to the given mount.
+      @param secret A secret to set at the given location in a Vault secret
+                    store.
+      @param enableCas Enable
+                       <a href="https://developer.hashicorp.com/vault/tutorials/secrets-management/versioned-kv#step-8-check-and-set-operations" target=_blank>Check and set</a>.
+                       This prevents unintentional overwriting of secrets.  This
+                       creates two requests: get current version of secret to be
+                       written, write secret with version set.  If the secret
+                       being set has been altered, then it will have a different
+                       version and Vault will reject the request..
+      */
     // TODO test mounts which contain a slash... because Vault allows that
-    // TODO test exception throwing
     void setSecret(Map location, Map secret, Boolean enableCas = false) {
         checkLocationMap(location)
         String mount = location.mount
@@ -434,35 +449,47 @@ vault.mountVersions</tt></pre>
       @param path      The destination to write the <tt>secret</tt>.
       @param secret    A Map converted to a JSON Object written to the Vault
                        <tt>path</tt>.
-      @param enableCas If enabled, a
-                       <a href="https://learn.hashicorp.com/tutorials/vault/versioned-kv#step-8-check-and-set-operations" target="_blank">Check-and-Set operation</a>
-                       is performed when writing to Vault.
+      @param enableCas Enable
+                       <a href="https://developer.hashicorp.com/vault/tutorials/secrets-management/versioned-kv#step-8-check-and-set-operations" target=_blank>Check and set</a>.
+                       This prevents unintentional overwriting of secrets.  This
+                       creates two requests: get current version of secret to be
+                       written, write secret with version set.  If the secret
+                       being set has been altered, then it will have a different
+                       version and Vault will reject the request..
       */
-    // TODO write tests
     void setSecret(String path, Map secret, Boolean enableCas = false) {
         setSecret(getLocationMapFromPath(path), secret, enableCas)
     }
 
     /**
       Forces a specified secrets engine <tt>mount</tt> to be KV v1 or KV v2.
-      See <tt>{@link #mountVersions}</tt> for additional usage.
+      See <tt>{@link #mountVersions}</tt> for additional usage.  For KV v2
+      mounts, this will check the mount config to see if
+      <a href="https://developer.hashicorp.com/vault/tutorials/secrets-management/versioned-kv#step-8-check-and-set-operations" target=_blank>Check and Set</a>
+      is required.  If you want to skip this check, then set cas_required List
+      with all KV v2 mounts.
+
+      <h5>Example of skipping CAS check on a KV v2 mount</h5>
+<pre><tt>VaultService vault = new VaultService(...)
+// Avoid cas check by setting cas_required before setting mount version.
+vault.cas_required = ['kv']
+vault.setMountVersions('kv', '2')</tt></pre>
 
       @param mount   A Vault secrets engine mount.
       @param version Must be <tt>"1"</tt> or <tt>"2"</tt> to denote KV v1 or KV
                      v2 secrets engine.  Any type is allowed to catch invalid
                      version setting.
       */
-    // TODO write tests
     // TODO test manual mounts that have a slash in its name
     void setMountVersions(String mount, def version) {
         if(!(version in ['1', '2', 1, 2])) {
             throw new VaultException('Vault key-value mounts can only be version "1" or "2".')
         }
         this.mountVersions[mount] = version.toString()
-        if(mountVersions[mount] == '2') {
+        if(mountVersions[mount] == '2' && !(mount in this.cas_required)) {
             Boolean isCasRequired = apiFetch(mount + '/config').data.cas_required
             if(isCasRequired) {
-                cas_required << mount
+                this.cas_required << mount
             }
         }
     }
@@ -474,7 +501,6 @@ vault.mountVersions</tt></pre>
       @param mountVersions A Key-Value map containing multiple Vault mounts and
                            respective version numbers.
       */
-    // TODO write tests
     void setMountVersions(Map mountVersions) {
         mountVersions.each { k, v ->
             this.setMountVersions(k, v)
