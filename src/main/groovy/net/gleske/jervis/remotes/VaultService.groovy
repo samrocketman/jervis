@@ -701,17 +701,37 @@ secret/
     }
 
     /**
-      Copies the contents of secret from a source key, srcKey, to the
-      destination key, destKey.  Optional argument srcVersion allows you to
-      select a specific version from a Key-Value v2 engine (default is get
-      latest version of secret).
+      Copies the contents of secret from a source key to the destination key.
+      Optional argument srcVersion allows you to select a specific version from
+      a Key-Value v2 engine (default is get latest version of secret).
 
-      TODO better java doc
+      @param srcKey The source key to copy from.
+      @param destKey The destination key to copy to.
+      @param srcVersion The version to select in the source key if the
+                        <tt>srcKey</tt> is a KV v2 secrets engine.
       */
-    // TODO write tests
-    // TODO support Map location
     void copySecret(String srcKey, String destKey, Integer srcVersion = 0) {
         setSecret(destKey, getSecret(srcKey, srcVersion), true)
+    }
+
+    /**
+      Copies the contents of secret from a source key to the destination key
+      using location maps.  Optional argument srcVersion allows you to select a
+      specific version from a Key-Value v2 engine (default is get latest version
+      of secret).
+
+      @param srcLocation The source to copy from.  A location map contains two
+                         keys: mount and path.  The mount is a KV mount in Vault
+                         and the path is a location of a secret relative to the
+                         given mount.
+      @param destLocation The destination key to copy to.  See
+                          <tt>srcLocation</tt> for definition of a location.
+      @param srcVersion The version to select in the source key if the
+                        <tt>srcLocation</tt> is a KV v2 secrets engine.
+      */
+    // TODO write tests
+    void copySecret(Map srcLocation, Map destLocation, Integer srcVersion = 0) {
+        setSecret(destLocation, getSecret(srcLocation, srcVersion), true)
     }
 
     /**
