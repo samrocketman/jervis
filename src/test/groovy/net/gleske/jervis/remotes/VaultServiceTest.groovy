@@ -249,16 +249,7 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_discover_mount_versions() {
-        myvault.@mountVersions = [:]
-        myvault.@cas_required = []
-        assert myvault.mountVersions == [:]
-        assert myvault.cas_required == []
-        myvault.discoverKVMounts()
-        assert myvault.mountVersions == ['kv':'2', 'kv_cas':'2', 'secret':'1']
-        assert myvault.cas_required == ['kv_cas']
-    }
-    @Test public void test_VaultService_getSecret_map_kv_v1() {
+    @Test public void test_VaultService_getSecret_location_map_kv_v1() {
         assert myvault.getSecret(mount: 'secret', path: 'foo') == [test: 'data']
         assert myvault.getSecret(mount: 'secret', path: 'foo/bar') == [someother: 'data']
         assert myvault.getSecret(mount: 'secret', path: 'foo/bar/baz') == [more: 'secrets']
@@ -273,7 +264,13 @@ class VaultServiceTest extends GroovyTestCase {
             myvault.getSecret(path: 'foo/bar/baz')
         }
     }
-    @Test public void test_VaultService_getSecret_map_kv_v2() {
+    @Test public void test_VaultService_getSecret_location_map_kv_v1_slash() {
+        assert myvault.getSecret(mount: 'secret', path: '/foo') == [test: 'data']
+        assert myvault.getSecret(mount: 'secret', path: '/foo/bar') == [someother: 'data']
+        assert myvault.getSecret(mount: 'secret', path: '/foo/bar/baz') == [more: 'secrets']
+        assert myvault.getSecret(mount: 'secret', path: '/foo/bar/baz', dont_care: 'value') == [more: 'secrets']
+    }
+    @Test public void test_VaultService_getSecret_location_map_kv_v2() {
         assert myvault.getSecret(mount: 'kv', path: 'foo') == [another: 'secret', hello: 'world']
         assert myvault.getSecret(mount: 'kv', path: 'foo/bar') == [hello: 'friend']
         assert myvault.getSecret(mount: 'kv', path: 'foo/bar/baz') == [foo: 'bar']
@@ -291,7 +288,13 @@ class VaultServiceTest extends GroovyTestCase {
             myvault.getSecret(mount: 'doesnotexist', path: 'foo/bar/baz')
         }
     }
-    @Test public void test_VaultService_getSecret_map_kv_v2_older_version_1() {
+    @Test public void test_VaultService_getSecret_location_map_kv_v2_slash() {
+        assert myvault.getSecret(mount: 'kv', path: '/foo') == [another: 'secret', hello: 'world']
+        assert myvault.getSecret(mount: 'kv', path: '/foo/bar') == [hello: 'friend']
+        assert myvault.getSecret(mount: 'kv', path: '/foo/bar/baz') == [foo: 'bar']
+        assert myvault.getSecret(mount: 'kv', path: '/foo/bar/baz', dont_care: 'value') == [foo: 'bar']
+    }
+    @Test public void test_VaultService_getSecret_location_map_kv_v2_older_version_1() {
         assert myvault.getSecret(mount: 'kv', path: 'foo', 1) == [hello: 'world']
         shouldFail(VaultException) {
             myvault.getSecret([:], 1)
@@ -305,6 +308,18 @@ class VaultServiceTest extends GroovyTestCase {
         shouldFail(VaultException) {
             myvault.getSecret(mount: 'doesnotexist', path: 'foo', 1)
         }
+    }
+    @Test public void test_VaultService_getSecret_location_map_kv_v2_older_version_1_slash() {
+        assert myvault.getSecret(mount: 'kv', path: '/foo', 1) == [hello: 'world']
+    }
+    @Test public void test_VaultService_discover_mount_versions() {
+        myvault.@mountVersions = [:]
+        myvault.@cas_required = []
+        assert myvault.mountVersions == [:]
+        assert myvault.cas_required == []
+        myvault.discoverKVMounts()
+        assert myvault.mountVersions == ['kv':'2', 'kv_cas':'2', 'secret':'1']
+        assert myvault.cas_required == ['kv_cas']
     }
     @Test public void test_VaultService_setMountVersions_String() {
         myvault.@mountVersions = [:]
