@@ -885,23 +885,21 @@ secret/
         if(subpath.endsWith('/')) {
             throw new VaultException('Cannot check if a path has been deleted.  Must provide a key i.e. not end with a trailing slash.')
         }
-        Boolean exists = true
-        if(!subpath.contains('/')) {
-            exists = (subpath in listPath(mount))
+        Map metadata = [:]
+        try {
+            if(isKeyValueV2(mount)) {
+                metadata = apiFetch("${mount}/metadata/${subpath}").data
+            }
+            else {
+                getSecret(location)
+                return false
+            }
         }
-        else {
-            String key = subpath.tokenize('/')[-1]
-            exists = (key in listPath(mount: mount, path: subpath.tokenize('/')[0..-2].join('/') + '/'))
-        }
-        if(!exists) {
+        catch(IOException ignored) {
+            // The metadata path does not exist so safe to assume it is deleted.
             return true
         }
-        // KV v1 either it exists or it doesn't
-        if(this.mountVersions[mount] == '1') {
-            return false
-        }
         // KV v2 it exists but must verify it is not a soft delete.
-        Map metadata = apiFetch("${mount}/metadata/${subpath}").data
         if(!version) {
             // check if current version is deleted
             return metadata.versions[metadata.current_version.toString()].with { it.deletion_time || it.destroyed }
