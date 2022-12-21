@@ -486,11 +486,12 @@ vault.setMountVersions('kv', '2')</tt></pre>
             throw new VaultException('Vault key-value mounts can only be version "1" or "2".')
         }
         this.mountVersions[mount] = version.toString()
-        if(mountVersions[mount] == '2' && !(mount in this.cas_required)) {
-            Boolean isCasRequired = apiFetch(mount + '/config').data.cas_required
-            if(isCasRequired) {
-                this.cas_required << mount
-            }
+        if(!isKeyValueV2(mount) || mount in this.cas_required) {
+            return
+        }
+        Boolean isCasRequired = apiFetch(mount + '/config').data.cas_required
+        if(isCasRequired) {
+            this.cas_required << mount
         }
     }
 
