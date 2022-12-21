@@ -861,8 +861,8 @@ secret/
             // of the list.  Depth is defined as the number of '/' in the path.
             b.count('/') <=> a.count('/')
         }.each { String key ->
-            // destroy all versions when recursive deleting
-            deleteKey(key, [], true)
+            // Performs a soft delete by default or destroys all versions
+            deleteKey(key, [], destroyAllVersions)
         }
     }
     */
@@ -873,6 +873,4 @@ secret/
            ['a', 'a/b/c', 'a/b', 'a/b/c/d'].sort { a, b -> b.count('/') <=> a.count('/') }
            returns ['a/b/c/d', 'a/b/c', 'a/b', 'a']
      */
-    // TODO getSecretsAsList should return a combined list matching the order of the input keys.
-    // TODO getSecretsAsMap should return a Key-Value Map where the key is the secret key and value is contents of the secret.
 }
