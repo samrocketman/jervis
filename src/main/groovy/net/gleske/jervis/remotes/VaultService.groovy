@@ -734,7 +734,6 @@ secret/
                         ignored if <tt>srcLocation</tt> is a KV v1 secrets
                         engine.
       */
-    // TODO write tests
     void copySecret(Map srcLocation, Map destLocation, Integer srcVersion = 0) {
         setSecret(destLocation, getSecret(srcLocation, srcVersion), true)
     }
@@ -862,7 +861,8 @@ secret/
             // of the list.  Depth is defined as the number of '/' in the path.
             b.count('/') <=> a.count('/')
         }.each { String key ->
-            deleteKey(key)
+            // destroy all versions when recursive deleting
+            deleteKey(key, [], true)
         }
     }
     */
@@ -873,9 +873,6 @@ secret/
            ['a', 'a/b/c', 'a/b', 'a/b/c/d'].sort { a, b -> b.count('/') <=> a.count('/') }
            returns ['a/b/c/d', 'a/b/c', 'a/b', 'a']
      */
-    // TODO implement combining path of keys into a List of Maps?  This might not be useful.
-    // TODO organize private methods to bottom of class
-    // TODO add Vault exception higherarchy?
     // TODO getSecretsAsList should return a combined list matching the order of the input keys.
     // TODO getSecretsAsMap should return a Key-Value Map where the key is the secret key and value is contents of the secret.
 }
