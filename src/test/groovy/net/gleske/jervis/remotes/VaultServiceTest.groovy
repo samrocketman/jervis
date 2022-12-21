@@ -693,6 +693,140 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
+    @Test public void test_VaultService_setSecret_location_map_v1() {
+        myvault.setSecret([mount: 'secret', path: 'v1_set'], [another: 'secret', hello: 'world'])
+        List urls = ['http://vault:8200/v1/secret/v1_set']
+        List methods = ['POST']
+        List datas = ['{"another":"secret","hello":"world"}']
+        List response_codes = [204]
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+        assert request_history*.response_code == response_codes
+    }
+    @Test public void test_VaultService_setSecret_location_map_v1_slash() {
+        myvault.setSecret([mount: 'secret', path: '/v1_set'], [another: 'secret', hello: 'world'])
+        List urls = ['http://vault:8200/v1/secret/v1_set']
+        List methods = ['POST']
+        List datas = ['{"another":"secret","hello":"world"}']
+        List response_codes = [204]
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+        assert request_history*.response_code == response_codes
+    }
+    @Test public void test_VaultService_setSecret_location_map_v1_force_cas() {
+        myvault.setSecret([mount: 'secret', path: 'v1_set_force_cas'], [another: 'secret', hello: 'world'], true)
+        List urls = ['http://vault:8200/v1/secret/v1_set_force_cas']
+        List methods = ['POST']
+        List datas = ['{"another":"secret","hello":"world"}']
+        List response_codes = [204]
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+        assert request_history*.response_code == response_codes
+    }
+    @Test public void test_VaultService_setSecret_location_map_v1_force_cas_slash() {
+        myvault.setSecret([mount: 'secret', path: '/v1_set_force_cas'], [another: 'secret', hello: 'world'], true)
+        List urls = ['http://vault:8200/v1/secret/v1_set_force_cas']
+        List methods = ['POST']
+        List datas = ['{"another":"secret","hello":"world"}']
+        List response_codes = [204]
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+        assert request_history*.response_code == response_codes
+    }
+    @Test public void test_VaultService_setSecret_location_map_v2_no_cas() {
+        myvault.setSecret([mount: 'kv', path: 'v2_no_cas'], [test: 'data'])
+        List urls = ['http://vault:8200/v1/kv/data/v2_no_cas']
+        List methods = ['POST']
+        List datas = ['{"data":{"test":"data"}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_setSecret_location_map_v2_no_cas_slash() {
+        myvault.setSecret([mount: 'kv', path: '/v2_no_cas'], [test: 'data'])
+        List urls = ['http://vault:8200/v1/kv/data/v2_no_cas']
+        List methods = ['POST']
+        List datas = ['{"data":{"test":"data"}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_setSecret_location_map_v2_force_cas() {
+        myvault.setSecret([mount: 'kv', path: 'v2_force_cas'], [test: 'data'], true)
+        List urls = ['http://vault:8200/v1/kv/metadata/v2_force_cas', 'http://vault:8200/v1/kv/data/v2_force_cas']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"data":{"test":"data"},"options":{"cas":0}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_setSecret_location_map_v2_force_cas_slash() {
+        myvault.setSecret([mount: 'kv', path: '/v2_force_cas'], [test: 'data'], true)
+        List urls = ['http://vault:8200/v1/kv/metadata/v2_force_cas', 'http://vault:8200/v1/kv/data/v2_force_cas']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"data":{"test":"data"},"options":{"cas":0}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_setSecret_location_map_v2_force_cas_update_secret() {
+        myvault.setSecret([mount: 'kv', path: 'v2_force_cas_update'], [test: 'update'], true)
+        List urls = ['http://vault:8200/v1/kv/metadata/v2_force_cas_update', 'http://vault:8200/v1/kv/data/v2_force_cas_update']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"data":{"test":"update"},"options":{"cas":1}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_setSecret_location_map_v2_force_cas_update_secret_slash() {
+        myvault.setSecret([mount: 'kv', path: '/v2_force_cas_update'], [test: 'update'], true)
+        List urls = ['http://vault:8200/v1/kv/metadata/v2_force_cas_update', 'http://vault:8200/v1/kv/data/v2_force_cas_update']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"data":{"test":"update"},"options":{"cas":1}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_setSecret_location_map_v2_detect_cas() {
+        myvault.setSecret([mount: 'kv_cas', path: 'v2_detect_cas'], [another: 'secret', hello: 'world'])
+        List urls = ['http://vault:8200/v1/kv_cas/metadata/v2_detect_cas', 'http://vault:8200/v1/kv_cas/data/v2_detect_cas']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"data":{"another":"secret","hello":"world"},"options":{"cas":0}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_setSecret_location_map_v2_detect_cas_slash() {
+        myvault.setSecret([mount: 'kv_cas', path: '/v2_detect_cas'], [another: 'secret', hello: 'world'])
+        List urls = ['http://vault:8200/v1/kv_cas/metadata/v2_detect_cas', 'http://vault:8200/v1/kv_cas/data/v2_detect_cas']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"data":{"another":"secret","hello":"world"},"options":{"cas":0}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_setSecret_location_map_v2_detect_cas_update_secret() {
+        myvault.setSecret([mount: 'kv_cas', path: 'data_to_update'], [update: 'secret'])
+        List urls = ['http://vault:8200/v1/kv_cas/metadata/data_to_update', 'http://vault:8200/v1/kv_cas/data/data_to_update']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"data":{"update":"secret"},"options":{"cas":1}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_setSecret_location_map_v2_detect_cas_update_secret_slash() {
+        myvault.setSecret([mount: 'kv_cas', path: '/data_to_update'], [update: 'secret'])
+        List urls = ['http://vault:8200/v1/kv_cas/metadata/data_to_update', 'http://vault:8200/v1/kv_cas/data/data_to_update']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"data":{"update":"secret"},"options":{"cas":1}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
     @Test public void test_VaultService_getMountFromPath_nonempty_path() {
         assert myvault.getMountFromPath('kv/foo') == 'kv'
         assert myvault.getMountFromPath('secret/foo') == 'secret'
