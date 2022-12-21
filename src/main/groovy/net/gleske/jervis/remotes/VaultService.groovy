@@ -803,14 +803,16 @@ secret/
         paths.collect { String path ->
             try {
                 getEnvironmentSecret(path, 0, allowInvalidKeys)
-            } catch(FileNotFoundException e) {
+            }
+            catch(IOException ignored) {
                 [:]
             }
         }.sum()
     }
 
     /**
-      Deletes data from a KV v1 or KV v2 secrets engine.
+      Deletes data from a KV v1 or KV v2 secrets engine using a location map.
+
       @param key
       @param destroyVersions
       @param destroyAllVersions Permanently deletes the key metadata and all
@@ -819,11 +821,15 @@ secret/
                                 ignored.  This option is ignored for KV v1
                                 secrets engine.
       */
-    /* TODO work in progress
+    // TODO update javadoc
     // TODO write tests
-    void deleteKey(String key, List<Integer> destroyVersions = [], Boolean destroyAllVersions = false) {
-        String mount = path -~ '/.*$'
-        String subpath = path -~ '^[^/]+/'
+    void deleteKey(Map location, List<Integer> destroyVersions = [], Boolean destroyAllVersions = false) {
+        checkLocationMap(location)
+        String mount = location.mount
+        String subpath = location.path.replaceAll('^/', '')
+        if(!subpath.trim() || subpath.trim().endsWith('/')) {
+            throw new VaultException('Must provide a valid key to be deleted.  Paths are not allowed.')
+        }
         if(isKeyValueV2(mount)) {
             if(destroyAllVersions) {
                 apiFetch("${mount}/metadata/${subpath}", [:], 'DELETE')
@@ -840,7 +846,12 @@ secret/
             apiFetch(path, [:], 'DELETE')
         }
     }
-    */
+
+    // TODO update javadoc
+    // TODO write tests
+    void deleteKey(String path, Boolean destroyAllVersions = false, List<Integer> destroyVersions = []) {
+        deleteKey(getLocationMapFromPath(path), destroyVersions, destroyAllVersions)
+    }
 
     /**
       Deletes data from a KV v1 or KV v2 secrets engine.
@@ -852,9 +863,7 @@ secret/
                                 ignored.  This option is ignored for KV v1
                                 secrets engine.
       */
-    /* TODO work in progress
     // TODO write tests
-    void deleteKey(String key, List<Integer> destroyVersions = [], Boolean destroyAllVersions = false) {
     void deletePath(String path, Boolean level = 0, Boolean destroyAllVersions = false) {
         findAllKeys(path, level).sort { String a, String b ->
             // performs a reverse sort to list maximum depth at the beginning
@@ -862,10 +871,54 @@ secret/
             b.count('/') <=> a.count('/')
         }.each { String key ->
             // Performs a soft delete by default or destroys all versions
-            deleteKey(key, [], destroyAllVersions)
+            deleteKey(key, destroyAllVersions)
         }
     }
-    */
+
+
+    // TODO write javadoc
+    // TODO write tests
+    Boolean isDeletedKey(Map location, Integer version = 0) {
+        checkLocationMap(location)
+        String mount = location.mount
+        String subpath = location.path.replaceAll('^/', '')
+        if(subpath.endsWith('/')) {
+            throw new VaultException('Cannot check if a path has been deleted.  Must provide a key i.e. not end with a trailing slash.')
+        }
+        Boolean exists = true
+        if(!subpath.contains('/')) {
+            exists = (subpath in listPath(mount))
+        }
+        else {
+            String key = subpath.tokenize('/')[-1]
+            exists = (key in listPath(mount: mount, path: subpath.tokenize('/')[0..-2].join('/') + '/'))
+        }
+        if(!exists) {
+            return true
+        }
+        // KV v1 either it exists or it doesn't
+        if(this.mountVersions[mount] == '1') {
+            return false
+        }
+        // KV v2 it exists but must verify it is not a soft delete.
+        Map metadata = apiFetch("${mount}/metadata/${subpath}").data
+        if(!version) {
+            // check if current version is deleted
+            return metadata.versions[metadata.current_version.toString()].with { it.deletion_time || it.destroyed }
+        }
+        // If user asks for version that is not real, then report it as deleted
+        // since it is non-existent.
+        if(!(version.toString() in metadata.versions.keySet())) {
+            return true
+        }
+        metadata.versions[version.toString()].with { it.deletion_time || it.destroyed }
+    }
+
+    // TODO write javadoc
+    // TODO write tests
+    Boolean isDeletedKey(String path, Integer version = 0) {
+        isDeletedKey(getLocationMapFromPath(path), version)
+    }
 
     // TODO implement DELETE key
     /* TODO implement recursive DELETE path
