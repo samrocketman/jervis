@@ -373,7 +373,7 @@ vault.mountVersions</tt></pre>
     Map getSecret(Map location, Integer version = 0) {
         checkLocationMap(location)
         String mount = location.mount
-        String subpath = location.path
+        String subpath = location.path.replaceAll('^/', '')
         if(isKeyValueV2(mount)) {
             apiFetch("${mount}/data/${subpath}?version=${version}")?.data?.data
         }
@@ -418,7 +418,7 @@ vault.mountVersions</tt></pre>
     void setSecret(Map location, Map secret, Boolean enableCas = false) {
         checkLocationMap(location)
         String mount = location.mount
-        String subpath = location.path
+        String subpath = location.path.replaceAll('^/', '')
         if(isKeyValueV2(mount)) {
             Map data = [data: secret]
             Map secretMeta = [:]
@@ -708,7 +708,9 @@ secret/
       @param srcKey The source key to copy from.
       @param destKey The destination key to copy to.
       @param srcVersion The version to select in the source key if the
-                        <tt>srcKey</tt> is a KV v2 secrets engine.
+                        <tt>srcKey</tt> is a KV v2 secrets engine.  By default
+                        it will get the latest version.  This option is ignored
+                        if <tt>srcKey</tt> is a KV v1 secrets engine.
       */
     void copySecret(String srcKey, String destKey, Integer srcVersion = 0) {
         setSecret(destKey, getSecret(srcKey, srcVersion), true)
@@ -727,7 +729,10 @@ secret/
       @param destLocation The destination key to copy to.  See
                           <tt>srcLocation</tt> for definition of a location.
       @param srcVersion The version to select in the source key if the
-                        <tt>srcLocation</tt> is a KV v2 secrets engine.
+                        <tt>srcLocation</tt> is a KV v2 secrets engine.  By
+                        default it will get the latest version.  This option is
+                        ignored if <tt>srcLocation</tt> is a KV v1 secrets
+                        engine.
       */
     // TODO write tests
     void copySecret(Map srcLocation, Map destLocation, Integer srcVersion = 0) {

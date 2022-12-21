@@ -536,6 +536,96 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
+    @Test public void test_VaultService_copySecret_location_map_v1_to_v2() {
+        myvault.copySecret([mount: 'secret', path: 'foo'], [mount: 'kv', path: 'v1_to_v2'])
+        List urls = ['http://vault:8200/v1/secret/foo', 'http://vault:8200/v1/kv/metadata/v1_to_v2', 'http://vault:8200/v1/kv/data/v1_to_v2']
+        List methods = ['GET', 'GET', 'POST']
+        List datas = ['', '', '{"data":{"test":"data"},"options":{"cas":0}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_location_map_v1_to_v2_slashes() {
+        myvault.copySecret([mount: 'secret', path: '/foo'], [mount: 'kv', path: '/v1_to_v2'])
+        List urls = ['http://vault:8200/v1/secret/foo', 'http://vault:8200/v1/kv/metadata/v1_to_v2', 'http://vault:8200/v1/kv/data/v1_to_v2']
+        List methods = ['GET', 'GET', 'POST']
+        List datas = ['', '', '{"data":{"test":"data"},"options":{"cas":0}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_location_map_v2_to_v1() {
+        myvault.copySecret([mount: 'kv', path: 'foo'], [mount: 'secret', path: 'v2_to_v1'])
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=0', 'http://vault:8200/v1/secret/v2_to_v1']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"another":"secret","hello":"world"}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_location_map_v2_to_v1_slashes() {
+        myvault.copySecret([mount: 'kv', path: '/foo'], [mount: 'secret', path: '/v2_to_v1'])
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=0', 'http://vault:8200/v1/secret/v2_to_v1']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"another":"secret","hello":"world"}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_location_map_v2_to_v1_version_1() {
+        myvault.copySecret([mount: 'kv', path: 'foo'], [mount: 'secret', path: 'v2_to_v1_version_1'], 1)
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=1', 'http://vault:8200/v1/secret/v2_to_v1_version_1']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"hello":"world"}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_location_map_v2_to_v1_version_1_slashes() {
+        myvault.copySecret([mount: 'kv', path: '/foo'], [mount: 'secret', path: '/v2_to_v1_version_1'], 1)
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=1', 'http://vault:8200/v1/secret/v2_to_v1_version_1']
+        List methods = ['GET', 'POST']
+        List datas = ['', '{"hello":"world"}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_location_map_v2_to_v2() {
+        myvault.copySecret([mount: 'kv', path: 'foo'], [mount: 'kv', path: 'v2_to_v2/v2_to_v2'])
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=0', 'http://vault:8200/v1/kv/metadata/v2_to_v2/v2_to_v2', 'http://vault:8200/v1/kv/data/v2_to_v2/v2_to_v2']
+        List methods = ['GET', 'GET', 'POST']
+        List datas = ['', '', '{"data":{"another":"secret","hello":"world"},"options":{"cas":0}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_location_map_v2_to_v2_slashes() {
+        myvault.copySecret([mount: 'kv', path: '/foo'], [mount: 'kv', path: '/v2_to_v2/v2_to_v2'])
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=0', 'http://vault:8200/v1/kv/metadata/v2_to_v2/v2_to_v2', 'http://vault:8200/v1/kv/data/v2_to_v2/v2_to_v2']
+        List methods = ['GET', 'GET', 'POST']
+        List datas = ['', '', '{"data":{"another":"secret","hello":"world"},"options":{"cas":0}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_location_map_v2_to_v2_version_1() {
+        myvault.copySecret([mount: 'kv', path: 'foo'], [mount: 'kv', path: 'v2_to_v2_version_1'], 1)
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=1', 'http://vault:8200/v1/kv/metadata/v2_to_v2_version_1', 'http://vault:8200/v1/kv/data/v2_to_v2_version_1']
+        List methods = ['GET', 'GET', 'POST']
+        List datas = ['', '', '{"data":{"hello":"world"},"options":{"cas":0}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_location_map_v2_to_v2_version_1_slashes() {
+        myvault.copySecret([mount: 'kv', path: 'foo'], [mount: 'kv', path: 'v2_to_v2_version_1'], 1)
+        List urls = ['http://vault:8200/v1/kv/data/foo?version=1', 'http://vault:8200/v1/kv/metadata/v2_to_v2_version_1', 'http://vault:8200/v1/kv/data/v2_to_v2_version_1']
+        List methods = ['GET', 'GET', 'POST']
+        List datas = ['', '', '{"data":{"hello":"world"},"options":{"cas":0}}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
     @Test public void test_VaultService_setSecret_v1() {
         myvault.setSecret('secret/v1_set', [another: 'secret', hello: 'world'])
         List urls = ['http://vault:8200/v1/secret/v1_set']
@@ -585,7 +675,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-
     @Test public void test_VaultService_setSecret_v2_detect_cas() {
         myvault.setSecret('kv_cas/v2_detect_cas', [another: 'secret', hello: 'world'])
         List urls = ['http://vault:8200/v1/kv_cas/metadata/v2_detect_cas', 'http://vault:8200/v1/kv_cas/data/v2_detect_cas']
