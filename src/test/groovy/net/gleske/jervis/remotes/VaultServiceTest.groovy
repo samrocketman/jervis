@@ -76,8 +76,8 @@ if(!('kv_cas' in myvault.mountVersions.keySet())) {
     init_kv_cas = true
 }
 if(!('secret' in myvault.mountVersions.keySet())) {
-  myvault.apiFetch('sys/mounts/secret', [:], 'POST', '{"type": "kv", "options": {"version": "1"}}')
-  init_secret = true
+    myvault.apiFetch('sys/mounts/secret', [:], 'POST', '{"type": "kv", "options": {"version": "1"}}')
+    init_secret = true
 }
 
 // Discover mounts after potentially adding new secrets engines.
