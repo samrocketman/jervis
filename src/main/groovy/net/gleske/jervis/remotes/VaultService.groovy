@@ -193,17 +193,17 @@ class VaultService implements SimpleRestServiceSupport {
                           compare against desiredLevel.
       @return A list of keys that are paths.
       */
-    private List<String> recursiveFindAllKeys(String path, Integer desiredLevel, Integer level) {
+    private List<String> recursiveFindAllKeys(Map location, Integer desiredLevel, Integer level) {
         if(desiredLevel > 0 && level > desiredLevel) {
             return []
         }
         List entries = []
-        entries = listPath(path).collect { String key ->
+        entries = listPath(location).collect { String key ->
             if(key.endsWith('/')) {
-                recursiveFindAllKeys(path + key, desiredLevel, level + 1)
+                recursiveFindAllKeys([mount: location.mount, path: location.path + key], desiredLevel, level + 1)
             }
             else {
-                [path + key]
+                [getPathFromLocationMap([mount: location.mount, path: location.path + key])]
             }
         }
         entries.sum()
@@ -524,7 +524,7 @@ vault.setMountVersions('kv', '2')</tt></pre>
             path.startsWith(mount + '/') || path == mount
         }
         if(mount == null) {
-            throw new VaultException('Provided path does not match any existing mounts.')
+            throw new VaultException('Provided path does not match any existing mounts.  For path: ' + path)
         }
         mount
     }
@@ -673,16 +673,26 @@ secret/
       </li>
       </ul>
       */
-    List<String> findAllKeys(String path, Integer level = 0) throws IOException {
+    List<String> findAllKeys(Map location, Integer level = 0) throws IOException {
+        checkLocationMap(location)
+        String mount = location.mount
+        String subpath = location.path.replaceAll('^/', '')
         List additionalKeys = []
-        // check if a key exists instead of a path
-        if(!path.endsWith('/') && path.contains('/')) {
-            if(path in findAllKeys(path.tokenize('/')[0..-2].join('/'), 1)) {
-                additionalKeys << path
+        if(subpath) {
+            // check if a key exists instead of a path
+            if(!subpath.endsWith('/')) {
+                String path = getPathFromLocationMap(location)
+                String parentPath = ''
+                if(subpath.contains('/')) {
+                    parentPath = subpath.tokenize('/')[0..-2].join('/')
+                }
+                if(path in findAllKeys([mount: mount, path: parentPath], 1)) {
+                    additionalKeys << getPathFromLocationMap(location)
+                }
             }
+            subpath = addTrailingSlash(subpath)
         }
-        path = addTrailingSlash(path)
-        additionalKeys + recursiveFindAllKeys(path, level, 1)
+        additionalKeys + recursiveFindAllKeys([mount: mount, path: subpath], level, 1)
     }
 
     /**
@@ -696,9 +706,8 @@ secret/
       @param level When traversing secrets paths <tt>level</tt> limits how deep
                    the path goes when returning results.
       */
-    List<String> findAllKeys(Map location, Integer level = 0) throws IOException {
-        checkLocationMap(location)
-        findAllKeys(getPathFromLocationMap(location), level)
+    List<String> findAllKeys(String path, Integer level = 0) throws IOException {
+        findAllKeys(getLocationMapFromPath(path), level)
     }
 
     /**
@@ -865,8 +874,9 @@ secret/
                                 secrets engine.
       */
     // TODO write tests
-    void deletePath(String path, Boolean level = 0, Boolean destroyAllVersions = false) {
-        findAllKeys(path, level).sort { String a, String b ->
+    void deletePath(Map location, Integer level, Boolean destroyAllVersions = false) {
+        checkLocationMap(location)
+        findAllKeys(location, level).sort { String a, String b ->
             // performs a reverse sort to list maximum depth at the beginning
             // of the list.  Depth is defined as the number of '/' in the path.
             b.count('/') <=> a.count('/')
@@ -874,6 +884,16 @@ secret/
             // Performs a soft delete by default or destroys all versions
             deleteKey(key, destroyAllVersions)
         }
+    }
+    void deletePath(Map location, Boolean destroyAllVersions = false) {
+        deletePath(location, 0, destroyAllVersions)
+    }
+    void deletePath(String path, Boolean destroyAllVersions = false) {
+        deletePath(getLocationMapFromPath(path), 0, destroyAllVersions)
+    }
+
+    void deletePath(String path, Integer level, Boolean destroyAllVersions = false) {
+        deletePath(getLocationMapFromPath('path'), level, destroyAllVersions)
     }
 
 
