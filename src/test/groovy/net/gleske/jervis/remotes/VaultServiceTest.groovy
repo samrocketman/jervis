@@ -1052,10 +1052,9 @@ class VaultServiceTest extends GroovyTestCase {
     }
     @Test public void test_VaultService_copyAllKeys_kv1_to_kv2_withslash_rename() {
         myvault.copyAllKeys('secret/foo', 'secret2/withslash/rename')
-        List urls = []
-        List methods = []
-        List datas = []
-        assert metaResult() == []
+        List urls = ['http://vault:8200/v1/secret/', 'http://vault:8200/v1/secret/foo/', 'http://vault:8200/v1/secret/foo/bar/', 'http://vault:8200/v1/secret/foo', 'http://vault:8200/v1/secret2/withslash/rename', 'http://vault:8200/v1/secret/foo/bar', 'http://vault:8200/v1/secret2/withslash/rename/bar', 'http://vault:8200/v1/secret/foo/bar/baz', 'http://vault:8200/v1/secret2/withslash/rename/bar/baz']
+        List methods = ['LIST', 'LIST', 'LIST', 'GET', 'POST', 'GET', 'POST', 'GET', 'POST']
+        List datas = ['', '', '', '', '{"test":"data"}', '', '{"someother":"data"}', '', '{"more":"secrets"}']
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
