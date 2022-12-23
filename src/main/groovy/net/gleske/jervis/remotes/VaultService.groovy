@@ -844,7 +844,7 @@ secret/
       */
     // TODO update javadoc
     // TODO write tests
-    void deleteKey(Map location, List<Integer> destroyVersions, Boolean destroyAllVersions = false) {
+    void deleteKey(Map location, List<Integer> deleteVersions, Boolean destroyAllVersions = false) {
         checkLocationMap(location)
         String mount = location.mount
         String subpath = location.path.replaceAll('^/', '')
@@ -852,11 +852,12 @@ secret/
             throw new VaultException('Must provide a valid key to be deleted.  Paths are not allowed.')
         }
         if(isKeyValueV2(mount)) {
-            if(destroyAllVersions) {
-                apiFetch("${mount}/metadata/${subpath}", [:], 'DELETE')
+            if(deleteVersions) {
+                String deleteVersions_api = destroyAllVersions ? 'destroy' : 'delete'
+                apiFetch("${mount}/${deleteVersions_api}/${subpath}", [:], 'POST', objToJson([versions: deleteVersions]))
             }
-            else if(destroyVersions) {
-                apiFetch("${mount}/destroy/${subpath}", [:], 'DELETE', objToJson([versions: destroyVersions]))
+            else if(destroyAllVersions) {
+                apiFetch("${mount}/metadata/${subpath}", [:], 'DELETE')
             }
             else {
                 // soft delete
