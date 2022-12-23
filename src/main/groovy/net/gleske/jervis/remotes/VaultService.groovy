@@ -755,16 +755,27 @@ secret/
       TODO better java doc
       */
     // TODO write tests
-    // TODO support Map location for both srcPath and destPath
-    void copyAllKeys(String srcPath, String destPath, Integer level = 0) {
+    void copyAllKeys(Map srcLocation, Map destLocation, Integer level = 0) {
+        checkLocationMap(srcLocation)
+        checkLocationMap(destLocation)
+        String srcPath = srcLocation.path.replaceAll('^/', '')
+        String destPath = destLocation.path.replaceAll('^/', '')
         // TODO support path and path/ for source and destination.
-        findAllKeys(srcPath, level).each { String srcKey ->
-            String destKey = destPath + (srcKey -~ "^\\Q${srcPath}\\E")
+        findAllKeys(srcLocation, level).each { String srcKey ->
+            Map srcKeyLocation = getLocationMapFromPath(srcKey)
+            Map destKeyLocation = [
+                mount: destLocation.mount,
+                path: destPath + (srcKeyLocation.path -~ "^\\Q${srcPath}\\E")
+            ]
             if(destPath.endsWith('/')) {
-                destKey = destPath + getLocationFromPath(srcKey)
+                destKeyLocation.path = destPath + srcKeyLocation.path
             }
-            copySecret(srcKey, destKey)
+            copySecret(srcKeyLocation, destKeyLocation)
         }
+    }
+
+    void copyAllKeys(String srcPath, String destPath, Integer level = 0) {
+        copyAllKeys(getLocationMapFromPath(srcPath), getLocationMapFromPath(destPath), level)
     }
 
     /**
@@ -833,7 +844,7 @@ secret/
       */
     // TODO update javadoc
     // TODO write tests
-    void deleteKey(Map location, List<Integer> destroyVersions = [], Boolean destroyAllVersions = false) {
+    void deleteKey(Map location, List<Integer> destroyVersions, Boolean destroyAllVersions = false) {
         checkLocationMap(location)
         String mount = location.mount
         String subpath = location.path.replaceAll('^/', '')
@@ -853,14 +864,21 @@ secret/
             }
         }
         else {
-            apiFetch(path, [:], 'DELETE')
+            apiFetch(getPathFromLocationMap(location), [:], 'DELETE')
         }
+    }
+
+    void deleteKey(Map location, Boolean destroyAllVersions = false) {
+        deleteKey(location, [], destroyAllVersions)
     }
 
     // TODO update javadoc
     // TODO write tests
-    void deleteKey(String path, Boolean destroyAllVersions = false, List<Integer> destroyVersions = []) {
+    void deleteKey(String path, List<Integer> destroyVersions, Boolean destroyAllVersions = false) {
         deleteKey(getLocationMapFromPath(path), destroyVersions, destroyAllVersions)
+    }
+    void deleteKey(String path, Boolean destroyAllVersions = false) {
+        deleteKey(getLocationMapFromPath(path), [], destroyAllVersions)
     }
 
     /**
@@ -889,11 +907,11 @@ secret/
         deletePath(location, 0, destroyAllVersions)
     }
     void deletePath(String path, Boolean destroyAllVersions = false) {
-        deletePath(getLocationMapFromPath(path), 0, destroyAllVersions)
+        deletePath(path, 0, destroyAllVersions)
     }
 
     void deletePath(String path, Integer level, Boolean destroyAllVersions = false) {
-        deletePath(getLocationMapFromPath('path'), level, destroyAllVersions)
+        deletePath(getLocationMapFromPath(path), level, destroyAllVersions)
     }
 
 
