@@ -1,4 +1,4 @@
-request_id: ba17028a-d52b-3ce3-1980-f3d367f75409
+request_id: 0895a859-11a3-2daf-1c90-a8a07f05b9f1
 lease_id: ''
 renewable: false
 lease_duration: 0
@@ -6,7 +6,12 @@ data:
   keys:
     - foo
     - foo/
+    - v1_to_v2
+    - v2_force_cas
     - v2_force_cas_update
+    - v2_no_cas
+    - v2_to_v2/
+    - v2_to_v2_version_1
 wrap_info: null
 warnings: null
 auth: null

@@ -1,0 +1,16 @@
+request_id: 618353ac-f357-46a5-574f-1c349d1fb41a
+lease_id: ''
+renewable: false
+lease_duration: 0
+data:
+  data:
+    hello: friend
+  metadata:
+    created_time: '2022-12-23T05:16:30.131767159Z'
+    custom_metadata: null
+    deletion_time: ''
+    destroyed: false
+    version: 1
+wrap_info: null
+warnings: null
+auth: null

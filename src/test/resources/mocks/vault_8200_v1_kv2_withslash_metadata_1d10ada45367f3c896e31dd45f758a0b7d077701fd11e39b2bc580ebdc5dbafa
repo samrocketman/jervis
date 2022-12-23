@@ -1,0 +1,15 @@
+request_id: fa029b3c-e9b6-bf09-c6b5-16654ac4a91a
+lease_id: ''
+renewable: false
+lease_duration: 0
+data:
+  keys:
+    - deleteone
+    - rename
+    - rename/
+    - somepath
+    - somepath/
+    - subpath/
+wrap_info: null
+warnings: null
+auth: null
