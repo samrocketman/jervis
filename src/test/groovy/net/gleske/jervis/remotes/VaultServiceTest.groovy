@@ -185,9 +185,9 @@ myvault.copySecret('secret/foo', 'kv2/withslash/deleteone')
 myvault.copySecret('kv/foo', 'kv2/withslash/deleteone', 1)
 myvault.copySecret('secret/foo', 'kv2/withslash/deleteone')
 myvault.copySecret('kv/foo', 'kv2/withslash/deleteone')
-myvault.deleteKey( 'kv2/withslash/deleteone')
-myvault.deleteKey( 'kv2/withslash/deleteone', [1])
-myvault.deleteKey( 'kv2/withslash/deleteone', [3], true)
+myvault.deleteKey('kv2/withslash/deleteone')
+myvault.deleteKey('kv2/withslash/deleteone', [1])
+myvault.deleteKey('kv2/withslash/deleteone', [3], true)
 myvault.isDeletedKey('kv2/withslash/deleteone')
 myvault.isDeletedKey('kv2/withslash/deleteone', 1)
 myvault.isDeletedKey('kv2/withslash/deleteone', 2)
@@ -265,7 +265,7 @@ class VaultServiceTest extends GroovyTestCase {
         //TokenCredential cred = [getToken: {-> 'fake-token' }] as TokenCredential
         TokenCredential cred = [getToken: {-> 'hvs.CT1912OdOBRWnn1UVQntX9Ld' }] as TokenCredential
         myvault = new VaultService(DEFAULT_VAULT_URL, cred)
-        myvault.@mountVersions = ['kv':'2', 'kv_cas':'2', 'secret':'1']
+        myvault.@mountVersions = ['secret':'1', 'kv2/withslash':'2', 'secret2/withslash':'1', 'kv':'2', 'kv_cas':'2']
         myvault.@cas_required = ['kv_cas']
     }
     //tear down after every test
@@ -1029,5 +1029,168 @@ class VaultServiceTest extends GroovyTestCase {
         shouldFail(VaultException) {
             myvault.getPathFromLocationMap(mount: 'some', path: 'fake/path')
         }
+    }
+    @Test public void test_VaultService_copyAllKeys_kv2_withslash_rename() {
+        myvault.copyAllKeys('kv/foo', 'kv2/withslash/rename')
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copyAllKeys_kv2_to_kv1_withslash_subpath() {
+        myvault.copyAllKeys('kv2/withslash/rename', 'secret2/withslash/subpath/')
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copyAllKeys_kv1_to_kv2_withslash_rename() {
+        myvault.copyAllKeys('secret/foo', 'secret2/withslash/rename')
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copyAllKeys_kv1_to_kv2_withslash_subpath() {
+        myvault.copyAllKeys('secret2/withslash/rename', 'kv2/withslash/subpath/')
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_isDeletedKey() {
+        assert true == myvault.isDeletedKey('kv/foo')
+        assert true == myvault.isDeletedKey('secret/foo')
+        assert false == myvault.isDeletedKey('secret/foo2')
+        assert false == myvault.isDeletedKey('kv/foo2')
+    }
+    @Test public void test_VaultService_copySecret_kv1_to_kv2_withslash() {
+        myvault.copySecret('secret/foo', 'kv2/withslash/deleteone')
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_kv1_to_kv2_withslash_version_1() {
+        myvault.copySecret('kv/foo', 'kv2/withslash/deleteone', 1)
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_kv2_to_kv2_withslash() {
+        myvault.copySecret('kv/foo', 'kv2/withslash/deleteone')
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deleteKey_kv2_softdelete() {
+        myvault.deleteKey('kv2/withslash/deleteone')
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deleteKey_kv2_softdelete_version_1() {
+        myvault.deleteKey('kv2/withslash/deleteone', [1])
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deleteKey_kv2_destroy_version_3() {
+        myvault.deleteKey('kv2/withslash/deleteone', [3], true)
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_isDeletedKey_versions_1_through_4() {
+        assert true == myvault.isDeletedKey('kv2/withslash/deleteone')
+        assert true == myvault.isDeletedKey('kv2/withslash/deleteone', 1)
+        assert false == myvault.isDeletedKey('kv2/withslash/deleteone', 2)
+        assert true == myvault.isDeletedKey('kv2/withslash/deleteone', 3)
+        assert true == myvault.isDeletedKey('kv2/withslash/deleteone', 4)
+    }
+    @Test public void test_VaultService_getSecret_kv2_withslash_version_2() {
+        myvault.getSecret('kv2/withslash/deleteone', 2)
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deletePath_kv2_withslash_softdelete() {
+        myvault.deletePath('kv2/withslash/somepath')
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deletePath_kv2_withslash_destroy() {
+        myvault.deletePath('kv2/withslash/somepath', true)
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deletePath_kv1_withslash_softdelete() {
+        myvault.deletePath('secret2/withslash/somepath')
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deletePath_kv1_withslash_destroy() {
+        myvault.deletePath('secret2/withslash/somepath', true)
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
     }
 }
