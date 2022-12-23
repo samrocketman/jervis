@@ -400,19 +400,19 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.mountVersions == [:]
         assert myvault.cas_required == []
         myvault.discoverKVMounts()
-        assert myvault.mountVersions == ['kv':'2', 'kv_cas':'2', 'secret':'1']
+        assert myvault.mountVersions == ['secret':'1', 'kv2/withslash':'2', 'secret2/withslash':'1', 'kv':'2', 'kv_cas':'2']
         assert myvault.cas_required == ['kv_cas']
-        assert request_history*.url == ['http://vault:8200/v1/sys/mounts', 'http://vault:8200/v1/kv/config', 'http://vault:8200/v1/kv_cas/config']
-        assert request_history*.method == ['GET', 'GET', 'GET']
+        assert request_history*.url == ['http://vault:8200/v1/sys/mounts', 'http://vault:8200/v1/kv2/withslash/config', 'http://vault:8200/v1/kv/config', 'http://vault:8200/v1/kv_cas/config']
+        assert request_history*.method == ['GET', 'GET', 'GET', 'GET']
     }
     @Test public void test_VaultService_discover_mount_versions_skip_cas_check() {
         myvault.@mountVersions = [:]
-        myvault.@cas_required = ['kv', 'kv_cas']
+        myvault.@cas_required = ['kv2/withslash', 'kv', 'kv_cas']
         assert myvault.mountVersions == [:]
-        assert myvault.cas_required == ['kv', 'kv_cas']
+        assert myvault.cas_required == ['kv2/withslash', 'kv', 'kv_cas']
         myvault.discoverKVMounts()
-        assert myvault.mountVersions == ['kv':'2', 'kv_cas':'2', 'secret':'1']
-        assert myvault.cas_required == ['kv', 'kv_cas']
+        assert myvault.mountVersions == ['secret':'1', 'kv2/withslash':'2', 'secret2/withslash':'1', 'kv':'2', 'kv_cas':'2']
+        assert myvault.cas_required == ['kv2/withslash', 'kv', 'kv_cas']
         assert request_history*.url == ['http://vault:8200/v1/sys/mounts']
         assert request_history*.method == ['GET']
     }
@@ -454,11 +454,12 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_findAllKeys_v1() {
-        assert myvault.findAllKeys('secret') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
-        assert myvault.findAllKeys('secret/') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
-        assert myvault.findAllKeys('secret/', 1) == ['secret/foo']
-        assert myvault.findAllKeys('secret/', 2) == ['secret/foo', 'secret/foo/bar']
-        assert myvault.findAllKeys('secret/', 3) == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
+        List data = ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz', 'secret/v1_set', 'secret/v1_set_force_cas', 'secret/v2_to_v1', 'secret/v2_to_v1_version_1']
+        assert myvault.findAllKeys('secret') == data
+        assert myvault.findAllKeys('secret/') == data
+        assert myvault.findAllKeys('secret/', 1) == data.findAll { it.count('/') <= 1 }
+        assert myvault.findAllKeys('secret/', 2) == data.findAll { it.count('/') <= 2 }
+        assert myvault.findAllKeys('secret/', 3) == data.findAll { it.count('/') <= 3 }
     }
     @Test public void test_VaultService_findAllKeys_v1_subkey() {
         assert myvault.findAllKeys('secret/foo') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
@@ -473,11 +474,12 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_findAllKeys_v2() {
-        assert myvault.findAllKeys('kv') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
-        assert myvault.findAllKeys('kv/') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
-        assert myvault.findAllKeys('kv/', 1) == ['kv/foo', 'kv/v2_force_cas_update']
-        assert myvault.findAllKeys('kv/', 2) == ['kv/foo', 'kv/foo/bar', 'kv/v2_force_cas_update']
-        assert myvault.findAllKeys('kv/', 3) == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
+        List data = ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v1_to_v2', 'kv/v2_force_cas', 'kv/v2_force_cas_update', 'kv/v2_no_cas', 'kv/v2_to_v2/v2_to_v2', 'kv/v2_to_v2_version_1']
+        assert myvault.findAllKeys('kv') == data
+        assert myvault.findAllKeys('kv/') == data
+        assert myvault.findAllKeys('kv/', 1) == data.findAll { it.count('/') <= 1 }
+        assert myvault.findAllKeys('kv/', 2) == data.findAll { it.count('/') <= 2 }
+        assert myvault.findAllKeys('kv/', 3) == data.findAll { it.count('/') <= 3 }
     }
     @Test public void test_VaultService_findAllKeys_v2_subkey() {
         assert myvault.findAllKeys('kv/foo') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
@@ -506,11 +508,12 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_findAllKeys_v1_location_map() {
-        assert myvault.findAllKeys(mount: 'secret', path: '') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
-        assert myvault.findAllKeys(mount: 'secret', path: '/') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
-        assert myvault.findAllKeys([mount: 'secret', path: '/'], 1) == ['secret/foo']
-        assert myvault.findAllKeys([mount: 'secret', path: '/'], 2) == ['secret/foo', 'secret/foo/bar']
-        assert myvault.findAllKeys([mount: 'secret', path: '/'], 3) == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
+        List data = ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz', 'secret/v1_set', 'secret/v1_set_force_cas', 'secret/v2_to_v1', 'secret/v2_to_v1_version_1']
+        assert myvault.findAllKeys(mount: 'secret', path: '') == data
+        assert myvault.findAllKeys(mount: 'secret', path: '/') == data
+        assert myvault.findAllKeys([mount: 'secret', path: '/'], 1) == data.findAll { it.count('/') <= 1 }
+        assert myvault.findAllKeys([mount: 'secret', path: '/'], 2) == data.findAll { it.count('/') <= 2 }
+        assert myvault.findAllKeys([mount: 'secret', path: '/'], 3) == data.findAll { it.count('/') <= 3 }
     }
     @Test public void test_VaultService_findAllKeys_v1_location_map_subkey() {
         assert myvault.findAllKeys(mount: 'secret', path: 'foo') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
@@ -525,11 +528,12 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_findAllKeys_v2_location_map() {
-        assert myvault.findAllKeys(mount: 'kv', path: '') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
-        assert myvault.findAllKeys(mount: 'kv', path: '/') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
-        assert myvault.findAllKeys([mount: 'kv', path: '/'], 1) == ['kv/foo', 'kv/v2_force_cas_update']
-        assert myvault.findAllKeys([mount: 'kv', path: '/'], 2) == ['kv/foo', 'kv/foo/bar', 'kv/v2_force_cas_update']
-        assert myvault.findAllKeys([mount: 'kv', path: '/'], 3) == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v2_force_cas_update']
+        List data = ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'kv/v1_to_v2', 'kv/v2_force_cas', 'kv/v2_force_cas_update', 'kv/v2_no_cas', 'kv/v2_to_v2/v2_to_v2', 'kv/v2_to_v2_version_1']
+        assert myvault.findAllKeys(mount: 'kv', path: '') == data
+        assert myvault.findAllKeys(mount: 'kv', path: '/') == data
+        assert myvault.findAllKeys([mount: 'kv', path: '/'], 1) == data.findAll { it.count('/') <= 1 }
+        assert myvault.findAllKeys([mount: 'kv', path: '/'], 2) == data.findAll { it.count('/') <= 2 }
+        assert myvault.findAllKeys([mount: 'kv', path: '/'], 3) == data.findAll { it.count('/') <= 3 }
     }
     @Test public void test_VaultService_findAllKeys_v2_location_map_subkey() {
         assert myvault.findAllKeys(mount: 'kv', path: 'foo') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
@@ -544,8 +548,9 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_listPath_v1() {
-        assert myvault.listPath('secret') == ['foo', 'foo/']
-        assert myvault.listPath('secret/') == ['foo', 'foo/']
+        List data = ['foo', 'foo/', 'v1_set', 'v1_set_force_cas', 'v2_to_v1', 'v2_to_v1_version_1']
+        assert myvault.listPath('secret') == data
+        assert myvault.listPath('secret/') == data
         assert myvault.listPath('secret/foo') == ['bar', 'bar/']
         assert myvault.listPath('secret/foo/') == ['bar', 'bar/']
         assert myvault.listPath('secret/foo/bar') == ['baz']
@@ -555,8 +560,9 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_listPath_v2() {
-        assert myvault.listPath('kv') == ['foo', 'foo/', 'v2_force_cas_update']
-        assert myvault.listPath('kv/') == ['foo', 'foo/', 'v2_force_cas_update']
+        List data = ['foo', 'foo/', 'v1_to_v2', 'v2_force_cas', 'v2_force_cas_update', 'v2_no_cas', 'v2_to_v2/', 'v2_to_v2_version_1']
+        assert myvault.listPath('kv') == data
+        assert myvault.listPath('kv/') == data
         assert myvault.listPath('kv/foo') == ['bar', 'bar/']
         assert myvault.listPath('kv/foo/') == ['bar', 'bar/']
         assert myvault.listPath('kv/foo/bar') == ['baz']
@@ -566,8 +572,9 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_listPath_v1_location_map() {
-        assert myvault.listPath(mount: 'secret', path: '') == ['foo', 'foo/']
-        assert myvault.listPath(mount: 'secret', path: '/') == ['foo', 'foo/']
+        List data = ['foo', 'foo/', 'v1_set', 'v1_set_force_cas', 'v2_to_v1', 'v2_to_v1_version_1']
+        assert myvault.listPath(mount: 'secret', path: '') == data
+        assert myvault.listPath(mount: 'secret', path: '/') == data
         assert myvault.listPath(mount: 'secret', path: 'foo') == ['bar', 'bar/']
         assert myvault.listPath(mount: 'secret', path: '/foo') == ['bar', 'bar/']
         assert myvault.listPath(mount: 'secret', path: 'foo/') == ['bar', 'bar/']
@@ -584,8 +591,9 @@ class VaultServiceTest extends GroovyTestCase {
         }
     }
     @Test public void test_VaultService_listPath_v2_location_map() {
-        assert myvault.listPath(mount: 'kv', path: '') == ['foo', 'foo/', 'v2_force_cas_update']
-        assert myvault.listPath(mount: 'kv', path: '/') == ['foo', 'foo/', 'v2_force_cas_update']
+        List data = ['foo', 'foo/', 'v1_to_v2', 'v2_force_cas', 'v2_force_cas_update', 'v2_no_cas', 'v2_to_v2/', 'v2_to_v2_version_1']
+        assert myvault.listPath(mount: 'kv', path: '') == data
+        assert myvault.listPath(mount: 'kv', path: '/') == data
         assert myvault.listPath(mount: 'kv', path: 'foo') == ['bar', 'bar/']
         assert myvault.listPath(mount: 'kv', path: '/foo') == ['bar', 'bar/']
         assert myvault.listPath(mount: 'kv', path: 'foo/') == ['bar', 'bar/']

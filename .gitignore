@@ -20,3 +20,6 @@ id_rsa*
 
 *.swp
 *.hprof
+
+#ignore test scripts
+/*.groovy
