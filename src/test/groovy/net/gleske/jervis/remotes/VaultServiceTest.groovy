@@ -465,6 +465,10 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.findAllKeys('secret/foo') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
         assert myvault.findAllKeys('secret/foo/') == ['secret/foo/bar', 'secret/foo/bar/baz']
     }
+    @Test public void test_VaultService_findAllKeys_v1_subkey_subpath() {
+        assert myvault.findAllKeys('secret/foo/bar') == ['secret/foo/bar', 'secret/foo/bar/baz']
+        assert myvault.findAllKeys('secret/foo/bar/') == ['secret/foo/bar/baz']
+    }
     @Test public void test_VaultService_findAllKeys_v1_doesnotexist() {
         shouldFail(IOException) {
             myvault.findAllKeys('secret/zerg')
@@ -484,6 +488,10 @@ class VaultServiceTest extends GroovyTestCase {
     @Test public void test_VaultService_findAllKeys_v2_subkey() {
         assert myvault.findAllKeys('kv/foo') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
         assert myvault.findAllKeys('kv/foo/') == ['kv/foo/bar', 'kv/foo/bar/baz']
+    }
+    @Test public void test_VaultService_findAllKeys_v2_subkey_subpath() {
+        assert myvault.findAllKeys('kv/foo/bar') == ['kv/foo/bar', 'kv/foo/bar/baz']
+        assert myvault.findAllKeys('kv/foo/bar/') == ['kv/foo/bar/baz']
     }
     @Test public void test_VaultService_findAllKeys_v2_doesnotexist() {
         shouldFail(IOException) {
@@ -519,6 +527,12 @@ class VaultServiceTest extends GroovyTestCase {
         assert myvault.findAllKeys(mount: 'secret', path: 'foo') == ['secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz']
         assert myvault.findAllKeys(mount: 'secret', path: 'foo/') == ['secret/foo/bar', 'secret/foo/bar/baz']
     }
+    @Test public void test_VaultService_findAllKeys_v1_location_map_subkey_subpath() {
+        assert myvault.findAllKeys(mount: 'secret', path: '/foo/bar') == ['secret/foo/bar', 'secret/foo/bar/baz']
+        assert myvault.findAllKeys(mount: 'secret', path: 'foo/bar') == ['secret/foo/bar', 'secret/foo/bar/baz']
+        assert myvault.findAllKeys(mount: 'secret', path: '/foo/bar/') == ['secret/foo/bar/baz']
+        assert myvault.findAllKeys(mount: 'secret', path: 'foo/bar/') == ['secret/foo/bar/baz']
+    }
     @Test public void test_VaultService_findAllKeys_v1_location_map_doesnotexist() {
         shouldFail(IOException) {
             myvault.findAllKeys(mount: 'secret', path: 'zerg')
@@ -538,6 +552,12 @@ class VaultServiceTest extends GroovyTestCase {
     @Test public void test_VaultService_findAllKeys_v2_location_map_subkey() {
         assert myvault.findAllKeys(mount: 'kv', path: 'foo') == ['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz']
         assert myvault.findAllKeys(mount: 'kv', path: 'foo/') == ['kv/foo/bar', 'kv/foo/bar/baz']
+    }
+    @Test public void test_VaultService_findAllKeys_v2_location_map_subkey_subpath() {
+        assert myvault.findAllKeys(mount: 'kv', path: '/foo/bar') == ['kv/foo/bar', 'kv/foo/bar/baz']
+        assert myvault.findAllKeys(mount: 'kv', path: 'foo/bar') == ['kv/foo/bar', 'kv/foo/bar/baz']
+        assert myvault.findAllKeys(mount: 'kv', path: '/foo/bar/') == ['kv/foo/bar/baz']
+        assert myvault.findAllKeys(mount: 'kv', path: 'foo/bar/') == ['kv/foo/bar/baz']
     }
     @Test public void test_VaultService_findAllKeys_v2_location_map_doesnotexist() {
         shouldFail(IOException) {
@@ -1066,42 +1086,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_isDeletedKey() {
-        assert false == myvault.isDeletedKey('kv/foo')
-        assert false == myvault.isDeletedKey('secret/foo')
-        assert true == myvault.isDeletedKey('secret/foo2')
-        assert true == myvault.isDeletedKey('kv/foo2')
-    }
-    @Test public void test_VaultService_copySecret_kv1_to_kv2_withslash() {
-        myvault.copySecret('secret/foo', 'kv2/withslash/deleteone')
-        List urls = []
-        List methods = []
-        List datas = []
-        assert metaResult() == []
-        assert request_history*.url == urls
-        assert request_history*.method == methods
-        assert request_history*.data == datas
-    }
-    @Test public void test_VaultService_copySecret_kv1_to_kv2_withslash_version_1() {
-        myvault.copySecret('kv/foo', 'kv2/withslash/deleteone', 1)
-        List urls = []
-        List methods = []
-        List datas = []
-        assert metaResult() == []
-        assert request_history*.url == urls
-        assert request_history*.method == methods
-        assert request_history*.data == datas
-    }
-    @Test public void test_VaultService_copySecret_kv2_to_kv2_withslash() {
-        myvault.copySecret('kv/foo', 'kv2/withslash/deleteone')
-        List urls = []
-        List methods = []
-        List datas = []
-        assert metaResult() == []
-        assert request_history*.url == urls
-        assert request_history*.method == methods
-        assert request_history*.data == datas
-    }
     @Test public void test_VaultService_deleteKey_kv2_softdelete() {
         myvault.deleteKey('kv2/withslash/deleteone')
         List urls = ['http://vault:8200/v1/kv2/withslash/data/deleteone']
@@ -1181,4 +1165,42 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
+    /*
+    @Test public void test_VaultService_isDeletedKey() {
+        assert false == myvault.isDeletedKey('kv/foo')
+        assert false == myvault.isDeletedKey('secret/foo')
+        assert true == myvault.isDeletedKey('secret/foo2')
+        assert true == myvault.isDeletedKey('kv/foo2')
+    }
+    @Test public void test_VaultService_copySecret_kv1_to_kv2_withslash_version_1() {
+        myvault.copySecret('kv/foo', 'kv2/withslash/deleteone', 1)
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_kv2_to_kv2_withslash() {
+        myvault.copySecret('kv/foo', 'kv2/withslash/deleteone')
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_copySecret_kv1_to_kv2_withslash() {
+        myvault.copySecret('secret/foo', 'kv2/withslash/deleteone')
+        List urls = []
+        List methods = []
+        List datas = []
+        assert metaResult() == []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    */
 }
