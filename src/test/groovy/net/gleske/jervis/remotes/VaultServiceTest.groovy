@@ -1127,6 +1127,42 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
+    @Test public void test_VaultService_deletePath_location_map_kv2_withslash_softdelete() {
+        myvault.deletePath(mount: 'kv2/withslash', path: 'somepath')
+        List urls = ['http://vault:8200/v1/kv2/withslash/metadata/', 'http://vault:8200/v1/kv2/withslash/metadata/somepath/', 'http://vault:8200/v1/kv2/withslash/metadata/somepath/bar/', 'http://vault:8200/v1/kv2/withslash/data/somepath/bar/baz', 'http://vault:8200/v1/kv2/withslash/data/somepath/bar', 'http://vault:8200/v1/kv2/withslash/data/somepath']
+        List methods = ['LIST', 'LIST', 'LIST', 'DELETE', 'DELETE', 'DELETE']
+        List datas = ['', '', '', '', '', '']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deletePath_location_map_kv2_withslash_destroy() {
+        myvault.deletePath([mount: 'kv2/withslash', path: 'somepath'], true)
+        List urls = ['http://vault:8200/v1/kv2/withslash/metadata/', 'http://vault:8200/v1/kv2/withslash/metadata/somepath/', 'http://vault:8200/v1/kv2/withslash/metadata/somepath/bar/', 'http://vault:8200/v1/kv2/withslash/metadata/somepath/bar/baz', 'http://vault:8200/v1/kv2/withslash/metadata/somepath/bar', 'http://vault:8200/v1/kv2/withslash/metadata/somepath']
+        List methods = ['LIST', 'LIST', 'LIST', 'DELETE', 'DELETE', 'DELETE']
+        List datas = ['', '', '', '', '', '']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deletePath_location_map_kv1_withslash_softdelete() {
+        myvault.deletePath(mount: 'secret2/withslash', path: 'somepath')
+        List urls = ['http://vault:8200/v1/secret2/withslash/', 'http://vault:8200/v1/secret2/withslash/somepath/', 'http://vault:8200/v1/secret2/withslash/somepath/bar/', 'http://vault:8200/v1/secret2/withslash/somepath/bar/baz', 'http://vault:8200/v1/secret2/withslash/somepath/bar', 'http://vault:8200/v1/secret2/withslash/somepath']
+        List methods = ['LIST', 'LIST', 'LIST', 'DELETE', 'DELETE', 'DELETE']
+        List datas = ['', '', '', '', '', '']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deletePath_location_map_kv1_withslash_destroy() {
+        myvault.deletePath([mount: 'secret2/withslash', path: 'somepath'], true)
+        List urls = ['http://vault:8200/v1/secret2/withslash/', 'http://vault:8200/v1/secret2/withslash/somepath/', 'http://vault:8200/v1/secret2/withslash/somepath/bar/', 'http://vault:8200/v1/secret2/withslash/somepath/bar/baz', 'http://vault:8200/v1/secret2/withslash/somepath/bar', 'http://vault:8200/v1/secret2/withslash/somepath']
+        List methods = ['LIST', 'LIST', 'LIST', 'DELETE', 'DELETE', 'DELETE']
+        List datas = ['', '', '', '', '', '']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
     @Test public void test_VaultService_isDeletedKey() {
         assert false == myvault.isDeletedKey('kv/foo')
         assert false == myvault.isDeletedKey('secret/foo')
@@ -1317,37 +1353,4 @@ class VaultServiceTest extends GroovyTestCase {
             myvault.deleteKey(mount: 'secret', path: '')
         }
     }
-
-    /*
-    @Test public void test_VaultService_copySecret_kv1_to_kv2_withslash_version_1() {
-        myvault.copySecret('kv/foo', 'kv2/withslash/deleteone', 1)
-        List urls = []
-        List methods = []
-        List datas = []
-        assert metaResult() == []
-        assert request_history*.url == urls
-        assert request_history*.method == methods
-        assert request_history*.data == datas
-    }
-    @Test public void test_VaultService_copySecret_kv2_to_kv2_withslash() {
-        myvault.copySecret('kv/foo', 'kv2/withslash/deleteone')
-        List urls = []
-        List methods = []
-        List datas = []
-        assert metaResult() == []
-        assert request_history*.url == urls
-        assert request_history*.method == methods
-        assert request_history*.data == datas
-    }
-    @Test public void test_VaultService_copySecret_kv1_to_kv2_withslash() {
-        myvault.copySecret('secret/foo', 'kv2/withslash/deleteone')
-        List urls = []
-        List methods = []
-        List datas = []
-        assert metaResult() == []
-        assert request_history*.url == urls
-        assert request_history*.method == methods
-        assert request_history*.data == datas
-    }
-    */
 }

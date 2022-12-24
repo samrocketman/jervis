@@ -849,7 +849,6 @@ secret/
                                 secrets engine.
       */
     // TODO update javadoc
-    // TODO write tests
     void deleteKey(Map location, List<Integer> deleteVersions, Boolean destroyAllVersions = false) {
         checkLocationMap(location)
         String mount = location.mount
@@ -880,7 +879,6 @@ secret/
     }
 
     // TODO update javadoc
-    // TODO write tests
     void deleteKey(String path, List<Integer> destroyVersions, Boolean destroyAllVersions = false) {
         deleteKey(getLocationMapFromPath(path), destroyVersions, destroyAllVersions)
     }
@@ -898,7 +896,7 @@ secret/
                                 ignored.  This option is ignored for KV v1
                                 secrets engine.
       */
-    // TODO write tests
+    // TODO write javadoc
     void deletePath(Map location, Integer level, Boolean destroyAllVersions = false) {
         checkLocationMap(location)
         findAllKeys(location, level).sort { String a, String b ->
@@ -910,13 +908,18 @@ secret/
             deleteKey(key, destroyAllVersions)
         }
     }
+
+    // TODO write javadoc
     void deletePath(Map location, Boolean destroyAllVersions = false) {
         deletePath(location, 0, destroyAllVersions)
     }
+
+    // TODO write javadoc
     void deletePath(String path, Boolean destroyAllVersions = false) {
         deletePath(path, 0, destroyAllVersions)
     }
 
+    // TODO write javadoc
     void deletePath(String path, Integer level, Boolean destroyAllVersions = false) {
         deletePath(getLocationMapFromPath(path), level, destroyAllVersions)
     }
