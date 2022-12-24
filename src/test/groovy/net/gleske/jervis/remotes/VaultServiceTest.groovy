@@ -1075,33 +1075,6 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_deleteKey_kv2_softdelete() {
-        myvault.deleteKey('kv2/withslash/deleteone')
-        List urls = ['http://vault:8200/v1/kv2/withslash/data/deleteone']
-        List methods = ['DELETE']
-        List datas = ['']
-        assert request_history*.url == urls
-        assert request_history*.method == methods
-        assert request_history*.data == datas
-    }
-    @Test public void test_VaultService_deleteKey_kv2_softdelete_version_1() {
-        myvault.deleteKey('kv2/withslash/deleteone', [1])
-        List urls = ['http://vault:8200/v1/kv2/withslash/delete/deleteone']
-        List methods = ['POST']
-        List datas = ['{"versions":[1]}']
-        assert request_history*.url == urls
-        assert request_history*.method == methods
-        assert request_history*.data == datas
-    }
-    @Test public void test_VaultService_deleteKey_kv2_destroy_version_3() {
-        myvault.deleteKey('kv2/withslash/deleteone', [3], true)
-        List urls = ['http://vault:8200/v1/kv2/withslash/destroy/deleteone']
-        List methods = ['POST']
-        List datas = ['{"versions":[3]}']
-        assert request_history*.url == urls
-        assert request_history*.method == methods
-        assert request_history*.data == datas
-    }
     @Test public void test_VaultService_isDeletedKey_versions_1_through_4() {
         assert true == myvault.isDeletedKey('kv2/withslash/deleteone')
         assert true == myvault.isDeletedKey('kv2/withslash/deleteone', 1)
@@ -1231,6 +1204,73 @@ class VaultServiceTest extends GroovyTestCase {
         // version does not exist
         assert true == myvault.isDeletedKey([mount: 'kv', path: '/foo'], 25)
         assert true == myvault.isDeletedKey([mount: 'kv', path: 'foo'], 25)
+    }
+    @Test public void test_VaultService_deleteKey_kv2_softdelete() {
+        myvault.deleteKey('kv2/withslash/deleteone')
+        List urls = ['http://vault:8200/v1/kv2/withslash/data/deleteone']
+        List methods = ['DELETE']
+        List datas = ['']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deleteKey_kv2_softdelete_version_1() {
+        myvault.deleteKey('kv2/withslash/deleteone', [1])
+        List urls = ['http://vault:8200/v1/kv2/withslash/delete/deleteone']
+        List methods = ['POST']
+        List datas = ['{"versions":[1]}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deleteKey_kv2_destroy_version_3() {
+        myvault.deleteKey('kv2/withslash/deleteone', [3], true)
+        List urls = ['http://vault:8200/v1/kv2/withslash/destroy/deleteone']
+        List methods = ['POST']
+        List datas = ['{"versions":[3]}']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultService_deleteKey_path_fail() {
+        shouldFail(VaultException) {
+            myvault.deleteKey('kv/foo/')
+        }
+        shouldFail(VaultException) {
+            myvault.deleteKey('secret/foo/')
+        }
+        shouldFail(VaultException) {
+            myvault.deleteKey('kv')
+        }
+        shouldFail(VaultException) {
+            myvault.deleteKey('secret')
+        }
+    }
+    @Test public void test_VaultService_deleteKey_location_map_path_fail() {
+        shouldFail(VaultException) {
+            myvault.deleteKey(mount: 'kv', path: '/foo/')
+        }
+        shouldFail(VaultException) {
+            myvault.deleteKey(mount: 'kv', path: 'foo/')
+        }
+        shouldFail(VaultException) {
+            myvault.deleteKey(mount: 'secret', path: '/foo/')
+        }
+        shouldFail(VaultException) {
+            myvault.deleteKey(mount: 'secret', path: 'foo/')
+        }
+        shouldFail(VaultException) {
+            myvault.deleteKey(mount: 'kv', path: '/')
+        }
+        shouldFail(VaultException) {
+            myvault.deleteKey(mount: 'kv', path: '')
+        }
+        shouldFail(VaultException) {
+            myvault.deleteKey(mount: 'secret', path: '/')
+        }
+        shouldFail(VaultException) {
+            myvault.deleteKey(mount: 'secret', path: '')
+        }
     }
 
     /*
