@@ -199,6 +199,11 @@ myvault.copyAllKeys('kv/foo', 'secret2/withslash/somepath')
 myvault.deletePath('kv2/withslash/somepath')
 myvault.deletePath('kv2/withslash/somepath', true)
 myvault.deletePath('secret2/withslash/somepath')
+myvault.copySecret('kv/foo', 'kv2/withslash/destroyone', 1)
+myvault.copySecret('secret/foo', 'kv2/withslash/destroyone')
+myvault.deleteKey('kv2/withslash/destroyone', [2], true)
+myvault.isDeletedKey('kv2/withslash/destroyone')
+myvault.isDeletedKey('kv2/withslash/destroyone', 1)
 
 // Rediscover mounts
 myvault.discoverKVMounts()
