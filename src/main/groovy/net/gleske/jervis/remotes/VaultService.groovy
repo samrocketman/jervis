@@ -854,7 +854,7 @@ secret/
         checkLocationMap(location)
         String mount = location.mount
         String subpath = location.path.replaceAll('^/', '')
-        if(!subpath.trim() || subpath.trim().endsWith('/')) {
+        if(subpath.trim().endsWith('/') || !subpath.trim()) {
             throw new VaultException('Must provide a valid key to be deleted.  Paths are not allowed.')
         }
         if(isKeyValueV2(mount)) {
@@ -927,7 +927,7 @@ secret/
         checkLocationMap(location)
         String mount = location.mount
         String subpath = location.path.replaceAll('^/', '')
-        if(subpath.endsWith('/') || !subpath) {
+        if(subpath.endsWith('/') || !subpath.trim()) {
             throw new VaultException('Cannot check if a path has been deleted.  Must provide a key i.e. not end with a trailing slash.')
         }
         Map metadata = [:]
