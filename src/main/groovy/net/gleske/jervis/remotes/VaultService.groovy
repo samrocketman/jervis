@@ -923,7 +923,6 @@ secret/
 
 
     // TODO write javadoc
-    // TODO write tests
     Boolean isDeletedKey(Map location, Integer version = 0) {
         checkLocationMap(location)
         String mount = location.mount
@@ -959,15 +958,7 @@ secret/
     }
 
     // TODO write javadoc
-    // TODO write tests
     Boolean isDeletedKey(String path, Integer version = 0) {
         isDeletedKey(getLocationMapFromPath(path), version)
     }
-
-    // TODO implement DELETE key
-    /* TODO implement recursive DELETE path
-           Reverse sort showing deepest depth keys first in the list
-           ['a', 'a/b/c', 'a/b', 'a/b/c/d'].sort { a, b -> b.count('/') <=> a.count('/') }
-           returns ['a/b/c/d', 'a/b/c', 'a/b', 'a']
-     */
 }

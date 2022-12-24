@@ -1158,6 +1158,10 @@ class VaultServiceTest extends GroovyTestCase {
         assert false == myvault.isDeletedKey('kv/foo')
         assert false == myvault.isDeletedKey('secret/foo')
     }
+    @Test public void test_VaultService_isDeletedKey_with_history_version_0_destroyed() {
+        assert true == myvault.isDeletedKey('kv2/withslash/destroyone')
+        assert false == myvault.isDeletedKey('kv2/withslash/destroyone', 1)
+    }
     @Test public void test_VaultService_isDeletedKey_path_fail() {
         shouldFail(VaultException) {
             myvault.isDeletedKey('kv/foo/')
