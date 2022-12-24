@@ -197,8 +197,14 @@ class VaultService implements SimpleRestServiceSupport {
         if(desiredLevel > 0 && level > desiredLevel) {
             return []
         }
+        List dirList = []
+        try {
+            dirList = listPath(location)
+        } catch(IOException ignored) {
+            return []
+        }
         List entries = []
-        entries = listPath(location).collect { String key ->
+        entries = dirList.collect { String key ->
             if(key.endsWith('/')) {
                 recursiveFindAllKeys([mount: location.mount, path: location.path + key], desiredLevel, level + 1)
             }
@@ -684,7 +690,7 @@ secret/
                 String path = getPathFromLocationMap(location)
                 String parentPath = ''
                 if(subpath.contains('/')) {
-                    parentPath = subpath.tokenize('/')[0..-2].join('/')
+                    parentPath = subpath.tokenize('/')[0..-2].join('/') + '/'
                 }
                 if(path in findAllKeys([mount: mount, path: parentPath], 1)) {
                     additionalKeys << getPathFromLocationMap(location)
