@@ -928,7 +928,7 @@ secret/
         checkLocationMap(location)
         String mount = location.mount
         String subpath = location.path.replaceAll('^/', '')
-        if(subpath.endsWith('/')) {
+        if(subpath.endsWith('/') || !subpath) {
             throw new VaultException('Cannot check if a path has been deleted.  Must provide a key i.e. not end with a trailing slash.')
         }
         Map metadata = [:]
