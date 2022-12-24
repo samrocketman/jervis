@@ -402,7 +402,7 @@ class VaultServiceTest extends GroovyTestCase {
         myvault.discoverKVMounts()
         assert myvault.mountVersions == ['secret':'1', 'kv2/withslash':'2', 'secret2/withslash':'1', 'kv':'2', 'kv_cas':'2']
         assert myvault.cas_required == ['kv_cas']
-        assert request_history*.url == ['http://vault:8200/v1/sys/mounts', 'http://vault:8200/v1/kv2/withslash/config', 'http://vault:8200/v1/kv/config', 'http://vault:8200/v1/kv_cas/config']
+        assert request_history*.url == ['http://vault:8200/v1/sys/mounts', 'http://vault:8200/v1/kv/config', 'http://vault:8200/v1/kv_cas/config', 'http://vault:8200/v1/kv2/withslash/config']
         assert request_history*.method == ['GET', 'GET', 'GET', 'GET']
     }
     @Test public void test_VaultService_discover_mount_versions_skip_cas_check() {
