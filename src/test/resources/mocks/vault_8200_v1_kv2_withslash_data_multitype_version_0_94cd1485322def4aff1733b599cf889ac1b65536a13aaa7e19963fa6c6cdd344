@@ -1,0 +1,26 @@
+request_id: 7c4863b2-bd3d-a3ca-bc16-52dc6e5b3a66
+lease_id: ''
+renewable: false
+lease_duration: 0
+data:
+  data:
+    '%user': special symbol
+    bool: true
+    listkey:
+      - 1
+      - 2
+      - 3
+    mapkey:
+      simple: submap
+    nullkey: null
+    number: 23
+    validvar: somevalue
+  metadata:
+    created_time: '2022-12-25T19:53:12.614532036Z'
+    custom_metadata: null
+    deletion_time: ''
+    destroyed: false
+    version: 1
+wrap_info: null
+warnings: null
+auth: null
