@@ -825,7 +825,6 @@ secret/
 
       TODO better java doc
       */
-    // TODO write tests
     Map<String, String> getEnvironmentSecrets(List paths, Boolean allowInvalidKeys = false) {
         paths.collect { path ->
             try {

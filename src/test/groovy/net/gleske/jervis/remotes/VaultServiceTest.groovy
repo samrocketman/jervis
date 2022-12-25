@@ -1457,4 +1457,36 @@ class VaultServiceTest extends GroovyTestCase {
         assert result == myvault.getEnvironmentSecrets([[mount: 'secret', path: '/foo/bar/baz'], 'secret/foo/bar', 'secret/foo', 'secret/doesnotexist', 'kv/foo/bar/baz', [mount: 'kv', path: '/foo/bar'], 'kv/foo', 'kv/doesnotexist'])
         assert result == myvault.getEnvironmentSecrets([[mount: 'secret', path: 'foo/bar/baz'], 'secret/foo/bar', 'secret/foo', 'secret/doesnotexist', 'kv/foo/bar/baz', [mount: 'kv', path: 'foo/bar'], 'kv/foo', 'kv/doesnotexist'])
     }
+    @Test public void test_VaultService_getEnvironmentSecret_kv1_mixdata() {
+        Map result = [bool: 'true', number: '23', validvar: 'somevalue']
+        assert result == myvault.getEnvironmentSecret('secret2/withslash/multitype')
+    }
+    @Test public void test_VaultService_getEnvironmentSecret_kv1_mixdata_allowInvalidKeys() {
+        Map result = ['%user': 'special symbol', bool: 'true', number: '23', validvar: 'somevalue']
+        assert result == myvault.getEnvironmentSecret('secret2/withslash/multitype', 0, true)
+    }
+    @Test public void test_VaultService_getEnvironmentSecret_kv2_mixdata() {
+        Map result = [bool: 'true', number: '23', validvar: 'somevalue']
+        assert result == myvault.getEnvironmentSecret('kv2/withslash/multitype')
+    }
+    @Test public void test_VaultService_getEnvironmentSecret_kv2_mixdata_allowInvalidKeys() {
+        Map result = ['%user': 'special symbol', bool: 'true', number: '23', validvar: 'somevalue']
+        assert result == myvault.getEnvironmentSecret('kv2/withslash/multitype', 0, true)
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv1_mixdata() {
+        Map result = [bool: 'true', number: '23', someother: 'data', validvar: 'somevalue']
+        assert result == myvault.getEnvironmentSecrets(['secret2/withslash/multitype', 'secret/foo/bar'])
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv1_mixdata_allowInvalidKeys() {
+        Map result = ['%user': 'special symbol', bool: 'true', number: '23', someother: 'data', validvar: 'somevalue']
+        assert result == myvault.getEnvironmentSecrets(['secret2/withslash/multitype', 'secret/foo/bar'], true)
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv2_mixdata() {
+        Map result = [bool: 'true', hello: 'friend', number: '23', validvar: 'somevalue']
+        assert result == myvault.getEnvironmentSecrets(['kv2/withslash/multitype', 'kv/foo/bar'])
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv2_mixdata_allowInvalidKeys() {
+        Map result = ['%user': 'special symbol', bool: 'true', hello: 'friend', number: '23', validvar: 'somevalue']
+        assert result == myvault.getEnvironmentSecrets(['kv2/withslash/multitype', 'kv/foo/bar'], true)
+    }
 }
