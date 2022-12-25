@@ -1367,6 +1367,18 @@ class VaultServiceTest extends GroovyTestCase {
             myvault.getEnvironmentSecrets(['foo', 'foo/bar', 'foo/bar/baz'])
         }
     }
+    @Test public void test_VaultService_getEnvironmentSecret_kv2_location_map() {
+        assert [another: 'secret', hello: 'world'] == myvault.getEnvironmentSecret(mount: 'kv', path: '/foo')
+        assert [another: 'secret', hello: 'world'] == myvault.getEnvironmentSecret(mount: 'kv', path: 'foo')
+    }
+    @Test public void test_VaultService_getEnvironmentSecret_kv2_location_map_version_1() {
+        assert [hello: 'world'] == myvault.getEnvironmentSecret([mount: 'kv', path: '/foo'], 1)
+        assert [hello: 'world'] == myvault.getEnvironmentSecret([mount: 'kv', path: 'foo'], 1)
+    }
+    @Test public void test_VaultService_getEnvironmentSecret_kv1_location_map() {
+        assert [test: 'data'] == myvault.getEnvironmentSecret(mount: 'secret', path: '/foo')
+        assert [test: 'data'] == myvault.getEnvironmentSecret(mount: 'secret', path: 'foo')
+    }
     @Test public void test_VaultService_getEnvironmentSecrets_kv2_order() {
         Map result = [another: 'secret', foo: 'bar', hello: 'friend']
         assert result == myvault.getEnvironmentSecrets(['kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz'])
@@ -1378,6 +1390,21 @@ class VaultServiceTest extends GroovyTestCase {
     @Test public void test_VaultService_getEnvironmentSecrets_kv2_missingkey() {
         Map result = [another: 'secret', foo: 'bar', hello: 'friend']
         assert result == myvault.getEnvironmentSecrets(['kv/doesnotexist', 'kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz'])
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv2_location_map_order() {
+        Map result = [another: 'secret', foo: 'bar', hello: 'friend']
+        assert result == myvault.getEnvironmentSecrets([[mount: 'kv', path: '/foo'], [mount: 'kv', path: '/foo/bar'], [mount: 'kv', path: '/foo/bar/baz']])
+        assert result == myvault.getEnvironmentSecrets([[mount: 'kv', path: 'foo'], [mount: 'kv', path: 'foo/bar'], [mount: 'kv', path: 'foo/bar/baz']])
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv2_location_map_reverse_order() {
+        Map result = [another: 'secret', foo: 'bar', hello: 'world']
+        assert result == myvault.getEnvironmentSecrets([[mount: 'kv', path: '/foo/bar/baz'], [mount: 'kv', path: '/foo/bar'], [mount: 'kv', path: '/foo']])
+        assert result == myvault.getEnvironmentSecrets([[mount: 'kv', path: 'foo/bar/baz'], [mount: 'kv', path: 'foo/bar'], [mount: 'kv', path: 'foo']])
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv2_location_map_missingkey() {
+        Map result = [another: 'secret', foo: 'bar', hello: 'friend']
+        assert result == myvault.getEnvironmentSecrets([[mount: 'kv', path: '/doesnotexist'], [mount: 'kv', path: '/foo'], [mount: 'kv', path: '/foo/bar'], [mount: 'kv', path: '/foo/bar/baz']])
+        assert result == myvault.getEnvironmentSecrets([[mount: 'kv', path: 'doesnotexist'], [mount: 'kv', path: 'foo'], [mount: 'kv', path: 'foo/bar'], [mount: 'kv', path: 'foo/bar/baz']])
     }
     @Test public void test_VaultService_getEnvironmentSecrets_kv1_order() {
         Map result = [more: 'secrets', someother: 'data', test: 'data']
@@ -1391,6 +1418,21 @@ class VaultServiceTest extends GroovyTestCase {
         Map result = [more: 'secrets', someother: 'data', test: 'data']
         assert result == myvault.getEnvironmentSecrets(['secret/doesnotexist', 'secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz'])
     }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv1_location_map_order() {
+        Map result = [more: 'secrets', someother: 'data', test: 'data']
+        assert result == myvault.getEnvironmentSecrets([[mount: 'secret', path: '/foo'], [mount: 'secret', path: '/foo/bar'], [mount: 'secret', path: '/foo/bar/baz']])
+        assert result == myvault.getEnvironmentSecrets([[mount: 'secret', path: 'foo'], [mount: 'secret', path: 'foo/bar'], [mount: 'secret', path: 'foo/bar/baz']])
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv1_location_map_reverse_order() {
+        Map result = [more: 'secrets', someother: 'data', test: 'data']
+        assert result == myvault.getEnvironmentSecrets([[mount: 'secret', path: '/foo/bar/baz'], [mount: 'secret', path: '/foo/bar'], [mount: 'secret', path: '/foo']])
+        assert result == myvault.getEnvironmentSecrets([[mount: 'secret', path: 'foo/bar/baz'], [mount: 'secret', path: 'foo/bar'], [mount: 'secret', path: 'foo']])
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv1_location_map_missingkey() {
+        Map result = [more: 'secrets', someother: 'data', test: 'data']
+        assert result == myvault.getEnvironmentSecrets([[mount: 'secret', path: '/doesnotexist'], [mount: 'secret', path: '/foo'], [mount: 'secret', path: '/foo/bar'], [mount: 'secret', path: '/foo/bar/baz']])
+        assert result == myvault.getEnvironmentSecrets([[mount: 'secret', path: 'doesnotexist'], [mount: 'secret', path: 'foo'], [mount: 'secret', path: 'foo/bar'], [mount: 'secret', path: 'foo/bar/baz']])
+    }
     @Test public void test_VaultService_getEnvironmentSecrets_kv1_kv2_mix_order() {
         Map result = [another: 'secret', foo: 'bar', hello: 'friend', more: 'secrets', someother: 'data', test: 'data']
         assert result == myvault.getEnvironmentSecrets(['kv/doesnotexist', 'kv/foo', 'kv/foo/bar', 'kv/foo/bar/baz', 'secret/doesnotexist', 'secret/foo', 'secret/foo/bar', 'secret/foo/bar/baz'])
@@ -1398,5 +1440,15 @@ class VaultServiceTest extends GroovyTestCase {
     @Test public void test_VaultService_getEnvironmentSecrets_kv1_kv2_mix_reverse_order() {
         Map result = [another: 'secret', foo: 'bar', hello: 'world', more: 'secrets', someother: 'data', test: 'data']
         assert result == myvault.getEnvironmentSecrets(['secret/foo/bar/baz', 'secret/foo/bar', 'secret/foo', 'secret/doesnotexist', 'kv/foo/bar/baz', 'kv/foo/bar', 'kv/foo', 'kv/doesnotexist'])
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv1_kv2_location_map_mix_order() {
+        Map result = [another: 'secret', foo: 'bar', hello: 'friend', more: 'secrets', someother: 'data', test: 'data']
+        assert result == myvault.getEnvironmentSecrets(['kv/doesnotexist', [mount: 'kv', path: '/foo'], 'kv/foo/bar', 'kv/foo/bar/baz', 'secret/doesnotexist', 'secret/foo', [mount: 'secret', path: '/foo/bar'], 'secret/foo/bar/baz'])
+        assert result == myvault.getEnvironmentSecrets(['kv/doesnotexist', [mount: 'kv', path: 'foo'], 'kv/foo/bar', 'kv/foo/bar/baz', 'secret/doesnotexist', 'secret/foo', [mount: 'secret', path: 'foo/bar'], 'secret/foo/bar/baz'])
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv1_kv2_location_map_mix_reverse_order() {
+        Map result = [another: 'secret', foo: 'bar', hello: 'world', more: 'secrets', someother: 'data', test: 'data']
+        assert result == myvault.getEnvironmentSecrets([[mount: 'secret', path: '/foo/bar/baz'], 'secret/foo/bar', 'secret/foo', 'secret/doesnotexist', 'kv/foo/bar/baz', [mount: 'kv', path: '/foo/bar'], 'kv/foo', 'kv/doesnotexist'])
+        assert result == myvault.getEnvironmentSecrets([[mount: 'secret', path: 'foo/bar/baz'], 'secret/foo/bar', 'secret/foo', 'secret/doesnotexist', 'kv/foo/bar/baz', [mount: 'kv', path: 'foo/bar'], 'kv/foo', 'kv/doesnotexist'])
     }
 }

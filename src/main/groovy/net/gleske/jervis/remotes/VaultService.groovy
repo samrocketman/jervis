@@ -791,7 +791,6 @@ secret/
 
       TODO better java doc
       */
-    // TODO write tests
     Map<String, String> getEnvironmentSecret(Map location, Integer version = 0, Boolean allowInvalidKeys = false) {
         getSecret(location, version).findAll { k, v ->
             (k ==~ '^[a-zA-Z0-9_]+$' || allowInvalidKeys) && (
