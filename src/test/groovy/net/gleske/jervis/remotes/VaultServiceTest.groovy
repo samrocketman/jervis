@@ -204,6 +204,9 @@ myvault.copySecret('secret/foo', 'kv2/withslash/destroyone')
 myvault.deleteKey('kv2/withslash/destroyone', [2], true)
 myvault.isDeletedKey('kv2/withslash/destroyone')
 myvault.isDeletedKey('kv2/withslash/destroyone', 1)
+myvault.setSecret('kv2/withslash/multitype', [number: 23, bool: true, 'nullkey': null, 'listkey': [1,2,3], 'mapkey': [simple: 'submap'], validvar: 'somevalue', '%user': 'special symbol'])
+myvault.setSecret('secret2/withslash/multitype', [number: 23, bool: true, 'nullkey': null, 'listkey': [1,2,3], 'mapkey': [simple: 'submap'], validvar: 'somevalue', '%user': 'special symbol'])
+myvault.setSecret('kv2/withslash/emptysecret', [:])
 
 // Rediscover mounts
 myvault.discoverKVMounts()
@@ -247,6 +250,9 @@ myvault.listPath('kv/foo')
 myvault.listPath('kv/foo/')
 myvault.listPath('kv/foo/bar')
 myvault.listPath('kv/foo/bar/')
+myvault.getSecret('kv2/withslash/multitype')
+myvault.getSecret('secret2/withslash/multitype')
+myvault.getSecret('kv2/withslash/emptysecret')
 
 println 'Success.'
 </tt></pre>
