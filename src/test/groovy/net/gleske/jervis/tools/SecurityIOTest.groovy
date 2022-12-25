@@ -307,4 +307,12 @@ class SecurityIOTest extends GroovyTestCase {
         String jwt = security.getGitHubJWT('1234', 1, 40)
         assert false == security.verifyGitHubJWTPayload(jwt, -60)
     }
+    @Test public void test_SecurityIO_verifyRS256Base64Url() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new SecurityIO(url.content.text)
+        String data = 'dummy data'
+        String signed = security.signRS256Base64Url(data)
+        assert true == security.verifyRS256Base64Url(signed, data)
+        assert false == security.verifyRS256Base64Url(signed, 'corrupt')
+    }
 }

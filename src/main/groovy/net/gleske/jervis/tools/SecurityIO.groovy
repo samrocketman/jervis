@@ -123,6 +123,22 @@ println key_pair.public.modulus.bitLength()</tt></pre>
     }
 
     /**
+      Verify data signed by RS256 Base64 URL encoded signature.
+
+      @param signature A Base64 URL encoded signature of RS256 algorithm.
+      @param data      The data in which the signature should verify.
+      @return          Returns <tt>true</tt> if the signature was successfully
+                       verified or <tt>false</tt> if signature verification
+                       failed.
+      */
+    Boolean verifyRS256Base64Url(String signature, String data) {
+        Signature publicSignature = Signature.getInstance("SHA256withRSA")
+        publicSignature.initVerify(key_pair.public);
+        publicSignature.update(data.bytes)
+        publicSignature.verify(decodeBase64UrlBytes(signature))
+    }
+
+    /**
       Get a <a href="https://jwt.io/">JSON Web Token</a> (JWT) meant for use with
       <a href="https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#authenticating-as-a-github-app">GitHub App Authentication</a>.
       This assumes the <tt>SecurityIO</tt> class was loaded with an RSA private
@@ -212,10 +228,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
         List jwt = github_jwt.tokenize('.')
         String data = jwt[0..1].join('.')
         String signature = jwt[-1]
-        Signature publicSignature = Signature.getInstance("SHA256withRSA")
-        publicSignature.initVerify(key_pair.public);
-        publicSignature.update(data.bytes)
-        publicSignature.verify(decodeBase64UrlBytes(signature))
+        verifyRS256Base64Url(signature, data)
     }
 
     /**
