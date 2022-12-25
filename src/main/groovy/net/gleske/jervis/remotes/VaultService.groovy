@@ -792,10 +792,8 @@ secret/
       TODO better java doc
       */
     // TODO write tests
-    // TODO support Map location
-    Map<String, String> getEnvironmentSecret(String path, Integer version = 0, Boolean allowInvalidKeys = false) {
-        getSecret(path, version).findAll { k, v ->
-            k in String &&
+    Map<String, String> getEnvironmentSecret(Map location, Integer version = 0, Boolean allowInvalidKeys = false) {
+        getSecret(location, version).findAll { k, v ->
             (k ==~ '^[a-zA-Z0-9_]+$' || allowInvalidKeys) && (
                 v in String ||
                 v in Boolean ||
@@ -803,7 +801,11 @@ secret/
             )
         }.collect { k, v ->
             [(k): v.toString()]
-        }.sum() ?: [:]
+        }.sum().sort() ?: [:]
+    }
+
+    Map<String, String> getEnvironmentSecret(String path, Integer version = 0, Boolean allowInvalidKeys = false) {
+        getEnvironmentSecret(getLocationMapFromPath(path), version, allowInvalidKeys)
     }
 
     /**
@@ -825,16 +827,15 @@ secret/
       TODO better java doc
       */
     // TODO write tests
-    // TODO support Map location
     Map<String, String> getEnvironmentSecrets(List paths, Boolean allowInvalidKeys = false) {
-        paths.collect { String path ->
+        paths.collect { path ->
             try {
                 getEnvironmentSecret(path, 0, allowInvalidKeys)
             }
             catch(IOException ignored) {
                 [:]
             }
-        }.sum()
+        }.sum().sort()
     }
 
     /**
