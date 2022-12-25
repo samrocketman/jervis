@@ -1489,4 +1489,13 @@ class VaultServiceTest extends GroovyTestCase {
         Map result = ['%user': 'special symbol', bool: 'true', hello: 'friend', number: '23', validvar: 'somevalue']
         assert result == myvault.getEnvironmentSecrets(['kv2/withslash/multitype', 'kv/foo/bar'], true)
     }
+    @Test public void test_VaultService_getEnvironmentSecret_kv2_emptydata() {
+        assert [:] == myvault.getEnvironmentSecret('kv2/withslash/emptysecret')
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv2_emptydata() {
+        assert [:] == myvault.getEnvironmentSecrets(['kv2/withslash/emptysecret'])
+    }
+    @Test public void test_VaultService_getEnvironmentSecrets_kv2_emptydata_in_list() {
+        assert [hello: 'friend'] == myvault.getEnvironmentSecrets(['kv2/withslash/emptysecret', 'kv/foo/bar'])
+    }
 }

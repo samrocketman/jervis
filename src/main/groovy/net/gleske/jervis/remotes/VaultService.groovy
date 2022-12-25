@@ -798,9 +798,9 @@ secret/
                 v in Boolean ||
                 v in Number
             )
-        }.collect { k, v ->
+        }?.collect { k, v ->
             [(k): v.toString()]
-        }.sum().sort() ?: [:]
+        }?.sum()?.sort() ?: [:]
     }
 
     Map<String, String> getEnvironmentSecret(String path, Integer version = 0, Boolean allowInvalidKeys = false) {
