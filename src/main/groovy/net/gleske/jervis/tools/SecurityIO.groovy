@@ -447,4 +447,26 @@ if(security.verifyGitHubJWTPayload(jwt)) {
         }
         return false
     }
+
+    /**
+      This is a constant-time function intended to wrap security-sensitive code.
+      This forces code to always take a certain amount of time regardless of
+      input in order to have a constant-time result to avoid timing based
+      attacks.
+
+      @param milliseconds The number of milliseconds a section of code should
+                          take.  This could be 200 millis.
+      @param body A closure of code to execute.  The code will execute as fast
+                  as it can and this function will enforce a constant time.
+      */
+    public static void avoidTimingAttack(Long milliseconds, Closure body) {
+        Long before = Instant.now().toEpochMilli()
+        // execute code
+        body()
+        // milliseconds - (after - before)
+        Long remainingTime = milliseconds - (Instant.now().toEpochMilli() - before)
+        if(remainingTime > 0) {
+            sleep(remainingTime)
+        }
+    }
 }
