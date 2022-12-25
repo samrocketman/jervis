@@ -399,7 +399,6 @@ vault.mountVersions</tt></pre>
                v2 secrets engine and <tt>version</tt> was customized, then the
                secret at that version is returned (if it exists).
       */
-    // TODO test getting mount with a slash in its name
     Map getSecret(String path, Integer version = 0) {
         getSecret(getLocationMapFromPath(path), version)
     }
@@ -420,7 +419,6 @@ vault.mountVersions</tt></pre>
                        being set has been altered, then it will have a different
                        version and Vault will reject the request..
       */
-    // TODO test mounts which contain a slash... because Vault allows that
     void setSecret(Map location, Map secret, Boolean enableCas = false) {
         checkLocationMap(location)
         String mount = location.mount
@@ -486,7 +484,6 @@ vault.setMountVersions('kv', '2')</tt></pre>
                      v2 secrets engine.  Any type is allowed to catch invalid
                      version setting.
       */
-    // TODO test manual mounts that have a slash in its name
     void setMountVersions(String mount, def version) {
         if(!(version in ['1', '2', 1, 2])) {
             throw new VaultException('Vault key-value mounts can only be version "1" or "2".')
@@ -755,18 +752,38 @@ secret/
     }
 
     /**
-      Recursively copies all secrets from the source path, srcPath, to the
-      destination path, destPath.
+      Recursively copies all secrets from the source location,
+      <tt>srcLocation</tt>, to the destination location, <tt>destLocation</tt>.
 
-      TODO better java doc
+      <ul>
+      <li>
+        If the <tt>srcLocation.path</tt> has a trailing slash, then only folders
+        will be considered.  e.g. <tt>foo/</tt> will only match
+        <tt>foo/*</tt>keys.  If it does not contain a trailing slash, then it
+        may include a key that is the same name as the foloder path.  e.g.
+        <tt>foo</tt> will match key <tt>foo</tt> and folder <tt>foo/*</tt>.
+      </li>
+      <li>
+        If the <tt>destLocation.path</tt> has a trailing slash, then keys will
+        be copied as is to the subfolder of the destination.  If it does not
+        contain a trailing slash, then matched keys will be renamed.
+      </li>
+      </ul>
+
+      @param srcLocation A location map contains two keys: mount and path.  The
+                         mount is a KV mount in Vault and the path is a location
+                         of a secret relative to the given mount.
+      @param destLocation A location map contains two keys: mount and path.  The
+                          mount is a KV mount in Vault and the path is a
+                          location of a secret relative to the given mount.
+      @param level When traversing secrets paths <tt>level</tt> limits how deep
+                   the path goes when returning results.
       */
-    // TODO write tests
     void copyAllKeys(Map srcLocation, Map destLocation, Integer level = 0) {
         checkLocationMap(srcLocation)
         checkLocationMap(destLocation)
         String srcPath = srcLocation.path.replaceAll('^/', '')
         String destPath = destLocation.path.replaceAll('^/', '')
-        // TODO support path and path/ for source and destination.
         findAllKeys(srcLocation, level).each { String srcKey ->
             Map srcKeyLocation = getLocationMapFromPath(srcKey)
             Map destKeyLocation = [
@@ -780,6 +797,32 @@ secret/
         }
     }
 
+    /**
+      Recursively copies all secrets from the source location, <tt>srcPaht</tt>,
+      to the destination location, <tt>destPath</tt>.
+
+      <ul>
+      <li>
+        If the <tt>srcPath</tt> has a trailing slash, then only folders will be
+        considered.  e.g. <tt>foo/</tt> will only match <tt>foo/*</tt>keys.  If
+        it does not contain a trailing slash, then it may include a key that is
+        the same name as the foloder path.  e.g.  <tt>foo</tt> will match key
+        <tt>foo</tt> and folder <tt>foo/*</tt>.
+      </li>
+      <li>
+        If the <tt>destPath</tt> has a trailing slash, then keys will be copied
+        as is to the subfolder of the destination.  If it does not contain a
+        trailing slash, then matched keys will be renamed.
+      </li>
+      </ul>
+
+      @param srcPath A path to a secret in Vault.  The path includes the KV v1
+                     or KV v2 secret engine mount path.
+      @param destPath A path to a secret in Vault.  The path includes the KV v1
+                      or KV v2 secret engine mount path.
+      @param level When traversing secrets paths <tt>level</tt> limits how deep
+                   the path goes when returning results.
+      */
     void copyAllKeys(String srcPath, String destPath, Integer level = 0) {
         copyAllKeys(getLocationMapFromPath(srcPath), getLocationMapFromPath(destPath), level)
     }
