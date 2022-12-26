@@ -322,7 +322,7 @@ vault.mountVersions</tt></pre>
 
     /**
       Query Vault to find all of the KV mounts.  This can be called immediately
-      following the constructure to initiate service connectivity.
+      following the constructor to initiate service connectivity.
       */
     void discoverKVMounts() throws IOException, VaultException {
         apiFetch("sys/mounts").with { Map mounts ->
