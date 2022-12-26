@@ -16,6 +16,7 @@
 package net.gleske.jervis.tools
 //the SecurityIOTest() class automatically sees the SecurityIO() class because they're in the same package
 
+import static net.gleske.jervis.tools.SecurityIO.avoidTimingAttack
 import net.gleske.jervis.exceptions.DecryptException
 import net.gleske.jervis.exceptions.EncryptException
 import net.gleske.jervis.exceptions.KeyPairDecodeException
@@ -32,6 +33,17 @@ import org.junit.Test
 class SecurityIOTest extends GroovyTestCase {
     def jervis_tmp
     def security
+    /**
+      Executes a closure of code and returns its timing in milliseconds.
+      @param c A closure to execute.
+      @return Returns the number of milliseconds the timed closure took to execute.
+      */
+    private Long timing(Closure c) {
+        Long before = Instant.now().toEpochMilli()
+        c()
+        Long after = Instant.now().toEpochMilli()
+        after - before
+    }
     //set up before every test
     @Before protected void setUp() {
         security = new SecurityIO()
@@ -314,5 +326,90 @@ class SecurityIOTest extends GroovyTestCase {
         String signed = security.signRS256Base64Url(data)
         assert true == security.verifyRS256Base64Url(signed, data)
         assert false == security.verifyRS256Base64Url(signed, 'corrupt')
+    }
+    @Test public void test_SecurityIO_avoidTimingAttack_fixed() {
+        Integer mysecret = 0
+        // Assert benchmark
+        Long runtime = timing {
+            1+1
+        }
+        assert runtime < 10
+        runtime = timing {
+            // Force code to always take 50ms
+            avoidTimingAttack(50) {
+                mysecret = 1+1
+            }
+        }
+        assert mysecret == 2
+        assert runtime >= 50
+        runtime = timing {
+            // Force code to always take 70ms
+            avoidTimingAttack(70) {
+                mysecret = 1+1
+            }
+        }
+        assert mysecret == 2
+        assert runtime >= 70
+    }
+    @Test public void test_SecurityIO_avoidTimingAttack_random() {
+        Integer mysecret = 0
+        // Assert benchmark
+        Long runtime = timing {
+            2*2
+        }
+        assert runtime < 10
+        runtime = timing {
+            // Force code to randomly delay up to 200ms
+            avoidTimingAttack(-50) {
+                mysecret = 2*2
+            }
+        }
+        assert mysecret == 4
+        assert runtime >= 0
+        // 55 to allow a 5ms overage buffer
+        assert runtime < 55
+        Integer limit = 5
+        Integer current = 0
+        Long runtime2
+        // Loop over randomness calculation with a limit of 5 iterations to
+        // avoid randomly getting the same timing twice.
+        while({->
+            if(current > limit) {
+                return false
+            }
+            current++
+            runtime2 = timing {
+                // Force code to randomly delay up to 200ms
+                avoidTimingAttack(-50) {
+                    mysecret = 2*2
+                }
+            }
+            runtime2 == runtime
+        }()) continue
+        assert mysecret == 4
+        assert runtime2 >= 0
+        // 55 to allow a 5ms overage buffer
+        assert runtime2 < 55
+        assert runtime2 != runtime
+    }
+    @Test public void test_SecurityIO_avoidTimingAttack_fixed_min_random_max_with_implicit_return() {
+        Integer mysecret = 0
+        // Assert benchmark
+        Long runtime = timing {
+            5*5
+        }
+        assert runtime < 10
+        runtime = timing {
+            // Set an implicit value.  Minimum execution time is 100ms random between 100-200ms.
+            mysecret = avoidTimingAttack(30) {
+                avoidTimingAttack(-50) {
+                    5*5
+                }
+            }
+        }
+        assert mysecret == 25
+        assert runtime >= 30
+        // 55 to allow a 5ms overage buffer
+        assert runtime < 55
     }
 }

@@ -503,6 +503,16 @@ avoidTimingAttack(-200) {
 }
 assert mysecret == 4
 println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
+
+before = Instant.now().toEpochMilli()
+// Set an implicit value.  Minimum execution time is 100ms random between 100-200ms.
+mysecret = avoidTimingAttack(100) {
+    avoidTimingAttack(-200) {
+        mysecret + mysecret
+    }
+}
+assert mysecret == 8
+println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
 </tt></pre>
 
       @param milliseconds The number of milliseconds a section of code must
@@ -512,16 +522,18 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
                           <tt>milliseconds</tt>.
       @param body A closure of code to execute.  The code will execute as fast
                   as it can and this function will enforce a constant time.
+      @return Returns the result from the executed closure.
       */
-    public static void avoidTimingAttack(Integer milliseconds, Closure body) {
+    public static def avoidTimingAttack(Integer milliseconds, Closure body) {
         Long desiredTime = (milliseconds < 0) ? (new Random().nextInt(milliseconds * -1)) : milliseconds
         Long before = Instant.now().toEpochMilli()
         // execute code
-        body()
+        def result = body()
         // milliseconds - (after - before)
         Long remainingTime = desiredTime - (Instant.now().toEpochMilli() - before)
         if(remainingTime > 0) {
             sleep(remainingTime)
         }
+        result
     }
 }
