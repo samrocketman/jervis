@@ -155,20 +155,20 @@ class SecurityIOTest extends GroovyTestCase {
         }
     }
 
-    @Test public void test_SecurityIO_signRS256Base64Url_and_verifyGitHubJWT() {
+    @Test public void test_SecurityIO_signRS256Base64Url_and_verifyJsonWebToken() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         security = new SecurityIO(url.content.text)
         String signature = security.signRS256Base64Url('data.data')
         String jwt_like = "data.data.${signature}"
-        assert true == security.verifyGitHubJWT(jwt_like)
+        assert true == security.verifyJsonWebToken(jwt_like)
     }
 
-    @Test public void test_SecurityIO_verifyGitHubJWT_fail_to_verify() {
+    @Test public void test_SecurityIO_verifyJsonWebToken_fail_to_verify() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         security = new SecurityIO(url.content.text)
         String signature = security.signRS256Base64Url('data.data')
         String jwt_like = "junk.junk.${signature}"
-        assert false == security.verifyGitHubJWT(jwt_like)
+        assert false == security.verifyJsonWebToken(jwt_like)
     }
 
     @Test public void test_SecurityIO_encodeBase64UrlBytes() {
@@ -211,7 +211,7 @@ class SecurityIOTest extends GroovyTestCase {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         security = new SecurityIO(url.content.text)
         String jwt_token = security.getGitHubJWT('1234')
-        assert true == security.verifyGitHubJWT(jwt_token)
+        assert true == security.verifyJsonWebToken(jwt_token)
         String header
         Map payload
         jwt_token.tokenize('.').with {

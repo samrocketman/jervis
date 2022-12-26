@@ -219,12 +219,11 @@ if(security.verifyGitHubJWTPayload(jwt)) {
     /**
       Use the loaded public key to verify the provided JSON web token (JWT).
 
-      @param github_jwt A JSON Web Token meant for <a href="https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#authenticating-as-a-github-app">GitHub App Authentication</a>.
-      @return           Returns <tt>true</tt> if the signature was successfully
-                        verified or <tt>false</tt> if signature verification
-                        failed.
+      @param jwt A JSON Web Token meant for authentication.
+      @return    Returns <tt>true</tt> if the signature was successfully
+                 verified or <tt>false</tt> if signature verification failed.
       */
-    Boolean verifyGitHubJWT(String github_jwt) {
+    Boolean verifyJsonWebToken(String github_jwt) {
         List jwt = github_jwt.tokenize('.')
         String data = jwt[0..1].join('.')
         String signature = jwt[-1]
@@ -235,6 +234,8 @@ if(security.verifyGitHubJWTPayload(jwt)) {
       Verify a GitHub JWT is not expired by checking the signature and
       ensuring current time falls within issued at and expiration.  This does
       both signature checking and decoding the payload to check for validity.
+      See also
+      <a href="https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#authenticating-as-a-github-app">GitHub App Authentication</a>.
 
       @param github_jwt A JWT meant for use in GitHub App Auth.
       @param drift      Add seconds into the future in order to account for
@@ -247,7 +248,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
                         Default: <tt>30</tt> seconds.
       */
     Boolean verifyGitHubJWTPayload(String github_jwt, Integer drift = 30) {
-        if(!verifyGitHubJWT(github_jwt)) {
+        if(!verifyJsonWebToken(github_jwt)) {
             return false
         }
         Map payload = YamlOperator.loadYamlFrom(decodeBase64UrlBytes(github_jwt.tokenize('.')[1]))
