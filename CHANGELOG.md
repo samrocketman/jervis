@@ -108,7 +108,8 @@ The following classes have been renamed.
   `net.gleske.jervis.remotes.SimpleRestService.apiFetch()`.
 - Enhancements in `net.gleske.jervis.tools.SecurityIO`
   - Added RS256 aglorithm for data signing and verification.
-  - Added JSON Web Token (JWT) creation and verification support.
+  - Added GitHub JSON Web Token (JWT) creation and verification support.
+  - Added generic JWT verification.
   - `avoidTimingAttack()` static function available with usage documentation.
 
 ### Bug fixes:
