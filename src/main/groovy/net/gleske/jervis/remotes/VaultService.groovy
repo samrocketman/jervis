@@ -183,7 +183,7 @@ class VaultService implements SimpleRestServiceSupport {
 
     /**
       Internal method used by
-      <tt>{@link #findAllKeys(java.lang.String, java.lang.Integer)}</tt>
+      <tt>{@link #findAllKeys(java.util.Map, java.lang.Integer)}</tt>
       which tracks recursion level in addition to the user-passed settings.
 
       @param path         A path to recursively search.
@@ -702,7 +702,7 @@ secret/
       Recursively traverses the path for subkeys.  If level is 0 then there's
       no depth limit.  When level = n, keys are traversed up to the limit.
 
-      <p>To learn more see <tt>{@link #findAllKeys(java.lang.String, java.lang.Integer)}</tt>.</p>
+      <p>To learn more see <tt>{@link #findAllKeys(java.util.Map, java.lang.Integer)}</tt>.</p>
       @param location A location map contains two keys: mount and path.  The
                       mount is a KV mount in Vault and the path is a location of
                       a secret relative to the given mount.
@@ -832,7 +832,17 @@ secret/
       variables.  The key and value returned in the Map will always be type
       String.
 
-      TODO better java doc
+      @param location A location map contains two keys: mount and path.  The
+                      mount is a KV mount in Vault and the path is a location of
+                      a secret relative to the given mount.
+      @param version Request a specific version of a secret.  If <tt>0</tt>,
+                     then the latest version is returned.  This option is
+                     ignored for KV v1 secrets engine.
+      @param allowInvalidKeys Allow key names which are valid String keys but
+                              invalid bash environment variables.
+      @return A filtered Map containing only valid key-value pairs given the
+              above parameters when a secret is pulled from Vault.  Map is
+              sorted by key name.
       */
     Map<String, String> getEnvironmentSecret(Map location, Integer version = 0, Boolean allowInvalidKeys = false) {
         getSecret(location, version).findAll { k, v ->
@@ -846,27 +856,43 @@ secret/
         }?.sum()?.sort() ?: [:]
     }
 
+    /**
+      Returns a Map of key-value pairs compatible with bash environment
+      variables.  The key and value returned in the Map will always be type
+      String.
+
+      @param path A path to a secret in Vault.  The path includes the KV v1 or
+                  KV v2 secret engine mount path.
+      @param version Request a specific version of a secret.  If <tt>0</tt>,
+                     then the latest version is returned.  This option is
+                     ignored for KV v1 secrets engine.
+      @param allowInvalidKeys Includes keys which have invalid bash variable
+                              names.  This might be useful for additional logic
+                              processing.
+      @return A filtered Map containing only valid key-value pairs given the
+              above parameters when a secret is pulled from Vault.  Map is
+              sorted by key name.
+      */
     Map<String, String> getEnvironmentSecret(String path, Integer version = 0, Boolean allowInvalidKeys = false) {
         getEnvironmentSecret(getLocationMapFromPath(path), version, allowInvalidKeys)
     }
 
     /**
       Returns a Map of key-value pairs compatible with bash environment
-      variables.  Given a list of paths, they'll be combined with the end of
-      the list taking precedence over the beginning of  the list.  When
-      combining the Maps, the last Key-Value pair wins when key names conflict.
+      variables.  Given a list of paths, they'll be combined with the end of the
+      list taking precedence over the beginning of the list.  When combining the
+      Maps, the last Key-Value pair wins when key names conflict.
 
-      @param paths            A List of paths to search Vault for Maps.  Maps
-                              are eventually combined.  A path can be a String
-                              or a location Map.  A location Map includes a
-                              mount and path key e.g.
-                              <tt>[mount: 'kv', path: 'my/secret/path']</tt>.
+      @param paths A List of paths to search Vault for Maps.  Maps are
+                   eventually combined.  A path can be a String or a location
+                   Map.  A location Map includes a mount and path key e.g.
+                   <tt>[mount: 'kv', path: 'my/secret/path']</tt>.
       @param allowInvalidKeys Includes keys which have invalid bash variable
                               names.  This might be useful for additional logic
                               processing.
-      @return Returns a Map which is the sum of all of the keys provided.
-
-      TODO better java doc
+      @return A filtered Map containing only valid key-value pairs given the
+              above parameters when a secret is pulled from Vault.  Map is
+              sorted by key name.
       */
     Map<String, String> getEnvironmentSecrets(List paths, Boolean allowInvalidKeys = false) {
         paths.collect { path ->
@@ -880,17 +906,24 @@ secret/
     }
 
     /**
-      Deletes data from a KV v1 or KV v2 secrets engine using a location map.
+      Deletes data from a KV v1 or KV v2 secrets engine.
 
-      @param key
-      @param destroyVersions
-      @param destroyAllVersions Permanently deletes the key metadata and all
-                                version data for the specified <tt>key</tt>.
-                                When enabled, <tt>destroyVersions</tt> is
-                                ignored.  This option is ignored for KV v1
+      @param location A location map contains two keys: mount and path.  The
+                      mount is a KV mount in Vault and the path is a location of
+                      a secret relative to the given mount.
+      @param destroyVersions When a key has multiple versions you might want to
+                             only delete a specific version.  Pass in a list of
+                             version numbers and only those versions of the
+                             secret will be deleted or destroyed.
+      @param destroyAllVersions Permanently deletes a secret.  If no
+                                <tt>destroyVersions</tt> are given, then all
+                                secret metadata and versions will be permanently
+                                deleted.  If specific <tt>destroyVersions</tt>
+                                are given, then those specific versions are
+                                permanently destroyed so they can't be
+                                un-deleted.  This option is ignored for KV v1
                                 secrets engine.
       */
-    // TODO update javadoc
     void deleteKey(Map location, List<Integer> deleteVersions, Boolean destroyAllVersions = false) {
         checkLocationMap(location)
         String mount = location.mount
@@ -916,29 +949,82 @@ secret/
         }
     }
 
+    /**
+      Deletes data from a KV v1 or KV v2 secrets engine.
+
+      @param location A location map contains two keys: mount and path.  The
+                      mount is a KV mount in Vault and the path is a location of
+                      a secret relative to the given mount.
+      @param destroyAllVersions Permanently deletes a secret.  If no
+                                <tt>destroyVersions</tt> are given, then all
+                                secret metadata and versions will be permanently
+                                deleted.  If specific <tt>destroyVersions</tt>
+                                are given, then those specific versions are
+                                permanently destroyed so they can't be
+                                un-deleted.  This option is ignored for KV v1
+                                secrets engine.
+      */
     void deleteKey(Map location, Boolean destroyAllVersions = false) {
         deleteKey(location, [], destroyAllVersions)
     }
 
-    // TODO update javadoc
+    /**
+      Deletes data from a KV v1 or KV v2 secrets engine.
+
+      @param path A path to a secret in Vault.  The path includes the KV v1 or
+                  KV v2 secret engine mount path.
+      @param destroyVersions When a key has multiple versions you might want to
+                             only delete a specific version.  Pass in a list of
+                             version numbers and only those versions of the
+                             secret will be deleted or destroyed.
+      @param destroyAllVersions Permanently deletes a secret.  If no
+                                <tt>destroyVersions</tt> are given, then all
+                                secret metadata and versions will be permanently
+                                deleted.  If specific <tt>destroyVersions</tt>
+                                are given, then those specific versions are
+                                permanently destroyed so they can't be
+                                un-deleted.  This option is ignored for KV v1
+                                secrets engine.
+      */
     void deleteKey(String path, List<Integer> destroyVersions, Boolean destroyAllVersions = false) {
         deleteKey(getLocationMapFromPath(path), destroyVersions, destroyAllVersions)
     }
+
+    /**
+      Deletes data from a KV v1 or KV v2 secrets engine.
+
+      @param path A path to a secret in Vault.  The path includes the KV v1 or
+                  KV v2 secret engine mount path.
+      @param destroyAllVersions Permanently deletes a secret.  If no
+                                <tt>destroyVersions</tt> are given, then all
+                                secret metadata and versions will be permanently
+                                deleted.  If specific <tt>destroyVersions</tt>
+                                are given, then those specific versions are
+                                permanently destroyed so they can't be
+                                un-deleted.  This option is ignored for KV v1
+                                secrets engine.
+      */
     void deleteKey(String path, Boolean destroyAllVersions = false) {
         deleteKey(getLocationMapFromPath(path), [], destroyAllVersions)
     }
 
     /**
-      Deletes data from a KV v1 or KV v2 secrets engine.
-      @param path
-      @param level
+      Recursively deletes a path of keys including all child keys from a KV v1
+      or KV v2 secrets engine.  The trailing slash on <tt>location.path</tt>
+      behaves similarly to
+      <tt>{@link #findAllKeys(java.util.Map, java.lang.Integer)}</tt>.
+
+      @param location A location map contains two keys: mount and path.  The
+                      mount is a KV mount in Vault and the path is a location of
+                      a secret relative to the given mount.
+      @param level When traversing secrets paths <tt>level</tt> limits how deep
+                   the path goes when returning results.
       @param destroyAllVersions Permanently deletes the key metadata and all
                                 version data for the specified <tt>key</tt>.
                                 When enabled, <tt>destroyVersions</tt> is
                                 ignored.  This option is ignored for KV v1
                                 secrets engine.
       */
-    // TODO write javadoc
     void deletePath(Map location, Integer level, Boolean destroyAllVersions = false) {
         checkLocationMap(location)
         findAllKeys(location, level).sort { String a, String b ->
@@ -951,23 +1037,79 @@ secret/
         }
     }
 
-    // TODO write javadoc
+    /**
+      Recursively deletes a path of keys including all child keys from a KV v1
+      or KV v2 secrets engine.  The trailing slash on <tt>location.path</tt>
+      behaves similarly to
+      <tt>{@link #findAllKeys(java.util.Map, java.lang.Integer)}</tt>.
+
+      @param location A location map contains two keys: mount and path.  The
+                      mount is a KV mount in Vault and the path is a location of
+                      a secret relative to the given mount.
+      @param destroyAllVersions Permanently deletes the key metadata and all
+                                version data for the specified <tt>key</tt>.
+                                When enabled, <tt>destroyVersions</tt> is
+                                ignored.  This option is ignored for KV v1
+                                secrets engine.
+      */
     void deletePath(Map location, Boolean destroyAllVersions = false) {
         deletePath(location, 0, destroyAllVersions)
     }
 
-    // TODO write javadoc
+    /**
+      Recursively deletes a path of keys including all child keys from a KV v1
+      or KV v2 secrets engine.  The trailing slash on <tt>path</tt> behaves
+      similarly to
+      <tt>{@link #findAllKeys(java.util.Map, java.lang.Integer)}</tt>.
+
+      @param path A path to a secret in Vault.  The path includes the KV v1 or
+                  KV v2 secret engine mount path.
+      @param destroyAllVersions Permanently deletes the key metadata and all
+                                version data for the specified <tt>key</tt>.
+                                When enabled, <tt>destroyVersions</tt> is
+                                ignored.  This option is ignored for KV v1
+                                secrets engine.
+      */
     void deletePath(String path, Boolean destroyAllVersions = false) {
         deletePath(path, 0, destroyAllVersions)
     }
 
-    // TODO write javadoc
+    /**
+      Recursively deletes a path of keys including all child keys from a KV v1
+      or KV v2 secrets engine.  The trailing slash on <tt>path</tt> behaves
+      similarly to
+      <tt>{@link #findAllKeys(java.util.Map, java.lang.Integer)}</tt>.
+
+      @param path A path to a secret in Vault.  The path includes the KV v1 or
+                  KV v2 secret engine mount path.
+      @param level When traversing secrets paths <tt>level</tt> limits how deep
+                   the path goes when returning results.
+      @param destroyAllVersions Permanently deletes the key metadata and all
+                                version data for the specified <tt>key</tt>.
+                                When enabled, <tt>destroyVersions</tt> is
+                                ignored.  This option is ignored for KV v1
+                                secrets engine.
+      */
     void deletePath(String path, Integer level, Boolean destroyAllVersions = false) {
         deletePath(getLocationMapFromPath(path), level, destroyAllVersions)
     }
 
+    /**
+      Check if a secret is deleted by attempting to retrieve it or check its
+      status.  A secret could be in one of three states: non-existent, deleted
+      (recoverable), and destroyed (exists but not recoverable).
 
-    // TODO write javadoc
+      @param location A location map contains two keys: mount and path.  The
+                      mount is a KV mount in Vault and the path is a location of
+                      a secret relative to the given mount.
+       @param version Request a specific version of a secret.  If <tt>0</tt>,
+                      then the latest version is returned.  This option is
+                      ignored for KV v1 secrets engine.
+      @return Returns <tt>true</tt> if a key is non-existent in KV v1 or KV v2
+              secrets engines.  On a KV v2 secrets engine, will return
+              <tt>true</tt> if a secret exists but the version requested is
+              deleted or destroyed.  Otherwise, returns <tt>false</tt>.
+      */
     Boolean isDeletedKey(Map location, Integer version = 0) {
         checkLocationMap(location)
         String mount = location.mount
@@ -1002,7 +1144,21 @@ secret/
         metadata.versions[version.toString()].with { it.deletion_time || it.destroyed }
     }
 
-    // TODO write javadoc
+    /**
+      Check if a secret is deleted by attempting to retrieve it or check its
+      status.  A secret could be in one of three states: non-existent, deleted
+      (recoverable), and destroyed (exists but not recoverable).
+
+      @param path A path to a secret in Vault.  The path includes the KV v1 or
+                  KV v2 secret engine mount path.
+       @param version Request a specific version of a secret.  If <tt>0</tt>,
+                      then the latest version is returned.  This option is
+                      ignored for KV v1 secrets engine.
+      @return Returns <tt>true</tt> if a key is non-existent in KV v1 or KV v2
+              secrets engines.  On a KV v2 secrets engine, will return
+              <tt>true</tt> if a secret exists but the version requested is
+              deleted or destroyed.  Otherwise, returns <tt>false</tt>.
+      */
     Boolean isDeletedKey(String path, Integer version = 0) {
         isDeletedKey(getLocationMapFromPath(path), version)
     }
