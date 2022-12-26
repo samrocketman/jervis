@@ -454,17 +454,71 @@ if(security.verifyGitHubJWTPayload(jwt)) {
       input in order to have a constant-time result to avoid timing based
       attacks.
 
-      @param milliseconds The number of milliseconds a section of code should
-                          take.  This could be 200 millis.
+      <p>If <tt>milliseconds</tt> is a negative number, e.g. <tt>-200</tt>, then
+      the delay will be randomized between 0 and <tt>milliseconds</tt> but not
+      more than <tt>milliseconds</tt>.</p>
+
+      <h2>Security Notes</h2>
+
+      <p><b>Please Note:</b> due to how time works on computers sometimes the
+      time can be 1 or 2 ms over the time you specify.  If you have an absolute
+      maximum, then you should account for this in the value you pass.  This
+      function can't guarantee absolute maximum.</p>
+
+      <p><b>Please Note:</b> this function provides fixed maximum delays.  If
+      code being called goes over this fixed delay, then timing attacks are
+      still possible on your code.  You should account for this with defensive
+      programming such as validating inputs on security sensitive code before
+      calling algorithms.</p>
+
+      <p><b>Please note:</b> randomized delay can have a limit.  If an attacker
+      has infinite time and unlimited samples, then statistically randomness
+      goes away.  This function makes it harder to calculate timing attacks;
+      other protections should be in place on your code endpoints such as
+      request limits within a given time frame.</p>
+
+      <p><b>Please note:</b> These notes are known as defense in depth.  Have
+      multiple controls around securing your code in case one control fails.
+      Knowing the weakness of different controls enables you to better secure
+      it with additional layers of security.</p>
+
+      <h2>Sample Usage</h2>
+<pre><tt>import static net.gleske.jervis.tools.SecurityIO.avoidTimingAttack
+import java.time.Instant
+
+Integer mysecret = 0
+Long before = Instant.now().toEpochMilli()
+// Force code to always take 200ms
+avoidTimingAttack(200) {
+    mysecret = 1+1
+}
+assert mysecret == 2
+println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
+
+before = Instant.now().toEpochMilli()
+// Force code to randomly delay up to 200ms
+avoidTimingAttack(-200) {
+    mysecret = mysecret + 2
+}
+assert mysecret == 4
+println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
+</tt></pre>
+
+      @param milliseconds The number of milliseconds a section of code must
+                          minimally take.  If <tt>milliseconds</tt> is negative,
+                          then randomly delay up to the value.  In both cases,
+                          the maximum delay is fixed at the absolute value of
+                          <tt>milliseconds</tt>.
       @param body A closure of code to execute.  The code will execute as fast
                   as it can and this function will enforce a constant time.
       */
-    public static void avoidTimingAttack(Long milliseconds, Closure body) {
+    public static void avoidTimingAttack(Integer milliseconds, Closure body) {
+        Long desiredTime = (milliseconds < 0) ? (new Random().nextInt(milliseconds * -1)) : milliseconds
         Long before = Instant.now().toEpochMilli()
         // execute code
         body()
         // milliseconds - (after - before)
-        Long remainingTime = milliseconds - (Instant.now().toEpochMilli() - before)
+        Long remainingTime = desiredTime - (Instant.now().toEpochMilli() - before)
         if(remainingTime > 0) {
             sleep(remainingTime)
         }
