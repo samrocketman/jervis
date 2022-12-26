@@ -992,7 +992,7 @@ secret/
                                 un-deleted.  This option is ignored for KV v1
                                 secrets engine.
       */
-    void deleteKey(Map location, List<Integer> deleteVersions, Boolean destroyAllVersions = false) {
+    void deleteSecret(Map location, List<Integer> deleteVersions, Boolean destroyAllVersions = false) {
         checkLocationMap(location)
         String mount = location.mount
         String subpath = location.path.replaceAll('^/', '')
@@ -1032,8 +1032,8 @@ secret/
                                 un-deleted.  This option is ignored for KV v1
                                 secrets engine.
       */
-    void deleteKey(Map location, Boolean destroyAllVersions = false) {
-        deleteKey(location, [], destroyAllVersions)
+    void deleteSecret(Map location, Boolean destroyAllVersions = false) {
+        deleteSecret(location, [], destroyAllVersions)
     }
 
     /**
@@ -1054,8 +1054,8 @@ secret/
                                 un-deleted.  This option is ignored for KV v1
                                 secrets engine.
       */
-    void deleteKey(String path, List<Integer> destroyVersions, Boolean destroyAllVersions = false) {
-        deleteKey(getLocationMapFromPath(path), destroyVersions, destroyAllVersions)
+    void deleteSecret(String path, List<Integer> destroyVersions, Boolean destroyAllVersions = false) {
+        deleteSecret(getLocationMapFromPath(path), destroyVersions, destroyAllVersions)
     }
 
     /**
@@ -1072,8 +1072,8 @@ secret/
                                 un-deleted.  This option is ignored for KV v1
                                 secrets engine.
       */
-    void deleteKey(String path, Boolean destroyAllVersions = false) {
-        deleteKey(getLocationMapFromPath(path), [], destroyAllVersions)
+    void deleteSecret(String path, Boolean destroyAllVersions = false) {
+        deleteSecret(getLocationMapFromPath(path), [], destroyAllVersions)
     }
 
     /**
@@ -1101,7 +1101,7 @@ secret/
             b.count('/') <=> a.count('/')
         }.each { String key ->
             // Performs a soft delete by default or destroys all versions
-            deleteKey(key, destroyAllVersions)
+            deleteSecret(key, destroyAllVersions)
         }
     }
 
@@ -1178,7 +1178,7 @@ secret/
               <tt>true</tt> if a secret exists but the version requested is
               deleted or destroyed.  Otherwise, returns <tt>false</tt>.
       */
-    Boolean isDeletedKey(Map location, Integer version = 0) {
+    Boolean isDeletedSecret(Map location, Integer version = 0) {
         checkLocationMap(location)
         String mount = location.mount
         String subpath = location.path.replaceAll('^/', '')
@@ -1227,7 +1227,7 @@ secret/
               <tt>true</tt> if a secret exists but the version requested is
               deleted or destroyed.  Otherwise, returns <tt>false</tt>.
       */
-    Boolean isDeletedKey(String path, Integer version = 0) {
-        isDeletedKey(getLocationMapFromPath(path), version)
+    Boolean isDeletedSecret(String path, Integer version = 0) {
+        isDeletedSecret(getLocationMapFromPath(path), version)
     }
 }

@@ -178,22 +178,22 @@ myvault.copyAllKeys('kv/foo', 'kv2/withslash/rename')
 myvault.copyAllKeys('kv2/withslash/rename', 'secret2/withslash/subpath/')
 myvault.copyAllKeys('secret/foo', 'secret2/withslash/rename')
 myvault.copyAllKeys('secret2/withslash/rename', 'kv2/withslash/subpath/')
-myvault.isDeletedKey('kv/foo')
-myvault.isDeletedKey('secret/foo')
-myvault.isDeletedKey('secret/foo2')
-myvault.isDeletedKey('kv/foo2')
+myvault.isDeletedSecret('kv/foo')
+myvault.isDeletedSecret('secret/foo')
+myvault.isDeletedSecret('secret/foo2')
+myvault.isDeletedSecret('kv/foo2')
 myvault.copySecret('secret/foo', 'kv2/withslash/deleteone')
 myvault.copySecret('kv/foo', 'kv2/withslash/deleteone', 1)
 myvault.copySecret('secret/foo', 'kv2/withslash/deleteone')
 myvault.copySecret('kv/foo', 'kv2/withslash/deleteone')
-myvault.deleteKey('kv2/withslash/deleteone')
-myvault.deleteKey('kv2/withslash/deleteone', [1])
-myvault.deleteKey('kv2/withslash/deleteone', [3], true)
-myvault.isDeletedKey('kv2/withslash/deleteone')
-myvault.isDeletedKey('kv2/withslash/deleteone', 1)
-myvault.isDeletedKey('kv2/withslash/deleteone', 2)
-myvault.isDeletedKey('kv2/withslash/deleteone', 3)
-myvault.isDeletedKey('kv2/withslash/deleteone', 4)
+myvault.deleteSecret('kv2/withslash/deleteone')
+myvault.deleteSecret('kv2/withslash/deleteone', [1])
+myvault.deleteSecret('kv2/withslash/deleteone', [3], true)
+myvault.isDeletedSecret('kv2/withslash/deleteone')
+myvault.isDeletedSecret('kv2/withslash/deleteone', 1)
+myvault.isDeletedSecret('kv2/withslash/deleteone', 2)
+myvault.isDeletedSecret('kv2/withslash/deleteone', 3)
+myvault.isDeletedSecret('kv2/withslash/deleteone', 4)
 myvault.getSecret('kv2/withslash/deleteone', 2)
 myvault.copyAllKeys('kv/foo', 'kv2/withslash/somepath')
 myvault.copyAllKeys('kv/foo', 'secret2/withslash/somepath')
@@ -202,9 +202,9 @@ myvault.deletePath('kv2/withslash/somepath', true)
 myvault.deletePath('secret2/withslash/somepath')
 myvault.copySecret('kv/foo', 'kv2/withslash/destroyone', 1)
 myvault.copySecret('secret/foo', 'kv2/withslash/destroyone')
-myvault.deleteKey('kv2/withslash/destroyone', [2], true)
-myvault.isDeletedKey('kv2/withslash/destroyone')
-myvault.isDeletedKey('kv2/withslash/destroyone', 1)
+myvault.deleteSecret('kv2/withslash/destroyone', [2], true)
+myvault.isDeletedSecret('kv2/withslash/destroyone')
+myvault.isDeletedSecret('kv2/withslash/destroyone', 1)
 myvault.setSecret('kv2/withslash/multitype', [number: 23, bool: true, 'nullkey': null, 'listkey': [1,2,3], 'mapkey': [simple: 'submap'], validvar: 'somevalue', '%user': 'special symbol'])
 myvault.setSecret('secret2/withslash/multitype', [number: 23, bool: true, 'nullkey': null, 'listkey': [1,2,3], 'mapkey': [simple: 'submap'], validvar: 'somevalue', '%user': 'special symbol'])
 myvault.setSecret('kv2/withslash/emptysecret', [:])
@@ -1081,12 +1081,12 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_isDeletedKey_versions_1_through_4() {
-        assert true == myvault.isDeletedKey('kv2/withslash/deleteone')
-        assert true == myvault.isDeletedKey('kv2/withslash/deleteone', 1)
-        assert false == myvault.isDeletedKey('kv2/withslash/deleteone', 2)
-        assert true == myvault.isDeletedKey('kv2/withslash/deleteone', 3)
-        assert true == myvault.isDeletedKey('kv2/withslash/deleteone', 4)
+    @Test public void test_VaultService_isDeletedSecret_versions_1_through_4() {
+        assert true == myvault.isDeletedSecret('kv2/withslash/deleteone')
+        assert true == myvault.isDeletedSecret('kv2/withslash/deleteone', 1)
+        assert false == myvault.isDeletedSecret('kv2/withslash/deleteone', 2)
+        assert true == myvault.isDeletedSecret('kv2/withslash/deleteone', 3)
+        assert true == myvault.isDeletedSecret('kv2/withslash/deleteone', 4)
     }
     @Test public void test_VaultService_getSecret_kv2_withslash_version_2() {
         assert [hello: 'world'] == myvault.getSecret('kv2/withslash/deleteone', 2)
@@ -1169,86 +1169,86 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_isDeletedKey() {
-        assert false == myvault.isDeletedKey('kv/foo')
-        assert false == myvault.isDeletedKey('secret/foo')
+    @Test public void test_VaultService_isDeletedSecret() {
+        assert false == myvault.isDeletedSecret('kv/foo')
+        assert false == myvault.isDeletedSecret('secret/foo')
     }
-    @Test public void test_VaultService_isDeletedKey_with_history_version_0_destroyed() {
-        assert true == myvault.isDeletedKey('kv2/withslash/destroyone')
-        assert false == myvault.isDeletedKey('kv2/withslash/destroyone', 1)
+    @Test public void test_VaultService_isDeletedSecret_with_history_version_0_destroyed() {
+        assert true == myvault.isDeletedSecret('kv2/withslash/destroyone')
+        assert false == myvault.isDeletedSecret('kv2/withslash/destroyone', 1)
     }
-    @Test public void test_VaultService_isDeletedKey_path_fail() {
+    @Test public void test_VaultService_isDeletedSecret_path_fail() {
         shouldFail(VaultException) {
-            myvault.isDeletedKey('kv/foo/')
+            myvault.isDeletedSecret('kv/foo/')
         }
         shouldFail(VaultException) {
-            myvault.isDeletedKey('secret/foo/')
+            myvault.isDeletedSecret('secret/foo/')
         }
         shouldFail(VaultException) {
-            myvault.isDeletedKey('kv')
+            myvault.isDeletedSecret('kv')
         }
         shouldFail(VaultException) {
-            myvault.isDeletedKey('secret')
+            myvault.isDeletedSecret('secret')
         }
     }
-    @Test public void test_VaultService_isDeletedKey_doesnotexist() {
-        assert true == myvault.isDeletedKey('secret/doesnotexist')
-        assert true == myvault.isDeletedKey('kv/doesnotexist')
+    @Test public void test_VaultService_isDeletedSecret_doesnotexist() {
+        assert true == myvault.isDeletedSecret('secret/doesnotexist')
+        assert true == myvault.isDeletedSecret('kv/doesnotexist')
     }
-    @Test public void test_VaultService_isDeletedKey_versions() {
-        assert false == myvault.isDeletedKey('kv/foo', 1)
+    @Test public void test_VaultService_isDeletedSecret_versions() {
+        assert false == myvault.isDeletedSecret('kv/foo', 1)
         // version does not exist
-        assert true == myvault.isDeletedKey('kv/foo', 25)
+        assert true == myvault.isDeletedSecret('kv/foo', 25)
     }
 
 
-    @Test public void test_VaultService_isDeletedKey_location_map() {
-        assert false == myvault.isDeletedKey(mount: 'kv', path: '/foo')
-        assert false == myvault.isDeletedKey(mount: 'kv', path: 'foo')
-        assert false == myvault.isDeletedKey(mount: 'secret', path: '/foo')
-        assert false == myvault.isDeletedKey(mount: 'secret', path: 'foo')
+    @Test public void test_VaultService_isDeletedSecret_location_map() {
+        assert false == myvault.isDeletedSecret(mount: 'kv', path: '/foo')
+        assert false == myvault.isDeletedSecret(mount: 'kv', path: 'foo')
+        assert false == myvault.isDeletedSecret(mount: 'secret', path: '/foo')
+        assert false == myvault.isDeletedSecret(mount: 'secret', path: 'foo')
     }
-    @Test public void test_VaultService_isDeletedKey_location_map_path_fail() {
+    @Test public void test_VaultService_isDeletedSecret_location_map_path_fail() {
         shouldFail(VaultException) {
-            myvault.isDeletedKey(mount: 'kv', path: '/foo/')
+            myvault.isDeletedSecret(mount: 'kv', path: '/foo/')
         }
         shouldFail(VaultException) {
-            myvault.isDeletedKey(mount: 'kv', path: 'foo/')
+            myvault.isDeletedSecret(mount: 'kv', path: 'foo/')
         }
         shouldFail(VaultException) {
-            myvault.isDeletedKey(mount: 'secret', path: '/foo/')
+            myvault.isDeletedSecret(mount: 'secret', path: '/foo/')
         }
         shouldFail(VaultException) {
-            myvault.isDeletedKey(mount: 'secret', path: 'foo/')
+            myvault.isDeletedSecret(mount: 'secret', path: 'foo/')
         }
         shouldFail(VaultException) {
-            myvault.isDeletedKey(mount: 'kv', path: '/')
+            myvault.isDeletedSecret(mount: 'kv', path: '/')
         }
         shouldFail(VaultException) {
-            myvault.isDeletedKey(mount: 'kv', path: '')
+            myvault.isDeletedSecret(mount: 'kv', path: '')
         }
         shouldFail(VaultException) {
-            myvault.isDeletedKey(mount: 'secret', path: '/')
+            myvault.isDeletedSecret(mount: 'secret', path: '/')
         }
         shouldFail(VaultException) {
-            myvault.isDeletedKey(mount: 'secret', path: '')
+            myvault.isDeletedSecret(mount: 'secret', path: '')
         }
     }
-    @Test public void test_VaultService_isDeletedKey_location_map_doesnotexist() {
-        assert true == myvault.isDeletedKey(mount: 'secret', path: '/doesnotexist')
-        assert true == myvault.isDeletedKey(mount: 'secret', path: 'doesnotexist')
-        assert true == myvault.isDeletedKey(mount: 'kv', path: '/doesnotexist')
-        assert true == myvault.isDeletedKey(mount: 'kv', path: 'doesnotexist')
+    @Test public void test_VaultService_isDeletedSecret_location_map_doesnotexist() {
+        assert true == myvault.isDeletedSecret(mount: 'secret', path: '/doesnotexist')
+        assert true == myvault.isDeletedSecret(mount: 'secret', path: 'doesnotexist')
+        assert true == myvault.isDeletedSecret(mount: 'kv', path: '/doesnotexist')
+        assert true == myvault.isDeletedSecret(mount: 'kv', path: 'doesnotexist')
     }
-    @Test public void test_VaultService_isDeletedKey_location_map_versions() {
-        assert false == myvault.isDeletedKey([mount: 'kv', path: '/foo'], 1)
-        assert false == myvault.isDeletedKey([mount: 'kv', path: 'foo'], 1)
+    @Test public void test_VaultService_isDeletedSecret_location_map_versions() {
+        assert false == myvault.isDeletedSecret([mount: 'kv', path: '/foo'], 1)
+        assert false == myvault.isDeletedSecret([mount: 'kv', path: 'foo'], 1)
         // version does not exist
-        assert true == myvault.isDeletedKey([mount: 'kv', path: '/foo'], 25)
-        assert true == myvault.isDeletedKey([mount: 'kv', path: 'foo'], 25)
+        assert true == myvault.isDeletedSecret([mount: 'kv', path: '/foo'], 25)
+        assert true == myvault.isDeletedSecret([mount: 'kv', path: 'foo'], 25)
     }
-    @Test public void test_VaultService_deleteKey_kv2_softdelete() {
-        myvault.deleteKey('kv2/withslash/deleteone')
+    @Test public void test_VaultService_deleteSecret_kv2_softdelete() {
+        myvault.deleteSecret('kv2/withslash/deleteone')
         List urls = ['http://vault:8200/v1/kv2/withslash/data/deleteone']
         List methods = ['DELETE']
         List datas = ['']
@@ -1256,8 +1256,8 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_deleteKey_kv2_destroy() {
-        myvault.deleteKey('kv2/withslash/somepath', true)
+    @Test public void test_VaultService_deleteSecret_kv2_destroy() {
+        myvault.deleteSecret('kv2/withslash/somepath', true)
         List urls = ['http://vault:8200/v1/kv2/withslash/metadata/somepath']
         List methods = ['DELETE']
         List datas = ['']
@@ -1265,8 +1265,8 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_deleteKey_kv2_softdelete_version_1() {
-        myvault.deleteKey('kv2/withslash/deleteone', [1])
+    @Test public void test_VaultService_deleteSecret_kv2_softdelete_version_1() {
+        myvault.deleteSecret('kv2/withslash/deleteone', [1])
         List urls = ['http://vault:8200/v1/kv2/withslash/delete/deleteone']
         List methods = ['POST']
         List datas = ['{"versions":[1]}']
@@ -1274,8 +1274,8 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_deleteKey_kv2_destroy_version_3() {
-        myvault.deleteKey('kv2/withslash/deleteone', [3], true)
+    @Test public void test_VaultService_deleteSecret_kv2_destroy_version_3() {
+        myvault.deleteSecret('kv2/withslash/deleteone', [3], true)
         List urls = ['http://vault:8200/v1/kv2/withslash/destroy/deleteone']
         List methods = ['POST']
         List datas = ['{"versions":[3]}']
@@ -1283,22 +1283,22 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_deleteKey_path_fail() {
+    @Test public void test_VaultService_deleteSecret_path_fail() {
         shouldFail(VaultException) {
-            myvault.deleteKey('kv/foo/')
+            myvault.deleteSecret('kv/foo/')
         }
         shouldFail(VaultException) {
-            myvault.deleteKey('secret/foo/')
+            myvault.deleteSecret('secret/foo/')
         }
         shouldFail(VaultException) {
-            myvault.deleteKey('kv')
+            myvault.deleteSecret('kv')
         }
         shouldFail(VaultException) {
-            myvault.deleteKey('secret')
+            myvault.deleteSecret('secret')
         }
     }
-    @Test public void test_VaultService_deleteKey_location_map_kv2_softdelete() {
-        myvault.deleteKey(mount: 'kv2/withslash', path: 'deleteone')
+    @Test public void test_VaultService_deleteSecret_location_map_kv2_softdelete() {
+        myvault.deleteSecret(mount: 'kv2/withslash', path: 'deleteone')
         List urls = ['http://vault:8200/v1/kv2/withslash/data/deleteone']
         List methods = ['DELETE']
         List datas = ['']
@@ -1306,8 +1306,8 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_deleteKey_location_map_kv2_destroy() {
-        myvault.deleteKey([mount: 'kv2/withslash', path: 'somepath'], true)
+    @Test public void test_VaultService_deleteSecret_location_map_kv2_destroy() {
+        myvault.deleteSecret([mount: 'kv2/withslash', path: 'somepath'], true)
         List urls = ['http://vault:8200/v1/kv2/withslash/metadata/somepath']
         List methods = ['DELETE']
         List datas = ['']
@@ -1315,8 +1315,8 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_deleteKey_location_map_kv2_softdelete_version_1() {
-        myvault.deleteKey([mount: 'kv2/withslash', path: 'deleteone'], [1])
+    @Test public void test_VaultService_deleteSecret_location_map_kv2_softdelete_version_1() {
+        myvault.deleteSecret([mount: 'kv2/withslash', path: 'deleteone'], [1])
         List urls = ['http://vault:8200/v1/kv2/withslash/delete/deleteone']
         List methods = ['POST']
         List datas = ['{"versions":[1]}']
@@ -1324,8 +1324,8 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_deleteKey_location_map_kv2_destroy_version_3() {
-        myvault.deleteKey([mount: 'kv2/withslash', path: 'deleteone'], [3], true)
+    @Test public void test_VaultService_deleteSecret_location_map_kv2_destroy_version_3() {
+        myvault.deleteSecret([mount: 'kv2/withslash', path: 'deleteone'], [3], true)
         List urls = ['http://vault:8200/v1/kv2/withslash/destroy/deleteone']
         List methods = ['POST']
         List datas = ['{"versions":[3]}']
@@ -1333,30 +1333,30 @@ class VaultServiceTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultService_deleteKey_location_map_path_fail() {
+    @Test public void test_VaultService_deleteSecret_location_map_path_fail() {
         shouldFail(VaultException) {
-            myvault.deleteKey(mount: 'kv', path: '/foo/')
+            myvault.deleteSecret(mount: 'kv', path: '/foo/')
         }
         shouldFail(VaultException) {
-            myvault.deleteKey(mount: 'kv', path: 'foo/')
+            myvault.deleteSecret(mount: 'kv', path: 'foo/')
         }
         shouldFail(VaultException) {
-            myvault.deleteKey(mount: 'secret', path: '/foo/')
+            myvault.deleteSecret(mount: 'secret', path: '/foo/')
         }
         shouldFail(VaultException) {
-            myvault.deleteKey(mount: 'secret', path: 'foo/')
+            myvault.deleteSecret(mount: 'secret', path: 'foo/')
         }
         shouldFail(VaultException) {
-            myvault.deleteKey(mount: 'kv', path: '/')
+            myvault.deleteSecret(mount: 'kv', path: '/')
         }
         shouldFail(VaultException) {
-            myvault.deleteKey(mount: 'kv', path: '')
+            myvault.deleteSecret(mount: 'kv', path: '')
         }
         shouldFail(VaultException) {
-            myvault.deleteKey(mount: 'secret', path: '/')
+            myvault.deleteSecret(mount: 'secret', path: '/')
         }
         shouldFail(VaultException) {
-            myvault.deleteKey(mount: 'secret', path: '')
+            myvault.deleteSecret(mount: 'secret', path: '')
         }
     }
     @Test public void test_VaultService_getEnvironmentSecret_kv2() {
