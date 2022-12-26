@@ -106,6 +106,10 @@ The following classes have been renamed.
     empty `HashMap`.
 - More flexibility has been added to static method
   `net.gleske.jervis.remotes.SimpleRestService.apiFetch()`.
+- Enhancements in `net.gleske.jervis.tools.SecurityIO`
+  - Added RS256 aglorithm for data signing and verification.
+  - Added JSON Web Token (JWT) creation and verification support.
+  - `avoidTimingAttack()` static function available with usage documentation.
 
 ### Bug fixes:
 
