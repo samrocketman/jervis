@@ -33,6 +33,18 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
     private Boolean renewable = false
     private Instant leaseCreated
 
+    /**
+      Customizable HTTP headers which get sent to Vault in addition to
+      authentication headers.
+      */
+    Map<String, String> headers = [:]
+
+    /**
+      The time buffer before a renewal is forced.  This is to account for clock
+      drift and is customizable by the client.
+      */
+    Long renew_buffer = 15
+
 
     String getVault_url() {
         this.vault_url
@@ -43,10 +55,16 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
     }
 
     Map header(Map headers = [:]) {
-        if(this.token) {
-            headers['X-Vault-Token'] = getToken()
+        Map tempHeaders = this.headers + headers
+        // https://www.vaultproject.io/api-docs#the-x-vault-request-header
+        tempHeaders['X-Vault-Request'] = "true"
+        if(headers['X-Jervis-Vault-Login']) {
+            tempHeaders.remove('X-Jervis-Vault-Login')
         }
-        headers
+        else {
+            tempHeaders['X-Vault-Token'] = getToken()
+        }
+        tempHeaders
     }
 
     VaultAppRoleCredential(String vault_url, String role_id, String secret_id) {
@@ -59,11 +77,11 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
     }
 
     private Boolean isExpired() {
-        if(!token) {
+        if(!this.token) {
             return true
         }
         Instant now = new Date().toInstant()
-        if(ttl - (now.epochSecond - this.leaseCreated.epochSecond) > 15) {
+        if(this.ttl - (now.epochSecond - this.leaseCreated.epochSecond) > renew_buffer) {
             return false
         }
         true
@@ -86,7 +104,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
         this.token = null
         String data = objToJson([role_id: this.credential.role_id, secret_id: this.credential.secret_id])
         this.leaseCreated = new Date().toInstant()
-        Map response = apiFetch('auth/approle/login', [:], 'POST', data)
+        Map response = apiFetch('auth/approle/login', ['X-Jervis-Vault-Login': true], 'POST', data)
         this.ttl = response.auth.lease_duration
         this.renewable = response.auth.renewable
         this.token = response.auth.client_token
@@ -96,6 +114,9 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
     // (new Date().toInstant().epochSecond) - createdLease.epochSecond // gives seconds elapsed
     // new Date(((Integer) epoc_seconds as Long)*1000).toInstant() // gets instant from given epoch timestamp
     String getToken() {
+        if(!isExpired()) {
+            return this.token
+        }
         leaseToken()
         this.token
     }
