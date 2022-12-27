@@ -16,13 +16,14 @@
 package net.gleske.jervis.remotes
 //the SimpleRestServiceTest() class automatically sees the SimpleRestService() class because they're in the same package
 
+import static net.gleske.jervis.remotes.SimpleRestService.addTrailingSlash
+import static net.gleske.jervis.remotes.SimpleRestService.apiFetch
+import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
+import net.gleske.jervis.exceptions.JervisException
+
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-
-import net.gleske.jervis.exceptions.JervisException
-import static net.gleske.jervis.remotes.SimpleRestService.apiFetch
-import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 
 class SimpleRestServiceTest extends GroovyTestCase {
     def url
@@ -163,5 +164,17 @@ class SimpleRestServiceTest extends GroovyTestCase {
         assert request_history*.method == ['DELETE']
         // get HTTP response code
         assert '' == apiFetch(new URL('https://www.example.com/doesnotexist'), ['Response-Code': false], 'DELETE')
+    }
+    @Test public void test_SimpleRestService_addTrailingSlash() {
+        String result = 'https://example.com/'
+        assert result == addTrailingSlash('https://example.com')
+        assert result == addTrailingSlash('https://example.com/')
+    }
+    @Test public void test_SimpleRestService_addTrailingSlash_suffix() {
+        String result = 'https://example.com/v1/'
+        assert result == addTrailingSlash('https://example.com', 'v1')
+        assert result == addTrailingSlash('https://example.com', 'v1/')
+        assert result == addTrailingSlash('https://example.com/', 'v1')
+        assert result == addTrailingSlash('https://example.com/', 'v1/')
     }
 }

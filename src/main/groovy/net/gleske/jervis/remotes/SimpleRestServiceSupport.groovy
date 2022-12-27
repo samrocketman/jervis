@@ -41,12 +41,19 @@ trait SimpleRestServiceSupport {
         SimpleRestService.objToJson(obj)
     }
 
-    // TODO java doc
-    static String addTrailingSlash(String s) {
-        if(s.endsWith('/')) {
-            return s
-        }
-        s + '/'
+    /**
+      Meant for flexibly setting API URLs, this will enforce a trailing slash
+      and optionaly a suffix such as an API version applied to the URL.
+
+      @param url    Typically an API URL where a trailing slash will be added if
+                    missing.
+      @param suffix Typically an API version path where a trailing slash will be
+                    added if missing.  If this option is provided, then it will
+                    ensure <tt>url</tt> ends with the <tt>suffix</tt> and add it
+                    if missing.
+      */
+    static String addTrailingSlash(String url, String suffix = '') {
+        SimpleRestService.addTrailingSlash(url, suffix)
     }
 
 

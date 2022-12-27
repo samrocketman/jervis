@@ -31,6 +31,32 @@ class SimpleRestService {
     }
 
     /**
+      Meant for flexibly setting API URLs, this will enforce a trailing slash
+      and optionaly a suffix such as an API version applied to the URL.
+
+      @param url    Typically an API URL where a trailing slash will be added if
+                    missing.
+      @param suffix Typically an API version path where a trailing slash will be
+                    added if missing.  If this option is provided, then it will
+                    ensure <tt>url</tt> ends with the <tt>suffix</tt> and add it
+                    if missing.
+      */
+    static String addTrailingSlash(String url, String suffix = '') {
+        String result = url
+        String end = suffix
+        if(end && !end.endsWith('/')) {
+            end += '/'
+        }
+        if(!result.endsWith('/')) {
+            result += '/'
+        }
+        if(suffix && !result.endsWith(end)) {
+            result += end
+        }
+        result
+    }
+
+    /**
       A method for converting an object comprising of standard Java classes
       <tt>Map</tt> or <tt>List</tt> to a JSON String.
 
