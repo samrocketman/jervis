@@ -303,10 +303,7 @@ vault.discoverKVMounts()
 vault.mountVersions</tt></pre>
       */
     VaultService(String vault_url, TokenCredential credential) {
-        this.vault_url = addTrailingSlash(vault_url)
-        if(!this.vault_url.endsWith('v1/')) {
-            this.vault_url += 'v1/'
-        }
+        this.vault_url = addTrailingSlash(vault_url, 'v1/')
         this.credential = credential
     }
     /**

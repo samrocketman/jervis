@@ -54,7 +54,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
     }
 
     VaultAppRoleCredential(String vault_url, VaultRoleIdCredential credential) {
-        this.vault_url = addTrailingSlash(vault_url)
+        this.vault_url = addTrailingSlash(vault_url, 'v1/')
         this.credential = credential
     }
 
@@ -74,7 +74,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
             return
         }
         if(this.token_type != 'batch') {
-            apiFetch('v1/auth/token/revoke-self', [:], 'POST')
+            apiFetch('auth/token/revoke-self', [:], 'POST')
         }
         this.token = null
     }
@@ -86,7 +86,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
         this.token = null
         String data = objToJson([role_id: this.credential.role_id, secret_id: this.credential.secret_id])
         this.leaseCreated = new Date().toInstant()
-        Map response = apiFetch('v1/auth/approle/login', [:], 'POST', data)
+        Map response = apiFetch('auth/approle/login', [:], 'POST', data)
         this.ttl = response.auth.lease_duration
         this.renewable = response.auth.renewable
         this.token = response.auth.client_token
@@ -106,7 +106,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
         }
         try {
             String data = objToJson([increment: "${this.ttl}s"])
-            Map response = apiFetch('v1/auth/token/renew-self', [:], 'POST', data)
+            Map response = apiFetch('auth/token/renew-self', [:], 'POST', data)
             this.leaseCreated = new Date().toInstant()
             this.ttl = response.auth.lease_duration
             this.renewable = response.auth.renewable
@@ -119,6 +119,6 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
     }
 
     Map lookupSelfToken() throws IOException {
-        apiFetch('v1/auth/token/lookup-self')
+        apiFetch('auth/token/lookup-self')
     }
 }
