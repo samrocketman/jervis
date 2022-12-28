@@ -218,19 +218,38 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
 
     /**
       The time buffer before a renewal is forced.  This is to account for clock
-      drift and is customizable by the client.
+      drift and is customizable by the client.  By default the value is
+      <tt>15</tt> seconds.
       */
     Long renew_buffer = 15
 
 
+    /**
+      Returns the Vault URL.  This method is used internally by the
+      <tt>{@link net.gleske.jervis.remotes.VaultService}</tt> class to establish
+      Vault connectivity.
+
+      @return Returns the Vault API URL.
+      */
     String getVault_url() {
         this.vault_url
     }
 
+    /**
+      Returns the Vault URL.  This method is used internally by this class
+      establish Vault connectivity.
+
+      @return Returns the Vault API URL.
+      */
     String baseUrl() {
         this.vault_url
     }
 
+    /**
+      Returns authentication headers used for API requests to Vault.
+
+      @return Returns a <tt>Map</tt> of HTTP headers.
+      */
     Map header(Map headers = [:]) {
         Map tempHeaders = this.headers + headers
         // https://www.vaultproject.io/api-docs#the-x-vault-request-header
@@ -244,10 +263,21 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
         tempHeaders
     }
 
+    /**
+      A simple way to establish an authenticated session with Vault.  In
+      general, this is less secure.  Favor using
+      <tt>{@link #VaultAppRoleCredential(java.lang.String, net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential)}</tt>,
+      instead.
+      */
     VaultAppRoleCredential(String vault_url, String role_id, String secret_id) {
         this(vault_url, new VaultRoleIdCredentialImpl(role_id, secret_id))
     }
 
+    /**
+      The recommended way to establish a secured authenticated session with
+      Vault.  Refer to the API documentation of <tt>VaultRoleIdCredential</tt>
+      for detailed examples on how this credential should be instantiated.
+      */
     VaultAppRoleCredential(String vault_url, VaultRoleIdCredential credential) {
         this.vault_url = addTrailingSlash(vault_url, 'v1/')
         this.credential = credential
@@ -264,6 +294,11 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
         true
     }
 
+    /**
+      Revokes the current token in use by this auth client.  Please note, if
+      more API communication occurs this auth client will automatically lease a
+      new token.
+      */
     void revokeToken() {
         if(!this.token) {
             return
@@ -288,8 +323,16 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
         this.token_type = response.auth.token_type
     }
 
-    // (new Date().toInstant().epochSecond) - createdLease.epochSecond // gives seconds elapsed
-    // new Date(((Integer) epoc_seconds as Long)*1000).toInstant() // gets instant from given epoch timestamp
+    /**
+      This will lease a new token via AppRole and return the leased token.  If
+      the token is use is due for renewal it will automatically be renewed. If
+      the token is expired or needs renewal but is non-renewable, then a new
+      token lease will automatically be created.
+
+      @return Always returns a valid token with at least a 15 second lease.  If
+      you require the minimum lease to be longer, then adjust
+      <tt>{@link #renew_buffer}</tt>.
+      */
     String getToken() {
         if(!isExpired()) {
             return this.token
@@ -298,6 +341,13 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
         this.token
     }
 
+    /**
+      Force a token renewal.  It is unlikely this method will ever need to be
+      called because <tt>{@link #getToken()}</tt> will manage token renewal.
+
+      @return Returns <tt>true</tt> if the token renewal was successful.
+              Otherwise, returns <tt>false</tt>.
+      */
     Boolean tryRenewToken() {
         if(!this.token || !this.renewable) {
             return false
@@ -311,11 +361,17 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
             this.token = response.auth.client_token
             this.token_type = response.auth.token_type
             return true
-        } catch(IOException e) {
+        } catch(IOException ignored) {
             return false
         }
     }
 
+    /**
+      Performs a lookup of the currently leased token and returns the response
+      from Vault.
+
+      @return Returns the JSON response from Vault parsed as a <tt>Map</tt>.
+      */
     Map lookupSelfToken() throws IOException {
         apiFetch('auth/token/lookup-self')
     }
