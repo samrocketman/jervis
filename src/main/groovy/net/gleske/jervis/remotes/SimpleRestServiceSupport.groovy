@@ -21,21 +21,31 @@ package net.gleske.jervis.remotes
 trait SimpleRestServiceSupport {
 
     /**
-      A method for getting the API URL which will be used by apiFetch(String).
-      TODO better java doc
+      A method for getting the API URL which will be used by
+      <tt>{@link #apiFetch(java.lang.String, java.util.Map, java.lang.String, java.lang.String)}</tt>.
+      When developing an API client extending <tt>SimpleRestServiceSupport</tt>
+      you can call
+      <tt>{@link #addTrailingSlash(java.lang.String, java.lang.String)}</tt>
+      for convenience.
       */
     abstract String baseUrl()
 
     /**
       A method for getting authentication headers and other default headers
-      used by apiFetch(String).
-      TODO better java doc
+      used by <tt>{@link #apiFetch(java.lang.String, java.util.Map, java.lang.String, java.lang.String)}</tt>.
+      @param original_headers A Map of user-provided headers when making an API
+                              call.
+      @return A Map of headers added by the class to perform authentication.
       */
     abstract Map header(Map original_headers)
 
     /**
-      A method for converting a HashMap to a JSON String.
-      TODO better java doc
+      A method for converting a HashMap of standard Java types to a JSON String.
+
+      @param obj A Map of standard Java types like Boolean, List, Map, Number,
+                 String, and null.
+      @return Returns a <tt>String</tt> of JSON content created from the
+              <tt>obj</tt> parameter.
       */
     static String objToJson(Map obj) {
         SimpleRestService.objToJson(obj)
@@ -58,13 +68,37 @@ trait SimpleRestServiceSupport {
 
 
     /**
-      A method to simplify fetching from remote REST services.
-      TODO better java doc
+      This is a convenient method for making API calls to remote REST services.
+      It automatically builds out authentication headers by calling other
+      methods defined in this trait.
+
       */
     def apiFetch(String path = '', Map http_headers = [:], String http_method = 'GET', String data = '') {
         http_headers = header(http_headers)
         path = path ? (baseUrl() + path) : baseUrl()
         URL api_url = new URL(path)
         SimpleRestService.apiFetch(api_url, http_headers, http_method, data)
+    }
+
+    /**
+      This method is provided for REST client development convenience.  This
+      calls
+      <tt>{@link #apiFetch(java.lang.String, java.util.Map, java.lang.String, java.lang.String)}</tt>
+      for JSON-based APIs.
+
+      @param path A path appended to the <tt>{@link #baseUrl()}</tt> for making
+                  an API call.
+      @param http_headers A list of user or client-provided headers.  These
+                          provided headers get passed to
+                          <tt>{@link #header(java.util.Map)}</tt>.
+      @param http_method The HTTP method to call when making an API request.
+                         Non-standard HTTP verbs can also be provided for REST
+                         services that support custom verbs.
+      @param data Assuming a Map consisting of standard Java types, performs
+                  <tt>{@link #objToJson(java.util.Map)}</tt> on the
+                  <tt>data</tt> parameter.  Submits JSON data to the remote API.
+      */
+    def apiFetch(String path, Map http_headers, String http_method, Map data) {
+        apiFetch(path, http_headers, http_method, SimpleRestService.objToJson(data))
     }
 }

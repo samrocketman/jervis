@@ -453,10 +453,10 @@ vault.discoverKVMounts()</tt></pre>
                 }
                 data['options'] = [cas: (secretMeta?.data?.current_version ?: 0)]
             }
-            apiFetch("${mount}/data/${subpath}", [:], 'POST', objToJson(data))
+            apiFetch("${mount}/data/${subpath}", [:], 'POST', data)
         }
         else {
-            apiFetch("${mount}/${subpath}", [:], 'POST', objToJson(secret))
+            apiFetch("${mount}/${subpath}", [:], 'POST', secret)
         }
     }
 
@@ -933,7 +933,7 @@ secret/
         if(isKeyValueV2(mount)) {
             if(deleteVersions) {
                 String deleteVersions_api = destroyAllVersions ? 'destroy' : 'delete'
-                apiFetch("${mount}/${deleteVersions_api}/${subpath}", [:], 'POST', objToJson([versions: deleteVersions]))
+                apiFetch("${mount}/${deleteVersions_api}/${subpath}", [:], 'POST', [versions: deleteVersions])
             }
             else if(destroyAllVersions) {
                 apiFetch("${mount}/metadata/${subpath}", [:], 'DELETE')

@@ -102,7 +102,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
             return
         }
         this.token = null
-        String data = objToJson([role_id: this.credential.role_id, secret_id: this.credential.secret_id])
+        Map data = [role_id: this.credential.role_id, secret_id: this.credential.secret_id]
         this.leaseCreated = new Date().toInstant()
         Map response = apiFetch('auth/approle/login', ['X-Jervis-Vault-Login': true], 'POST', data)
         this.ttl = response.auth.lease_duration
@@ -126,7 +126,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
             return false
         }
         try {
-            String data = objToJson([increment: "${this.ttl}s"])
+            Map data = [increment: "${this.ttl}s"]
             Map response = apiFetch('auth/token/renew-self', [:], 'POST', data)
             this.leaseCreated = new Date().toInstant()
             this.ttl = response.auth.lease_duration
