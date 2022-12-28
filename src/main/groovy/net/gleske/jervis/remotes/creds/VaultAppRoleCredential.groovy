@@ -50,6 +50,77 @@ import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
   </li>
   </ul>
 
+  <h2>Vault Policy</h2>
+
+  <p>If you decide to use renable tokens and allow all features provided by this
+  class, then you'll need the following Vault policy.</p>
+
+<pre><code>
+# Allow tokens to look up their own properties
+path "auth/token/lookup-self" {
+    capabilities = ["read"]
+}
+
+# Allow tokens to renew themselves
+path "auth/token/renew-self" {
+    capabilities = ["update"]
+}
+
+# Allow tokens to revoke themselves
+path "auth/token/revoke-self" {
+    capabilities = ["update"]
+}
+</code></pre>
+
+  <p>Bear in mind the above policy is just for this class for its credential
+  management.  You'll want other policy rules for accessing secrets.</p>
+
+  <h2>Recommended Vault Policy</h2>
+
+  <p>In general, you'll want to use the most limited Vault Policy you can for
+  your application.  For example, in this section you only need a two rule
+  policy.</p>
+
+<pre><code>
+# Allow tokens to revoke themselves
+path "auth/token/revoke-self" {
+    capabilities = ["update"]
+}
+
+# Read only KV v2 Permissions
+path "kv/*" {
+    capabilities = ["read"]
+}
+</code></pre>
+
+  <p>You can use the <tt>{@link net.gleske.jervis.remotes.VaultService}</tt> API
+  client to apply this policy.  Alternately, you can do this in the Vault
+  UI.</p>
+
+<pre><code>
+import net.gleske.jervis.remotes.interfaces.TokenCredential
+import net.gleske.jervis.remotes.VaultService
+
+Map data = [policy: '''\
+# Allow tokens to revoke themselves
+path "auth/token/revoke-self" {
+    capabilities = ["update"]
+}
+
+# Read only KV v2 Permissions
+path "kv/*" {
+    capabilities = ["read"]
+}
+''']
+
+// Create an API client using an admin human user vault token
+TokenCredential creds = [getToken: {-> 'your admin token' }] as TokenCredential
+VaultService myvault = new VaultService('https://vault.example.com/', creds)
+
+// Upload policy
+myvault.apiFetch('sys/policy/jenkins-limited', [:], 'POST', data)
+</code></pre>
+
   <h2>Initializing AppRole</h2>
 
   <p>This section discusses how to enable AppRole authentication in Vault as
@@ -59,11 +130,15 @@ import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
 
   <p>You can enable AppRole via the Vault UI and set it up via Vault CLI.  This
   example illustrates how to do the same thing with the
-  <tt>{@link net.gleske.jervis.remotes.VaultService}</tt> API client.</p>
+  <tt>{@link net.gleske.jervis.remotes.VaultService}</tt> API client.  The
+  example includes recommended service role settings with a short TTL (1 minute)
+  and non-renewable tokens.  This class will automatically manage obtaining new
+  tokens if a token it uses expires.</p>
 
 <pre><code>
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.VaultService
+import net.gleske.jervis.tools.YamlOperator
 
 // Create an API client using an admin human user vault token
 TokenCredential creds = [getToken: {-> 'your admin token' }] as TokenCredential
@@ -115,8 +190,12 @@ VaultService vault = new VaultService(approle)
 // Set mount kv/ to be KV v2 secrets engine
 vault.mountVersions = [kv: 2]
 
-// ready to perform secrets operations
+// Ready to perform secrets operations
 vault.getSecret('kv/path/to/secret')
+
+// When your application is done using Vault it can proceed to revoke its active
+// token.
+approle.revokeToken()
 </code></pre>
   */
 class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential, SimpleRestServiceSupport {

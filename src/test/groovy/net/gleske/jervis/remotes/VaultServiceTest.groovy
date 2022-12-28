@@ -57,7 +57,7 @@ if(binding.hasVariable('request_history')) {
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.VaultService
 
-TokenCredential creds = [getToken: {-> 'hvs.bu4PfApCPrpSL0P1iOfC8EDE' }] as TokenCredential
+TokenCredential creds = [getToken: {-> 'some token' }] as TokenCredential
 VaultService myvault = new VaultService('http://vault:8200/v1/', creds)
 
 myvault.discoverKVMounts()
