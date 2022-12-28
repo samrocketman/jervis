@@ -40,7 +40,7 @@ import net.gleske.jervis.remotes.interfaces.VaultCredential
   more reliable and recommended.  Manually specifying mounts is available to
   reduce API usage.</p>
 
-  <h4>Automatic discover mounts</h4>
+  <h4>Automatically discover mounts</h4>
 
 <pre><tt>
 import net.gleske.jervis.remotes.interfaces.TokenCredential
@@ -52,7 +52,7 @@ VaultService vault = new VaultService('http://active.vault.service.consul:8200/'
 vault.discoverKVMounts()
 </tt></pre>
 
-  <h4>Manuaully declare mounts</h4>
+  <h4>Manually declare mounts</h4>
 
 <pre><tt>
 import net.gleske.jervis.remotes.interfaces.TokenCredential
@@ -60,9 +60,59 @@ import net.gleske.jervis.remotes.VaultService
 
 VaultService vault = new VaultService('http://active.vault.service.consul:8200/', creds)
 
-// specify mounts
+// Specify mounts
 vault.mountVersions = [kv: '2', secret: '1']
+
+// Optional: KV v2 might require Check-and-Set to be enabled.
+vault.cas_required = ['kv']
 </tt></pre>
+
+  <h2>Restricting by Vault Policy</h2>
+
+  <p>Ideally, your policy for an application would be limited only to what that
+  application needs.  This section provides some guidance for Vault policy.</p>
+
+  <p>If you decide to use <tt>discoverMounts()</tt> method, then you'll need the
+  following policy addition.  However, this is insecure and could leak other
+  secrets engine mounts.</p>
+
+<pre><tt># Read all mounts to find KV stores
+path "sys/mounts" {
+  capabilities = ["read"]
+}
+# Read mount config for Check-and-Set configuration.
+path "+/config" {
+  capabilities = ["read"]
+}
+</tt></pre>
+
+<p>Instead of the above policy, it is recommended you instantiate your code with
+static values.  The following will not generate any API calls to vault and so do
+not need a policy.</p>
+
+<pre><tt>
+// Set secrets engines KV v1 and KV v2 mounts
+vault.mountVersions = [kv: 2, secret: 1, kv_cas: 2]
+// Only mount kv_cas requires Check-and-Set
+vault.cas_required = ['kv_cas']
+</tt></pre>
+
+  <p>On a KV secrets store, you'll want to limit access for an application to
+  read-only most likely.  Here's an example policy which would look the same
+  whether a KV v1 or KV v2 secrets engine.  The following policy will allow your
+  application to walk the full secrets store.  You can further restrict the
+  policy to certain paths inside of the secret store.</p>
+
+<pre><tt>path "kv/*" {
+    capabilities = ["read", "list"]
+}
+</tt></pre>
+
+  <p>Be aware that <tt>list</tt> capability enables recursive searching through
+  the secrets store or path.  Ideally, your application will only be looking for
+  secrets in a specific path so there should be no need to grant <tt>list</tt>
+  capability.</p>
+
 
   <h2>Sample usage</h2>
   <p>To run examples, clone Jervis and execute <tt>./gradlew console</tt> to
