@@ -57,13 +57,17 @@ import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
 
   <h5>Enable AppRole authentication engine</h5>
 
+  <p>You can enable AppRole via the Vault UI and set it up via Vault CLI.  This
+  example illustrates how to do the same thing with the
+  <tt>{@link net.gleske.jervis.remotes.VaultService}</tt> API client.</p>
+
 <pre><code>
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.VaultService
 
 // Create an API client using an admin human user vault token
-TokenCredential creds = [getToken: {-> 'hvs.bu4PfApCPrpSL0P1iOfC8EDE' }] as TokenCredential
-VaultService myvault = new VaultService('http://vault:8200/v1/', creds)
+TokenCredential creds = [getToken: {-> 'your admin token' }] as TokenCredential
+VaultService myvault = new VaultService('https://vault.example.com/', creds)
 
 // Recommended AppRole settings
 Map approle_settings = [
@@ -77,12 +81,18 @@ Map approle_settings = [
 // Enable AppRole Authentication Engine
 myvault.apiFetch('sys/auth/approle', [:], 'POST', [type: 'approle'])
 
-// Create an application Role ID 'jenkins'
+// Create an application Role 'jenkins'
 myvault.apiFetch('auth/approle/role/jenkins', [:], 'POST', approle_settings)
 
-// Generate an AppRole Secret ID for the 'jenkins' Role ID
-
+// Generate an AppRole Role ID and Secret ID for the 'jenkins' Role
+Map role_data = [:]
+role_data.role_id = myvault.apiFetch('auth/approle/role/jenkins/role-id').data.role_id
+role_data.secret_id = myvault.apiFetch('auth/approle/role/jenkins/secret-id', [:], 'POST')?.data?.secret_id
+println(YamlOperator.writeObjToYaml(role_data))
 </code></pre>
+
+    <p>Take the <tt>role_id</tt> and <tt>secret_id</tt>, and use it to
+    instantiate examples for this class.</p>
 
   <h2>Sample usage</h2>
   <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
