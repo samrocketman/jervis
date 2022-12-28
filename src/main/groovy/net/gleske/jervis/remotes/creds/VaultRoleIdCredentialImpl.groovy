@@ -23,15 +23,28 @@ import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
 class VaultRoleIdCredentialImpl implements VaultRoleIdCredential {
     private final String role_id
     private final String secret_id
+
+    /**
+      Instantiate a role ID credential meant to be used with approle
+      authentication.
+      @param role_id A role ID from an approle.
+      @param secret_id A secret ID from an approle.
+      */
     VaultRoleIdCredentialImpl(String role_id, String secret_id) {
         this.role_id = role_id
         this.secret_id = secret_id
     }
 
+    /**
+      Returns the Role ID used for approle authentication.
+      */
     final String getRole_id() {
         this.role_id
     }
 
+    /**
+      Returns the Secret ID used for approle authentication.
+      */
     final String getSecret_id() {
         this.secret_id
     }
