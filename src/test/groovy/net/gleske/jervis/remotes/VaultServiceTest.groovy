@@ -34,7 +34,7 @@ import org.junit.Test
   Mock data has already been generated.  This is the script which captured mock
   data.
 
-<pre><tt>import static net.gleske.jervis.remotes.StaticMocking.recordMockUrls
+<pre><code>import static net.gleske.jervis.remotes.StaticMocking.recordMockUrls
 import net.gleske.jervis.remotes.SimpleRestServiceSupport
 
 if(!binding.hasVariable('url')) {
@@ -255,7 +255,7 @@ myvault.getSecret('secret2/withslash/multitype')
 myvault.getSecret('kv2/withslash/emptysecret')
 
 println 'Success.'
-</tt></pre>
+</code></pre>
 
   */
 class VaultServiceTest extends GroovyTestCase {

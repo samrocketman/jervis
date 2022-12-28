@@ -27,13 +27,13 @@ import net.gleske.jervis.tools.SecurityIO
    to bring up a <a href="http://groovy-lang.org/groovyconsole.html"
    target="_blank">Groovy Console</a> with the classpath set up.</p>
 
-<pre><tt>import net.gleske.jervis.remotes.GitHub
+<pre><code>import net.gleske.jervis.remotes.GitHub
 
 def x = new GitHub()
 println 'Print each branch.'
 x.branches('samrocketman/jervis').each{ println it }
 println 'Print the contents of .travis.yml from the main branch.'
-println x.getFile('samrocketman/jervis','.travis.yml','main')</tt></pre><br>
+println x.getFile('samrocketman/jervis','.travis.yml','main')</code></pre><br>
  */
 class GitHub implements JervisRemote, SimpleRestServiceSupport {
 

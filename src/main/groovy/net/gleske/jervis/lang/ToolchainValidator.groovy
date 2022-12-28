@@ -34,7 +34,7 @@ import net.gleske.jervis.tools.YamlOperator
   where your DSL scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
-<pre><tt>import net.gleske.jervis.lang.ToolchainValidator
+<pre><code>import net.gleske.jervis.lang.ToolchainValidator
 
 def toolchains = new ToolchainValidator()
 toolchains.load_JSON('resources/toolchains-ubuntu1604-stable.json')
@@ -46,7 +46,7 @@ toolchains.languages.each { language ->
         (tool == 'toolchains')? false : toolchains.supportedMatrix(language, tool)
     }.join('\n        ')
 }
-null</tt></pre>
+null</code></pre>
  */
 class ToolchainValidator implements Serializable {
 

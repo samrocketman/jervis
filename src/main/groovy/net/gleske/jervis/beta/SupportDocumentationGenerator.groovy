@@ -33,12 +33,12 @@ import net.gleske.jervis.tools.YamlOperator
    <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
    to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a> with the classpath set up.</p>
 
-<pre><tt>import net.gleske.jervis.tools.SupportDocumentationGenerator as Doc
+<pre><code>import net.gleske.jervis.tools.SupportDocumentationGenerator as Doc
 
 Doc docs = new Doc()
 
 println docs.supportByOS
-</tt></pre>
+</code></pre>
   */
 class SupportDocumentationGenerator {
 

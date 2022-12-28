@@ -52,7 +52,7 @@ package net.gleske.jervis.exceptions;
   programming.  The following is an example of overriding the
   <tt>{@link #LIFECYCLES_SPEC}</tt>.</p>
 
-<pre><tt>import net.gleske.jervis.exceptions.WikiPages
+<pre><code>import net.gleske.jervis.exceptions.WikiPages
 WikiPages.metaClass.static.getLifecyclesSpec = {->'https://wiki.example.com/lifecycle_explanation.html'}
 
 import net.gleske.jervis.lang.LifecycleValidator
@@ -77,14 +77,14 @@ x.load_JSONString("""
     }
 }
 """.toString())
-x.validate()</tt></pre>
+x.validate()</code></pre>
 
   The important part of the above example is the following excerpt.
 
-<pre><tt>import net.gleske.jervis.exceptions.WikiPages
+<pre><code>import net.gleske.jervis.exceptions.WikiPages
 WikiPages.metaClass.static.getLifecyclesSpec = {->'https://wiki.example.com/lifecycle_explanation.html'}
 
-import net.gleske.jervis.lang.LifecycleValidator</tt></pre>
+import net.gleske.jervis.lang.LifecycleValidator</code></pre>
 
   What is important is that we modified the <tt>WikiPages</tt> class
   <strong>before</strong> we imported the <tt>{@link net.gleske.jervis.lang.LifecycleValidator}</tt> class.

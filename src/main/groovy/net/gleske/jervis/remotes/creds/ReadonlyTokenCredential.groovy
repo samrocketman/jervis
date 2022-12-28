@@ -26,7 +26,7 @@ import net.gleske.jervis.remotes.interfaces.TokenCredential
    to bring up a <a href="http://groovy-lang.org/groovyconsole.html"
    target="_blank">Groovy Console</a> with the classpath set up.</p>
 
-<pre><tt>import net.gleske.jervis.remotes.creds.ReadonlyTokenCredential
+<pre><code>import net.gleske.jervis.remotes.creds.ReadonlyTokenCredential
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 
 class MyCredential implements ReadonlyTokenCredential {
@@ -42,7 +42,7 @@ def creds = new MyCredential()
 println "TokenCredential instance? ${creds instanceof TokenCredential}"
 println "Secret token: ${creds.token}"
 creds.setToken( 'foo')
-println creds.getToken()</tt></pre><br>
+println creds.getToken()</code></pre><br>
   */
 trait ReadonlyTokenCredential implements TokenCredential {
 

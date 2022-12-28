@@ -37,7 +37,7 @@ import java.util.regex.Pattern
   where your DSL scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
-<pre><tt>import net.gleske.jervis.lang.LifecycleGenerator
+<pre><code>import net.gleske.jervis.lang.LifecycleGenerator
 
 String yaml = """
 language: ruby
@@ -75,7 +75,7 @@ println generator.matrixGetAxisValue('env')
 println 'Generating the matrix build script.'
 println generator.generateAll()
 print 'Labels: '
-println generator.getLabels()</tt></pre>
+println generator.getLabels()</code></pre>
  */
 class LifecycleGenerator implements Serializable {
 
@@ -471,16 +471,16 @@ class LifecycleGenerator implements Serializable {
       language and the array for the section must be greater than 1.
 
       <p>For example the following YAML would not produce a matrix build.</p>
-      <pre><tt>language: groovy
-env: foo=bar</tt></pre>
-      <pre><tt>language: groovy
+      <pre><code class="language-yaml">language: groovy
+env: foo=bar</code></pre>
+      <pre><code class="language-yaml">language: groovy
 env:
-  - foo=bar</tt></pre>
+  - foo=bar</code></pre>
       <p>However, the following YAML will produce a matrix build.  This assumes that <tt>matrix: disabled</tt> is not set for <tt>env</tt> in the <a href="https://github.com/samrocketman/jervis/wiki/Specification-for-toolchains-file" target="_blank">toolchains file</a>.</p>
-      <pre><tt>language: groovy
+      <pre><code class="language-yaml">language: groovy
 env:
   - foobar=foo
-  - foobar=bar</tt></pre>
+  - foobar=bar</code></pre>
 
       @return <tt>true</tt> if a matrix build will be generated or <tt>false</tt> if it will just be a regular build.
      */

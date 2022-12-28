@@ -28,7 +28,7 @@ import static net.gleske.jervis.lang.LifecycleGenerator.getObjectValue
   to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
   with the classpath set up.</p>
 
-<pre><tt>import net.gleske.jervis.lang.LifecycleGenerator
+<pre><code>import net.gleske.jervis.lang.LifecycleGenerator
 import net.gleske.jervis.lang.PipelineGenerator
 
 def generator = new LifecycleGenerator()
@@ -59,7 +59,7 @@ pipeline_generator.getBuildableMatrixAxes().each { axis ->
         println "stash ${axis}  --->  ${pipeline_generator.getStashMap(axis)}"
     }
 }
-println "Buildable matrices: " + pipeline_generator.getBuildableMatrixAxes().size()</tt></pre>
+println "Buildable matrices: " + pipeline_generator.getBuildableMatrixAxes().size()</code></pre>
  */
 class PipelineGenerator implements Serializable {
 
@@ -123,7 +123,7 @@ class PipelineGenerator implements Serializable {
       keys must be a String.  All values must be a Closure which takes a single
       argument that is a Map.  The following is an example.
 
-      <pre><tt>import net.gleske.jervis.lang.LifecycleGenerator
+      <pre><code>import net.gleske.jervis.lang.LifecycleGenerator
 import net.gleske.jervis.lang.PipelineGenerator
 
 String yaml = '''
@@ -152,7 +152,7 @@ pipeline_generator.stashmap_preprocessor = [
 ]
 
 //should return "build/docs/groovydoc/foo"
-pipeline_generator.stashMap['html']['includes']</tt></pre>
+pipeline_generator.stashMap['html']['includes']</code></pre>
      */
     Map stashmap_preprocessor = [:]
 

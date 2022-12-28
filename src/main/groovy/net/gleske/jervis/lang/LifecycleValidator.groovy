@@ -35,7 +35,7 @@ import net.gleske.jervis.tools.YamlOperator
   where your DSL scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
-<pre><tt>import net.gleske.jervis.lang.LifecycleValidator
+<pre><code>import net.gleske.jervis.lang.LifecycleValidator
 
 def lifecycles = new LifecycleValidator()
 lifecycles.load_JSON('resources/lifecycles-ubuntu1604-stable.json')
@@ -43,7 +43,7 @@ println 'Does the file validate? ' + lifecycles.validate()
 print 'Supported languages include:\n    '
 println lifecycles.languages.collect {
     lifecycles.lifecycles[it]['friendlyName']
-}.sort().join('\n    ')</tt></pre>
+}.sort().join('\n    ')</code></pre>
  */
 class LifecycleValidator implements Serializable {
 
