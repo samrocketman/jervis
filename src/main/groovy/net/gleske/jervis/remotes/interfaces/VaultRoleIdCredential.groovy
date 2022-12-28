@@ -22,7 +22,8 @@ package net.gleske.jervis.remotes.interfaces
 
   <h2>Sample Usage</h2>
 
-<pre><code>import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
+<pre><code>
+import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
 
 
 // A file-based backend where the file has 'role_id:secret_id' as its content.
@@ -36,7 +37,8 @@ VaultRoleIdCredential roleid = [
   memory except for when it is used.  The following is a hypothetical example.
   A third example will be provided as a real world example.</p>
 
-<pre><code>import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
+<pre><code>
+import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
 
 class FileRoleId implements VaultRoleIdCredential {
     final File file
@@ -71,7 +73,8 @@ VaultRoleIdCredential roleid = new FileRoleId('somefile')
   secure store to keep the credential secured.  In this case, we only want to
   retrieve the credential when we need it and not actually store it.</p>
 
-<pre><code>import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
+<pre><code>
+import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
 
 import com.cloudbees.plugins.credentials.CredentialsProvider
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials

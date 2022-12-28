@@ -28,7 +28,8 @@ import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
    to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a> with the classpath set up.</p>
    <p>For more GraphQL samples see <a href="https://github.com/samrocketman/jervis/issues/133" target="_blank">Jervis issue number 133</a>.</p>
 
-<pre><code>import net.gleske.jervis.remotes.GitHubGraphQL
+<pre><code>
+import net.gleske.jervis.remotes.GitHubGraphQL
 
 GitHubGraphQL github = new GitHubGraphQL()
 github.token = 'GitHub personal access token here with no scopes necessary'
@@ -242,16 +243,19 @@ class GitHubGraphQL implements SimpleRestServiceSupport {
               example when calling with defaults.
 
               <p>Call with default arguments</p>
-<pre><code>import net.gleske.jervis.remotes.GitHubGraphQL
+<pre><code>
+import net.gleske.jervis.remotes.GitHubGraphQL
 
 GitHubGraphQL github = new GitHubGraphQL()
 github.token = new File('../github_token').text.trim()
 
 
 // Make an API call to GitHub
-Map response = github.getJervisYamlFiles('samrocketman', 'jervis')</code></pre>
+Map response = github.getJervisYamlFiles('samrocketman', 'jervis')
+</code></pre>
               <p>Responds with parsed data</p>
-<pre><code>[
+<pre><code>
+[
     gitRef0: [
         jervisYaml0: null,
         jervisYaml1: [
@@ -270,7 +274,8 @@ Map response = github.getJervisYamlFiles('samrocketman', 'jervis')</code></pre>
             ]
         ]
     ]
-]</code></pre>
+]
+</code></pre>
               <p>The above response indicates there was no
               <tt>.jervis.yml</tt>, but there was a <tt>.travis.yml</tt>
               file.</p>

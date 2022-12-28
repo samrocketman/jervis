@@ -189,7 +189,8 @@ class StaticMocking {
 
 <h2>Sample Usage</h2>
 
-<pre><code>import static net.gleske.jervis.remotes.StaticMocking.recordMockUrls
+<pre><code>
+import static net.gleske.jervis.remotes.StaticMocking.recordMockUrls
 import net.gleske.jervis.remotes.SimpleRestServiceSupport
 
 if(!binding.hasVariable('url')) {
@@ -224,7 +225,8 @@ class MyApi implements SimpleRestServiceSupport {
 new MyApi().apiFetch('')
 
 // return full request history of the request_meta
-request_history</code></pre>
+request_history
+</code></pre>
       */
     static def recordMockUrls(String mockedUrl, Class<URL> clazz, Map request_meta = [:], Boolean checksumMocks = false, String checksumAlgorithm = 'SHA-256', List request_history = []) {
         def mc = clazz.metaClass

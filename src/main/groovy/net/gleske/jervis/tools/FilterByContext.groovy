@@ -42,11 +42,13 @@ import net.gleske.jervis.exceptions.FilterByContextException
   A context is a HashMap with three root keys which get fed into this class
   from a CI server.
 
-<pre><code>Map context = [
+<pre><code>
+Map context = [
     trigger: '',
     context: '',
     metadata: [:]
-]</code></pre>
+]
+</code></pre>
 
   Valid values for trigger include: manually, cron, pr_comment, push.
 
@@ -56,7 +58,8 @@ import net.gleske.jervis.exceptions.FilterByContextException
   in the
   <a target=_blank href="https://github.com/samrocketman/jervis/blob/main/vars/getBuildContextMap.groovy"><tt>getBuildContextMap()</tt></a>
   Jenkins pipeline step.
-<pre><code>Map context = [
+<pre><code>
+Map context = [
     trigger: 'push',
     context: 'pr',
     metadata: [
@@ -68,7 +71,8 @@ import net.gleske.jervis.exceptions.FilterByContextException
         manually: '',
         pr_comment: ''
     ]
-]</code></pre>
+]
+</code></pre>
 
   The metadata values are defined as:
 
@@ -112,7 +116,8 @@ import net.gleske.jervis.exceptions.FilterByContextException
 
   <h2>Sample Usage</h2>
 
-<pre><code>import net.gleske.jervis.tools.FilterByContext
+<pre><code>
+import net.gleske.jervis.tools.FilterByContext
 
 Map context = [
     trigger: 'push',
@@ -129,7 +134,8 @@ def filters = 'pr'
 FilterByContext filterShould = new FilterByContext(context, filters)
 
 // returns true because it is a pull request build
-filterShould.allowBuild</code></pre>
+filterShould.allowBuild
+</code></pre>
   */
 class FilterByContext {
     /**

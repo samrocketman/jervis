@@ -47,7 +47,8 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
   to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
   with the classpath set up.</p>
 
-<pre><code>import net.gleske.jervis.tools.SecurityIO
+<pre><code>
+import net.gleske.jervis.tools.SecurityIO
 
 if(!(new File('/tmp/id_rsa').exists())) {
     'openssl genrsa -out /tmp/id_rsa 2048'.execute().waitFor()
@@ -62,7 +63,8 @@ println s
 println 'Decrypted string:'
 println security.rsaDecrypt(s)
 new File('/tmp/id_rsa').delete()
-new File('/tmp/id_rsa.pub').delete()</code></pre>
+new File('/tmp/id_rsa.pub').delete()
+</code></pre>
  */
 class SecurityIO implements Serializable {
 
@@ -76,8 +78,10 @@ class SecurityIO implements Serializable {
     /**
       A decoded RSA key pair used for encryption and decryption.  The key size can be determined from the modulus.  For example,
 
-<pre><code>println key_pair.private.modulus.bitLength()
-println key_pair.public.modulus.bitLength()</code></pre>
+<pre><code>
+println key_pair.private.modulus.bitLength()
+println key_pair.public.modulus.bitLength()
+</code></pre>
 
       @see #setKey_pair(java.lang.String)
 
@@ -149,7 +153,8 @@ println key_pair.public.modulus.bitLength()</code></pre>
       The following code will generate a JWT, verify it, and extract its
       payload contents.
 
-<pre><code>import net.gleske.jervis.tools.SecurityIO
+<pre><code>
+import net.gleske.jervis.tools.SecurityIO
 
 if(!(new File('/tmp/id_rsa').exists())) {
     'openssl genrsa -out /tmp/id_rsa 2048'.execute().waitFor()
@@ -170,7 +175,8 @@ if(security.verifyGitHubJWTPayload(jwt)) {
     println('JWT is currently valid.')
 } else {
     println('JWT is invalid or expired.')
-}</code></pre>
+}
+</code></pre>
 
       @param github_app_id The GitHub App ID available when generating a GitHub App.
       @param expiration    The duration of the JWT in minutes before the JWT
@@ -395,7 +401,9 @@ if(security.verifyGitHubJWTPayload(jwt)) {
 
       For third party reference, this is essentially executing the following commands in a terminal.
 
-<pre><code>echo -n 'plaintext' | openssl rsautl -encrypt -inkey ./id_rsa.pub -pubin | openssl enc -base64 -A</code></pre>
+<pre><code>
+echo -n 'plaintext' | openssl rsautl -encrypt -inkey ./id_rsa.pub -pubin | openssl enc -base64 -A
+</code></pre>
 
       @param  plaintext A plain text <tt>String</tt> to be encrypted.
       @return A Base64 encoded cipher text or more generically: <tt>ciphertext = base64encode(RSAPublicKeyEncrypt(plaintext))</tt>
@@ -415,7 +423,9 @@ if(security.verifyGitHubJWTPayload(jwt)) {
 
       For third party reference, this is essentially executing the following commands in a terminal.
 
-<pre><code>echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey /tmp/id_rsa</code></pre>
+<pre><code>
+echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey /tmp/id_rsa
+</code></pre>
 
       @param  ciphertext A Base64 encoded cipher text <tt>String</tt> to be decrypted.
       @return A plain text <tt>String</tt> or more generically: <tt>plaintext = RSAPrivateKeyDecrypt(base64decode(ciphertext))</tt>
@@ -484,7 +494,8 @@ if(security.verifyGitHubJWTPayload(jwt)) {
       it with additional layers of security.</p>
 
       <h2>Sample Usage</h2>
-<pre><code>import static net.gleske.jervis.tools.SecurityIO.avoidTimingAttack
+<pre><code>
+import static net.gleske.jervis.tools.SecurityIO.avoidTimingAttack
 import java.time.Instant
 
 Integer mysecret = 0

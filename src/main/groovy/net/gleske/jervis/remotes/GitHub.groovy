@@ -27,7 +27,8 @@ import net.gleske.jervis.tools.SecurityIO
    to bring up a <a href="http://groovy-lang.org/groovyconsole.html"
    target="_blank">Groovy Console</a> with the classpath set up.</p>
 
-<pre><code>import net.gleske.jervis.remotes.GitHub
+<pre><code>
+import net.gleske.jervis.remotes.GitHub
 
 def x = new GitHub()
 println 'Print each branch.'

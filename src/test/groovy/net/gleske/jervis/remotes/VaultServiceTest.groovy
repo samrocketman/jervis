@@ -34,7 +34,8 @@ import org.junit.Test
   Mock data has already been generated.  This is the script which captured mock
   data.
 
-<pre><code>import static net.gleske.jervis.remotes.StaticMocking.recordMockUrls
+<pre><code>
+import static net.gleske.jervis.remotes.StaticMocking.recordMockUrls
 import net.gleske.jervis.remotes.SimpleRestServiceSupport
 
 if(!binding.hasVariable('url')) {

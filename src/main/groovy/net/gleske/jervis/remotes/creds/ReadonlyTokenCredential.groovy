@@ -26,7 +26,8 @@ import net.gleske.jervis.remotes.interfaces.TokenCredential
    to bring up a <a href="http://groovy-lang.org/groovyconsole.html"
    target="_blank">Groovy Console</a> with the classpath set up.</p>
 
-<pre><code>import net.gleske.jervis.remotes.creds.ReadonlyTokenCredential
+<pre><code>
+import net.gleske.jervis.remotes.creds.ReadonlyTokenCredential
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 
 class MyCredential implements ReadonlyTokenCredential {

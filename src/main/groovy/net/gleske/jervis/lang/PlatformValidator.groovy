@@ -34,7 +34,8 @@ import net.gleske.jervis.tools.YamlOperator
   where your DSL scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
-<pre><code>import net.gleske.jervis.lang.PlatformValidator
+<pre><code>
+import net.gleske.jervis.lang.PlatformValidator
 
 def platforms = new PlatformValidator()
 platforms.load_JSON('resources/platforms.json')
@@ -46,7 +47,8 @@ platforms.platforms['supported_platforms'].sort { k, v -> k }.each { platform, o
         println "    ${o} (Supported languages: ${s['language'].sort().join(', ')})"
     }
 }
-null</code></pre>
+null
+</code></pre>
  */
 class PlatformValidator implements Serializable {
 

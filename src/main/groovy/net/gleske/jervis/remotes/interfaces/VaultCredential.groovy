@@ -25,7 +25,8 @@ package net.gleske.jervis.remotes.interfaces
    to bring up a <a href="http://groovy-lang.org/groovyconsole.html"
    target="_blank">Groovy Console</a> with the classpath set up.</p>
 
-<pre><code>import net.gleske.jervis.remotes.interfaces.VaultCredential
+<pre><code>
+import net.gleske.jervis.remotes.interfaces.VaultCredential
 import net.gleske.jervis.remotes.VaultService
 
 class VaultToken implements VaultCredential {

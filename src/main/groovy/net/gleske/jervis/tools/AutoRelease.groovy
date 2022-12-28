@@ -29,7 +29,8 @@ import java.util.regex.Pattern
    <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
    to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a> with the classpath set up.</p>
 
-<pre><code>import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
+<pre><code>
+import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
 import static net.gleske.jervis.tools.AutoRelease.getNextRelease
 import static net.gleske.jervis.tools.AutoRelease.getNextSemanticRelease
 import static net.gleske.jervis.tools.AutoRelease.isMatched
@@ -66,7 +67,8 @@ println()
     println isMatched('/([0-9]+\\.){2}[0-9]+(-.*)?$/', version)
     println()
 }
-println('='*80)</code></pre>
+println('='*80)
+</code></pre>
   */
 class AutoRelease {
 
@@ -346,7 +348,8 @@ class AutoRelease {
         An example of <tt>script</tt> and <tt>variables</tt> used by this
         method would be the following.
 
-<pre><code>import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
+<pre><code>
+import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
 
 String script = '''
 #!/bin/bash
@@ -385,11 +388,13 @@ Map variables = [
 println 'Build tool detection script'
 println('='*80)
 println getScriptFromTemplate(script, variables)
-println('='*80)</code></pre>
+println('='*80)
+</code></pre>
 
         Which returns the following output.
 
-<pre><code>Build tool detection script
+<pre><code>
+Build tool detection script
 ================================================================================
 #!/bin/bash
 set -euxo pipefail
@@ -410,7 +415,8 @@ if [ -f "setup.py" ]; then
   echo "This project contains code for the build tool Python setuptools."
 fi
 
-================================================================================</code></pre>
+================================================================================
+</code></pre>
 
         This example shows that you can pass in Groovy templates with bindings.
         By using this method yourself you do not need to manage the template

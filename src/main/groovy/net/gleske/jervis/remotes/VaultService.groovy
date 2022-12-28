@@ -42,7 +42,8 @@ import net.gleske.jervis.remotes.interfaces.VaultCredential
 
   <h4>Automatically discover mounts</h4>
 
-<pre><code>import net.gleske.jervis.remotes.interfaces.TokenCredential
+<pre><code>
+import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.VaultService
 
 VaultService vault = new VaultService('http://active.vault.service.consul:8200/', creds)
@@ -53,7 +54,8 @@ vault.discoverKVMounts()
 
   <h4>Manually declare mounts</h4>
 
-<pre><code>import net.gleske.jervis.remotes.interfaces.TokenCredential
+<pre><code>
+import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.VaultService
 
 VaultService vault = new VaultService('http://active.vault.service.consul:8200/', creds)
@@ -74,7 +76,8 @@ vault.cas_required = ['kv']
   following policy addition.  However, this is insecure and could leak other
   secrets engine mounts.</p>
 
-<pre><code># Read all mounts to find KV stores
+<pre><code>
+# Read all mounts to find KV stores
 path "sys/mounts" {
   capabilities = ["read"]
 }
@@ -88,7 +91,8 @@ path "+/config" {
 static values.  The following will not generate any API calls to vault and so do
 not need a policy.</p>
 
-<pre><code class="language-groovy">// Set secrets engines KV v1 and KV v2 mounts
+<pre><code class="language-groovy">
+// Set secrets engines KV v1 and KV v2 mounts
 vault.mountVersions = [kv: 2, secret: 1, kv_cas: 2]
 // Only mount kv_cas requires Check-and-Set
 vault.cas_required = ['kv_cas']
@@ -100,7 +104,8 @@ vault.cas_required = ['kv_cas']
   application to walk the full secrets store.  You can further restrict the
   policy to certain paths inside of the secret store.</p>
 
-<pre><code>path "kv/*" {
+<pre><code>
+path "kv/*" {
     capabilities = ["read", "list"]
 }
 </code></pre>
@@ -120,15 +125,18 @@ vault.cas_required = ['kv_cas']
   After you instantiate the local Vault cluster you'll need to run the
   following Shell commands relative to the root of the repository at
   <tt>~/git/github/docker-compose-ha-consul-vault-ui</tt>.</p>
-<pre><code># Enable secrets engines KV v1 and KV v2
+<pre><code>
+# Enable secrets engines KV v1 and KV v2
 ./scripts/curl-api.sh --request POST --data '{"type": "kv", "options": {"version": "1"}}' http://active.vault.service.consul:8200/v1/sys/mounts/secret
 ./scripts/curl-api.sh --request POST --data '{"type": "kv", "options": {"version": "2"}}' http://active.vault.service.consul:8200/v1/sys/mounts/kv
 
 # Generate an admin token for initial setup
-./scripts/get-admin-token.sh</code></pre>
+./scripts/get-admin-token.sh
+</code></pre>
   <p>Afterwards, run the following Groovy Console script to populate the local
   Vault cluster with dummy secret data.</p>
-<pre><code>System.setProperty("socksProxyHost", "localhost")
+<pre><code>
+System.setProperty("socksProxyHost", "localhost")
 System.setProperty("socksProxyPort", "1080")
 
 import net.gleske.jervis.remotes.interfaces.TokenCredential
@@ -147,12 +155,15 @@ vault.setSecret("kv/foo/bar/baz", ['foo':'bar'])
 vault.setSecret("secret/foo", ['test':'data'])
 vault.setSecret("secret/foo/bar", ['someother':'data'])
 vault.setSecret("secret/foo/bar/baz", ['more':'secrets'])
-println 'Success.'</code></pre>
+println 'Success.'
+</code></pre>
   <p><b>Please note:</b> If you're practicing against the local Vault cluster,
   then your Groovy Console requires the following lines of code at the top of
   the Groovy script.  It uses the SOCKS proxy provided by the test cluster.</p>
-<pre><code>System.setProperty("socksProxyHost", "localhost")
-System.setProperty("socksProxyPort", "1080")</code></pre>
+<pre><code>
+System.setProperty("socksProxyHost", "localhost")
+System.setProperty("socksProxyPort", "1080")
+</code></pre>
 
   <h2>Recommended setup</h2>
   <ul>
@@ -185,7 +196,8 @@ System.setProperty("socksProxyPort", "1080")</code></pre>
   This section will discuss both AppRole and Token-based authentication.</p>
 
   <h4>AppRole Authentication</h4>
-<pre><code>import net.gleske.jervis.remotes.creds.VaultAppRoleCredential
+<pre><code>
+import net.gleske.jervis.remotes.creds.VaultAppRoleCredential
 import net.gleske.jervis.remotes.VaultService
 
 VaultAppRoleCredential creds = new VaultAppRoleCredential('http://active.vault.service.consul:8200/', 'my-app-role', 'my-secret-id')
@@ -202,7 +214,8 @@ vault.getSecret('path/to/secret')
   you must use a Vault Token, then this example describes a basic method.  This
   example uses a basic static token and will not automatically renew the token
   like AppRole support.</p>
-<pre><code>import net.gleske.jervis.remotes.interfaces.TokenCredential
+<pre><code>
+import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.VaultService
 
 // 's.fuFc...' is a vault token in this example
@@ -210,7 +223,8 @@ TokenCredential creds = [getToken: {-> 's.fuFc...' }] as TokenCredential
 VaultService vault = new VaultService('http://active.vault.service.consul:8200/', creds)
 
 // get a secret using the basic Vault Token
-vault.getSecret('path/to/secret')</code></pre>
+vault.getSecret('path/to/secret')
+</code></pre>
   */
 class VaultService implements SimpleRestServiceSupport {
     private final String vault_url
@@ -284,10 +298,12 @@ class VaultService implements SimpleRestServiceSupport {
       <p>If you choose not to manually set the mount version, then you'll need
       the following
       <a href="https://www.vaultproject.io/docs/concepts/policies#policy-syntax" target="_blank">Vault policy ACL</a>.</p>
-<pre><code># Read mount config to detect KV secrets engine version
+<pre><code>
+# Read mount config to detect KV secrets engine version
 path "sys/mounts/+/tune" {
     capabilities = ["read"]
-}</code></pre>
+}
+</code></pre>
 
       <h5>Manually setting mount version</h5>
 
@@ -305,7 +321,8 @@ path "sys/mounts/+/tune" {
       </ul>
 
       <h5>Code Example</h5>
-<pre><code>import net.gleske.jervis.remotes.VaultService
+<pre><code>
+import net.gleske.jervis.remotes.VaultService
 import net.gleske.jervis.remotes.creds.VaultAppRoleCredential
 
 VaultAppRoleCredential cred = new VaultAppRoleCredential('http://active.vault.service.consul:8200/', 'app-id', 'secret-id')
@@ -318,7 +335,8 @@ vault.setMountVersions('kv', '2')
 // alternately
 Map versions = [secret: '1', kv: '2']
 vault.setMountVersions(versions)
-vault.mountVersions = versions</code></pre>
+vault.mountVersions = versions
+</code></pre>
       */
     Map<String, String> mountVersions = [:]
 
@@ -339,7 +357,8 @@ vault.mountVersions = versions</code></pre>
       constructor is provided for simplicity and testing.  However, AppRole
       authentication is recommended, instead.
       <h2>Example usage</h2>
-<pre><code>import net.gleske.jervis.remotes.interfaces.TokenCredential
+<pre><code>
+import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.VaultService
 
 TokenCredential creds = [getToken: {-> 'some vault token' }] as TokenCredential
@@ -347,7 +366,8 @@ VaultService vault = new VaultService('http://vault:8200/', creds)
 
 // ready to perform vault operations
 vault.discoverKVMounts()
-vault.mountVersions</code></pre>
+vault.mountVersions
+</code></pre>
       */
     VaultService(String vault_url, TokenCredential credential) {
         this.vault_url = addTrailingSlash(vault_url, 'v1/')
@@ -373,10 +393,12 @@ vault.mountVersions</code></pre>
       with all KV v2 mounts.
 
       <h5>Example of skipping CAS check on a KV v2 mount</h5>
-<pre><code>VaultService vault = new VaultService(...)
+<pre><code>
+VaultService vault = new VaultService(...)
 // Avoid cas check by setting cas_required before discovering mount version.
 vault.cas_required = ['kv']
-vault.discoverKVMounts()</code></pre>
+vault.discoverKVMounts()
+</code></pre>
 
       */
     void discoverKVMounts() throws IOException, VaultException {
@@ -668,7 +690,8 @@ vault.discoverKVMounts()</code></pre>
       behavior depending on the existence of keys in Vault. For example, let's
       say Vault has the following key layout.  <tt>kv</tt> is a KV v2 and
       <tt>secret</tt> is a KV v1 secrets engine.</p>
-<pre><code>kv/
+<pre><code>
+kv/
   |- foo
   |- foo/
     |- bar
@@ -680,7 +703,8 @@ vault.discoverKVMounts()</code></pre>
 secret/
   |- foo
   |- foo/
-    |- bar</code></pre>
+    |- bar
+</code></pre>
 
     <p>findAllKeys operates on both KV v1 and KV v2 secrets engines the same
     way.</p>
