@@ -19,14 +19,6 @@ import net.gleske.jervis.exceptions.VaultException
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.interfaces.VaultCredential
 
-// TODO: Enhance java doc
-    // document recommended setup and usage (setting up recommended
-    //   policy, AppId, use batch token, manually set mountVersions to cut down
-    //   on API calls).  Add a bullet point list of useful methods.  Document
-    //   usage of the method within the method itself.
-    // document minimum required role for full functionality
-    // document reducing the role and code changes required (e.g. using
-    //   mountVersions or a batch token instead of a service token)
 /**
   Provides easy access to
   <a href="https://www.vaultproject.io/" target="_blank">HashiCorp Vault</a>
@@ -196,6 +188,12 @@ System.setProperty("socksProxyPort", "1080")
   This section will discuss both AppRole and Token-based authentication.</p>
 
   <h4>AppRole Authentication</h4>
+
+  <p>Refer to
+  <tt>{@link net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential}</tt>
+  for production-use examples of securely managing the Role ID and Secret ID.
+  This example is for simple demonstration purposes of this class.</p>
+
 <pre><code>
 import net.gleske.jervis.remotes.creds.VaultAppRoleCredential
 import net.gleske.jervis.remotes.VaultService
