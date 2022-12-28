@@ -276,8 +276,8 @@ class VaultServiceTest extends GroovyTestCase {
         //TokenCredential cred = [getToken: {-> 'fake-token' }] as TokenCredential
         TokenCredential cred = [getToken: {-> 'hvs.CT1912OdOBRWnn1UVQntX9Ld' }] as TokenCredential
         myvault = new VaultService(DEFAULT_VAULT_URL, cred)
-        myvault.@mountVersions = ['secret':'1', 'kv2/withslash':'2', 'secret2/withslash':'1', 'kv':'2', 'kv_cas':'2']
-        myvault.@cas_required = ['kv_cas']
+        myvault.mountVersions = ['secret':'1', 'kv2/withslash':'2', 'secret2/withslash':'1', 'kv':'2', 'kv_cas':'2']
+        myvault.cas_required = ['kv_cas']
     }
     //tear down after every test
     @After protected void tearDown() {

@@ -319,14 +319,33 @@ vault.mountVersions</tt></pre>
 
     /**
       Query Vault to find all of the KV mounts.  This can be called immediately
-      following the constructor to initiate service connectivity.
+      following the constructor to initiate service connectivity.  For KV v2
+      mounts, this will check the mount config to see if
+      <a href="https://developer.hashicorp.com/vault/tutorials/secrets-management/versioned-kv#step-8-check-and-set-operations" target=_blank>Check and Set</a>
+      is required.  If you want to skip this check, then set cas_required List
+      with all KV v2 mounts.
+
+      <h5>Example of skipping CAS check on a KV v2 mount</h5>
+<pre><tt>VaultService vault = new VaultService(...)
+// Avoid cas check by setting cas_required before discovering mount version.
+vault.cas_required = ['kv']
+vault.discoverKVMounts()</tt></pre>
+
       */
     void discoverKVMounts() throws IOException, VaultException {
         apiFetch("sys/mounts").with { Map mounts ->
             mounts.findAll { k, v ->
                 v in Map && v.type == 'kv'
             }.each { k, v ->
-                setMountVersions(k.replaceAll('/$', ''), v.options.version)
+                String mount = k.replaceAll('/$', '')
+                setMountVersions(mount, v.options.version)
+                if(!isKeyValueV2(mount) || mount in this.cas_required) {
+                    return
+                }
+                Boolean isCasRequired = apiFetch(mount + '/config').data.cas_required
+                if(isCasRequired) {
+                    this.cas_required << mount
+                }
             }
         }
     }
@@ -464,17 +483,7 @@ vault.mountVersions</tt></pre>
 
     /**
       Forces a specified secrets engine <tt>mount</tt> to be KV v1 or KV v2.
-      See <tt>{@link #mountVersions}</tt> for additional usage.  For KV v2
-      mounts, this will check the mount config to see if
-      <a href="https://developer.hashicorp.com/vault/tutorials/secrets-management/versioned-kv#step-8-check-and-set-operations" target=_blank>Check and Set</a>
-      is required.  If you want to skip this check, then set cas_required List
-      with all KV v2 mounts.
-
-      <h5>Example of skipping CAS check on a KV v2 mount</h5>
-<pre><tt>VaultService vault = new VaultService(...)
-// Avoid cas check by setting cas_required before setting mount version.
-vault.cas_required = ['kv']
-vault.setMountVersions('kv', '2')</tt></pre>
+      See <tt>{@link #mountVersions}</tt> for additional usage.
 
       @param mount   A Vault secrets engine mount.
       @param version Must be <tt>"1"</tt> or <tt>"2"</tt> to denote KV v1 or KV
@@ -486,13 +495,6 @@ vault.setMountVersions('kv', '2')</tt></pre>
             throw new VaultException('Vault key-value mounts can only be version "1" or "2".')
         }
         this.mountVersions[mount] = version.toString()
-        if(!isKeyValueV2(mount) || mount in this.cas_required) {
-            return
-        }
-        Boolean isCasRequired = apiFetch(mount + '/config').data.cas_required
-        if(isCasRequired) {
-            this.cas_required << mount
-        }
     }
 
     /**
