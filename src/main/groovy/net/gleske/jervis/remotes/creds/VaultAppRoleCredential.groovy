@@ -102,7 +102,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
             return
         }
         this.token = null
-        Map data = [role_id: this.credential.role_id, secret_id: this.credential.secret_id]
+        Map data = [role_id: this.credential.getRole_id(), secret_id: this.credential.getSecret_id()]
         this.leaseCreated = new Date().toInstant()
         Map response = apiFetch('auth/approle/login', ['X-Jervis-Vault-Login': true], 'POST', data)
         this.ttl = response.auth.lease_duration
