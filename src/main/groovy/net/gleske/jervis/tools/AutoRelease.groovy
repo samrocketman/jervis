@@ -66,7 +66,7 @@ println()
     println isMatched('/([0-9]+\\.){2}[0-9]+(-.*)?$/', version)
     println()
 }
-println('='*80)</pre></tt>
+println('='*80)</code></pre>
   */
 class AutoRelease {
 

@@ -72,6 +72,17 @@ trait SimpleRestServiceSupport {
       It automatically builds out authentication headers by calling other
       methods defined in this trait.
 
+      @param path A path appended to the <tt>{@link #baseUrl()}</tt> for making
+                  an API call.
+      @param http_headers A list of user or client-provided headers.  These
+                          provided headers get passed to
+                          <tt>{@link #header(java.util.Map)}</tt>.
+      @param http_method The HTTP method to call when making an API request.
+                         Non-standard HTTP verbs can also be provided for REST
+                         services that support custom verbs.
+      @param data Data to be written to the remote service upon API request.
+                  This is typically done via HTTP <tt>POST</tt> method but other
+                  methods can also accept data written.
       */
     def apiFetch(String path = '', Map http_headers = [:], String http_method = 'GET', String data = '') {
         http_headers = header(http_headers)

@@ -52,7 +52,7 @@ package net.gleske.jervis.exceptions;
   programming.  The following is an example of overriding the
   <tt>{@link #LIFECYCLES_SPEC}</tt>.</p>
 
-<pre><code>import net.gleske.jervis.exceptions.WikiPages
+<pre><code class="language-groovy">import net.gleske.jervis.exceptions.WikiPages
 WikiPages.metaClass.static.getLifecyclesSpec = {->'https://wiki.example.com/lifecycle_explanation.html'}
 
 import net.gleske.jervis.lang.LifecycleValidator
@@ -81,7 +81,7 @@ x.validate()</code></pre>
 
   The important part of the above example is the following excerpt.
 
-<pre><code>import net.gleske.jervis.exceptions.WikiPages
+<pre><code class="language-groovy">import net.gleske.jervis.exceptions.WikiPages
 WikiPages.metaClass.static.getLifecyclesSpec = {->'https://wiki.example.com/lifecycle_explanation.html'}
 
 import net.gleske.jervis.lang.LifecycleValidator</code></pre>

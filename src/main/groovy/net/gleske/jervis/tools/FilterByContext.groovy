@@ -110,7 +110,7 @@ import net.gleske.jervis.exceptions.FilterByContextException
     </li>
   </ul>
 
-  <h2>Sample Usage</tt>
+  <h2>Sample Usage</h2>
 
 <pre><code>import net.gleske.jervis.tools.FilterByContext
 
