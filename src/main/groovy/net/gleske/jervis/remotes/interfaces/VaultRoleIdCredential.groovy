@@ -19,6 +19,18 @@ package net.gleske.jervis.remotes.interfaces
   A basic credential whose only purpose is to get a Role ID and Secret ID for
   <a href="https://developer.hashicorp.com/vault/docs/auth/approle" target=_blank>HashCorp Vault AppRole</a>
   authentication.
+
+  <h2>Sample Usage</h2>
+
+<pre><code>import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
+
+
+// A file-based backend where the file has 'role_id:secret_id' as its content.
+VaultRoleIdCredential roleid = [
+    getRole_id: {-> new File('somefile').text.trim().tokenize(':')[0]},
+    getSecret_id: {-> new File('somefile').text.trim().tokenize(':')[1]}
+] as VaultRoleIdCredential
+</pre></code>
   */
 interface VaultRoleIdCredential extends JervisCredential {
     /**
