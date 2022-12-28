@@ -88,7 +88,7 @@ path "+/config" {
 static values.  The following will not generate any API calls to vault and so do
 not need a policy.</p>
 
-<pre><code class="language-java">// Set secrets engines KV v1 and KV v2 mounts
+<pre><code class="language-groovy">// Set secrets engines KV v1 and KV v2 mounts
 vault.mountVersions = [kv: 2, secret: 1, kv_cas: 2]
 // Only mount kv_cas requires Check-and-Set
 vault.cas_required = ['kv_cas']

@@ -37,7 +37,7 @@ import java.util.regex.Pattern
   where your DSL scripts reside.  Instead, use the
   <a href="https://github.com/samrocketman/jervis/issues/43" target="_blank"><tt>readFileFromWorkspace</tt></a>
   method provided by the Job DSL plugin in Jenkins.</p>
-<pre><code>import net.gleske.jervis.lang.LifecycleGenerator
+<pre><code class="language-groovy">import net.gleske.jervis.lang.LifecycleGenerator
 
 String yaml = """
 language: ruby
