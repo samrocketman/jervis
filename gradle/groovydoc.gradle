@@ -1,10 +1,18 @@
 import java.text.SimpleDateFormat
 
+// https://blog.mrhaki.com/2016/01/groovy-goodness-customise-groovydoc.html
+sourceSets {
+    groovydoc {
+        resources {
+            srcDir 'src/groovydoc'
+        }
+    }
+}
+
 /*
  * http://gradle.org/docs/current/dsl/org.gradle.api.tasks.javadoc.Groovydoc.html
  * https://github.com/evgeny-goldin/spock-extensions/blob/master/build.gradle
  */
-
 groovydoc {
     use = true
     // groovyClasspath = configurations.compile // http://issues.gradle.org/browse/GRADLE-1391
@@ -27,4 +35,7 @@ groovydoc {
             from "assets/stylesheet-${groovyVersion.tokenize('.')[0..1].join('.')}.css" into 'build/docs/groovydoc'
         }
     }
+
+    // Use custom sourceSet template
+    classpath = sourceSets.groovydoc.output + classpath
 }
