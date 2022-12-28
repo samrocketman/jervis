@@ -2377,6 +2377,9 @@ tt:before, tt:after {
 pre tt:before, pre tt:after {
     content: normal;
 }
+pre > code:first-line, pre > tt:first-line {
+    line-height: 0px;
+}
 ul.blockListLast ol.numbered li {
   list-style-type: decimal;
 }
