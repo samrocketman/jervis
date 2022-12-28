@@ -20,7 +20,10 @@ package net.gleske.jervis.remotes.interfaces
   <a href="https://developer.hashicorp.com/vault/docs/auth/approle" target=_blank>HashiCorp Vault AppRole</a>
   authentication.
 
-  <h2>Sample Usage</h2>
+  <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
 
 <pre><code>
 import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential

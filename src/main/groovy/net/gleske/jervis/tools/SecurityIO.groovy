@@ -493,7 +493,11 @@ echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey /
       Knowing the weakness of different controls enables you to better secure
       it with additional layers of security.</p>
 
-      <h2>Sample Usage</h2>
+  <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
+
 <pre><code>
 import static net.gleske.jervis.tools.SecurityIO.avoidTimingAttack
 import java.time.Instant
