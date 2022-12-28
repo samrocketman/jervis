@@ -20,7 +20,95 @@ import net.gleske.jervis.remotes.SimpleRestServiceSupport
 import net.gleske.jervis.remotes.interfaces.VaultCredential
 import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
 
-// TODO add java doc
+/**
+  This provides
+  <a href="https://developer.hashicorp.com/vault/docs/auth/approle" target=_blank>HashiCorp Vault AppRole Authentication</a>
+  which issues rotating ephemeral tokens automatically.  HashiCorp recommends
+  using AppRole authentication for applications and services.  The high level
+  operation of this class is the following.
+
+  <ul>
+  <li>
+    Provide seamless Vault API authentication for
+    <tt>{@link net.gleske.jervis.remotes.VaultService}</tt>.
+  </li>
+  <li>
+    Use Role ID and Secret ID to issue, renew, rotate, and revoke Vault tokens
+    automatically.  See examples in
+    <tt>{@link net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential}</tt> and
+    <tt>{@link net.gleske.jervis.remotes.creds.VaultRoleIdCredentialImpl}</tt>.
+  </li>
+  <li>
+    Automatically injects issued Vault tokens as authentication headers.
+  </li>
+  <li>
+    Tracks token expiration and automatically renews or rotates tokens
+    transparent to <tt>VaultService</tt>.
+  </li>
+  <li>
+    Can revoke issued tokens.
+  </li>
+  </ul>
+
+  <h2>Initializing AppRole</h2>
+
+  <p>This section discusses how to enable AppRole authentication in Vault as
+  well as generate an application secret for a service such as Jenkins.</p>
+
+  <h5>Enable AppRole authentication engine</h5>
+
+<pre><code>
+import net.gleske.jervis.remotes.interfaces.TokenCredential
+import net.gleske.jervis.remotes.VaultService
+
+// Create an API client using an admin human user vault token
+TokenCredential creds = [getToken: {-> 'hvs.bu4PfApCPrpSL0P1iOfC8EDE' }] as TokenCredential
+VaultService myvault = new VaultService('http://vault:8200/v1/', creds)
+
+// Recommended AppRole settings
+Map approle_settings = [
+    token_ttl: "1m",
+    token_explicit_max_ttl: "1m",
+    token_policies: ["jenkins-limited"],
+    token_no_default_policy: true,
+    token_type: "service"
+]
+
+// Enable AppRole Authentication Engine
+myvault.apiFetch('sys/auth/approle', [:], 'POST', [type: 'approle'])
+
+// Create an application Role ID 'jenkins'
+myvault.apiFetch('auth/approle/role/jenkins', [:], 'POST', approle_settings)
+
+// Generate an AppRole Secret ID for the 'jenkins' Role ID
+
+</code></pre>
+
+  <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
+
+  <p>The following offers basic usage.  However, there are better and more
+  secure examples in
+  <tt>{@link net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential}</tt>.</p>
+
+<pre><code>
+import net.gleske.jervis.remotes.creds.VaultAppRoleCredential
+import net.gleske.jervis.remotes.VaultService
+
+VaultAppRoleCredential approle = new VaultAppRoleCredential('https://vault.example.com', 'app role id', 'app secret id')
+
+// Instantiate vault API client with approle
+VaultService vault = new VaultService(approle)
+
+// Set mount kv/ to be KV v2 secrets engine
+vault.mountVersions = [kv: 2]
+
+// ready to perform secrets operations
+vault.getSecret('kv/path/to/secret')
+</code></pre>
+  */
 class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential, SimpleRestServiceSupport {
     // values specific to token instance
     private final String vault_url
