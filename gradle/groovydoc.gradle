@@ -34,6 +34,9 @@ groovydoc {
             rename "stylesheet-${groovyVersion.tokenize('.')[0..1].join('.')}.css", 'stylesheet.css'
             from "assets/stylesheet-${groovyVersion.tokenize('.')[0..1].join('.')}.css" into 'build/docs/groovydoc'
         }
+        copy {
+            from 'src/groovydoc/resources/highlightjs' into 'build/docs/groovydoc'
+        }
     }
 
     // Use custom sourceSet template
