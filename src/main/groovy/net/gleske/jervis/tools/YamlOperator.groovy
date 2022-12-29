@@ -95,7 +95,16 @@ class YamlOperator {
       @return A plain old Java object consisting of standard Java classes.
       */
     static def loadYamlFrom(InputStream srcStream) {
-        def yaml = new Yaml(new SafeConstructor(new LoaderOptions()))
+        LoaderOptions options = new LoaderOptions()
+        options.allowDuplicateKeys = true
+        options.allowRecursiveKeys = false
+        // 5MB data limit?  code point limit is not well explained
+        options.codePointLimit = 5242880
+        options.maxAliasesForCollections = 500
+        options.nestingDepthLimit = 500
+        options.processComments = false
+        options.wrappedToRootException = false
+        def yaml = new Yaml(new SafeConstructor(options))
         yaml.load(srcStream)
     }
 
