@@ -15,8 +15,8 @@
    */
 package net.gleske.jervis.remotes
 //the VaultServiceTest() class automatically sees the VaultService() class because they're in the same package
-import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 
+import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 import net.gleske.jervis.exceptions.VaultException
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.interfaces.VaultCredential
@@ -27,7 +27,7 @@ import org.junit.Test
 
 /**
   This class tests the <tt>{@link net.gleske.jervis.remotes.VaultService}</tt>
-  class.  This uses auto-generated mock data using real API resonses.
+  class.  This uses auto-generated mock data using real API responses.
 
   <h2>Generate Mock Data</h2>
 
@@ -274,8 +274,7 @@ class VaultServiceTest extends GroovyTestCase {
     @Before protected void setUp() {
         super.setUp()
         mockStaticUrl(url, URL, request_meta, true, 'SHA-256', request_history)
-        //TokenCredential cred = [getToken: {-> 'fake-token' }] as TokenCredential
-        TokenCredential cred = [getToken: {-> 'hvs.CT1912OdOBRWnn1UVQntX9Ld' }] as TokenCredential
+        TokenCredential cred = [getToken: {-> 'fake-token' }] as TokenCredential
         myvault = new VaultService(DEFAULT_VAULT_URL, cred)
         myvault.mountVersions = ['secret':'1', 'kv2/withslash':'2', 'secret2/withslash':'1', 'kv':'2', 'kv_cas':'2']
         myvault.cas_required = ['kv_cas']
