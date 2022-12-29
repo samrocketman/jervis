@@ -1,0 +1,23 @@
+request_id: 0c59046c-c5f7-1641-a2e6-8600667209a3
+lease_id: ''
+renewable: false
+lease_duration: 0
+data: null
+wrap_info: null
+warnings: null
+auth:
+  client_token: hvs.CAESIEftQgLQe4uToWsJLL7C6XsBKCZbuku0HrmC6JFA-LqVGh4KHGh2cy5kNjF4bGN6cTRyOHNLcWFURjFxYm13VHk
+  accessor: v7GC2pDjGtyiSu6YgZ2aOt8n
+  policies:
+    - my_role
+  token_policies:
+    - my_role
+  metadata:
+    role_name: my_approle_service
+  lease_duration: 60
+  renewable: true
+  entity_id: 40dabc48-87eb-d28b-3f3d-02a4a43f27bf
+  token_type: service
+  orphan: true
+  mfa_requirement: null
+  num_uses: 0

@@ -1,0 +1,23 @@
+request_id: 80a40680-398c-9095-33be-1cf4c7d8cbe1
+lease_id: ''
+renewable: false
+lease_duration: 0
+data: null
+wrap_info: null
+warnings: null
+auth:
+  client_token: hvb.AAAAAQJgxDgqsGNorpoOR7hPZ5SU-ynBvCl764jyRP_fnX7WvkdkDzGjbLNGdPdtlY33Als2P36yDZueqzfdGw9RsaTeaYXSH7E4RYSWuRoQ9YRKIw8o7mDDY2ZcT3KOB7RwtWEw1FN2eDqcy_sbCjXPaM1iBVH-mqMSYRmRd2nb5D1SJPeBzIYRqSglLc31wUGN7xEzyrKUczqOKsIcybQA
+  accessor: ''
+  policies:
+    - my_role
+  token_policies:
+    - my_role
+  metadata:
+    role_name: my_approle_batch
+  lease_duration: 30
+  renewable: false
+  entity_id: 00a79602-2a69-576d-19b5-fcbc50d42f02
+  token_type: batch
+  orphan: true
+  mfa_requirement: null
+  num_uses: 0
