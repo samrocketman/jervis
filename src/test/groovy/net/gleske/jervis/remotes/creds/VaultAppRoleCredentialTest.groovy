@@ -38,4 +38,15 @@ class VaultAppRoleCredentialTest extends GroovyTestCase {
         assert cred.credential.getSecret_id() == 'another secret'
         assert cred.vault_url == 'https://vault.example.com/v1/'
     }
+    @Test public void test_VaultRoleIdCredentialImpl_approle_mount() {
+        VaultAppRoleCredential cred = new VaultAppRoleCredential('https://vault.example.com', 'some role id', 'some secret id')
+        cred.approle_mount = 'foo/'
+        assert cred.approle_mount == 'foo'
+        cred.approle_mount = '/foo'
+        assert cred.approle_mount == 'foo'
+        cred.approle_mount = '/foo/'
+        assert cred.approle_mount == 'foo'
+        cred.approle_mount = '/foo/bar/'
+        assert cred.approle_mount == 'foo/bar'
+    }
 }
