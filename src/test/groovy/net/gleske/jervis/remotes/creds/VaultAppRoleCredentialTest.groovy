@@ -19,6 +19,8 @@ package net.gleske.jervis.remotes.creds
 import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 import net.gleske.jervis.remotes.interfaces.VaultRoleIdCredential
 
+import java.time.Duration
+import java.time.Instant
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -145,7 +147,11 @@ VaultAppRoleCredential approle_batch = new VaultAppRoleCredential('http://vault:
 approle_service.lookupToken()
 approle_service.revokeToken()
 approle_service.getToken()
+approle_service.getToken()
+approle_service.tryRenewToken()
 approle_batch.getToken()
+approle_batch.getToken()
+wapprole_batch.tryRenewToken()
 </code></pre>
   */
 class VaultAppRoleCredentialTest extends GroovyTestCase {
@@ -164,8 +170,9 @@ class VaultAppRoleCredentialTest extends GroovyTestCase {
     @Before protected void setUp() {
         super.setUp()
         mockStaticUrl(url, URL, request_meta, true, 'SHA-256', request_history)
-        approle_service = new VaultAppRoleCredential('http://vault:8200', 'some role id', 'some secret id')
-        approle_batch = new VaultAppRoleCredential('http://vault:8200', 'some role id', 'some secret id')
+        // these credentials need to match the mock recorded credentials
+        approle_service = new VaultAppRoleCredential('http://vault:8200', 'd9fa9122-3dbb-05f6-e5c5-4b07cbaa3b58', 'c59d136e-c0a7-da31-efb7-79dd86e54ed8')
+        approle_batch = new VaultAppRoleCredential('http://vault:8200', '5849d9ce-c682-d39b-337e-02e5dad3fa04', '505c5461-b4a8-324c-af20-78a5323e61ab')
     }
     //tear down after every test
     @After protected void tearDown() {
@@ -202,5 +209,145 @@ class VaultAppRoleCredentialTest extends GroovyTestCase {
         assert cred.approle_mount == 'foo'
         cred.approle_mount = '/foo/bar/'
         assert cred.approle_mount == 'foo/bar'
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_service_lookupToken() {
+        List urls = ['http://vault:8200/v1/auth/approle/login', 'http://vault:8200/v1/auth/token/lookup-self']
+        List methods = ['POST', 'GET']
+        List datas = ['{"role_id":"d9fa9122-3dbb-05f6-e5c5-4b07cbaa3b58","secret_id":"c59d136e-c0a7-da31-efb7-79dd86e54ed8"}', '']
+        approle_service.lookupToken()
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_service_revokeToken() {
+        List urls = []
+        List methods = []
+        List datas = []
+        approle_service.revokeToken()
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_service_getToken() {
+        List urls = ['http://vault:8200/v1/auth/approle/login']
+        List methods = ['POST']
+        List datas = ['{"role_id":"d9fa9122-3dbb-05f6-e5c5-4b07cbaa3b58","secret_id":"c59d136e-c0a7-da31-efb7-79dd86e54ed8"}']
+        approle_service.getToken()
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_service_getToken_twice() {
+        List urls = ['http://vault:8200/v1/auth/approle/login']
+        List methods = ['POST']
+        List datas = ['{"role_id":"d9fa9122-3dbb-05f6-e5c5-4b07cbaa3b58","secret_id":"c59d136e-c0a7-da31-efb7-79dd86e54ed8"}']
+        approle_service.getToken()
+        approle_service.getToken()
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_service_getToken_twice_with_renewal() {
+        List urls = ['http://vault:8200/v1/auth/approle/login', 'http://vault:8200/v1/auth/token/renew-self']
+        List methods = ['POST', 'POST']
+        List datas = ['{"role_id":"d9fa9122-3dbb-05f6-e5c5-4b07cbaa3b58","secret_id":"c59d136e-c0a7-da31-efb7-79dd86e54ed8"}', '{"increment":"60s"}']
+        approle_service.getToken()
+        assert approle_service.ttl == 60
+        assert approle_service.renew_buffer == 5
+        approle_service.@leaseCreated = Instant.now().minus(Duration.ofSeconds(56))
+        approle_service.getToken()
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_service_getToken_twice_renew_buffer() {
+        List urls = ['http://vault:8200/v1/auth/approle/login']
+        List methods = ['POST']
+        List datas = ['{"role_id":"d9fa9122-3dbb-05f6-e5c5-4b07cbaa3b58","secret_id":"c59d136e-c0a7-da31-efb7-79dd86e54ed8"}']
+        approle_service.getToken()
+        assert approle_service.ttl == 60
+        approle_service.renew_buffer = 61
+        approle_service.getToken()
+        approle_service.getToken()
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_service_getToken_revokeToken() {
+        List urls = ['http://vault:8200/v1/auth/approle/login', 'http://vault:8200/v1/auth/token/revoke-self']
+        List methods = ['POST', 'POST']
+        List datas = ['{"role_id":"d9fa9122-3dbb-05f6-e5c5-4b07cbaa3b58","secret_id":"c59d136e-c0a7-da31-efb7-79dd86e54ed8"}', '']
+        approle_service.getToken()
+        approle_service.revokeToken()
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_service_getToken_tryRenewToken() {
+        List urls = ['http://vault:8200/v1/auth/approle/login', 'http://vault:8200/v1/auth/token/renew-self']
+        List methods = ['POST', 'POST']
+        List datas = ['{"role_id":"d9fa9122-3dbb-05f6-e5c5-4b07cbaa3b58","secret_id":"c59d136e-c0a7-da31-efb7-79dd86e54ed8"}', '{"increment":"60s"}']
+        approle_service.getToken()
+        assert approle_service.tryRenewToken() == true
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_service_getToken_tryRenewToken_exception() {
+        approle_service.getToken()
+        approle_service.headers = ['X-Mock-Throw-Exception': new IOException('dummy exception')]
+        assert approle_service.tryRenewToken() == false
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_batch_getToken() {
+        List urls = ['http://vault:8200/v1/auth/approle/login']
+        List methods = ['POST']
+        List datas = ['{"role_id":"5849d9ce-c682-d39b-337e-02e5dad3fa04","secret_id":"505c5461-b4a8-324c-af20-78a5323e61ab"}']
+        approle_batch.getToken()
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_batch_getToken_twice() {
+        List urls = ['http://vault:8200/v1/auth/approle/login']
+        List methods = ['POST']
+        List datas = ['{"role_id":"5849d9ce-c682-d39b-337e-02e5dad3fa04","secret_id":"505c5461-b4a8-324c-af20-78a5323e61ab"}']
+        approle_batch.getToken()
+        approle_batch.getToken()
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_batch_getToken_twice_with_renewal() {
+        List urls = ['http://vault:8200/v1/auth/approle/login', 'http://vault:8200/v1/auth/approle/login']
+        List methods = ['POST', 'POST']
+        List datas = ['{"role_id":"5849d9ce-c682-d39b-337e-02e5dad3fa04","secret_id":"505c5461-b4a8-324c-af20-78a5323e61ab"}', '{"role_id":"5849d9ce-c682-d39b-337e-02e5dad3fa04","secret_id":"505c5461-b4a8-324c-af20-78a5323e61ab"}']
+        approle_batch.getToken()
+        assert approle_batch.ttl == 30
+        assert approle_batch.renew_buffer == 5
+        approle_batch.@leaseCreated = Instant.now().minus(Duration.ofSeconds(26))
+        approle_batch.getToken()
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_batch_getToken_revokeToken() {
+        List urls = ['http://vault:8200/v1/auth/approle/login']
+        List methods = ['POST']
+        List datas = ['{"role_id":"5849d9ce-c682-d39b-337e-02e5dad3fa04","secret_id":"505c5461-b4a8-324c-af20-78a5323e61ab"}']
+        approle_batch.getToken()
+        approle_batch.revokeToken()
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
+    }
+    @Test public void test_VaultRoleIdCredentialImpl_batch_getToken_tryRenewToken() {
+        List urls = ['http://vault:8200/v1/auth/approle/login']
+        List methods = ['POST']
+        List datas = ['{"role_id":"5849d9ce-c682-d39b-337e-02e5dad3fa04","secret_id":"505c5461-b4a8-324c-af20-78a5323e61ab"}']
+        approle_batch.getToken()
+        assert approle_batch.tryRenewToken() == false
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+        assert request_history*.data == datas
     }
 }

@@ -225,9 +225,18 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
     /**
       The time buffer before a renewal is forced.  This is to account for clock
       drift and is customizable by the client.  By default the value is
-      <tt>15</tt> seconds.
+      <tt>5</tt> seconds.  All time-based calculations around token renewal
+      assume this is set correctly by the caller.  If it is incorrectly set then
+      <tt>renew_buffer</tt> is <tt>0</tt> seconds.
       */
-    Long renew_buffer = 15
+    Long renew_buffer = 5
+
+    Long getRenew_buffer() {
+        if(renew_buffer >= ttl) {
+            return 0
+        }
+        this.renew_buffer
+    }
 
     /**
       Sets the approle_mount property and trims leading or trailing slash.
@@ -303,7 +312,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
             return true
         }
         Instant now = new Date().toInstant()
-        if(this.ttl - (now.epochSecond - this.leaseCreated.epochSecond) > renew_buffer) {
+        if(this.ttl - (now.epochSecond - this.leaseCreated.epochSecond) > getRenew_buffer()) {
             return false
         }
         true
@@ -325,7 +334,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
     }
 
     private void leaseToken() {
-        if(!isExpired() || tryRenewToken()) {
+        if(tryRenewToken()) {
             return
         }
         this.token = null
@@ -344,7 +353,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
       the token is expired or needs renewal but is non-renewable, then a new
       token lease will automatically be created.
 
-      @return Always returns a valid token with at least a 15 second lease.  If
+      @return Always returns a valid token with at least a 5 second lease.  If
       you require the minimum lease to be longer, then adjust
       <tt>{@link #renew_buffer}</tt>.
       */
@@ -369,7 +378,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
         }
         try {
             Map data = [increment: "${this.ttl}s"]
-            Map response = apiFetch('auth/token/renew-self', [:], 'POST', data)
+            Map response = apiFetch('auth/token/renew-self', ['X-Jervis-Vault-Login': true, 'X-Vault-Token': this.token], 'POST', data)
             this.leaseCreated = new Date().toInstant()
             this.ttl = response.auth.lease_duration
             this.renewable = response.auth.renewable

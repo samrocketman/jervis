@@ -127,6 +127,9 @@ class StaticMocking {
                     null
                 },
                 setRequestProperty: { String key, def value ->
+                    if(key == 'X-Mock-Throw-Exception') {
+                        throw value
+                    }
                     if(key == 'X-HTTP-Method-Override') {
                         if(value) {
                             request_meta['method'] = value
