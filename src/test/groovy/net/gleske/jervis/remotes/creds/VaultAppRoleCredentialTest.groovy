@@ -148,10 +148,10 @@ approle_service.lookupToken()
 approle_service.revokeToken()
 approle_service.getToken()
 approle_service.getToken()
-approle_service.tryRenewToken()
+approle_service.renewToken()
 approle_batch.getToken()
 approle_batch.getToken()
-wapprole_batch.tryRenewToken()
+wapprole_batch.renewToken()
 </code></pre>
   */
 class VaultAppRoleCredentialTest extends GroovyTestCase {
@@ -283,20 +283,20 @@ class VaultAppRoleCredentialTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultRoleIdCredentialImpl_service_getToken_tryRenewToken() {
+    @Test public void test_VaultRoleIdCredentialImpl_service_getToken_renewToken() {
         List urls = ['http://vault:8200/v1/auth/approle/login', 'http://vault:8200/v1/auth/token/renew-self']
         List methods = ['POST', 'POST']
         List datas = ['{"role_id":"d9fa9122-3dbb-05f6-e5c5-4b07cbaa3b58","secret_id":"c59d136e-c0a7-da31-efb7-79dd86e54ed8"}', '{"increment":"60s"}']
         approle_service.getToken()
-        assert approle_service.tryRenewToken() == true
+        assert approle_service.renewToken() == true
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultRoleIdCredentialImpl_service_getToken_tryRenewToken_exception() {
+    @Test public void test_VaultRoleIdCredentialImpl_service_getToken_renewToken_exception() {
         approle_service.getToken()
         approle_service.headers = ['X-Mock-Throw-Exception': new IOException('dummy exception')]
-        assert approle_service.tryRenewToken() == false
+        assert approle_service.renewToken() == false
     }
     @Test public void test_VaultRoleIdCredentialImpl_batch_getToken() {
         List urls = ['http://vault:8200/v1/auth/approle/login']
@@ -340,12 +340,12 @@ class VaultAppRoleCredentialTest extends GroovyTestCase {
         assert request_history*.method == methods
         assert request_history*.data == datas
     }
-    @Test public void test_VaultRoleIdCredentialImpl_batch_getToken_tryRenewToken() {
+    @Test public void test_VaultRoleIdCredentialImpl_batch_getToken_renewToken() {
         List urls = ['http://vault:8200/v1/auth/approle/login']
         List methods = ['POST']
         List datas = ['{"role_id":"5849d9ce-c682-d39b-337e-02e5dad3fa04","secret_id":"505c5461-b4a8-324c-af20-78a5323e61ab"}']
         approle_batch.getToken()
-        assert approle_batch.tryRenewToken() == false
+        assert approle_batch.renewToken() == false
         assert request_history*.url == urls
         assert request_history*.method == methods
         assert request_history*.data == datas

@@ -334,7 +334,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
     }
 
     private void leaseToken() {
-        if(tryRenewToken()) {
+        if(renewToken()) {
             return
         }
         this.token = null
@@ -372,7 +372,7 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
       @return Returns <tt>true</tt> if the token renewal was successful.
               Otherwise, returns <tt>false</tt>.
       */
-    Boolean tryRenewToken() {
+    Boolean renewToken() {
         if(!this.token || !this.renewable) {
             return false
         }
