@@ -26,6 +26,31 @@ import org.yaml.snakeyaml.representer.Representer
   Reads and writes YAML.  This utility class is necessary because of a few
   major changes around how YAML loading works due to vulnerabilities or usage.
   So this utility class is to help minimize required changes to YAML usage.
+
+  <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
+<pre><code>
+import net.gleske.jervis.tools.YamlOperator
+
+String yaml = '''
+key: value
+list:
+  - one
+  - two
+  - three
+'''
+
+// Load YAML from many object types
+Map result = YamlOperator.loadYamlFrom(yaml)
+
+// Export YAML as a String
+println(YamlOperator.writeObjToYaml(result))
+
+// Write YAML to a File
+YamlOperator.writeObjToYaml(new File('/tmp/file.yaml')), result)
+</code></pre>
   */
 class YamlOperator {
     private YamlOperator() {
