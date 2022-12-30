@@ -28,6 +28,9 @@ import java.security.Signature
 import java.security.spec.PKCS8EncodedKeySpec
 import java.time.Duration
 import java.time.Instant
+import org.bouncycastle.asn1.ASN1Encodable
+import org.bouncycastle.asn1.ASN1Primitive
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
 import org.bouncycastle.crypto.AsymmetricBlockCipher
 import org.bouncycastle.crypto.encodings.PKCS1Encoding
 import org.bouncycastle.crypto.engines.RSAEngine
@@ -38,6 +41,9 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter
+import org.bouncycastle.util.io.pem.PemObject
+import org.bouncycastle.util.io.pem.PemObjectGenerator
 
 /**
   A class to provide cryptographic features to Jervis such as RSA encryption and base64 encoding.
@@ -271,26 +277,49 @@ if(security.verifyGitHubJWTPayload(jwt)) {
     void setKey_pair(String pem) {
         PEMParser parser = new PEMParser(new StringReader(pem))
         def obj = parser.readObject()
+        parser.close()
         if(!obj) {
             throw new KeyPairDecodeException("Could not decode KeyPair from pem String.  readObject returned null.")
         }
+        if(obj in PrivateKeyInfo) {
+            obj = getKeypairFromPkcs8(obj)
+        }
+        if(obj in PEMKeyPair) {
+            setPemKeyPair(obj)
+        } else {
+            throw new KeyPairDecodeException("Could not decode KeyPair from pem String.  Unable to handle ${obj.class}")
+        }
+    }
+
+    private PEMKeyPair getKeypairFromPkcs8(PrivateKeyInfo pkInfo) {
+        ASN1Encodable pkcs1ASN1Encodable = pkInfo.parsePrivateKey();
+        ASN1Primitive privateKeyPkcs1ASN1 = pkcs1ASN1Encodable.toASN1Primitive();
+        StringWriter stringWriter = new StringWriter()
+        JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(stringWriter)
+        jcaPEMWriter.writeObject((PemObjectGenerator)new PemObject("RSA PRIVATE KEY", privateKeyPkcs1ASN1.getEncoded()))
+        jcaPEMWriter.close();
+        String pkcs1pem = stringWriter.toString(); // -----BEGIN RSA PRIVATE KEY-----...
+        PEMParser parser = new PEMParser(new StringReader(pkcs1pem))
+        def obj = parser.readObject()
+        parser.close()
+        obj
+    }
+
+    private void setPemKeyPair(PEMKeyPair obj) {
         if(!Security.getProvider('BC')) {
             Security.addProvider(new BouncyCastleProvider())
         }
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC")
-        if(obj in PEMKeyPair) {
-            if(converter.getKeyPair(obj as PEMKeyPair).private.modulus.bitLength() < 2048) {
-                String message = 'Private keys smaller than 2048 are not allowed.'
-                message += '  Generate a new key pair 2048 bits or larger.\n\n'
-                message += 'Decrypt your old values using:\n\n    '
-                message += 'echo \'ciphertext\' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey path/to/id_rsa'
-                message += '\n\nSee "Enforcing stronger RSA keys" section of the wiki article.'
-                throw new KeyPairDecodeException(message)
-            }
-            key_pair = converter.getKeyPair(obj as PEMKeyPair)
-        } else {
-            throw new KeyPairDecodeException("Could not decode KeyPair from pem String.  Unable to handle ${obj.class}")
+        KeyPair parsedKeyPair = converter.getKeyPair(obj)
+        if(parsedKeyPair.private.modulus.bitLength() < 2048) {
+            String message = 'Private keys smaller than 2048 are not allowed.'
+            message += '  Generate a new key pair 2048 bits or larger.\n\n'
+            message += 'Decrypt your old values using:\n\n    '
+            message += 'echo \'ciphertext\' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey path/to/id_rsa'
+            message += '\n\nSee "Enforcing stronger RSA keys" section of the wiki article.'
+            throw new KeyPairDecodeException(message)
         }
+        key_pair = parsedKeyPair
     }
 
     /**
