@@ -417,18 +417,26 @@ class SecurityIOTest extends GroovyTestCase {
             5*5
         }
         assert runtime < 10
-        runtime = timing {
-            // Set an implicit value.  Minimum execution time is 100ms random between 100-200ms.
-            mysecret = avoidTimingAttack(30) {
-                avoidTimingAttack(-50) {
-                    5*5
+        Integer limit = 5
+        Integer current = 0
+        while({->
+            if(current > limit) {
+                return false
+            }
+            runtime = timing {
+                // Set an implicit value.  Minimum execution time is 100ms random between 100-200ms.
+                mysecret = avoidTimingAttack(30) {
+                    avoidTimingAttack(-50) {
+                        5*5
+                    }
                 }
             }
-        }
+            runtime >= 55
+        }()) continue
         assert mysecret == 25
         assert runtime >= 30
-        // 70 to allow a 20ms overage buffer
-        assert runtime < 70
+        // 55 to allow a 5ms overage buffer
+        assert runtime < 55
     }
     @Test public void test_SecurityIO_avoidTimingAttack_time_overflow() {
         Integer mysecret = 0
