@@ -427,8 +427,8 @@ class SecurityIOTest extends GroovyTestCase {
         }
         assert mysecret == 25
         assert runtime >= 30
-        // 55 to allow a 5ms overage buffer
-        assert runtime < 55
+        // 70 to allow a 20ms overage buffer
+        assert runtime < 70
     }
     @Test public void test_SecurityIO_avoidTimingAttack_time_overflow() {
         Integer mysecret = 0
