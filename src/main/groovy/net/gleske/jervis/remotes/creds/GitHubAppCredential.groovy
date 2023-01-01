@@ -25,6 +25,7 @@ import net.gleske.jervis.remotes.interfaces.GitHubAppTokenCredential
   */
 class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceSupport {
     GitHubAppRsaCredential credential
+
     /**
       The default GitHub API URL.
       */
@@ -37,9 +38,24 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
       */
     String installation_id
 
+    /**
+      The URL which will be used for API requests to GitHub.
+      */
     String github_api_url
 
     Map headers = [:]
+
+    /**
+      The scope a GitHub token should have when it is created.  By default, full
+      GitHub app scope.  Learn more about
+      <a href="https://docs.github.com/en/rest/apps/apps?apiVersion=2022-11-28#create-an-installation-access-token-for-an-app" target=_blank>available scopes when creating a token for a GitHub app</a>.
+
+      <h2>Sample usage</h2>
+<pre><code>
+github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "read"]]
+</code></pre>
+      */
+    Map scope = [:]
 
     private GitHubAppRsaCredential rsaCredential
     private GitHubAppTokenCredential tokenCredential
@@ -90,5 +106,14 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
       */
     String getInstallation_id() {
         this.installation_id
+    }
+
+    /**
+      A hash of the App ID, Installation ID, and requested token scope.
+
+      @return A <tt>SHA-256</tt> hash value.
+      */
+    String getHash() {
+        [rsaCredential.getAppID(), getInstallation_id(), this.scope.inspect()].join('\n').digest('SHA-256')
     }
 }
