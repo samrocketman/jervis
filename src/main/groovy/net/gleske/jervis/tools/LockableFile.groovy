@@ -29,7 +29,7 @@ import java.nio.channels.OverlappingFileLockException
 class LockableFile extends File {
 
     /**
-      Same as a <tt>{@link ava.io.File}</tt> with extra functionality for
+      Same as a <tt>{@link java.io.File}</tt> with extra functionality for
       creating exclusive locks on the <tt>File</tt> via
       <tt>{@link java.nio.channels.FileLock}</tt>.
 
