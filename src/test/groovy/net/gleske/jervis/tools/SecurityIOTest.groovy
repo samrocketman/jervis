@@ -44,6 +44,22 @@ class SecurityIOTest extends GroovyTestCase {
         Long after = Instant.now().toEpochMilli()
         after - before
     }
+
+    /**
+      Executes a closure of code up to a limit of retries.
+      @param limit The max number of retries.
+      @param body A closure to execute that must return a <tt>Boolean</tt>
+                  <tt>true</tt> to retry or <tt>false</tt> to stop retrying.
+      */
+    private void maxRetries(Integer limit, Closure body) {
+        Integer current = 0
+        while({->
+            if(current > limit) {
+                return false
+            }
+            body()
+        }()) continue
+    }
     //set up before every test
     @Before protected void setUp() {
         security = new SecurityIO()
@@ -386,16 +402,10 @@ class SecurityIOTest extends GroovyTestCase {
         assert runtime >= 0
         // 55 to allow a 5ms overage buffer
         assert runtime < 55
-        Integer limit = 5
-        Integer current = 0
         Long runtime2
         // Loop over randomness calculation with a limit of 5 iterations to
         // avoid randomly getting the same timing twice.
-        while({->
-            if(current > limit) {
-                return false
-            }
-            current++
+        maxRetries(5) {
             runtime2 = timing {
                 // Force code to randomly delay up to 200ms
                 avoidTimingAttack(-50) {
@@ -403,7 +413,7 @@ class SecurityIOTest extends GroovyTestCase {
                 }
             }
             runtime2 == runtime
-        }()) continue
+        }
         assert mysecret == 4
         assert runtime2 >= 0
         // 55 to allow a 5ms overage buffer
@@ -417,12 +427,7 @@ class SecurityIOTest extends GroovyTestCase {
             5*5
         }
         assert runtime < 10
-        Integer limit = 5
-        Integer current = 0
-        while({->
-            if(current > limit) {
-                return false
-            }
+        maxRetries(5) {
             runtime = timing {
                 // Set an implicit value.  Minimum execution time is 100ms random between 100-200ms.
                 mysecret = avoidTimingAttack(30) {
@@ -432,7 +437,7 @@ class SecurityIOTest extends GroovyTestCase {
                 }
             }
             runtime >= 55
-        }()) continue
+        }
         assert mysecret == 25
         assert runtime >= 30
         // 55 to allow a 5ms overage buffer
