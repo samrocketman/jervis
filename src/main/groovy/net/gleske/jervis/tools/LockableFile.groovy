@@ -118,9 +118,6 @@ new LockableFile('/path/to/file').withLockedWriter { Writer w ->
                   parameter.
       */
     void withLockedWriter(Closure body) {
-        if(!exists()) {
-            createNewFile()
-        }
         withLock {
             withWriter(body)
         }

@@ -36,7 +36,7 @@ class LockableFileTest extends GroovyAssert {
         threads += [Thread.start {
             Integer order = threads.size()
             sleep(100)
-            new LockableFile('/tmp/foo').withLockedWriter { Writer w ->
+            new LockableFile(tempfile).withLockedWriter { Writer w ->
                 w << 'friend'
             }
             complete_order << 1
@@ -44,7 +44,7 @@ class LockableFileTest extends GroovyAssert {
 
         // Take 200ms to write to file
         threads += [Thread.start {
-            new LockableFile('/tmp/foo').withLockedWriter { Writer w ->
+            new LockableFile(tempfile).withLockedWriter { Writer w ->
                 w << 'hello'
                 sleep(200)
             }
@@ -56,6 +56,6 @@ class LockableFileTest extends GroovyAssert {
 
         assert complete_order == [2, 1]
         // Test reading
-        assert (new LockableFile('/tmp/foo').getTextWithLock()) == 'friend'
+        assert (new LockableFile(tempfile).getTextWithLock()) == 'friend'
     }
 }
