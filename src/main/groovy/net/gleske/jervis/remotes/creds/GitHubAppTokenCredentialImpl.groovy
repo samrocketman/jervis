@@ -18,6 +18,8 @@ package net.gleske.jervis.remotes.creds
 
 import net.gleske.jervis.remotes.interfaces.GitHubAppTokenCredential
 
+import java.time.Instant
+
 /**
   A basic implementation of the
   <tt>{@link net.gleske.jervis.remotes.interfaces.GitHubAppTokenCredential}</tt>.
@@ -31,6 +33,7 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
       expiration.
       */
     private Map cache = [:]
+    private String hash
     String token
     String expiration
 
@@ -54,23 +57,32 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
         }
         this.renew_buffer
     }
-	
     Boolean isExpired(String hash) {
-        if(!(hash in cache.keySet()) || !cache[hash].expires_at || !cache[hash].token) {
+        this.hash = hash
+        if(!getExpiration() || !getToken()) {
             return true
         }
-        this.token = cache[hash].token
-        this.expiration = cache[hash].expires_at
         isExpired()
     }
 
     Boolean isExpired() {
-        isExpired(Instant.parse(this.expiration))
+        if(!getExpiration()) {
+            return true
+        }
+        isExpired(Instant.parse(getExpiration()))
     }
     Boolean isExpired(Instant expires) {
+        Long renewAt = expires.epochSecond - getRenew_buffer()
+        Instant now = new Date().toInstant()
+        now.epochSecond >= renewAt
     }
     void updateTokenWith(String token, String expiration, String hash)
-    String getExpiration()
+
+    String getExpiration() {
+        this.cache[this.hash]?.expires_at
+    }
+
     String getToken() {
+        this.cache[this.hash]?.token
     }
 }
