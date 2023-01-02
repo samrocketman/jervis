@@ -25,6 +25,13 @@ package net.gleske.jervis.remotes.interfaces
   */
 interface GitHubAppRsaCredential extends JervisCredential {
 
+
+    /**
+      Returns an ID unique to this credential to differentiate it from other
+      credentials.
+      */
+    String getId()
+
     /**
       Returns the GitHub App ID for the app installed into GitHub orgs and
       users.

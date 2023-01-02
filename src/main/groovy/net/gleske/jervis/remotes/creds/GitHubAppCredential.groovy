@@ -27,7 +27,7 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
     GitHubAppRsaCredential credential
 
     /**
-      The default GitHub API URL.
+      The public hosted GitHub API URL.
       */
     static String DEFAULT_GITHUB_API = 'https://api.github.com/'
 
@@ -99,21 +99,33 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
     }
 
     /**
+      Resolves installation ID for the GitHub app if it is not defined.
+      */
+    private void resolveInstallationId() {
+        if(this.installation_id) {
+            return
+        }
+        // TODO: resolve installation ID
+    }
+
+
+    /**
       If installation ID is not set, then it will automatically resolve an ID
       from app installations.  Automatic resolution will be attempted from the
       list of app installations based on the owner.  If owner is not set then
       the first item in the list of installations is selected.
       */
     String getInstallation_id() {
+        resolveInstallationId()
         this.installation_id
     }
 
     /**
-      A hash of the App ID, Installation ID, and requested token scope.
+      A hash of <tt>{@link net.gleske.jervis.remotes.interfaces.GitHubAppRsaCredential#getId()}</tt> and requested token scope.
 
       @return A <tt>SHA-256</tt> hash value.
       */
     String getHash() {
-        [rsaCredential.getAppID(), getInstallation_id(), this.scope.inspect()].join('\n').digest('SHA-256')
+        [rsaCredential.getId(), this.scope.inspect()].join('\n').digest('SHA-256')
     }
 }

@@ -26,33 +26,42 @@ import net.gleske.jervis.remotes.interfaces.GitHubAppRsaCredential
   */
 
 class GitHubAppRsaCredentialImpl implements GitHubAppRsaCredential {
-    String installation_id
+    /**
+      The GitHub App ID for a GitHub credential.
+      */
     String appID
-    String apiUri
-    String owner
+
+    /**
+      The GitHub API URL for querying GitHub App API in case of self-hosted
+      GitHub Enterprise.  Defaults to <tt>{@link net.gleske.jervis.remotes.creds.GitHubAppCredential#DEFAULT_GITHUB_API}</tt>.
+      */
+    String apiUri = GitHubAppCredential.DEFAULT_GITHUB_API
+
+    /**
+      When querying for App installations this is necessary to select the
+      install for a user or organization where the GitHub App is installed.
+      */
+    String owner = ''
+
+    /**
+      A private key for a GitHub App necessary for signing JSON web tokens.
+      */
     String privateKey
 
-    private static String GITHUB_API_URI = 'https://api.github.com/'
-
-    GitHubAppRsaCredentialImpl(String github_app_id) {
+    GitHubAppRsaCredentialImpl(String github_app_id, String private_key) {
         this.appID = github_app_id
+        this.privateKey = private_key
     }
 
-    private void resolveInstallationId() {
-    }
-
-    String getInstallation_id() {
-        if(!this.installation_id) {
-            resolveInstallationId()
-        }
-        this.installation_id
-    }
-
-    String getApiUri() {
-        this.apiUrl ?: this.GITHUB_API_URI
-    }
-
-    String getOwner() {
-        this.owner ?: ''
+    /**
+      An ID unique to this credential.
+      */
+    String getId() {
+        [
+            this.apiUri,
+            this.appID,
+            this.owner,
+            this.privateKey
+        ].join('\n').digest('SHA-256')
     }
 }
