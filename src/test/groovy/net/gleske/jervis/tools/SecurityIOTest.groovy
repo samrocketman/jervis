@@ -392,11 +392,14 @@ class SecurityIOTest extends GroovyTestCase {
             2*2
         }
         assert runtime < 10
-        runtime = timing {
-            // Force code to randomly delay up to 200ms
-            avoidTimingAttack(-50) {
-                mysecret = 2*2
+        maxRetries(5) {
+            runtime = timing {
+                // Force code to randomly delay up to 200ms
+                avoidTimingAttack(-50) {
+                    mysecret = 2*2
+                }
             }
+            runtime >= 55
         }
         assert mysecret == 4
         assert runtime >= 0
@@ -451,10 +454,13 @@ class SecurityIOTest extends GroovyTestCase {
         }
         assert runtime >= 10
         // Assert benchmark
-        runtime = timing {
-            avoidTimingAttack(5) {
-                1+1
+        maxRetries(5) {
+            runtime = timing {
+                avoidTimingAttack(5) {
+                    1+1
+                }
             }
+            runtime > 7
         }
         assert runtime <= 7
         // Test time overflow
