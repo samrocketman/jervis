@@ -231,8 +231,13 @@ class VaultAppRoleCredential implements VaultCredential, ReadonlyTokenCredential
       */
     Long renew_buffer = 5
 
+    /**
+      Returns renew buffer.  Does not allow renew buffer to be undefined or go below zero.
+
+      @return <tt>0</tt> or a <tt>renew_buffer</tt> greater than <tt>0</tt>.
+      */
     Long getRenew_buffer() {
-        if(renew_buffer >= ttl) {
+        if(!renew_buffer || renew_buffer <= 0 || renew_buffer >= ttl) {
             return 0
         }
         this.renew_buffer
