@@ -29,8 +29,9 @@ interface GitHubAppTokenCredential extends TokenCredential {
       other.  A hash will be provided in case there's a backend cache.  This
       method could load from the cache before returning the <tt>Boolean</tt>.
 
-      <p>The hash is unique to the token provided by <tt>{@link net.gleske.jervis.remotes.creds.GitHubAppCredential#getHash()}</tt>.</p>
-
+      @param hash Unique to the token provided by
+                  <tt>{@link net.gleske.jervis.remotes.creds.GitHubAppCredential#getHash()}</tt>.
+                  It can be used for caching and restoring cached tokens.
       @return Returns <tt>true</tt> if the GitHub token is expired requiring
               another to be issued.
       */
