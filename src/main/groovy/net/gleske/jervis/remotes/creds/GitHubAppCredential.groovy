@@ -36,7 +36,7 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
       extra API calls.  Querying for the app installation.  This ID is used
       when issuing ephemeral GitHub API tokens.
       */
-    String installation_id
+    private String installation_id
 
     /**
       The URL which will be used for API requests to GitHub.
@@ -105,7 +105,18 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
         if(this.installation_id) {
             return
         }
-        // TODO: resolve installation ID
+        List installations = apiFetch('app/installations')
+        if(!installations) {
+            throw new GitHubAppException('No GitHub App installations found.  Did you install the GitHub App after creating it?')
+        }
+        String installOwner = tokenCredential.getOwner()
+        if(!installOwner) {
+            this.installation_id = installations.first().id
+        } else {
+            this.installation_id = installations.find {
+                it?.account?.login == installOwner || it?.account?.slug == installOwner
+            }?.id
+        }
     }
 
 
@@ -115,7 +126,7 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
       list of app installations based on the owner.  If owner is not set then
       the first item in the list of installations is selected.
       */
-    String getInstallation_id() {
+    private String getInstallation_id() {
         resolveInstallationId()
         this.installation_id
     }
