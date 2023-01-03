@@ -24,12 +24,8 @@ import net.gleske.jervis.remotes.interfaces.GitHubAppTokenCredential
   Provides GitHub App Credential for API authentication.
   */
 class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceSupport {
-    GitHubAppRsaCredential credential
-
-    /**
-      The public hosted GitHub API URL.
-      */
-    static String DEFAULT_GITHUB_API = 'https://api.github.com/'
+    private GitHubAppRsaCredential rsaCredential
+    private GitHubAppTokenCredential tokenCredential
 
     /**
       Optionally set an installation ID for a GitHub app.  Set this to avoid
@@ -39,64 +35,9 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
     private String installation_id
 
     /**
-      The URL which will be used for API requests to GitHub.
+      A JSON Web Token (JWT) issued for GitHub App API authentication.
       */
-    String github_api_url
-
-    Map headers = [:]
-
-    /**
-      The scope a GitHub token should have when it is created.  By default, full
-      GitHub app scope.  Learn more about
-      <a href="https://docs.github.com/en/rest/apps/apps?apiVersion=2022-11-28#create-an-installation-access-token-for-an-app" target=_blank>available scopes when creating a token for a GitHub app</a>.
-
-      <h2>Sample usage</h2>
-<pre><code>
-github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "read"]]
-</code></pre>
-      */
-    Map scope = [:]
-
-    private GitHubAppRsaCredential rsaCredential
-    private GitHubAppTokenCredential tokenCredential
-
-    /**
-      Creates a new instance of a <tt>GitHubAppCredential</tt> meant to serve
-      as an easy to use credential in API clients such as
-      <tt>{@link net.gleske.jervis.remotes.GitHubGraphQL}</tt>
-      and
-      <tt>{@link net.gleske.jervis.remotes.GitHub}</tt>.
-
-      @param rsaCredential Is an RSA private key with other GitHub app details
-                           such as GitHub App ID and owner of an installation
-                           which would be use to retrieve the
-                           <tt>{@link #installation_id}</tt>.
-      @param tokenCredential This will be used to store ephemeral tokens issued
-                             by the GitHub App.  This parameter is provided as
-                             a means to securely store the token in any
-                             credential backend of choice.  As opposed to
-                             storing the token within this class instance.
-                             This is necessary due Jenkins serialization of
-                             data to disk in Jenkins pipelines.  Refer to the
-                             interface for a recommended example.
-      */
-    GitHubAppCredential(GitHubAppRsaCredential rsaCredential, GitHubAppTokenCredential tokenCredential) {
-        if(addTrailingSlash(credential.getApiUri()) == this.DEFAULT_GITHUB_API) {
-            this.github_api_url = this.DEFAULT_GITHUB_API
-        }
-    }
-
-    String baseUrl() {
-        this.github_api_url
-    }
-
-    Map header(Map headers = [:]) {
-        this.headers
-    }
-
-    String getToken() {
-        tokenCredential.getToken()
-    }
+    private String jwtToken
 
     /**
       Resolves installation ID for the GitHub app if it is not defined.
@@ -125,10 +66,87 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
       from app installations.  Automatic resolution will be attempted from the
       list of app installations based on the owner.  If owner is not set then
       the first item in the list of installations is selected.
+
+      @return An installation ID for the installed GitHub App.
       */
     private String getInstallation_id() {
         resolveInstallationId()
         this.installation_id
+    }
+
+    /**
+      The public hosted GitHub API URL.
+      */
+    static String DEFAULT_GITHUB_API = 'https://api.github.com/'
+
+    /**
+      The URL which will be used for API requests to GitHub.
+      */
+    String github_api_url
+
+    /**
+      Pre-defined headers to add to the request.
+      */
+    Map headers = [:]
+
+    /**
+      The scope a GitHub token should have when it is created.  By default, full
+      GitHub app scope.  Learn more about
+      <a href="https://docs.github.com/en/rest/apps/apps?apiVersion=2022-11-28#create-an-installation-access-token-for-an-app" target=_blank>available scopes when creating a token for a GitHub app</a>.
+
+      <h2>Sample usage</h2>
+<pre><code>
+github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "read"]]
+</code></pre>
+      */
+    Map scope = [:]
+
+    /**
+      Creates a new instance of a <tt>GitHubAppCredential</tt> meant to serve
+      as an easy to use credential in API clients such as
+      <tt>{@link net.gleske.jervis.remotes.GitHubGraphQL}</tt>
+      and
+      <tt>{@link net.gleske.jervis.remotes.GitHub}</tt>.
+
+      @param rsaCredential Is an RSA private key with other GitHub app details
+                           such as GitHub App ID and owner of an installation
+                           which would be use to retrieve the
+                           <tt>{@link #installation_id}</tt>.
+      @param tokenCredential This will be used to store ephemeral tokens issued
+                             by the GitHub App.  This parameter is provided as
+                             a means to securely store the token in any
+                             credential backend of choice.  As opposed to
+                             storing the token within this class instance.
+                             This is necessary due Jenkins serialization of
+                             data to disk in Jenkins pipelines.  Refer to the
+                             interface for a recommended example.
+      */
+    GitHubAppCredential(GitHubAppRsaCredential rsaCredential, GitHubAppTokenCredential tokenCredential) {
+        String rsaApiUrl = addTrailingSlash(credential.getApiUri())
+        this.github_api_url = (rsaApiUrl == this.DEFAULT_GITHUB_API) ? this.DEFAULT_GITHUB_API : rsaApiUrl
+        this.rsaCredential = rsaCredential
+        this.tokenCredential = tokenCredential
+    }
+
+    String baseUrl() {
+        this.github_api_url
+    }
+
+    Map header(Map headers = [:]) {
+        SecurityIO operator = new SecurityIO(rsaCredential.getPrivateKey())
+        if(!this.jwtToken || !operator.verifyGitHubJWTPayload(jwtToken)) {
+            this.jwtToken = operator.getGitHubJWT(rsaCredential.getAppID())
+        }
+        Map tempHeaders = this.headers + headers
+        tempHeaders['Authorization'] = "Bearer ${this.jwtToken}"
+        if(!('Accept' in tempHeaders.keySet())) {
+            tempHeaders['Accept'] = 'application/vnd.github+json'
+        }
+        tempHeaders
+    }
+
+    String getToken() {
+        tokenCredential.getToken()
     }
 
     /**
