@@ -16,8 +16,6 @@
 
 package net.gleske.jervis.remotes.interfaces
 
-import java.time.Instant
-
 /**
   Provides a high level interface for ephemeral API tokens issued by a GitHub
   App installation.

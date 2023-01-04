@@ -16,9 +16,11 @@
 
 package net.gleske.jervis.remotes.creds
 
+import net.gleske.jervis.exceptions.GitHubAppException
 import net.gleske.jervis.remotes.SimpleRestServiceSupport
 import net.gleske.jervis.remotes.interfaces.GitHubAppRsaCredential
 import net.gleske.jervis.remotes.interfaces.GitHubAppTokenCredential
+import net.gleske.jervis.tools.SecurityIO
 
 /**
   Provides GitHub App Credential for API authentication.
@@ -47,16 +49,16 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
             return
         }
         List installations = apiFetch('app/installations')
-        if(!installations) {
-            throw new GitHubAppException('No GitHub App installations found.  Did you install the GitHub App after creating it?')
-        }
         String installOwner = tokenCredential.getOwner()
-        if(!installOwner) {
-            this.installation_id = installations.first().id
-        } else {
+        if(installOwner) {
             this.installation_id = installations.find {
                 it?.account?.login == installOwner || it?.account?.slug == installOwner
             }?.id
+        } else {
+            this.installation_id = installations.first().id
+        }
+        if(!this.installation_id) {
+            throw new GitHubAppException('No GitHub App installations found.  Did you install the GitHub App after creating it?')
         }
     }
 

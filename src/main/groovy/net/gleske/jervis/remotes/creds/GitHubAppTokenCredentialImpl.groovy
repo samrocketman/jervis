@@ -136,9 +136,18 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
     void updateTokenWith(String token, String expiration, String hash) {
         this.hash = hash
         this.cache[hash].token = token
+        setExpiration(expiration)
         this.cache[hash].expires_at = expiration
         // Removes expired cache entries
         cleanupCache()
+    }
+
+    /**
+      Sets the expiration for a given token.
+      @param expiration An ISO instant formatted string like <tt>{@link java.time.Instant#toString()}</tt>.
+      */
+    void setExpiration(String expiration) {
+        this.cache[this.hash].expires_at = expiration
     }
 
     /**
