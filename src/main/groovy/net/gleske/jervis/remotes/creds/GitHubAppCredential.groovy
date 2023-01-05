@@ -77,7 +77,7 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
     }
 
     /**
-      The public hosted GitHub API URL.
+      The public hosted GitHub API URL.  Set to <tt>https://api.github.com/</tt>.
       */
     static String DEFAULT_GITHUB_API = 'https://api.github.com/'
 
