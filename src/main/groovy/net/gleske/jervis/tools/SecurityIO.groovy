@@ -23,12 +23,16 @@ import net.gleske.jervis.exceptions.SecurityException
 import groovy.json.JsonBuilder
 import java.security.KeyFactory
 import java.security.KeyPair
+import java.security.MessageDigest
+import java.security.SecureRandom
 import java.security.Security
 import java.security.Signature
-import java.security.MessageDigest
 import java.security.spec.PKCS8EncodedKeySpec
 import java.time.Duration
 import java.time.Instant
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1Primitive
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
@@ -592,5 +596,15 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         MessageDigest digest = MessageDigest.getInstance('SHA-256')
         digest.update(input.bytes)
         new BigInteger(1,digest.digest()).toString(16).padLeft(32, '0')
+    }
+
+    /**
+      Returns a random of bytes.
+      */
+    static byte[] randomBytes(int size) {
+        SecureRandom rand = SecureRandom.getInstance("SHA1PRNG")
+        byte[] random = new byte[size]
+        rand.nextBytes(random)
+        random
     }
 }
