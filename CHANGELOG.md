@@ -107,6 +107,8 @@ The following classes have been renamed.
 - More flexibility has been added to static method
   `net.gleske.jervis.remotes.SimpleRestService.apiFetch()`.
 - Enhancements in `net.gleske.jervis.tools.SecurityIO`
+  - Added AES-256 encryption with 5000 iteration SHA-256 checksum calculation of
+    IV.
   - Added RS256 aglorithm for data signing and verification.
   - Added GitHub JSON Web Token (JWT) creation and verification support.
   - Added generic JWT verification.
