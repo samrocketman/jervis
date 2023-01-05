@@ -356,7 +356,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
       @param  content Base64 encoded <tt>String</tt>.
       @return         A decoded <tt>String</tt>.
      */
-    public String decodeBase64String(String content) {
+    static String decodeBase64String(String content) {
         new String(content.trim().decodeBase64())
     }
 
@@ -366,7 +366,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
       @param  content Base64 encoded <tt>String</tt>.
       @return         Decoded raw <tt>Bytes</tt>.
      */
-    public byte[] decodeBase64Bytes(String content) {
+    static byte[] decodeBase64Bytes(String content) {
         content.trim().decodeBase64()
     }
 
@@ -386,7 +386,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
       @param  content URL safe base64 encoded <tt>String</tt>.
       @return         Decoded raw <tt>Bytes</tt>.
      */
-    public byte[] decodeBase64UrlBytes(String content) {
+    static byte[] decodeBase64UrlBytes(String content) {
         decodeBase64Bytes(content.tr('-_', '+/'))
     }
 
@@ -396,7 +396,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
       @param  content A plain <tt>String</tt>.
       @return         Base64 encoded <tt>String</tt>
      */
-    public String encodeBase64(String content) {
+    static String encodeBase64(String content) {
         content.bytes.encodeBase64().toString()
     }
 
@@ -406,7 +406,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
       @param  content Base64 encoded <tt>String</tt>.
       @return         Decoded raw <tt>Bytes</tt>.
      */
-    public String encodeBase64(byte[] content) {
+    static String encodeBase64(byte[] content) {
         content.encodeBase64().toString()
     }
 
@@ -416,7 +416,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
       @param  content A plain <tt>String</tt>.
       @return         A URL safe Base64 encoded <tt>String</tt>.
      */
-    public String encodeBase64Url(String content) {
+    static String encodeBase64Url(String content) {
         encodeBase64(content).tr('+/', '-_')
     }
 
@@ -426,7 +426,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
       @param  content Raw <tt>Bytes</tt>.
       @return         A URL safe Base64 encoded <tt>String</tt>.
      */
-    public String encodeBase64Url(byte[] content) {
+    static String encodeBase64Url(byte[] content) {
         encodeBase64(content).tr('+/', '-_')
     }
 
@@ -442,7 +442,7 @@ echo -n 'plaintext' | openssl rsautl -encrypt -inkey ./id_rsa.pub -pubin | opens
       @param  plaintext A plain text <tt>String</tt> to be encrypted.
       @return A Base64 encoded cipher text or more generically: <tt>ciphertext = base64encode(RSAPublicKeyEncrypt(plaintext))</tt>
      */
-    public String rsaEncrypt(String plaintext) throws EncryptException {
+    String rsaEncrypt(String plaintext) throws EncryptException {
         if(!key_pair) {
             throw new EncryptException('key_pair is not set.')
         }
@@ -464,7 +464,7 @@ echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey /
       @param  ciphertext A Base64 encoded cipher text <tt>String</tt> to be decrypted.
       @return A plain text <tt>String</tt> or more generically: <tt>plaintext = RSAPrivateKeyDecrypt(base64decode(ciphertext))</tt>
      */
-    public String rsaDecrypt(String ciphertext) throws DecryptException {
+    String rsaDecrypt(String ciphertext) throws DecryptException {
         if(!key_pair) {
             throw new DecryptException('key_pair is not set.')
         }
@@ -483,14 +483,8 @@ echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey /
       @param  property A simple object that can take multiple types to check against.
       @return Returns <tt>true</tt> if the field can potentially be decrypted.
      */
-    public Boolean isSecureField(def field) {
-        if(field instanceof Map) {
-            String[] field_keys = field.keySet() as String[]
-            if('secure' in field_keys) {
-                return true
-            }
-        }
-        return false
+    static Boolean isSecureField(def field) {
+        (field instanceof Map) && ('secure' in field.keySet())
     }
 
     /**
