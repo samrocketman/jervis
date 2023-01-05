@@ -55,7 +55,7 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
       @return <tt>0</tt> or a <tt>renew_buffer</tt> greater than <tt>0</tt>.
       */
     Long getRenew_buffer() {
-        if(!renew_buffer || renew_buffer <= 0 || renew_buffer >= ttl) {
+        if(!renew_buffer || renew_buffer <= 0) {
             return 0
         }
         this.renew_buffer

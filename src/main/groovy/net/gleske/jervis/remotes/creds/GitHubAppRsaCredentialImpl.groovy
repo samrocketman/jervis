@@ -17,6 +17,7 @@
 package net.gleske.jervis.remotes.creds
 
 import net.gleske.jervis.remotes.interfaces.GitHubAppRsaCredential
+import net.gleske.jervis.tools.SecurityIO
 
 /**
   A basic implementation of the
@@ -57,11 +58,13 @@ class GitHubAppRsaCredentialImpl implements GitHubAppRsaCredential {
       An ID unique to this credential.
       */
     String getId() {
-        [
-            this.apiUri,
-            this.appID,
-            this.owner,
-            this.privateKey
-        ].join('\n').digest('SHA-256')
+        SecurityIO.sha256Sum(
+            [
+                this.apiUri,
+                this.appID,
+                this.owner,
+                this.privateKey
+            ].join('\n')
+        )
     }
 }

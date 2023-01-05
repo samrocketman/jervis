@@ -49,7 +49,7 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
             return
         }
         List installations = apiFetch('app/installations')
-        String installOwner = tokenCredential.getOwner()
+        String installOwner = rsaCredential.getOwner()
         if(installOwner) {
             this.installation_id = installations.find {
                 it?.account?.login == installOwner || it?.account?.slug == installOwner
@@ -124,7 +124,7 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
                              interface for a recommended example.
       */
     GitHubAppCredential(GitHubAppRsaCredential rsaCredential, GitHubAppTokenCredential tokenCredential) {
-        String rsaApiUrl = addTrailingSlash(credential.getApiUri())
+        String rsaApiUrl = addTrailingSlash(rsaCredential.getApiUri())
         this.github_api_url = (rsaApiUrl == this.DEFAULT_GITHUB_API) ? this.DEFAULT_GITHUB_API : rsaApiUrl
         this.rsaCredential = rsaCredential
         this.tokenCredential = tokenCredential
@@ -148,6 +148,12 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
     }
 
     String getToken() {
+        String hash = getHash()
+        if(tokenCredential.isExpired(hash)) {
+            String id = getInstallation_id()
+            Map response = apiFetch("app/installations/${id}/access_tokens", [:], 'POST', this.scope)
+            tokenCredential.updateTokenWith(response.token, response.expires_at, hash)
+        }
         tokenCredential.getToken()
     }
 
@@ -157,6 +163,6 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
       @return A <tt>SHA-256</tt> hash value.
       */
     String getHash() {
-        [rsaCredential.getId(), this.scope.inspect()].join('\n').digest('SHA-256')
+        SecurityIO.sha256Sum([rsaCredential.getId(), this.scope.inspect()].join('\n'))
     }
 }
