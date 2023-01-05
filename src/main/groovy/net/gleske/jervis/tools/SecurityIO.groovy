@@ -605,12 +605,23 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
 
     /**
       Returns a random of bytes.
+      @param size Number of random bytes to generate.
+      @return Random bytes.
       */
     static byte[] randomBytes(int size) {
         SecureRandom rand = SecureRandom.getInstance("SHA1PRNG")
         byte[] random = new byte[size]
         rand.nextBytes(random)
         random
+    }
+
+    /**
+      Base64 encoded random bytes.
+      @param size Number of random bytes to generate.
+      @return Random bytes wrapped with Base64 encoding.
+      */
+    static String randomBytesBase64(int size) {
+        encodeBase64(randomBytes(size))
     }
 
     static byte[] encryptWithAES256(byte[] secret, byte[] iv, String data) {
