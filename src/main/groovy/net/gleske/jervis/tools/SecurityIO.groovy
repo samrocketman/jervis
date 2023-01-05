@@ -588,8 +588,18 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       @return A SHA-256 hex <tt>String</tt>.
       */
     static String sha256Sum(String input) {
+        sha256Sum(input.bytes)
+    }
+
+    /**
+      Calculates SHA-256 sum from a byte-array.
+
+      @param input A <tt>String</tt> to calculate a SHA-256 digest.
+      @return A SHA-256 hex <tt>String</tt>.
+      */
+    static String sha256Sum(byte[] input) {
         MessageDigest digest = MessageDigest.getInstance('SHA-256')
-        digest.update(input.bytes)
+        digest.update(input)
         new BigInteger(1,digest.digest()).toString(16).padLeft(32, '0')
     }
 
@@ -604,18 +614,30 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
     }
 
     static byte[] encryptWithAES256(byte[] secret, byte[] iv, String data) {
+        // Calculate IV with 5k iterations of SHA-256 sum
+        String checksum = sha256Sum(iv)
+        5000.times {
+            checksum = sha256Sum([iv, checksum.bytes].flatten() as byte[])
+        }
+        byte[] b_iv = checksum.substring(0, 16).getBytes('UTF-8')
         // 32 comes from 256 / 8 in AES-256
         SecretKey key = new SecretKeySpec(secret, 0, 32, 'AES')
         Cipher cipher = Cipher.getInstance('AES/CBC/PKCS5Padding')
-        cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv))
+        cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(b_iv))
         cipher.doFinal(data.getBytes('UTF-8'))
     }
 
     static String decryptWithAES256(byte[] secret, byte[] iv, byte[] data) {
+        // Calculate IV with 5k iterations of SHA-256 sum
+        String checksum = sha256Sum(iv)
+        5000.times {
+            checksum = sha256Sum([iv, checksum.bytes].flatten() as byte[])
+        }
+        byte[] b_iv = checksum.substring(0, 16).getBytes('UTF-8')
         // 32 comes from 256 / 8 in AES-256
         SecretKey key = new SecretKeySpec(secret, 0, 32, 'AES')
         Cipher cipher = Cipher.getInstance('AES/CBC/PKCS5Padding')
-        cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv))
+        cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(b_iv))
         new String(cipher.doFinal(data), 'UTF-8')
     }
 
