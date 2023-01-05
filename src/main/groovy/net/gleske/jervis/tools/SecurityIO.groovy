@@ -25,6 +25,7 @@ import java.security.KeyFactory
 import java.security.KeyPair
 import java.security.Security
 import java.security.Signature
+import java.security.MessageDigest
 import java.security.spec.PKCS8EncodedKeySpec
 import java.time.Duration
 import java.time.Instant
@@ -568,7 +569,7 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
                   as it can and this function will enforce a constant time.
       @return Returns the result from the executed closure.
       */
-    public static def avoidTimingAttack(Integer milliseconds, Closure body) {
+    static def avoidTimingAttack(Integer milliseconds, Closure body) {
         Long desiredTime = (milliseconds < 0) ? (new Random().nextInt(milliseconds * -1)) : milliseconds
         Long before = Instant.now().toEpochMilli()
         // execute code
@@ -579,5 +580,17 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
             sleep(remainingTime)
         }
         result
+    }
+
+    /**
+      Calculates SHA-256 sum from a String.
+
+      @param input A <tt>String</tt> to calculate a SHA-256 digest.
+      @return A SHA-256 hex <tt>String</tt>.
+      */
+    static String sha256Sum(String input) {
+        MessageDigest digest = MessageDigest.getInstance('SHA-256')
+        digest.update(input.bytes)
+        new BigInteger(1,digest.digest()).toString(16).padLeft(32, '0')
     }
 }
