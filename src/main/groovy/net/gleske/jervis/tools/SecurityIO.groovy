@@ -651,9 +651,9 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         }
         byte[] b_iv = checksum.substring(0, 16).getBytes('UTF-8')
         // 32 comes from 256 / 8 in AES-256
-        SecretKey key = new SecretKeySpec(secret, 0, 32, 'AES')
+        SecretKey key = new SecretKeySpec(padForAES256(secret), 0, 32, 'AES')
         Cipher cipher = Cipher.getInstance('AES/CBC/PKCS5Padding')
-        cipher.init(Cipher.ENCRYPT_MODE, padForAES256(key), new IvParameterSpec(b_iv))
+        cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(b_iv))
         cipher.doFinal(data.getBytes('UTF-8'))
     }
 
@@ -671,10 +671,10 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         new String(cipher.doFinal(data), 'UTF-8')
     }
 
-    static byte[] encryptWithAES256Base64(String secret, String iv, String data) {
+    static String encryptWithAES256Base64(String secret, String iv, String data) {
         byte[] b_secret = decodeBase64Bytes(secret)
         byte[] b_iv = decodeBase64Bytes(iv)
-        encryptWithAES256(b_secret, b_iv, data)
+        encodeBase64(encryptWithAES256(b_secret, b_iv, data))
     }
 
     static String decryptWithAES256Base64(String secret, String iv, String data) {
