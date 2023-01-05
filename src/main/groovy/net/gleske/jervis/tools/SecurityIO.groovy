@@ -31,6 +31,7 @@ import java.security.spec.PKCS8EncodedKeySpec
 import java.time.Duration
 import java.time.Instant
 import javax.crypto.Cipher
+import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import org.bouncycastle.asn1.ASN1Encodable
@@ -148,7 +149,7 @@ println key_pair.public.modulus.bitLength()
       */
     Boolean verifyRS256Base64Url(String signature, String data) {
         Signature publicSignature = Signature.getInstance("SHA256withRSA")
-        publicSignature.initVerify(key_pair.public);
+        publicSignature.initVerify(key_pair.public)
         publicSignature.update(data.bytes)
         publicSignature.verify(decodeBase64UrlBytes(signature))
     }
@@ -297,13 +298,13 @@ if(security.verifyGitHubJWTPayload(jwt)) {
     }
 
     private PEMKeyPair getKeypairFromPkcs8(PrivateKeyInfo pkInfo) {
-        ASN1Encodable pkcs1ASN1Encodable = pkInfo.parsePrivateKey();
-        ASN1Primitive privateKeyPkcs1ASN1 = pkcs1ASN1Encodable.toASN1Primitive();
+        ASN1Encodable pkcs1ASN1Encodable = pkInfo.parsePrivateKey()
+        ASN1Primitive privateKeyPkcs1ASN1 = pkcs1ASN1Encodable.toASN1Primitive()
         StringWriter stringWriter = new StringWriter()
         JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(stringWriter)
         jcaPEMWriter.writeObject((PemObjectGenerator)new PemObject("RSA PRIVATE KEY", privateKeyPkcs1ASN1.getEncoded()))
-        jcaPEMWriter.close();
-        String pkcs1pem = stringWriter.toString(); // -----BEGIN RSA PRIVATE KEY-----...
+        jcaPEMWriter.close()
+        String pkcs1pem = stringWriter.toString() // -----BEGIN RSA PRIVATE KEY-----...
         PEMParser parser = new PEMParser(new StringReader(pkcs1pem))
         def obj = parser.readObject()
         parser.close()
@@ -600,5 +601,61 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         byte[] random = new byte[size]
         rand.nextBytes(random)
         random
+    }
+
+    static byte[] encryptWithAES256(byte[] secret, byte[] iv, String data) {
+        // 32 comes from 256 / 8 in AES-256
+        SecretKey key = new SecretKeySpec(secret, 0, 32, 'AES')
+        Cipher cipher = Cipher.getInstance('AES/CBC/PKCS5Padding')
+        cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv))
+        cipher.doFinal(data.getBytes('UTF-8'))
+    }
+
+    static String decryptWithAES256(byte[] secret, byte[] iv, byte[] data) {
+        // 32 comes from 256 / 8 in AES-256
+        SecretKey key = new SecretKeySpec(secret, 0, 32, 'AES')
+        Cipher cipher = Cipher.getInstance('AES/CBC/PKCS5Padding')
+        cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv))
+        new String(cipher.doFinal(data), 'UTF-8')
+    }
+
+    static byte[] encryptWithAES256Base64(String secret, String iv, String data) {
+        byte[] b_secret = decodeBase64Bytes(secret)
+        byte[] b_iv = decodeBase64Bytes(iv)
+        encryptWithAES256(b_secret, b_iv, data)
+    }
+
+    static String decryptWithAES256Base64(String secret, String iv, String data) {
+        byte[] b_secret = decodeBase64Bytes(secret)
+        byte[] b_iv = decodeBase64Bytes(iv)
+        byte[] b_data = decodeBase64Bytes(data)
+        decryptWithAES256(b_secret, b_iv, b_data)
+    }
+
+    /**
+      Repeats the passphrase until enough bytes are provided for AES-256.
+      @return Returns 256 character String assumed to be 256 bytes of UTF-8
+      */
+    static String padForAES256(String passphrase) {
+        Integer len = passphrase.length()
+        if(len >= 256) {
+            return passphrase
+        }
+        String padded = passphrase * ((256 / len) + 1)
+        padded.substring(0, 256)
+    }
+
+    static String encryptWithAES256(String passphrase, String data) {
+        String padded_passphrase = padForAES256(passphrase)
+        byte[] b_secret = padded_passphrase.getBytes('UTF-8')
+        byte[] b_iv = padded_passphrase.substring(0, 16).getBytes('UTF-8')
+        encodeBase64(encryptWithAES256(b_secret, b_iv, data))
+    }
+    static String decryptWithAES256(String passphrase, String data) {
+        String padded_passphrase = padForAES256(passphrase)
+        byte[] b_secret = padded_passphrase.getBytes('UTF-8')
+        byte[] b_iv = padded_passphrase.substring(0, 16).getBytes('UTF-8')
+        byte[] b_data = decodeBase64Bytes(data)
+        decryptWithAES256(b_secret, b_iv, b_data)
     }
 }
