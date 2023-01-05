@@ -24,6 +24,33 @@ import net.gleske.jervis.tools.SecurityIO
 
 /**
   Provides GitHub App Credential for API authentication.
+
+  <h2>Sample usage</h2>
+<pre><code>
+import net.gleske.jervis.remotes.creds.GitHubAppCredential
+import net.gleske.jervis.remotes.creds.GitHubAppRsaCredentialImpl
+import net.gleske.jervis.remotes.creds.GitHubAppTokenCredentialImpl
+
+GitHubAppRsaCredentialImpl rsaCred = new GitHubAppRsaCredentialImpl('123456', new File('private-key.pem').text)
+GitHubAppTokenCredentialImpl tokenCred = new GitHubAppTokenCredentialImpl()
+tokenCred.loadCache = {-&gt;
+    File f = new File('/tmp/cache.yml')
+    if(!f.exists()) {
+        return [:]
+    }
+    def cache = net.gleske.jervis.tools.YamlOperator.loadYamlFrom(f)
+    (cache in Map) ? cache : [:]
+}
+tokenCred.saveCache = { Map cache -&gt;
+    File f = new File('/tmp/cache.yml')
+    net.gleske.jervis.tools.YamlOperator.writeObjToYaml(f, cache)
+}
+
+// Issue a token; if called multiple times then this token will retrieve the
+// token from the cache.  It will issue a new token if the existing token
+// expires.
+new GitHubAppCredential(rsaCred, tokenCred).getToken()
+</code></pre>
   */
 class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceSupport {
     private GitHubAppRsaCredential rsaCredential
@@ -143,6 +170,9 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
         tempHeaders['Authorization'] = "Bearer ${this.jwtToken}"
         if(!('Accept' in tempHeaders.keySet())) {
             tempHeaders['Accept'] = 'application/vnd.github+json'
+        }
+        if(!('X-GitHub-Api-Version' in tempHeaders.keySet())) {
+            tempHeaders['X-GitHub-Api-Version'] = '2022-11-28'
         }
         tempHeaders
     }

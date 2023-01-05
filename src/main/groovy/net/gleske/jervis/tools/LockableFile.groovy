@@ -28,15 +28,15 @@ import java.nio.channels.OverlappingFileLockException
   */
 class LockableFile extends File {
 
-    // sleep up to 1/10th of a second
     /**
-      The interval to wait between trying to obtain the file lock.  This value is milliseconds.
+      The interval to wait between trying to obtain the file lock.  This value
+      is milliseconds.  Defaults to <tt>500</tt> milliseconds.
      */
-    Integer lockWaitSleep = 100
+    Integer lockWaitSleep = 500
 
     void setLockWaitSleep(Integer value) {
         if(!value || value <= 0) {
-            lockWaitSleep = 100
+            lockWaitSleep = 500
             return
         }
         lockWaitSleep = value

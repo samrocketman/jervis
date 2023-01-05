@@ -17,6 +17,7 @@
 package net.gleske.jervis.remotes.creds
 
 import net.gleske.jervis.remotes.interfaces.GitHubAppTokenCredential
+import net.gleske.jervis.tools.LockableFile
 
 import java.time.Instant
 
@@ -39,6 +40,92 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
       The hash to be uses for token storage and lookup.
       */
     private String hash
+
+    /**
+      Load cache if both loading and saving cache are configured.
+      */
+    private void tryLoadCache() {
+        if(!(loadCache && saveCache)) {
+            return
+        }
+        Map cache = this.loadCache()
+        this.cache = cache.withDefault { key -> [:] }
+    }
+
+    /**
+      Save cache if both loading and saving cache are configured.
+      */
+    private void trySaveCache() {
+        if(!(loadCache && saveCache)) {
+            return
+        }
+        this.saveCache(this.cache)
+    }
+
+    /**
+      A function which may obtain a lock file if loading and saving a cache is
+      configured.
+
+      @param body A closure to execute with or without a lock.
+      */
+    private void tryLock(Closure body) {
+        if(loadCache && saveCache) {
+            new LockableFile(this.cacheLockFile).withLock {
+                body()
+            }
+        }
+        else {
+            body()
+        }
+    }
+
+    /**
+      The lock file to
+      */
+    String cacheLockFile = '/dev/shm/jervis-gh-app-token-cache.lock'
+
+    /**
+      A closure which should return a <tt>Map</tt> from loading the cache.
+      Persistent caching of tokens is optional.
+
+      <h2>Sample usage</h2>
+
+      <p><b>WARNING:</b> The cache entries contain sensitive GitHub API tokens
+      and should be encrypted at rest.  This example does not illustrate
+      encryption at rest.  Jenkins provides <tt>{@link hudson.util.Secret}</tt>
+      for symmetric encryption at rest.</p>
+
+      <p>This example shows an insecure file cache. Both <tt>loadCache</tt> and
+      <tt>saveCache</tt> must be set for caching to activate.</p>
+
+<pre><code>
+import net.gleske.jervis.remotes.creds.GitHubAppTokenCredentialImpl
+
+GitHubAppTokenCredentialImpl tokenCred = new GitHubAppTokenCredentialImpl()
+
+tokenCred.loadCache = {->
+    File f = new File('/tmp/cache.yml')
+    if(!f.exists()) {
+        return [:]
+    }
+    def cache = net.gleske.jervis.tools.YamlOperator.loadYamlFrom(f)
+    (cache in Map) ? cache : [:]
+}
+
+tokenCred.saveCache = { Map cache ->
+    File f = new File('/tmp/cache.yml')
+    net.gleske.jervis.tools.YamlOperator.writeObjToYaml(f, cache)
+}
+</code></pre>
+      */
+    Closure loadCache
+
+    /**
+      A closure which which should support a <tt>Map</tt> parameter used to
+      optionally persist a cache.  See <tt>{@link #loadCache}</tt> for an
+      example.
+      */
+    Closure saveCache
 
     /**
       The time buffer before a renewal is forced.  This is to account for clock
@@ -72,9 +159,9 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
       */
     Boolean isExpired(String hash) {
         this.hash = hash
-        // This would normally load from the cache but this example
-        // implementation directly references the cache (internally just a
-        // HashMap).
+        tryLock {
+            tryLoadCache()
+        }
         if(!getExpiration() || !getToken()) {
             return true
         }
@@ -135,11 +222,15 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
       */
     void updateTokenWith(String token, String expiration, String hash) {
         this.hash = hash
-        this.cache[hash].token = token
-        setExpiration(expiration)
-        this.cache[hash].expires_at = expiration
-        // Removes expired cache entries
-        cleanupCache()
+        tryLock {
+            tryLoadCache()
+            this.cache[hash].token = token
+            setExpiration(expiration)
+            this.cache[hash].expires_at = expiration
+            // Removes expired cache entries
+            cleanupCache()
+            trySaveCache()
+        }
     }
 
     /**
