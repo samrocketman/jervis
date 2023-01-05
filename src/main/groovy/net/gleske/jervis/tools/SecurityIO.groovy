@@ -432,7 +432,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
     }
 
     /**
-      Uses RSA asymetric encryption to encrypt a plain text <tt>String</tt> and outputs cipher text.
+      Uses RSA asymmetric encryption to encrypt a plain text <tt>String</tt> and outputs cipher text.
 
       For third party reference, this is essentially executing the following commands in a terminal.
 
@@ -444,17 +444,27 @@ echo -n 'plaintext' | openssl rsautl -encrypt -inkey ./id_rsa.pub -pubin | opens
       @return A Base64 encoded cipher text or more generically: <tt>ciphertext = base64encode(RSAPublicKeyEncrypt(plaintext))</tt>
      */
     String rsaEncrypt(String plaintext) throws EncryptException {
+        byte[] ciphertext = rsaEncryptBytes(plaintext.bytes)
+        encodeBase64(ciphertext)
+    }
+
+    /**
+      Uses RSA asymmetric encryption to encrypt a plain bytes and outputs enciphered bytes.
+      @param plainbytes Plain bytes to be encrypted.
+      @return Enciphered bytes are returned.
+      */
+    byte[] rsaEncryptBytes(byte[] plainbytes) throws EncryptException {
         if(!key_pair) {
             throw new EncryptException('key_pair is not set.')
         }
         AsymmetricBlockCipher encrypt = new PKCS1Encoding(new RSAEngine())
         encrypt.init(true, PublicKeyFactory.createKey(key_pair.public.encoded) as AsymmetricKeyParameter)
-        byte[] ciphertext = encrypt.processBlock(plaintext.bytes, 0, plaintext.bytes.length)
-        encodeBase64(ciphertext)
+        byte[] enciphered = encrypt.processBlock(plainbytes, 0, plainbytes.length)
+        enciphered
     }
 
     /**
-      Uses RSA asymetric encryption to decrypt a cipher text <tt>String</tt> and outputs plain text.
+      Uses RSA asymmetric encryption to decrypt a cipher text <tt>String</tt> and outputs plain text.
 
       For third party reference, this is essentially executing the following commands in a terminal.
 
@@ -466,13 +476,22 @@ echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey /
       @return A plain text <tt>String</tt> or more generically: <tt>plaintext = RSAPrivateKeyDecrypt(base64decode(ciphertext))</tt>
      */
     String rsaDecrypt(String ciphertext) throws DecryptException {
+        byte[] messageBytes = decodeBase64Bytes(ciphertext)
+        (new String(rsaDecryptBytes(messageBytes)))
+    }
+
+    /**
+      Uses RSA asymmetric encryption to decrypt enciphered bytes and returns plain bytes.
+      @param cipherbytes Encrypted bytes.
+      @return Returns decrypted bytes.
+      */
+    byte[] rsaDecryptBytes(byte[] cipherbytes) throws DecryptException {
         if(!key_pair) {
             throw new DecryptException('key_pair is not set.')
         }
         AsymmetricBlockCipher decrypt = new PKCS1Encoding(new RSAEngine())
         decrypt.init(false, PrivateKeyFactory.createKey(key_pair.private.encoded) as AsymmetricKeyParameter)
-        byte[] messageBytes = decodeBase64Bytes(ciphertext)
-        (new String(decrypt.processBlock(messageBytes, 0, messageBytes.length))).trim()
+        decrypt.processBlock(cipherbytes, 0, cipherbytes.length)
     }
 
     /**
@@ -634,7 +653,7 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         // 32 comes from 256 / 8 in AES-256
         SecretKey key = new SecretKeySpec(secret, 0, 32, 'AES')
         Cipher cipher = Cipher.getInstance('AES/CBC/PKCS5Padding')
-        cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(b_iv))
+        cipher.init(Cipher.ENCRYPT_MODE, padForAES256(key), new IvParameterSpec(b_iv))
         cipher.doFinal(data.getBytes('UTF-8'))
     }
 
@@ -646,7 +665,7 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         }
         byte[] b_iv = checksum.substring(0, 16).getBytes('UTF-8')
         // 32 comes from 256 / 8 in AES-256
-        SecretKey key = new SecretKeySpec(secret, 0, 32, 'AES')
+        SecretKey key = new SecretKeySpec(padForAES256(secret), 0, 32, 'AES')
         Cipher cipher = Cipher.getInstance('AES/CBC/PKCS5Padding')
         cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(b_iv))
         new String(cipher.doFinal(data), 'UTF-8')
@@ -676,6 +695,17 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         }
         String padded = passphrase * ((256 / len) + 1)
         padded.substring(0, 256)
+    }
+    static byte[] padForAES256(byte[] input) {
+        if(input.size() >= 256) {
+            return input
+        }
+        Integer n = 256 / input.size() + 1
+        List b_list = []
+        n.times {
+            b_list << input
+        }
+        b_list.flatten()[0..255]
     }
 
     static String encryptWithAES256(String passphrase, String data) {
