@@ -185,7 +185,7 @@ See [SonarQube README](sonarqube/README.md).
 
 # License
 
-    Copyright 2014-2022 Sam Gleske
+    Copyright 2014-2023 Sam Gleske
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
