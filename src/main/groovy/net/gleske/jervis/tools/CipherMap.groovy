@@ -67,8 +67,8 @@ class CipherMap implements Serializable {
                 data
             )
         }
-
     }
+
     /**
       Decrypts the data with AES.
       @param data To be decrypted.
@@ -130,7 +130,7 @@ class CipherMap implements Serializable {
         ]
     }
 
-    void initialize() {
+    private void initialize() {
         this.hidden = [
             age: Instant.now().toString(),
             cipher: newCipher(),
@@ -177,11 +177,12 @@ class CipherMap implements Serializable {
     /**
       Returns an encrypted object as text meant for storing at rest.
 <pre><code>
+age: AES encrypted timestamp
 cipher:
   - asymmetrically encrypted AES secret
   - asymmetrically encrypted AES IV
 data: AES encrypted data
-signature: RS256 Base64URL signature of data
+signature: RS256 Base64URL signature.
 </code></pre>
       */
     String toString() {
