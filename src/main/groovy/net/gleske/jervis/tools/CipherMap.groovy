@@ -17,6 +17,8 @@ package net.gleske.jervis.tools
 
 import net.gleske.jervis.tools.YamlOperator
 
+import java.time.Instant
+
 /**
 
 <pre><code>
@@ -52,18 +54,56 @@ class CipherMap implements Serializable {
         initialize()
     }
 
+    /**
+      Encrypts the data with AES.
+      @param data To be encrypted.
+      @return Returns encrypted String.
+      */
+    private String encrypt(String data) {
+        this.hidden.cipher.with { secret ->
+            return security.encryptWithAES256Base64(
+                security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[0]))),
+                security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[1]))),
+                data
+            )
+        }
+
+    }
+    /**
+      Decrypts the data with AES.
+      @param data To be decrypted.
+      @return Returns the plaintext data.
+      */
+    private String decrypt(String data) {
+        this.hidden.cipher.with { secret ->
+            return security.decryptWithAES256Base64(
+                security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[0]))),
+                security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[1]))),
+                data
+            )
+        }
+    }
+
+    /**
+      Returns a string meant for signing and verifying signed data.
+      */
+    private String signedData(Map obj) {
+        (obj.cipher + [obj.data]).join('\n')
+    }
+
     private Boolean verifyCipherObj(def obj) {
         // Strict type checking
         if(!(obj in Map)) {
             return false
         }
-        if(!(['cipher', 'data', 'signature'] == obj.keySet().toList())) {
+        if(!(['age', 'cipher', 'data', 'signature'] == obj.keySet().toList())) {
             return false
         }
         if(!((obj.cipher in List) && obj.cipher.size() == 2)) {
             return false
         }
         Boolean stringCheck = [
+            obj.age,
             obj.cipher[0],
             obj.cipher[1],
             obj.data,
@@ -72,26 +112,33 @@ class CipherMap implements Serializable {
         if(!(stringCheck)) {
             return false
         }
-        // Asymmetric decryption check
-        obj.cipher.each {
-            this.security.rsaDecrypt(it)
-        }
         // Data integrity check
-        security.verifyRS256Base64Url(obj.signature, obj.data)
+        security.verifyRS256Base64Url(obj.signature, signedData(obj))
     }
 
-    void initialize() {
+    /**
+      Creates a new cipher either for the first time or as part of rotation.
+      @return Returns a new random cipher secret and IV.
+      */
+    private List newCipher() {
         // Get the max size an RSA key can encrypt.  Sometimes this is less
         // than 256 bytes which means padding will be required.
         Integer maxSize = [((security.key_pair.private.modulus.bitLength() / 8) - 11), 256].min()
+        [
+            security.encodeBase64(security.rsaEncryptBytes(security.randomBytes(maxSize))),
+            security.encodeBase64(security.rsaEncryptBytes(security.randomBytes(16)))
+        ]
+    }
+
+    void initialize() {
         this.hidden = [
-            cipher: [
-                security.encodeBase64(security.rsaEncryptBytes(security.randomBytes(maxSize))),
-                security.encodeBase64(security.rsaEncryptBytes(security.randomBytes(16)))
-            ],
+            age: Instant.now().toString(),
+            cipher: newCipher(),
             data: '',
             signature: ''
         ]
+        // Encrypt the cipher age now that the secrets are available.
+        this.hidden.age = encrypt(this.hidden.age)
     }
 
     void leftShift(def input) {
@@ -103,30 +150,28 @@ class CipherMap implements Serializable {
         this.hidden = parsedObj
     }
 
-    void setPlainMap(Map obj) {
-        this.hidden.cipher.with { secret ->
-            this.hidden.data = security.encryptWithAES256Base64(
-                security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[0]))),
-                security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[1]))),
-                YamlOperator.writeObjToYaml([secure_field: obj])
-            )
+    private void rotateSecrets() {
+        Long age = Instant.parse(decrypt(this.hidden.age)).epochSecond
+        Long now = Instant.now().epochSecond
+        // Number of seconds in 30 days
+        Long limit = 2592000
+        if((now - age) < limit) {
+            return
         }
-        this.hidden.signature = security.signRS256Base64Url(this.hidden.data)
+        this.hidden.cipher = newCipher()
+    }
+
+    void setPlainMap(Map obj) {
+        rotateSecrets()
+        this.hidden.data = encrypt(YamlOperator.writeObjToYaml([secure_field: obj]))
+        this.hidden.signature = security.signRS256Base64Url(signedData(this.hidden))
     }
 
     Map getPlainMap() {
         if(!hidden.data) {
             return null
         }
-        String plaintext
-        this.hidden.cipher.with { secret ->
-            plaintext = security.decryptWithAES256Base64(
-                security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[0]))),
-                security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[1]))),
-                this.hidden.data
-            )
-        }
-        YamlOperator.loadYamlFrom(plaintext).secure_field
+        YamlOperator.loadYamlFrom(decrypt(this.hidden.data)).secure_field
     }
 
     /**
