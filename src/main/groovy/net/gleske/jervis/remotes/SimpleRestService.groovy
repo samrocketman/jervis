@@ -121,8 +121,8 @@ class SimpleRestService {
         parse_json = net.gleske.jervis.lang.LifecycleGenerator.getObjectValue(http_headers, 'Parse-JSON', parse_json)
         Boolean response_code = (http_method == 'DELETE')
         response_code = net.gleske.jervis.lang.LifecycleGenerator.getObjectValue(http_headers, 'Response-Code', response_code)
-        Boolean only_response_headers = net.gleske.jervis.lang.LifecycleGenerator.getObjectValue(http_headers, 'Response-Headers', response_code)
-        if(http_method == 'HEAD') {
+        Boolean only_response_headers = net.gleske.jervis.lang.LifecycleGenerator.getObjectValue(http_headers, 'Response-Headers', false)
+        if(!response_code && http_method == 'HEAD') {
             only_response_headers = true
         }
 
@@ -169,11 +169,11 @@ class SimpleRestService {
                 ''
             }
         }
-        if(response_code) {
-            return Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
-        }
         if(only_response_headers) {
             return response_headers
+        }
+        if(response_code) {
+            return Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
         }
         if(!response) {
             return ''

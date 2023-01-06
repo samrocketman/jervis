@@ -42,20 +42,29 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
     private static final String DEFAULT_WEB_URL = 'https://github.com/'
     private static final String DEFAULT_GHE = 'https://github.com/api/v3/'
 
+    /**
+      Optional HTTP headers that can be added to every request.
+      */
+    Map headers = [:]
+
     @Override
     String baseUrl() {
         this.gh_api
     }
 
     @Override
-    Map header(Map http_headers = [:]) {
-        if(!('Accept' in http_headers.keySet())) {
-            http_headers['Accept'] = 'application/vnd.github.v3+json'
+    Map header(Map headers = [:]) {
+        Map tempHeaders = this.headers + headers
+        if(!('Accept' in tempHeaders.keySet())) {
+            tempHeaders['Accept'] = 'application/vnd.github.v3+json'
+        }
+        if(!('X-GitHub-Api-Version' in tempHeaders.keySet())) {
+            tempHeaders['X-GitHub-Api-Version'] = '2022-11-28'
         }
         if(this.getGh_token()) {
-            http_headers['Authorization'] = "token ${this.getGh_token()}".toString()
+            tempHeaders['Authorization'] = "Bearer ${this.getGh_token()}".toString()
         }
-        http_headers
+        tempHeaders
     }
 
     /**

@@ -94,7 +94,7 @@ class GitHubTest extends GroovyTestCase {
     @Test public void test_GitHub_set3Gh_token() {
         mygh.gh_token = 'a'
         assert 'language: groovy\n' == mygh.getFile('samrocketman/jervis', '.travis.yml', 'main')
-        assert request_meta['headers']['Authorization'] == 'token a'
+        assert request_meta['headers']['Authorization'] == 'Bearer a'
     }
     //test GitHub().getWebUrl()
     @Test public void test_GitHub_getWebUrl1() {
@@ -151,20 +151,20 @@ class GitHubTest extends GroovyTestCase {
         mygh.credential = new CredentialsInterfaceHelper.ROCreds()
         assert mygh.gh_token == 'ro secret'
         mygh.getFolderListing('samrocketman/jervis')
-        assert request_meta['headers']?.get('Authorization') == 'token ro secret'
+        assert request_meta['headers']?.get('Authorization') == 'Bearer ro secret'
         mygh.gh_token = 'foo'
         assert mygh.gh_token == 'ro secret'
         mygh.getFolderListing('samrocketman/jervis')
-        assert request_meta['headers']['Authorization'] == 'token ro secret'
+        assert request_meta['headers']['Authorization'] == 'Bearer ro secret'
     }
     @Test public void test_GitHub_credentials_write() {
         mygh.credential = new CredentialsInterfaceHelper.RWCreds()
         assert mygh.gh_token == 'rw secret'
         mygh.getFolderListing('samrocketman/jervis')
-        assert request_meta['headers']['Authorization'] == 'token rw secret'
+        assert request_meta['headers']['Authorization'] == 'Bearer rw secret'
         mygh.gh_token = 'foo'
         assert mygh.gh_token == 'foo'
         mygh.getFolderListing('samrocketman/jervis')
-        assert request_meta['headers']['Authorization'] == 'token foo'
+        assert request_meta['headers']['Authorization'] == 'Bearer foo'
     }
 }
