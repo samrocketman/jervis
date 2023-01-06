@@ -108,7 +108,7 @@ class CipherMap implements Serializable {
             this.hidden.data = security.encryptWithAES256Base64(
                 security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[0]))),
                 security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[1]))),
-                YamlOperator.writeObjToYaml(obj)
+                YamlOperator.writeObjToYaml([secure_field: obj])
             )
         }
         this.hidden.signature = security.signRS256Base64Url(this.hidden.data)
@@ -126,7 +126,7 @@ class CipherMap implements Serializable {
                 this.hidden.data
             )
         }
-        YamlOperator.loadYamlFrom(plaintext)
+        YamlOperator.loadYamlFrom(plaintext).secure_field
     }
 
     /**
