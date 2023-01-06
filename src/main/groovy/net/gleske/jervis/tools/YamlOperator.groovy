@@ -148,4 +148,11 @@ class YamlOperator {
     static def loadYamlFrom(File srcFile) {
         loadYamlFrom(new FileInputStream(srcFile))
     }
+
+    static void catchErrors(Closure body) {
+        try {
+            body()
+        }
+        catch(IOException|org.yaml.snakeyaml.scanner.ScannerException ignored) { }
+    }
 }

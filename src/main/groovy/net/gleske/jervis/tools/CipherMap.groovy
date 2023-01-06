@@ -142,12 +142,14 @@ class CipherMap implements Serializable {
     }
 
     void leftShift(def input) {
-        def parsedObj = YamlOperator.loadYamlFrom(input)
-        if(!verifyCipherObj(parsedObj)) {
-            initialize()
-            return
+        YamlOperator.catchErrors {
+            def parsedObj = YamlOperator.loadYamlFrom(input)
+            if(!verifyCipherObj(parsedObj)) {
+                initialize()
+                return
+            }
+            this.hidden = parsedObj
         }
-        this.hidden = parsedObj
     }
 
     private void rotateSecrets() {

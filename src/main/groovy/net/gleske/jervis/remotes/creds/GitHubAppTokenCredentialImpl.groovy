@@ -17,8 +17,9 @@
 package net.gleske.jervis.remotes.creds
 
 import net.gleske.jervis.remotes.interfaces.GitHubAppTokenCredential
-import net.gleske.jervis.tools.LockableFile
 import net.gleske.jervis.tools.CipherMap
+import net.gleske.jervis.tools.LockableFile
+import net.gleske.jervis.tools.YamlOperator
 
 import java.time.Instant
 
@@ -278,7 +279,8 @@ tokenCred.saveCache = { String cache ->
     private void cleanupCache() {
         // Find expired cache entries.
         List cleanup = this.cache.findAll { hash, entry ->
-            !entry?.expires_at || isExpired(Instant.parse(entry.expires_at))
+            (entry in Map) &&
+            (!entry?.expires_at || isExpired(Instant.parse(entry.expires_at)))
         }.collect { hash, entry ->
             hash
         } ?: []
