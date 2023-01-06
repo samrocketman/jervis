@@ -38,7 +38,13 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
     }
 
     /**
-      The hash to be uses for token storage and lookup.
+      For encrypting at rest and loading encrypted data with regard to
+      persistent cache.
+      */
+    private transient CipherMap cipherMap
+
+    /**
+      The hash to be used for token storage and lookup.
       */
     private String hash
 
@@ -49,8 +55,20 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
         if(!(loadCache && saveCache)) {
             return
         }
-        Map cache = this.loadCache()
-        this.cache = cache.withDefault { key -> [:] }
+        Map temp = [:]
+        String data = this.loadCache()
+        String privateKey = this.getPrivateKey()
+        if(privateKey) {
+            this.cipherMap = new CipherMap(privateKey)
+            cm << data
+        }
+        if(this.cipherMap) {
+            temp = this.cipherMap.getPlainMap()
+        }
+        else {
+            temp = YamlOperator.loadYamlFrom(data)
+        }
+        this.cache = temp.withDefault { key -> [:] }
     }
 
     /**
@@ -60,7 +78,15 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
         if(!(loadCache && saveCache)) {
             return
         }
-        this.saveCache(this.cache)
+        String data
+        if(this.cipherMap) {
+            this.cipherMap.setPlainMap(this.cache)
+            data = this.cipherMap.toString()
+        }
+        else {
+            data = YamlOperator.writeObjToYaml(this.cache)
+        }
+        this.saveCache(data)
     }
 
     /**
@@ -173,7 +199,7 @@ tokenCred.saveCache = { String cache ->
       </li>
       </ul>
       */
-    Closure resolvePrivateKey
+    Closure getPrivateKey = {-> '' }
 
     /**
       The time buffer before a renewal is forced.  This is to account for clock
