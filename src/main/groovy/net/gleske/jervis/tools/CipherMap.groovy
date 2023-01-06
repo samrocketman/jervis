@@ -88,7 +88,7 @@ class CipherMap implements Serializable {
       Returns a string meant for signing and verifying signed data.
       */
     private String signedData(Map obj) {
-        (obj.cipher + [obj.data]).join('\n')
+        ([obj.age] + obj.cipher + [obj.data]).join('\n')
     }
 
     private Boolean verifyCipherObj(def obj) {
