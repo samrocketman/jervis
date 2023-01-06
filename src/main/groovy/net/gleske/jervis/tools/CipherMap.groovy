@@ -169,7 +169,7 @@ class CipherMap implements Serializable {
 
     Map getPlainMap() {
         if(!hidden.data) {
-            return null
+            return [:]
         }
         YamlOperator.loadYamlFrom(decrypt(this.hidden.data)).secure_field
     }
