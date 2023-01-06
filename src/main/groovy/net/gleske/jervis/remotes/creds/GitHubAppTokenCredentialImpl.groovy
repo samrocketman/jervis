@@ -30,6 +30,43 @@ import java.time.Instant
   example, see <tt>GitHubAppTokenCredential</tt> API documentation for examples.
   */
 class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, ReadonlyTokenCredential {
+
+    GitHubAppTokenCredentialImpl(Closure resolvePrivateKeyString) {
+        setupClosures(resolvePrivateKeyString)
+    }
+    GitHubAppTokenCredentialImpl(String privateKeyPath) {
+        setupClosures {->
+            new File(privateKeyPath).text
+        }
+    }
+
+    /**
+      Configures the load and save cache closures for a default file-based
+      approach.  This occurs when a valid RSA key is provided.
+      */
+    private void setupClosures(Closure pkey) {
+        this.getPrivateKey = pkey
+        // quickly test private key strength (it will throw an exception for a weak key)
+        new CipherMap(this.getPrivateKey())
+        this.loadCache = {->
+            File f = new File(this.cacheFile)
+            if(!f.exists()) {
+                return ''
+            }
+            f.text
+        }
+        this.saveCache = { String cache ->
+            File f = new File(this.cacheFile)
+            // initialize file with private permissions
+            if(!f.exists()) {
+                ['/bin/sh', '-ec', "touch '${this.cacheFile}'; chmod 600 '${this.cacheFile}'"].execute()
+            }
+            // write out cache
+            f.withWriter('UTF-8') { Writer w ->
+                w << cache
+            }
+        }
+    }
     /**
       An internal cache meant for storing issued credentials until their
       expiration.
@@ -116,6 +153,12 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
       fast.
       */
     String cacheLockFile = '/dev/shm/jervis-gh-app-token-cache.lock'
+
+    /**
+      The path to the persistent cache file if this class is initialized with
+      encryption at rest.
+      */
+    String cacheFile = '/dev/shm/jervis-gh-app-token-cache.yml'
 
     /**
       A closure which should return a <tt>String</tt> from loading the cache.

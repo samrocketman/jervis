@@ -16,6 +16,7 @@
 package net.gleske.jervis.tools
 
 import net.gleske.jervis.tools.YamlOperator
+import java.security.SignatureException
 
 import java.time.Instant
 
@@ -56,6 +57,7 @@ class CipherMap implements Serializable {
 
     /**
       Encrypts the data with AES.
+
       @param data To be encrypted.
       @return Returns encrypted String.
       */
@@ -113,7 +115,12 @@ class CipherMap implements Serializable {
             return false
         }
         // Data integrity check
-        security.verifyRS256Base64Url(obj.signature, signedData(obj))
+        try {
+            security.verifyRS256Base64Url(obj.signature, signedData(obj))
+        }
+        catch(SignatureException ignored) {
+            return false
+        }
     }
 
     /**
