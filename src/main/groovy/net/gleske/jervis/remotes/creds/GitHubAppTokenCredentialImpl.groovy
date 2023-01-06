@@ -60,7 +60,7 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
         String privateKey = this.getPrivateKey()
         if(privateKey) {
             this.cipherMap = new CipherMap(privateKey)
-            cm << data
+            this.cipherMap << data
         }
         if(this.cipherMap) {
             temp = this.cipherMap.getPlainMap()
@@ -125,7 +125,7 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
       <p><b>WARNING:</b> The cache entries contain sensitive GitHub API tokens
       and should be encrypted at rest.  This example is plain text tokens.  It
       is recommended to encrypt at rest.  Refer to
-      <tt>{@link #resolvePrivateKey}</tt> which includes an example for
+      <tt>{@link #getPrivateKey}</tt> which includes an example for
       encrypting at rest.</p>
 
       <p>This example shows an insecure file cache. Both <tt>loadCache</tt> and
@@ -159,7 +159,7 @@ tokenCred.saveCache = { String cache ->
     /**
       A closure which which should support a <tt>String</tt> parameter used to
       optionally persist a cache.  See <tt>{@link #loadCache}</tt> (plaintext)
-      or <tt>{@link #resolvePrivateKey}</tt> (encrypted at rest) for an example.
+      or <tt>{@link #getPrivateKey}</tt> (encrypted at rest) for an example.
       */
     Closure saveCache
 
