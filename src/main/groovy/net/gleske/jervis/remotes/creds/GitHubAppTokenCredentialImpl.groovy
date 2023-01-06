@@ -18,6 +18,7 @@ package net.gleske.jervis.remotes.creds
 
 import net.gleske.jervis.remotes.interfaces.GitHubAppTokenCredential
 import net.gleske.jervis.tools.LockableFile
+import net.gleske.jervis.tools.CipherMap
 
 import java.time.Instant
 
@@ -32,7 +33,7 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
       An internal cache meant for storing issued credentials until their
       expiration.
       */
-    private Map cache = [:].withDefault { key ->
+    private transient Map cache = [:].withDefault { key ->
         [:]
     }
 
@@ -80,20 +81,26 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
     }
 
     /**
-      The lock file to
+      The path to a lock file which serializes read and write access to
+      persistent cache where tokens issued by GitHub App are stored.
+
+      Defaults to <tt>/dev/shm/jervis-gh-app-token-cache.lock</tt>.  On Linux,
+      <tt>/dev/shm</tt> is similar to <tt>/tmp</tt> but is a RAM disk so very
+      fast.
       */
     String cacheLockFile = '/dev/shm/jervis-gh-app-token-cache.lock'
 
     /**
-      A closure which should return a <tt>Map</tt> from loading the cache.
+      A closure which should return a <tt>String</tt> from loading the cache.
       Persistent caching of tokens is optional.
 
       <h2>Sample usage</h2>
 
       <p><b>WARNING:</b> The cache entries contain sensitive GitHub API tokens
-      and should be encrypted at rest.  This example does not illustrate
-      encryption at rest.  Jenkins provides <tt>{@link hudson.util.Secret}</tt>
-      for symmetric encryption at rest.</p>
+      and should be encrypted at rest.  This example is plain text tokens.  It
+      is recommended to encrypt at rest.  Refer to
+      <tt>{@link #resolvePrivateKey}</tt> which includes an example for
+      encrypting at rest.</p>
 
       <p>This example shows an insecure file cache. Both <tt>loadCache</tt> and
       <tt>saveCache</tt> must be set for caching to activate.</p>
@@ -104,17 +111,20 @@ import net.gleske.jervis.remotes.creds.GitHubAppTokenCredentialImpl
 GitHubAppTokenCredentialImpl tokenCred = new GitHubAppTokenCredentialImpl()
 
 tokenCred.loadCache = {->
-    File f = new File('/tmp/cache.yml')
+    File f = new File('/dev/shm/cache.yml')
     if(!f.exists()) {
-        return [:]
+        return ''
     }
-    def cache = net.gleske.jervis.tools.YamlOperator.loadYamlFrom(f)
-    (cache in Map) ? cache : [:]
+    f.text
 }
 
-tokenCred.saveCache = { Map cache ->
-    File f = new File('/tmp/cache.yml')
-    net.gleske.jervis.tools.YamlOperator.writeObjToYaml(f, cache)
+tokenCred.saveCache = { String cache ->
+    // initialize file with private permissions
+    ['/bin/sh', '-ec', 'touch /dev/shm/cache.yml; chmod 600 /dev/shm/cache.yml'].execute()
+    // write out cache
+    new File('/dev/shm/cache.yml').withWriter('UTF-8') { Writer w ->
+        w << cache + '\n'
+    }
 }
 </code></pre>
       */
@@ -126,6 +136,12 @@ tokenCred.saveCache = { Map cache ->
       example.
       */
     Closure saveCache
+
+    /**
+      A closure which should return an RSA private key.  This is used to
+      encipher and encrypt the GitHub token cache at rest.  This is only called if
+      */
+    Closure resolvePrivateKey
 
     /**
       The time buffer before a renewal is forced.  This is to account for clock
