@@ -277,8 +277,10 @@ tokenCred.saveCache = { String cache ->
       */
     Boolean isExpired(String hash) {
         this.hash = hash
-        tryLock {
-            tryLoadCache()
+        if(!this.cache) {
+            tryLock {
+                tryLoadCache()
+            }
         }
         if(!getExpiration() || !getToken()) {
             return true

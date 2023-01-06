@@ -131,6 +131,11 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
     Map scope = [:]
 
     /**
+      A unique hash identifying this credential.
+      */
+    String hash
+
+    /**
       Creates a new instance of a <tt>GitHubAppCredential</tt> meant to serve
       as an easy to use credential in API clients such as
       <tt>{@link net.gleske.jervis.remotes.GitHubGraphQL}</tt>
@@ -188,11 +193,34 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
     }
 
     /**
+      Sets the RSA credential used for authentication.
+      */
+      void setRsaCredential(GitHubAppRsaCredential cred) {
+          this.rsaCredential = cred
+          // reset hash
+          this.hash = ''
+          getHash()
+      }
+
+    /**
+      Sets the scope for issuing tokens.
+      */
+      void setScope(Map scope) {
+          this.scope = scope
+          // reset hash
+          this.hash = ''
+          getHash()
+      }
+
+    /**
       A hash of <tt>{@link net.gleske.jervis.remotes.interfaces.GitHubAppRsaCredential#getId()}</tt> and requested token scope.
 
       @return A <tt>SHA-256</tt> hash value.
       */
     String getHash() {
-        SecurityIO.sha256Sum([rsaCredential.getId(), this.scope.inspect()].join('\n'))
+        if(!this.hash) {
+            this.hash = SecurityIO.sha256Sum([rsaCredential.getId(), this.scope.inspect()].join('\n'))
+        }
+        this.hash
     }
 }

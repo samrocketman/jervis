@@ -54,17 +54,22 @@ class GitHubAppRsaCredentialImpl implements GitHubAppRsaCredential {
         this.privateKey = private_key
     }
 
+    private String id
+
     /**
       An ID unique to this credential.
       */
     String getId() {
-        SecurityIO.sha256Sum(
-            [
-                this.apiUri,
-                this.appID,
-                this.owner,
-                this.privateKey
-            ].join('\n')
-        )
+        if(!this.id) {
+            this.id = SecurityIO.sha256Sum(
+                [
+                    this.apiUri,
+                    this.appID,
+                    this.owner,
+                    this.privateKey
+                ].join('\n')
+            )
+        }
+        this.id
     }
 }
