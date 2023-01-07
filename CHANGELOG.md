@@ -37,6 +37,15 @@ Usage of the sedfile is the following.
 find * -type f -name '*.groovy' -exec sed -i -f ../sedfile {} +
 ```
 
+Manually search for and change the following methods.  See [Major API changes
+section](#2.0-major-api-changes) for details.
+
+```bash
+# change id_rsa_keysize usage to rsa_keysize
+grep -r '\([gs]et\)\{0,1\}[Ii]d_rsa_keysize' *
+```
+
+<a name="2.0-major-api-changes"></a>
 ### Major API changes
 
 The following classes have been renamed.
@@ -49,6 +58,14 @@ The following classes have been renamed.
 | `net.gleske.jervis.lang.platformValidator`  | `net.gleske.jervis.lang.PlatformValidator`  |
 | `net.gleske.jervis.lang.toolchainValidator` | `net.gleske.jervis.lang.ToolchainValidator` |
 | `net.gleske.jervis.tools.securityIO`        | `net.gleske.jervis.tools.SecurityIO`        |
+
+The following methods and fields have been renamed or removed.
+
+| Class        | Old method name       | New method name    |
+| ------------ | --------------------- | ------------------ |
+| `SecurityIO` | `getId_rsa_keysize()` | `getRsa_keysize()` |
+| `SecurityIO` | `setId_rsa_keysize()` | Removed            |
+| `SecurityIO` | `id_rsa_keysize`      | Removed            |
 
 ### Warnings:
 
@@ -113,6 +130,11 @@ The following classes have been renamed.
   - Added GitHub JSON Web Token (JWT) creation and verification support.
   - Added generic JWT verification.
   - `avoidTimingAttack()` static function available with usage documentation.
+  - `getRsa_keysize()` always returns the calculated key size if any.
+- Enhancements in [`net.gleske.jervis.remotes.GitHub`][GitHub]
+  - Added support for adding headers to all requests via `GitHub.headers` field.
+  - Updated client HTTP headers to match GitHub v3 REST API version
+    `2022-11-28`.
 
 ### Bug fixes:
 
@@ -137,6 +159,7 @@ The following classes have been renamed.
   Gradle 3 or higher.
 - Added support for building on Groovy versions 2.4 through 4.0.
 
+[GitHub]: src/main/groovy/net/gleske/jervis/remotes/GitHub.groovy
 [StaticMocking]: src/test/groovy/net/gleske/jervis/remotes/StaticMocking.groovy
 [TokenCredential]: src/main/groovy/net/gleske/jervis/remotes/interfaces/TokenCredential.groovy
 [VaultAppRoleCredential]: src/main/groovy/net/gleske/jervis/remotes/creds/VaultAppRoleCredential.groovy

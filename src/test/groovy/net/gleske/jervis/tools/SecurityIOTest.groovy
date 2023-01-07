@@ -85,7 +85,7 @@ class SecurityIOTest extends GroovyTestCase {
     @Test public void test_SecurityIO_init_private_pem() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         security = new SecurityIO(url.content.text)
-        assert security.id_rsa_keysize == 2048
+        assert security.rsa_keysize == 2048
     }
     //test SecurityIO().decodeBase64()
     @Test public void test_SecurityIO_decodeBase64String() {
@@ -145,20 +145,20 @@ class SecurityIOTest extends GroovyTestCase {
         assert !security.key_pair
         security.key_pair = url.content.text
         assert security.key_pair
-        assert security.id_rsa_keysize == 2048
+        assert security.rsa_keysize == 2048
         url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
         security.key_pair = url.content.text
-        assert security.id_rsa_keysize == 4096
+        assert security.rsa_keysize == 4096
     }
     @Test public void test_SecurityIO_load_pkcs8_key() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_pkcs8_2048')
         assert !security.key_pair
         security.key_pair = url.content.text
         assert security.key_pair
-        assert security.id_rsa_keysize == 2048
+        assert security.rsa_keysize == 2048
         url = this.getClass().getResource('/rsa_keys/good_id_rsa_pkcs8_4096')
         security.key_pair = url.content.text
-        assert security.id_rsa_keysize == 4096
+        assert security.rsa_keysize == 4096
     }
     @Test public void test_SecurityIO_bad_key_pair() {
         shouldFail(KeyPairDecodeException) {
@@ -179,11 +179,6 @@ class SecurityIOTest extends GroovyTestCase {
         def ciphertext = security.rsaEncrypt('some text')
         def plaintext = security.rsaDecrypt(ciphertext)
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(security)
-    }
-    @Test public void test_SecurityIO_setId_rsa_keysize() {
-        shouldFail(SecurityException) {
-            security.id_rsa_keysize = 1024
-        }
     }
     @Test public void test_SecurityIO_fail_on_weak_keys() {
         URL url = this.getClass().getResource('/rsa_keys/bad_id_rsa_1024')

@@ -24,19 +24,41 @@ import java.time.Instant
 
 <pre><code>
 import net.gleske.jervis.tools.CipherMap
-import net.gleske.jervis.tools.SecurityIO
-import net.gleske.jervis.tools.YamlOperator
-Map m = [hello: 'world']
+import java.time.Instant
 
-def co = new CipherMap(new File('jervis-jenkins-as-a-service.2023-01-04.private-key.pem').text)
+Map plainTextMap = [hello: 'world']
 
-co.plainMap = m
+Long time(Closure c) {
+    Instant before = Instant.now()
+    c()
+    Instant after = Instant.now()
+    after.epochSecond - before.epochSecond
+}
 
-def c2 = new CipherMap(new File('jervis-jenkins-as-a-service.2023-01-04.private-key.pem').text)
+def cmap1 = new CipherMap(new File('src/test/resources/rsa_keys/good_id_rsa_4096'))
 
-c2 &lt;&lt; co.toString()
+Long timing = time {
+    cmap1.plainMap = plainTextMap
+}
+println("Time encrypting: ${timing} second(s)")
 
-c2.plainMap
+def cmap2 = new CipherMap(new File('src/test/resources/rsa_keys/good_id_rsa_4096'))
+timing = time {
+    cmap2 << cmap1.toString()
+    cmap2.plainMap
+}
+
+println("Time to load from String and decrypt: ${timing} second(s)")
+
+// re-encrypt with stronger security
+def cmap3 = new CipherMap(new File('src/test/resources/rsa_keys/good_id_rsa_4096').text)
+cmap3.hash_iterations = 100100
+
+timing = time {
+    cmap3.plainMap = cmap1.plainMap
+}
+println("Time migrating to stronger encryption with 100100 hash iterations: ${timing} second(s)")
+println(['\n', '='*80, 'Encrypted contents with CipherMap toString()'.with { ' '*(40 - it.size()/2) + it }, '='*80, "\n${cmap3}"].join('\n'))
 </code></pre>
   */
 class CipherMap implements Serializable {
@@ -50,9 +72,19 @@ class CipherMap implements Serializable {
       */
     private transient Map hidden
 
+    /**
+      Customize the number of SHA-256 hash iterations performed during AES
+      encryption operations.
+      */
+    Integer hash_iterations = 5000
+
     CipherMap(String private_key_pem) {
         this.security = new SecurityIO(private_key_pem)
         initialize()
+    }
+
+    CipherMap(File privateKey) {
+        this(privateKey.text)
     }
 
     /**
@@ -66,7 +98,8 @@ class CipherMap implements Serializable {
             return security.encryptWithAES256Base64(
                 security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[0]))),
                 security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[1]))),
-                data
+                data,
+                this.hash_iterations
             )
         }
     }
@@ -81,7 +114,8 @@ class CipherMap implements Serializable {
             return security.decryptWithAES256Base64(
                 security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[0]))),
                 security.encodeBase64(security.rsaDecryptBytes(security.decodeBase64Bytes(secret[1]))),
-                data
+                data,
+                this.hash_iterations
             )
         }
     }
@@ -130,7 +164,7 @@ class CipherMap implements Serializable {
     private List newCipher() {
         // Get the max size an RSA key can encrypt.  Sometimes this is less
         // than 256 bytes which means padding will be required.
-        Integer maxSize = [((security.key_pair.private.modulus.bitLength() / 8) - 11), 256].min()
+        Integer maxSize = [((security.getRsa_keysize() / 8) - 11), 256].min()
         [
             security.encodeBase64(security.rsaEncryptBytes(security.randomBytes(maxSize))),
             security.encodeBase64(security.rsaEncryptBytes(security.randomBytes(16)))
@@ -160,13 +194,18 @@ class CipherMap implements Serializable {
     }
 
     private void rotateSecrets() {
-        Long age = Instant.parse(decrypt(this.hidden.age)).epochSecond
+        Long age
+        try {
+            age = Instant.parse(decrypt(this.hidden.age)).epochSecond
+        }
+        catch(java.time.format.DateTimeParseException ignored) { }
         Long now = Instant.now().epochSecond
         // Number of seconds in 30 days
         Long limit = 2592000
-        if((now - age) < limit) {
+        if(age && ((now - age) < limit)) {
             return
         }
+        this.hidden.age = encrypt(Instant.now().toString())
         this.hidden.cipher = newCipher()
     }
 

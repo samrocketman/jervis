@@ -63,11 +63,11 @@ import org.bouncycastle.util.io.pem.PemObjectGenerator
 import net.gleske.jervis.tools.SecurityIO
 
 if(!(new File('/tmp/id_rsa').exists())) {
-    'openssl genrsa -out /tmp/id_rsa 2048'.execute().waitFor()
+    'openssl genrsa -out /tmp/id_rsa 4096'.execute().waitFor()
     'openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub'.execute().waitFor()
 }
 def security = new SecurityIO(new File("/tmp/id_rsa").text)
-println 'Key size: ' + security.id_rsa_keysize.toString()
+println "Key size: ${security.rsa_keysize}"
 def s = security.rsaEncrypt('hello friend')
 println 'Length of encrypted output: ' + s.length()
 println 'Encrypted string:'
@@ -81,24 +81,19 @@ new File('/tmp/id_rsa.pub').delete()
 class SecurityIO implements Serializable {
 
     /**
-      Shortcut to getting the key size of <tt>{@link #key_pair}</tt>.
-
-      @see #getId_rsa_keysize()
-     */
-    public int id_rsa_keysize = 0
+      The default number of iterations of SHA-256 hashing of the AES IV when AES
+      encryption or decryption is performed.  Default: <tt>5000</tt> iterations.
+      */
+    static Integer DEFAULT_AES_ITERATIONS = 5000
 
     /**
-      A decoded RSA key pair used for encryption and decryption.  The key size can be determined from the modulus.  For example,
-
-<pre><code>
-println key_pair.private.modulus.bitLength()
-println key_pair.public.modulus.bitLength()
-</code></pre>
+      A decoded RSA key pair used for encryption and decryption, and signing.
 
       @see #setKey_pair(java.lang.String)
+      @see #getRsa_keysize()
 
      */
-    public KeyPair key_pair
+    transient KeyPair key_pair
 
     /**
       Instantiates an unconfigured instance of this class.  Call
@@ -169,7 +164,7 @@ println key_pair.public.modulus.bitLength()
 import net.gleske.jervis.tools.SecurityIO
 
 if(!(new File('/tmp/id_rsa').exists())) {
-    'openssl genrsa -out /tmp/id_rsa 2048'.execute().waitFor()
+    'openssl genrsa -out /tmp/id_rsa 4096'.execute().waitFor()
     'openssl rsa -in /tmp/id_rsa -pubout -outform pem -out /tmp/id_rsa.pub'.execute().waitFor()
 }
 def security = new SecurityIO(new File("/tmp/id_rsa").text)
@@ -296,7 +291,9 @@ if(security.verifyGitHubJWTPayload(jwt)) {
             throw new KeyPairDecodeException("Could not decode KeyPair from pem String.  Unable to handle ${obj.class}")
         }
     }
-
+    /**
+      Converts from PKCS8 private to PKCS1 pair.
+      */
     private PEMKeyPair getKeypairFromPkcs8(PrivateKeyInfo pkInfo) {
         ASN1Encodable pkcs1ASN1Encodable = pkInfo.parsePrivateKey()
         ASN1Primitive privateKeyPkcs1ASN1 = pkcs1ASN1Encodable.toASN1Primitive()
@@ -311,6 +308,11 @@ if(security.verifyGitHubJWTPayload(jwt)) {
         obj
     }
 
+    /**
+      Creates a <tt>{@link java.security.KeyPair}</tt> from  <tt>PEMKeyPair</tt>
+      and checks minimum key strength.  Sets <tt>{@link #key_pair}</tt> which is
+      used for encryption, decryption, and signing.
+      */
     private void setPemKeyPair(PEMKeyPair obj) {
         if(!Security.getProvider('BC')) {
             Security.addProvider(new BouncyCastleProvider())
@@ -329,26 +331,21 @@ if(security.verifyGitHubJWTPayload(jwt)) {
     }
 
     /**
-      Gets the <tt>{@link #id_rsa_keysize}</tt> from the decoded private key.
+      Returns the calculated RSA private key size in bits calculated from the
+      <tt>{@link #key_pair}</tt>.  e.g. a 4096-bit RSA key will return <tt>4096</tt>.
+
+      <h2>Sample usage</h2>
+<pre><code>
+import net.gleske.jervis.tools.SecurityIO
+def security = new SecurityIO(new File("/tmp/id_rsa").text)
+println "Key size: ${security.rsa_keysize}"
+</code></pre>
 
       @returns Key size of the private key if <tt>{@link #key_pair}</tt> is
-               set.  Otherwise, returns the value of the variable
-               <tt>{@link #id_rsa_keysize}</tt>.
+               set.  If no private key, then returns <tt>0</tt>.
      */
-    int getId_rsa_keysize() {
-        key_pair.private.modulus.bitLength()
-    }
-
-    /**
-      A noop which does nothing.  It prevents setting the
-      <tt>{@link #id_rsa_keysize}</tt> because the getter is automatically
-      calculated from <tt>{@link #key_pair}</tt>.  This method throws a
-      <tt>{@link net.gleske.jervis.exceptions.SecurityException}</tt> if it is
-      called.
-
-     */
-    void setId_rsa_keysize(int i) throws SecurityException {
-        throw new SecurityException("setId_rsa_keysize(int) is no longer allowed.  Key size is now automatically calculated when using getId_rsa_keysize()")
+    Integer getRsa_keysize() {
+        key_pair?.private.modulus.bitLength() ?: 0
     }
 
     /**
@@ -643,13 +640,17 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         encodeBase64(randomBytes(size))
     }
 
-    static byte[] encryptWithAES256(byte[] secret, byte[] iv, String data) {
+    static byte[] encryptWithAES256(byte[] secret, byte[] iv, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         // Calculate IV with 5k iterations of SHA-256 sum
-        String checksum = sha256Sum(iv)
-        5000.times {
-            checksum = sha256Sum([iv, checksum.bytes].flatten() as byte[])
+        String checksum
+        if(hash_iterations > 0) {
+            Integer iterations = hash_iterations - 1
+            checksum = sha256Sum(iv)
+            hash_iterations.times {
+                checksum = sha256Sum([iv, checksum.bytes].flatten() as byte[])
+            }
         }
-        byte[] b_iv = checksum.substring(0, 16).getBytes('UTF-8')
+        byte[] b_iv = (checksum) ? checksum.substring(0, 16).getBytes('UTF-8') : iv
         // 32 comes from 256 / 8 in AES-256
         SecretKey key = new SecretKeySpec(padForAES256(secret), 0, 32, 'AES')
         Cipher cipher = Cipher.getInstance('AES/CBC/PKCS5Padding')
@@ -657,13 +658,17 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         cipher.doFinal(data.getBytes('UTF-8'))
     }
 
-    static String decryptWithAES256(byte[] secret, byte[] iv, byte[] data) {
+    static String decryptWithAES256(byte[] secret, byte[] iv, byte[] data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         // Calculate IV with 5k iterations of SHA-256 sum
-        String checksum = sha256Sum(iv)
-        5000.times {
-            checksum = sha256Sum([iv, checksum.bytes].flatten() as byte[])
+        String checksum
+        if(hash_iterations > 0) {
+            Integer iterations = hash_iterations - 1
+            checksum = sha256Sum(iv)
+            hash_iterations.times {
+                checksum = sha256Sum([iv, checksum.bytes].flatten() as byte[])
+            }
         }
-        byte[] b_iv = checksum.substring(0, 16).getBytes('UTF-8')
+        byte[] b_iv = (checksum) ? checksum.substring(0, 16).getBytes('UTF-8') : iv
         // 32 comes from 256 / 8 in AES-256
         SecretKey key = new SecretKeySpec(padForAES256(secret), 0, 32, 'AES')
         Cipher cipher = Cipher.getInstance('AES/CBC/PKCS5Padding')
@@ -671,17 +676,17 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         new String(cipher.doFinal(data), 'UTF-8')
     }
 
-    static String encryptWithAES256Base64(String secret, String iv, String data) {
+    static String encryptWithAES256Base64(String secret, String iv, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         byte[] b_secret = decodeBase64Bytes(secret)
         byte[] b_iv = decodeBase64Bytes(iv)
-        encodeBase64(encryptWithAES256(b_secret, b_iv, data))
+        encodeBase64(encryptWithAES256(b_secret, b_iv, data, hash_iterations))
     }
 
-    static String decryptWithAES256Base64(String secret, String iv, String data) {
+    static String decryptWithAES256Base64(String secret, String iv, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         byte[] b_secret = decodeBase64Bytes(secret)
         byte[] b_iv = decodeBase64Bytes(iv)
         byte[] b_data = decodeBase64Bytes(data)
-        decryptWithAES256(b_secret, b_iv, b_data)
+        decryptWithAES256(b_secret, b_iv, b_data, hash_iterations)
     }
 
     /**
@@ -708,17 +713,17 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         b_list.flatten()[0..255]
     }
 
-    static String encryptWithAES256(String passphrase, String data) {
+    static String encryptWithAES256(String passphrase, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         String padded_passphrase = padForAES256(passphrase)
         byte[] b_secret = padded_passphrase.getBytes('UTF-8')
         byte[] b_iv = padded_passphrase.substring(0, 16).getBytes('UTF-8')
-        encodeBase64(encryptWithAES256(b_secret, b_iv, data))
+        encodeBase64(encryptWithAES256(b_secret, b_iv, data, hash_iterations))
     }
-    static String decryptWithAES256(String passphrase, String data) {
+    static String decryptWithAES256(String passphrase, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         String padded_passphrase = padForAES256(passphrase)
         byte[] b_secret = padded_passphrase.getBytes('UTF-8')
         byte[] b_iv = padded_passphrase.substring(0, 16).getBytes('UTF-8')
         byte[] b_data = decodeBase64Bytes(data)
-        decryptWithAES256(b_secret, b_iv, b_data)
+        decryptWithAES256(b_secret, b_iv, b_data, hash_iterations)
     }
 }
