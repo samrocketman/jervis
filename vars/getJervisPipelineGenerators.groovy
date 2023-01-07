@@ -31,6 +31,9 @@ import net.gleske.scmfilter.credential.GraphQLTokenCredential
 
   Sample usage:
       getJervisPipelineGenerators(owner: 'samrocketman', repos: ['repo1', 'repo2'])
+    
+    TODO: continue migration to support multiple branches and multiple YAML
+          files in those branches.
   */
 @NonCPS
 def call(Map options) {
@@ -54,6 +57,9 @@ def getPipelineGenerators(Map options) {
     List errors
     Map projects = [:]
     Map jsonFiles = [:]
+    List refs = options.branches ?: ['refs/heads/main', 'refs/heads/master']
+    // TODO: YAML files from scm-filter-jervis plugin
+    List jervisYaml = ['.jervis.yaml', '.jervis.yml']
     if(options.projects in String) {
         requestedProjects = [options.repos]
     } else {
@@ -65,10 +71,10 @@ def getPipelineGenerators(Map options) {
         query {
             <% projects.eachWithIndex { repository, index -> %>repo${index}: repository(owner: "${owner}", name: "${repository}") {
                 name
-                master: object(expression: "refs/heads/master:.jervis.yml") {
+                master: object(expression: "refs/heads/master:.jervis.yaml") {
                     ...file
                 }
-                main: object(expression: "refs/heads/main:.jervis.yml") {
+                main: object(expression: "refs/heads/main:.jervis.yaml") {
                     ...file
                 }
             }
