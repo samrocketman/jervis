@@ -17,6 +17,7 @@ package net.gleske.jervis.tools
 
 import java.security.SignatureException
 import java.time.Instant
+import org.yaml.snakeyaml.scanner.ScannerException
 
 /**
   Strong encrypted storage backend used for encrypting a <tt>Map</tt> at rest.
@@ -234,13 +235,17 @@ class CipherMap implements Serializable {
     }
 
     void leftShift(def input) {
-        YamlOperator.catchErrors {
+        try {
             def parsedObj = YamlOperator.loadYamlFrom(input)
             if(!verifyCipherObj(parsedObj)) {
-                initialize()
-                return
+                throw new ScannerException('CipherMap verification failed')
             }
             this.hidden = parsedObj
+        }
+        catch(ScannerException ignored) {
+            // Caught exception thrown directly or thrown from
+            // YamlOperator.loadYamlFrom
+            initialize()
         }
     }
 
