@@ -75,8 +75,10 @@ class CipherMap implements Serializable {
     /**
       Customize the number of SHA-256 hash iterations performed during AES
       encryption operations.
+
+      @see net.gleske.jervis.tools.SecurityIO#DEFAULT_AES_ITERATIONS
       */
-    Integer hash_iterations = 5000
+    Integer hash_iterations = SecurityIO.DEFAULT_AES_ITERATIONS
 
     CipherMap(String private_key_pem) {
         this.security = new SecurityIO(private_key_pem)

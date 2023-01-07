@@ -98,6 +98,7 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
         String privateKey = this.getPrivateKey()
         if(privateKey) {
             this.cipherMap = new CipherMap(privateKey)
+            this.cipherMap.hash_iterations = this.hash_iterations
             this.cipherMap << data
         }
         if(this.cipherMap) {
@@ -253,6 +254,14 @@ tokenCred.saveCache = { String cache ->
       <tt>renew_buffer</tt> is <tt>0</tt> seconds.
       */
     Long renew_buffer = 30
+
+    /**
+      Customize the number of SHA-256 hash iterations performed during AES
+      encryption operations.
+
+      @see net.gleske.jervis.tools.SecurityIO#DEFAULT_AES_ITERATIONS
+      */
+    Integer hash_iterations = SecurityIO.DEFAULT_AES_ITERATIONS
 
     /**
       Returns renew buffer.  Does not allow renew buffer to be undefined or go below zero.
