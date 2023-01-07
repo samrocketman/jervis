@@ -83,6 +83,9 @@ class SecurityIO implements Serializable {
     /**
       The default number of iterations of SHA-256 hashing of the AES IV when AES
       encryption or decryption is performed.  Default: <tt>5000</tt> iterations.
+
+      @see #decryptWithAES256(byte[], byte[], byte[], java.lang.Integer)
+      @see #encryptWithAES256(byte[], byte[], java.lang.String, java.lang.Integer)
       */
     static Integer DEFAULT_AES_ITERATIONS = 5000
 
@@ -658,6 +661,20 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         cipher.doFinal(data.getBytes('UTF-8'))
     }
 
+    /**
+      Decrypts ciphertext with AES-256 CBC mode with PKCS5 padding.
+
+      @see #DEFAULT_AES_ITERATIONS
+      @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture JCA Reference Guide for <tt>Cipher</tt> class</a>
+      @param secret Secret key for decrypting.
+      @param iv Initialization vector (IV) used to initialize the cipher.  Used
+                as-is if <tt>0</tt> <tt>hash_iterations</tt>.
+      @param data Data to be encrypted with AES-256.
+      @param hash_iterations The IV is hashed with SHA-256.  For each iteration
+                             the <tt>iv</tt> is combined with the previous
+                             iteration result of the hashing.  The resulting
+                             bytes is used as the new initialization vector.
+      */
     static String decryptWithAES256(byte[] secret, byte[] iv, byte[] data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         // Calculate IV with 5k iterations of SHA-256 sum
         String checksum
