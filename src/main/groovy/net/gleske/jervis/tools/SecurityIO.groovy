@@ -643,6 +643,23 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         encodeBase64(randomBytes(size))
     }
 
+    /**
+      Encrypt plaintext using AES-256 CBC mode with PKCS5 padding.  The IV is
+      hashed with multiple iterations of SHA-256.
+
+      @see #DEFAULT_AES_ITERATIONS
+      @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture JCA Reference Guide for <tt>Cipher</tt> class</a>
+      @param secret Secret key for encrypting.
+      @param iv Initialization vector (IV) used to initialize the cipher.
+      @param data Data to be encrypted with AES-256.
+      @param hash_iterations The IV is hashed with SHA-256.  For each iteration
+                             the <tt>iv</tt> is combined with the previous
+                             iteration hashing result.  The resulting bytes are
+                             used as the new initialization vector.  If set to
+                             <tt>0</tt>, then hashing is skipped and the
+                             original <tt>iv</tt> is used for AES cipher
+                             initialization.
+      */
     static byte[] encryptWithAES256(byte[] secret, byte[] iv, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         // Calculate IV with 5k iterations of SHA-256 sum
         String checksum
@@ -662,18 +679,21 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
     }
 
     /**
-      Decrypts ciphertext with AES-256 CBC mode with PKCS5 padding.
+      Decrypt ciphertext using AES-256 CBC mode with PKCS5 padding.  The IV is
+      hashed with multiple iterations of SHA-256.
 
       @see #DEFAULT_AES_ITERATIONS
       @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture JCA Reference Guide for <tt>Cipher</tt> class</a>
       @param secret Secret key for decrypting.
-      @param iv Initialization vector (IV) used to initialize the cipher.  Used
-                as-is if <tt>0</tt> <tt>hash_iterations</tt>.
+      @param iv Initialization vector (IV) used to initialize the cipher.
       @param data Data to be encrypted with AES-256.
       @param hash_iterations The IV is hashed with SHA-256.  For each iteration
                              the <tt>iv</tt> is combined with the previous
                              iteration result of the hashing.  The resulting
-                             bytes is used as the new initialization vector.
+                             bytes is used as the new initialization vector.  If
+                             set to <tt>0</tt>, then hashing is skipped and the
+                             original <tt>iv</tt> is used for AES cipher
+                             initialization.
       */
     static String decryptWithAES256(byte[] secret, byte[] iv, byte[] data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         // Calculate IV with 5k iterations of SHA-256 sum
