@@ -667,7 +667,7 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         if(hash_iterations > 0) {
             Integer iterations = hash_iterations - 1
             checksum = sha256Sum(iv)
-            hash_iterations.times {
+            iterations.times {
                 checksum = sha256Sum([iv, checksum.bytes].flatten() as byte[])
             }
         }
@@ -703,7 +703,7 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         if(hash_iterations > 0) {
             Integer iterations = hash_iterations - 1
             checksum = sha256Sum(iv)
-            hash_iterations.times {
+            iterations.times {
                 checksum = sha256Sum([iv, checksum.bytes].flatten() as byte[])
             }
         }
