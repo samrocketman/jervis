@@ -34,7 +34,9 @@ class GitHubAppRsaCredentialImpl implements GitHubAppRsaCredential {
 
     /**
       The GitHub API URL for querying GitHub App API in case of self-hosted
-      GitHub Enterprise.  Defaults to <tt>{@link net.gleske.jervis.remotes.creds.GitHubAppCredential#DEFAULT_GITHUB_API}</tt>.
+      GitHub Enterprise.
+
+      @see net.gleske.jervis.remotes.creds.GitHubAppCredential#DEFAULT_GITHUB_API
       */
     String apiUri = GitHubAppCredential.DEFAULT_GITHUB_API
 
