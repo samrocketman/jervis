@@ -103,6 +103,7 @@ void initializeGenerator(PipelineGenerator pipeline_generator) {
     ]
 }
 
+@NonCPS
 void call(PipelineGenerator pipeline_generator) {
     initializeGenerator(pipeline_generator)
 }

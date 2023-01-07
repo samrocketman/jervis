@@ -45,6 +45,22 @@ section](#2.0-major-api-changes) for details.
 grep -r '\([gs]et\)\{0,1\}[Ii]d_rsa_keysize' *
 ```
 
+Several Jenkins shared pipline vars have been converted to `NonCPS`.  This means
+upstream `admin*` functions must also be changed to `NonCPS`.  The following is
+an example of a NonCPS var.
+
+```groovy
+@NonCPS
+def call() {
+    // this method is NonCPS JIT compiled
+}
+```
+
+If you define `admin*` vars you'll have to convert them to NonCPS.  The
+following is a list of vars now requiring `NonCPS` annotation.
+
+- `vars/adminLibraryResource.groovy`
+
 <a name="2.0-major-api-changes"></a>
 ### Major API changes
 
@@ -85,11 +101,35 @@ The following methods and fields have been renamed or removed.
 
 - New `hasGlobalResource()` step which can be used to conditionally load
   resources from `libraryResource` step.  Allows a pipeline developer to only
-  call `librarResource` if it exists.  Normally `libraryResource` step will
+  call `libraryResource` if it exists.  Normally `libraryResource` step will
   throw an exception if the step doesn't exist.  This is a fully `NonCPS` step
   and can be called from other `NonCPS` code blocks.
-- `hasGlobalVar` is now a full `NonCPS` step and can be called from within other
-  `NonCPS` code blocks.
+- New `getBuildContextMap()` which returns information about the current running
+  pipeline such as how it was triggered, which part of Git workflow, and other
+  meta info.
+- New `getJervisPipelineGenerators()` which can read multiple repositories and
+  return `.jervis.yml` pipeline objects for each repository in one API call.
+- `isBuilding()` more reliable now that it is built into Jervis with unit tests.  Several bugs were fixed while reaching 100% test coverage.
+- `loadCustomResource()` has some new behavior.  It first loads
+  `adminLibraryResource`, then checks for the resource in the global config
+  files plugin, and finally falls back to `libraryResource`.  It can also skip
+  looking for `adminLibraryResource` via a new boolean option:
+  ```groovy
+  // skip loading adminLibraryResource
+  loadCustomResource('resource-name', true)
+  ```
+- The following vars are now fully `NonCPS`.  These vars can be called from within other `NonCPS` annotated methods in shared pipelines.
+  - [`getBuildContextMap`](vars/getBuildContextMap.groovy)
+  - [`getJervisPipelineGenerators`](vars/getJervisPipelineGenerators.groovy)
+  - [`getUserBinding`](vars/getUserBinding.groovy)
+  - [`hasGlobalResource`](vars/hasGlobalResource.groovy)
+  - [`hasGlobalVar`](vars/hasGlobalVar.groovy)
+  - [`isBuilding`](vars/isBuilding.groovy)
+  - [`isPRBuild`](vars/isPRBuild.groovy)
+  - [`isTagBuild`](vars/isTagBuild.groovy)
+  - [`loadCustomResource`](vars/loadCustomResource.groovy)
+  - [`prepareJervisLifecycleGenerator`](vars/prepareJervisLifecycleGenerator.groovy)
+  - [`prepareJervisPipelineGenerator`](vars/prepareJervisPipelineGenerator.groovy)
 
 #### Jervis API changes in `src/` folder
 

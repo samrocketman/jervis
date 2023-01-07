@@ -38,6 +38,7 @@ def getBuildBinding(Run run, String bindingVar) {
     run.execution.shell.context.getVariable(bindingVar)
 }
 
+@NonCPS
 def call(String bindingVar) {
     getBuildBinding(currentBuild.rawBuild, bindingVar)
 }

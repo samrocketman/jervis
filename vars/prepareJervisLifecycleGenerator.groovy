@@ -123,6 +123,7 @@ void finalizeGenerator(LifecycleGenerator generator, String lifecycles_json, Str
     }
 }
 
+@NonCPS
 void call(LifecycleGenerator generator, String github_credentials) {
     /*
        Initialize generator object from GitHub API.

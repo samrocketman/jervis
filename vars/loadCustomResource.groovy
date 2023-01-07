@@ -40,8 +40,8 @@ String loadConfigFileResource(String resource) {
 }
 
 @NonCPS
-String call(String resource) {
-    if(hasGlobalVar('adminLibraryResource')) {
+String call(String resource, Boolean skipAdmin = false) {
+    if(!skipAdmin && hasGlobalVar('adminLibraryResource')) {
         adminLibraryResource(resource)
     }
     else if(loadConfigFileResource(resource)) {

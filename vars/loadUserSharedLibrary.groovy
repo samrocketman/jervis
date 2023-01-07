@@ -126,3 +126,7 @@ def call(Map settings = [:]) {
             ) // end modernSCM()
         ) // end library()
 }
+
+def call(Map additional_settings, Map settings) {
+    call(settings + additional_settings)
+}
