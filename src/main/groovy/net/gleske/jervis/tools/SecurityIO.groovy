@@ -18,7 +18,6 @@ package net.gleske.jervis.tools
 import net.gleske.jervis.exceptions.DecryptException
 import net.gleske.jervis.exceptions.EncryptException
 import net.gleske.jervis.exceptions.KeyPairDecodeException
-import net.gleske.jervis.exceptions.SecurityException
 
 import groovy.json.JsonBuilder
 import java.security.KeyFactory
@@ -278,7 +277,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
 
       @param pem An X.509 PEM encoded RSA private key.
      */
-    void setKey_pair(String pem) {
+    void setKey_pair(String pem) throws KeyPairDecodeException {
         PEMParser parser = new PEMParser(new StringReader(pem))
         def obj = parser.readObject()
         parser.close()
