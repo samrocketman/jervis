@@ -649,7 +649,7 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       hashed with multiple iterations of SHA-256.
 
       @see #DEFAULT_AES_ITERATIONS
-      @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture JCA Reference Guide for <tt>Cipher</tt> class</a>
+      @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture (JCA) Reference Guide for <tt>Cipher</tt> class</a>
       @see <a href="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html" target=_blank>Java Security Standard Algorithm Names</a>.
       @param secret Secret key for encrypting.
       @param iv Initialization vector (IV) used to initialize the cipher.
@@ -685,7 +685,7 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       hashed with multiple iterations of SHA-256.
 
       @see #DEFAULT_AES_ITERATIONS
-      @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture JCA Reference Guide for <tt>Cipher</tt> class</a>
+      @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture (JCA) Reference Guide for <tt>Cipher</tt> class</a>
       @see <a href="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html" target=_blank>Java Security Standard Algorithm Names</a>.
       @param secret Secret key for decrypting.
       @param iv Initialization vector (IV) used to initialize the cipher.
