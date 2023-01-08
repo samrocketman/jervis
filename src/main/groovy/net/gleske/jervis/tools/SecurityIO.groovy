@@ -26,12 +26,15 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import java.security.Security
 import java.security.Signature
+import java.security.spec.KeySpec
 import java.security.spec.PKCS8EncodedKeySpec
 import java.time.Duration
 import java.time.Instant
 import javax.crypto.Cipher
 import javax.crypto.SecretKey
+import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1Primitive
@@ -431,7 +434,7 @@ println "Key size: ${security.rsa_keysize}"
     }
 
     /**
-      Uses RSA asymmetric encryption to encrypt a plain text <tt>String</tt> and outputs cipher text.
+      Uses RSA asymmetric encryption to encrypt a plain text <tt>String</tt> and outputs ciphertext.
 
       For third party reference, this is essentially executing the following commands in a terminal.
 
@@ -440,7 +443,7 @@ echo -n 'plaintext' | openssl rsautl -encrypt -inkey ./id_rsa.pub -pubin | opens
 </code></pre>
 
       @param  plaintext A plain text <tt>String</tt> to be encrypted.
-      @return A Base64 encoded cipher text or more generically: <tt>ciphertext = base64encode(RSAPublicKeyEncrypt(plaintext))</tt>
+      @return A Base64 encoded ciphertext or more generically: <tt>ciphertext = base64encode(RSAPublicKeyEncrypt(plaintext))</tt>
      */
     String rsaEncrypt(String plaintext) throws EncryptException {
         byte[] ciphertext = rsaEncryptBytes(plaintext.bytes)
@@ -463,7 +466,7 @@ echo -n 'plaintext' | openssl rsautl -encrypt -inkey ./id_rsa.pub -pubin | opens
     }
 
     /**
-      Uses RSA asymmetric encryption to decrypt a cipher text <tt>String</tt> and outputs plain text.
+      Uses RSA asymmetric encryption to decrypt a ciphertext <tt>String</tt> and outputs plain text.
 
       For third party reference, this is essentially executing the following commands in a terminal.
 
@@ -471,7 +474,7 @@ echo -n 'plaintext' | openssl rsautl -encrypt -inkey ./id_rsa.pub -pubin | opens
 echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey /tmp/id_rsa
 </code></pre>
 
-      @param  ciphertext A Base64 encoded cipher text <tt>String</tt> to be decrypted.
+      @param  ciphertext A Base64 encoded ciphertext <tt>String</tt> to be decrypted.
       @return A plain text <tt>String</tt> or more generically: <tt>plaintext = RSAPrivateKeyDecrypt(base64decode(ciphertext))</tt>
      */
     String rsaDecrypt(String ciphertext) throws DecryptException {
@@ -715,6 +718,15 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         new String(cipher.doFinal(data), 'UTF-8')
     }
 
+    /**
+      Takes Base64 encoded secret and IV and encrypts the provided
+      <tt>String</tt> data.
+
+      @see #encryptWithAES256(byte[], byte[], java.lang.String, java.lang.Integer)
+      @param secret Base64 encoded binary secret.
+      @param iv Base64 encoded binary initialization vector (IV).
+      @param data A plain <tt>String</tt> to be encrypted (not Base64 encoded).
+      */
     static String encryptWithAES256Base64(String secret, String iv, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         byte[] b_secret = decodeBase64Bytes(secret)
         byte[] b_iv = decodeBase64Bytes(iv)
@@ -752,16 +764,120 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         b_list.flatten()[0..255]
     }
 
+    /**
+      Converts to an integer of iterations based on SHA-256 sum input.  The same
+      hash will always result in the same number of iterations.
+      @param shasum A SHA hash which will return an integer.
+      @return Returns an integer with a value between 100100 and 960000 for
+              SHA-256.  Larger hashes will return a larger maximum.
+      */
+    private static Integer iterationDerivation(String shasum) {
+        // An all f SHA-256 sum (64 chars) is 960.  This maxMultiplier sets the maximum
+        // value of the number of iterations.  e.g. 1000 means the max will be
+        // 960000
+        Integer maxMultiplier = 1000
+        Integer minIterations = 100100
+        String keyIndex = "0123456789abcdef"
+        Map subtract = [:]
+        Integer iterations =  shasum.toList().each { String c ->
+            Set keyset = subtract.keySet()
+            if(keyset.size() == 4 || c in keyset) {
+                return
+            }
+            Integer negative = 1 + (keyset.size() * 10 / 2)
+            subtract[c] = -1 * negative
+        }.collect {
+            (it in subtract.keySet()) ? subtract[it] : (keyIndex.indexOf(it) * maxMultiplier)
+        }.sum().abs()
+        [minIterations, iterations].max()
+    }
+
+    /**
+      Takes a passphrase and a SHA-256 checksum and returns a PBKDF2 with HMAC
+      SHA-256 secret key intended for AES encryption and decryption.
+
+      @param passphrase A passphrase which would typically come from human input.
+      @param shasum A SHA-256 a derived from the passphrase.
+      */
+    private static byte[] passwordKeyDerivation(String passphrase, String shasum) {
+        Integer iterations = iterationDerivation(shasum)
+        println("iterations: ${iterations}")
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+        KeySpec spec = new PBEKeySpec(passphrase.toCharArray(), shasum.getBytes(), iterations, 256)
+        factory.generateSecret(spec).getEncoded()
+    }
+
+    /**
+      Encrypts String data with AES-256 using a passphrase.
+
+      <h2>Sample usage</h2>
+<pre><code>
+import net.gleske.jervis.tools.SecurityIO
+import java.time.Instant
+
+Long time(Closure c) {
+    Long before = Instant.now().epochSecond
+    c()
+    Long after = Instant.now().epochSecond
+    after - before
+}
+
+String encrypted
+Long timing1 = time {
+    encrypted = SecurityIO.encryptWithAES256('correct horse battery staple', 'My secret data')
+}
+
+
+println("Encrypted text: ${encrypted}")
+Long timing2 = time {
+    println("Decrypted text: ${SecurityIO.decryptWithAES256('correct horse battery staple', encrypted)}")
+}
+
+println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
+</code></pre>
+
+      @see #DEFAULT_AES_ITERATIONS
+      @see #encryptWithAES256(byte[], byte[], java.lang.String, java.lang.Integer) encryptWithAES256 AES enciphering details
+      @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-5E8F4099-779F-4484-9A95-F1CEA167601A" target=_blank>Java Cryptography Architecture (JCA) Reference Guide for <tt>SecretKeyFactory</tt> class</a>
+      @see <a href="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html#secretkeyfactory-algorithms" target=_blank><tt>SecretKeyFactory</tt> algorithm names</a>
+      @param passphrase A passphrase used to generate AES keys for encryption.
+                        The passphrase creates an AES using
+                        <tt>PBKDF2WithHmacSHA256</tt>, a salt created from
+                        passphrase checksum, and variable PBKDF2 iterations
+                        based on passphrase checksum.  The PBKDF2 iterations are
+                        between <tt>100100</tt> and <tt>960000</tt>.
+      @param data Data to be encrypted.
+      @param hash_iterations The number of iterations the AES-256 initialization
+                             vector (IV) is hashed with SHA-256.
+      */
     static String encryptWithAES256(String passphrase, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
-        String padded_passphrase = padForAES256(passphrase)
-        byte[] b_secret = padded_passphrase.getBytes('UTF-8')
-        byte[] b_iv = padded_passphrase.substring(0, 16).getBytes('UTF-8')
+        // sha256Sum should always return lower case but forcing toLowerCase
+        // since this is used as an input for encryption and decryption.
+        String salt = sha256Sum(passphrase).toLowerCase()
+        byte[] b_secret = passwordKeyDerivation(passphrase, salt)
+        byte[] b_iv = salt.substring(0, 16).getBytes('UTF-8')
         encodeBase64(encryptWithAES256(b_secret, b_iv, data, hash_iterations))
     }
+
+    /**
+      Decrypts ciphertext with AES-256 using a passphrase.  See the encrypt
+      method for more details on both algorithms and usage.
+
+      @see #DEFAULT_AES_ITERATIONS
+      @see #encryptWithAES256(java.lang.String, java.lang.String, java.lang.Integer) encryptWithAES256 using passphrase method
+      @see #decryptWithAES256(byte[], byte[], byte[], java.lang.Integer) decryptWithAES256 AES deciphering details
+      @param passphrase A passphrase used to decrypt AES-256 ciphertext.  See
+                        encrypt method for more details.
+      @param data Base64 encoded ciphertext to be decrypted.
+      @param hash_iterations The number of iterations the AES-256 initialization
+                             vector (IV) is hashed with SHA-256.
+      */
     static String decryptWithAES256(String passphrase, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
-        String padded_passphrase = padForAES256(passphrase)
-        byte[] b_secret = padded_passphrase.getBytes('UTF-8')
-        byte[] b_iv = padded_passphrase.substring(0, 16).getBytes('UTF-8')
+        // sha256Sum should always return lower case but forcing toLowerCase
+        // since this is used as an input for encryption and decryption.
+        String salt = sha256Sum(passphrase).toLowerCase()
+        byte[] b_secret = passwordKeyDerivation(passphrase, salt)
+        byte[] b_iv = salt.substring(0, 16).getBytes('UTF-8')
         byte[] b_data = decodeBase64Bytes(data)
         decryptWithAES256(b_secret, b_iv, b_data, hash_iterations)
     }
