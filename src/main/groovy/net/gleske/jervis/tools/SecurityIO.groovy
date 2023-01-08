@@ -653,7 +653,8 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       @see #DEFAULT_AES_ITERATIONS
       @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture (JCA) Reference Guide for <tt>Cipher</tt> class</a>
       @see <a href="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html" target=_blank>Java Security Standard Algorithm Names</a>.
-      @param secret Secret key for encrypting.
+      @param secret Secret key for decrypting.  If byte-count is less than 32
+                    (256-bits), then bytes are repeated until 256 bits are available.
       @param iv Initialization vector (IV) used to initialize the cipher.
       @param data Data to be encrypted with AES-256.
       @param hash_iterations The IV is hashed with SHA-256.  For each iteration
@@ -689,7 +690,8 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       @see #DEFAULT_AES_ITERATIONS
       @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture (JCA) Reference Guide for <tt>Cipher</tt> class</a>
       @see <a href="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html" target=_blank>Java Security Standard Algorithm Names</a>.
-      @param secret Secret key for decrypting.
+      @param secret Secret key for decrypting.  If byte-count is less than 32
+                    (256-bits), then bytes are repeated until 256 bits are available.
       @param iv Initialization vector (IV) used to initialize the cipher.
       @param data Data to be encrypted with AES-256.
       @param hash_iterations The IV is hashed with SHA-256.  For each iteration
@@ -741,17 +743,10 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
     }
 
     /**
-      Repeats the passphrase until enough bytes are provided for AES-256.
-      @return Returns 256 character String assumed to be 256 bytes of UTF-8
+      Repeats the input bytes until enough bytes are provided for AES-256.
+
+      @param input Bytes to be repeated.
       */
-    static String padForAES256(String passphrase) {
-        Integer len = passphrase.length()
-        if(len >= 256) {
-            return passphrase
-        }
-        String padded = passphrase * ((256 / len) + 1)
-        padded.substring(0, 256)
-    }
     static byte[] padForAES256(byte[] input) {
         if(input.size() >= 256) {
             return input
