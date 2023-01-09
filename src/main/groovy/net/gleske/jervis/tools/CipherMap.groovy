@@ -286,6 +286,11 @@ class CipherMap implements Serializable {
         this.hidden.signature = security.signRS256Base64Url(signedData(this.hidden))
     }
 
+    /**
+      Decrypts the encrypted map and returns the object.
+
+      @returns A map consisting of standard java class objects.
+      */
     Map getPlainMap() {
         if(!hidden.data) {
             return [:]
