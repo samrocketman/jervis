@@ -17,6 +17,8 @@ package net.gleske.jervis.tools
 
 import java.security.SignatureException
 import java.time.Instant
+import java.time.format.DateTimeParseException
+import javax.crypto.BadPaddingException
 import org.yaml.snakeyaml.scanner.ScannerException
 
 /**
@@ -254,7 +256,7 @@ class CipherMap implements Serializable {
         try {
             age = Instant.parse(decrypt(this.hidden.age)).epochSecond
         }
-        catch(java.time.format.DateTimeParseException ignored) {
+        catch(BadPaddingException|DateTimeParseException ignored) {
             age = 0
         }
         if(age) {
