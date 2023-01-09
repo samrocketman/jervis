@@ -659,9 +659,10 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       @param data Data to be encrypted with AES-256.
       @param hash_iterations The IV is hashed with SHA-256.  For each iteration
                              the <tt>iv</tt> is combined with the previous
-                             iteration hashing result.  The resulting bytes are
-                             used as the new initialization vector.  If set to
-                             <tt>0</tt>, then hashing is skipped and the
+                             iteration result of the hashing.  The resulting
+                             bytes are fed into <tt>PBKDF2WithHmacSHA256</tt>
+                             resulting in a new initialization vector.  If set
+                             to <tt>0</tt>, then hashing is skipped and the
                              original <tt>iv</tt> is used for AES cipher
                              initialization.
       */
@@ -675,7 +676,7 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
                 checksum = sha256Sum([iv, checksum.bytes].flatten() as byte[])
             }
         }
-        byte[] b_iv = (checksum) ? checksum.substring(0, 16).getBytes('UTF-8') : iv
+        byte[] b_iv = (checksum) ? passwordKeyDerivation(checksum, checksum)[0..15] : iv
         // 32 comes from 256 / 8 in AES-256
         SecretKey key = new SecretKeySpec(padForAES256(secret), 0, 32, 'AES')
         Cipher cipher = Cipher.getInstance('AES/CBC/PKCS5Padding')
@@ -697,8 +698,9 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       @param hash_iterations The IV is hashed with SHA-256.  For each iteration
                              the <tt>iv</tt> is combined with the previous
                              iteration result of the hashing.  The resulting
-                             bytes is used as the new initialization vector.  If
-                             set to <tt>0</tt>, then hashing is skipped and the
+                             bytes are fed into <tt>PBKDF2WithHmacSHA256</tt>
+                             resulting in a new initialization vector.  If set
+                             to <tt>0</tt>, then hashing is skipped and the
                              original <tt>iv</tt> is used for AES cipher
                              initialization.
       */
@@ -712,7 +714,7 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
                 checksum = sha256Sum([iv, checksum.bytes].flatten() as byte[])
             }
         }
-        byte[] b_iv = (checksum) ? checksum.substring(0, 16).getBytes('UTF-8') : iv
+        byte[] b_iv = (checksum) ? passwordKeyDerivation(checksum, checksum)[0..15] : iv
         // 32 comes from 256 / 8 in AES-256
         SecretKey key = new SecretKeySpec(padForAES256(secret), 0, 32, 'AES')
         Cipher cipher = Cipher.getInstance('AES/CBC/PKCS5Padding')
@@ -796,7 +798,6 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       */
     private static byte[] passwordKeyDerivation(String passphrase, String shasum) {
         Integer iterations = iterationDerivation(shasum)
-        println("iterations: ${iterations}")
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
         KeySpec spec = new PBEKeySpec(passphrase.toCharArray(), shasum.getBytes(), iterations, 256)
         factory.generateSecret(spec).getEncoded()
