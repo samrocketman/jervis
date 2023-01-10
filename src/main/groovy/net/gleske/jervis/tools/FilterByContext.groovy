@@ -167,6 +167,11 @@ class FilterByContext {
 
     /**
       These filters will force the getAllowBuild method to always return true.
+
+      Default value is the following.
+<pre><code class="language-groovy">
+['pr', 'branch', 'tag']
+</code></pre>
       */
     private static List alwaysAllowFilters = ['pr', 'branch', 'tag']
 
@@ -180,11 +185,25 @@ class FilterByContext {
 
     /**
       Instantiate a default FilterByContext instance which will always allow
+      the build to proceed.
+
+      @see #alwaysAllowFilters
+      @param context A context map defining the current state of the build
+                     environment and how it was triggered.
       */
     public FilterByContext(Map context) {
         this(context, alwaysAllowFilters)
     }
 
+    /**
+      Instantiate a context and provide filters for potentially skipping builds
+      depending on context.
+
+      @param context A context map defining the current state of the build
+                     environment and how it was triggered.
+      @param filters A list of filters.  A filter might be a String, Map, List,
+                     or a mix of the three.
+      */
     public FilterByContext(Map context, List filters) {
         List requiredArgs = ['trigger', 'context', 'metadata'] - context.keySet().toList()
         if(requiredArgs) {
