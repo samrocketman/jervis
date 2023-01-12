@@ -228,11 +228,11 @@ tokenCred.saveCache = { String cache ->
 
     /**
       Customize the number of SHA-256 hash iterations performed during AES
-      encryption operations.
+      encryption operations.  Default: <tt>0</tt> iterations.
 
       @see net.gleske.jervis.tools.SecurityIO#DEFAULT_AES_ITERATIONS
       */
-    Integer hash_iterations = SecurityIO.DEFAULT_AES_ITERATIONS
+    Integer hash_iterations = 0
 
     /**
       Returns renew buffer.  Does not allow renew buffer to be undefined or go below zero.
