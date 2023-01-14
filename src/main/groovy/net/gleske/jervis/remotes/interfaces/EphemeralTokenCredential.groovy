@@ -19,6 +19,22 @@ package net.gleske.jervis.remotes.interfaces
 /**
   Provides a high level interface for ephemeral API tokens issued by a
   time-limited token issuing service.
+
+  <ul>
+  <li>
+    This interface expects <tt>{@link #isExpired(java.lang.String)}</tt> to be
+    the first function called.
+  </li>
+  <li>
+    If a token is verified as expired or otherwise invalid, then it is expected
+    that
+    <tt>{@link #updateTokenWith(java.lang.String, java.lang.String, java.lang.String)}</tt>
+    be called to set a valid token with its expiration.
+  </li>
+  </ul>
+
+  For an example implementation, refer to
+  <tt>{@link net.gleske.jervis.remotes.creds.EphemeralTokenCache}</tt>.
   */
 interface EphemeralTokenCredential extends TokenCredential {
 
@@ -37,7 +53,9 @@ interface EphemeralTokenCredential extends TokenCredential {
     Boolean isExpired(String hash)
 
     /**
-      Checks if a token is expired.
+      Checks if a token is expired.  <tt>{@link #isExpired(java.lang.String)}</tt> or
+      <tt>{@link #updateTokenWith(java.lang.String, java.lang.String, java.lang.String)}</tt>
+      should be called before this method.
       @return Returns <tt>true</tt> if the token is expired requiring another
               to be issued.
       */
@@ -54,19 +72,25 @@ interface EphemeralTokenCredential extends TokenCredential {
                         <tt>{@link java.time.format.DateTimeFormatter#ISO_INSTANT}</tt>.
       @param hash Unique to the token provided by issuer.  For an example see
                   <tt>{@link net.gleske.jervis.remotes.creds.GitHubAppCredential#getHash()}</tt>.
-                  It is used for storing and retrieving issued tokens from the
+                  It is used for storing and retrieving issued tokens from a
                   backend cache.
       */
     void updateTokenWith(String token, String expiration, String hash)
 
     /**
-      Returns when an issued ephemeral GitHub API token will expire.
+      Returns when an issued ephemeral token will expire.
+      <tt>{@link #isExpired(java.lang.String)}</tt> or
+      <tt>{@link #updateTokenWith(java.lang.String, java.lang.String, java.lang.String)}</tt>
+      should be called before this method.
       */
     String getExpiration()
 
     /**
       Sets when an ephemeral token will expire.  A quick parsing check can be
       performed with <tt>{@link java.time.Instant}</tt>.
+      <tt>{@link #isExpired(java.lang.String)}</tt> or
+      <tt>{@link #updateTokenWith(java.lang.String, java.lang.String, java.lang.String)}</tt>
+      should be called before this method.
 
 <pre><code class="language-groovy">
 void setExpiration(String expiration) {
