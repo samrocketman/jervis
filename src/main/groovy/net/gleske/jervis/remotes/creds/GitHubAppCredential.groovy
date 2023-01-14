@@ -29,10 +29,10 @@ import net.gleske.jervis.tools.SecurityIO
 <pre><code>
 import net.gleske.jervis.remotes.creds.GitHubAppCredential
 import net.gleske.jervis.remotes.creds.GitHubAppRsaCredentialImpl
-import net.gleske.jervis.remotes.creds.GitHubAppTokenCredentialImpl
+import net.gleske.jervis.remotes.creds.EphemeralTokenCache
 
 GitHubAppRsaCredentialImpl rsaCred = new GitHubAppRsaCredentialImpl('123456', new File('private-key.pem').text)
-GitHubAppTokenCredentialImpl tokenCred = new GitHubAppTokenCredentialImpl()
+EphemeralTokenCache tokenCred = new EphemeralTokenCache()
 tokenCred.loadCache = {-&gt;
     File f = new File('/tmp/cache.yml')
     if(!f.exists()) {

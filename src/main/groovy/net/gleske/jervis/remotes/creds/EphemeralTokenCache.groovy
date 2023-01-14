@@ -29,12 +29,12 @@ import java.time.Instant
   In general, a more secure credential implementation is suggested.  For an
   example, see <tt>GitHubAppTokenCredential</tt> API documentation for examples.
   */
-class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, ReadonlyTokenCredential {
+class EphemeralTokenCache implements GitHubAppTokenCredential, ReadonlyTokenCredential {
 
-    GitHubAppTokenCredentialImpl(Closure resolvePrivateKeyString) {
+    EphemeralTokenCache(Closure resolvePrivateKeyString) {
         setupClosures(resolvePrivateKeyString)
     }
-    GitHubAppTokenCredentialImpl(String privateKeyPath) {
+    EphemeralTokenCache(String privateKeyPath) {
         setupClosures {->
             new File(privateKeyPath).text
         }
@@ -177,9 +177,9 @@ class GitHubAppTokenCredentialImpl implements GitHubAppTokenCredential, Readonly
       <tt>saveCache</tt> must be set for caching to activate.</p>
 
 <pre><code>
-import net.gleske.jervis.remotes.creds.GitHubAppTokenCredentialImpl
+import net.gleske.jervis.remotes.creds.EphemeralTokenCache
 
-GitHubAppTokenCredentialImpl tokenCred = new GitHubAppTokenCredentialImpl()
+EphemeralTokenCache tokenCred = new EphemeralTokenCache()
 
 tokenCred.loadCache = {->
     File f = new File('/dev/shm/cache.yml')
