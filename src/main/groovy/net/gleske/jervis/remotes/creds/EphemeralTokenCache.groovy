@@ -22,6 +22,7 @@ import net.gleske.jervis.tools.LockableFile
 import net.gleske.jervis.tools.YamlOperator
 
 import java.time.Instant
+import java.time.format.DateTimeParseException
 
 /**
   A flexible token cache with pluggable backend storage which encrypts the
@@ -385,8 +386,9 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
       to store the new token.  This method will also remove expired tokens
       before persisting the cache.
       @see #getRenew_buffer()
+      @see java.time.format.DateTimeParseException
       */
-    void updateTokenWith(String token, String expiration, String hash) {
+    void updateTokenWith(String token, String expiration, String hash) throws DateTimeParseException {
         this.hash = hash
         tryLock {
             tryLoadCache()
@@ -401,9 +403,12 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
 
     /**
       Sets the expiration for a given token.
-      @param expiration An ISO instant formatted string like <tt>{@link java.time.Instant#toString()}</tt>.
+      @see java.time.Instant#toString()
+      @see java.time.format.DateTimeParseException
+      @param expiration An ISO instant formatted string like
+                        <tt>Instant.toString</tt>.
       */
-    void setExpiration(String expiration) {
+    void setExpiration(String expiration) throws DateTimeParseException {
         // A quick parse check
         Instant.parse(expiration)
         this.cache[this.hash].expires_at = expiration
