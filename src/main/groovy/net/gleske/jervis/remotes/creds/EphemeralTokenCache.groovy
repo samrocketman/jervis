@@ -45,6 +45,7 @@ class EphemeralTokenCache implements EphemeralTokenCredential, ReadonlyTokenCred
       @see net.gleske.jervis.tools.CipherMap CipherMap provides encryption at rest
       @see #getPrivateKey Instantiates getPrivateKey closure
       @see #loadCache Instantiates loadCache closure
+      @see #obtainLock Instantiates obtainLock closure
       @see #saveCache Instantiates saveCache closure
       @Warning If an empty <tt>String</tt> or <tt>null</tt> is returned by
                <tt>resolvePrivateKeyString()</tt>, then encryption at rest is
@@ -109,6 +110,11 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
             // write out cache
             f.withWriter('UTF-8') { Writer w ->
                 w << cache
+            }
+        }
+        this.obtainLock = { Closure body ->
+            new LockableFile(this.cacheLockFile).withLock {
+                body()
             }
         }
     }
@@ -180,10 +186,8 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
       @param body A closure to execute with or without a lock.
       */
     private void tryLock(Closure body) {
-        if(loadCache && saveCache) {
-            new LockableFile(this.cacheLockFile).withLock {
-                body()
-            }
+        if(loadCache && saveCache && obtainLock) {
+            obtainLock(body)
         }
         else {
             body()
@@ -197,8 +201,17 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
       @default <tt>/dev/shm/jervis-token-cache.lock</tt>
       @see <a href="https://docs.kernel.org/filesystems/tmpfs.html" target=_blank><tt>/dev/shm</tt> filesystem</a> which is in-memory file storage so very fast
       @see #cacheFile
+      @see #obtainLock
       */
     String cacheLockFile = '/dev/shm/jervis-token-cache.lock'
+
+    /**
+      Skip obtaining a file lock before persisting the cache.  By default,
+      cache is handled by file locking.  If you
+      wish to handle serialization of cache persistence yourself then disable
+      this behavior otherwise you may risk deadlock.
+      */
+    Boolean skipFileLock = false
 
     /**
       The path to the persistent cache file if this class is initialized with
@@ -208,6 +221,24 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
       @see <a href="https://docs.kernel.org/filesystems/tmpfs.html" target=_blank><tt>/dev/shm</tt> filesystem</a> which is in-memory file storage so very fast
       */
     String cacheFile = '/dev/shm/jervis-token-cache.yml'
+
+    /**
+      A centralized lock obtained in order to serialize loading and persisting
+      backend cache.  Since the backend cache is file-based by default this
+      lock is also file-based by default.  You can replace the default with a
+      distributed lock.
+      @default
+<pre><code>
+{ Closure body -&gt;
+    new LockableFile(this.cacheLockFile).withLock {
+        body()
+    }
+}
+</code></pre>
+      @see #cacheLockFile
+      @see net.gleske.jervis.tools.LockableFile
+      */
+    Closure obtainLock
 
     /**
       A closure which should return a <tt>String</tt> from loading the cache.
