@@ -339,6 +339,8 @@ tokenCred.saveCache = { String cache ->
       @param expiration An ISO instant formatted string like <tt>{@link java.time.Instant#toString()}</tt>.
       */
     void setExpiration(String expiration) {
+        // A quick parse check
+        Instant.parse(expiration)
         this.cache[this.hash].expires_at = expiration
     }
 
