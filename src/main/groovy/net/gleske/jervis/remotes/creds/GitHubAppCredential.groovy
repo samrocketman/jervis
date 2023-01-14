@@ -78,6 +78,12 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
     private String jwtToken
 
     /**
+      A unique hash identifying this credential.  This is a dynamically
+      calculated hash.
+      */
+    private String hash
+
+    /**
       Resolves installation ID for the GitHub app if it is not defined.
       */
     private void resolveInstallationId() {
@@ -113,17 +119,20 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
     }
 
     /**
-      The public hosted GitHub API URL.  Set to <tt>https://api.github.com/</tt>.
+      The public hosted GitHub API URL.
+      @default <tt>https://api.github.com/</tt>
       */
     static String DEFAULT_GITHUB_API = 'https://api.github.com/'
 
     /**
       The URL which will be used for API requests to GitHub.
+      @default <tt>https://api.github.com/</tt>
       */
     String github_api_url
 
     /**
       Pre-defined headers to add to the request.
+      @default <tt>[:]</tt>
       */
     Map headers = [:]
 
@@ -134,15 +143,11 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
 
       <h2>Sample usage</h2>
 <pre><code>
-github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "read"]]
+// Limit scope to readonly access to two repositories
+github_app.scope = [repositories: ['repo1', 'repo2'], permissions: [contents: 'read']]
 </code></pre>
       */
     Map scope = [:]
-
-    /**
-      A unique hash identifying this credential.
-      */
-    String hash
 
     /**
       Creates a new instance of a <tt>GitHubAppCredential</tt> meant to serve
@@ -171,10 +176,23 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
         this.tokenCredential = tokenCredential
     }
 
+    /**
+      Used for API access to issue tokens.
+      @see #github_api_url
+      @return A base URL for making GitHub API requests.
+      **/
     String baseUrl() {
         this.github_api_url
     }
 
+    /**
+      Headers used for authentication.
+      @see #headers
+      @param headers Custom headers can be provided and combined with default
+                     and pre-defined headers.
+      @return Returns as set of headers with authorization configured meant for
+              issuing tokens.
+      */
     Map header(Map headers = [:]) {
         SecurityIO operator = new SecurityIO(rsaCredential.getPrivateKey())
         if(!this.jwtToken || !operator.verifyGitHubJWTPayload(jwtToken)) {
@@ -191,6 +209,13 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
         tempHeaders
     }
 
+    /**
+      Get a valid GitHub App API token meant for cloning code or interacting
+      with GitHub APIs.
+      @return Returns a valid GitHub API token.  The returned token will expire
+              within an hour.  Calling this function should return the same
+              token until it expires and a new token is automatically rotated.
+      */
     String getToken() {
         String hash = getHash()
         if(tokenCredential.isExpired(hash)) {
@@ -203,6 +228,9 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
 
     /**
       Sets the RSA credential used for authentication.
+      @see #getToken()
+      @param cred A GitHub App RSA key used to generate a JSON Web Token (JWT)
+                  for issuing API credentials.
       */
       void setRsaCredential(GitHubAppRsaCredential cred) {
           this.rsaCredential = cred
@@ -212,7 +240,9 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
       }
 
     /**
-      Sets the scope for issuing tokens.
+      Sets the scope for issuing tokens.  This scope can be limited to specific
+      repositories or a subset of permissions from the GitHub App.
+      @see #scope
       */
       void setScope(Map scope) {
           this.scope = scope
@@ -224,6 +254,8 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
     /**
       A hash of <tt>{@link net.gleske.jervis.remotes.interfaces.GitHubAppRsaCredential#getId()}</tt> and requested token scope.
 
+      @see net.gleske.jervis.remotes.interfaces.GitHubAppRsaCredential#getId()
+      @see #scope
       @return A <tt>SHA-256</tt> hash value.
       */
     String getHash() {
@@ -231,5 +263,14 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
             this.hash = SecurityIO.sha256Sum([rsaCredential.getId(), this.scope.inspect()].join('\n'))
         }
         this.hash
+    }
+
+    /**
+      This method will throw an exception because the hash calculation is
+      dynamic and must not be set.
+      @see #getHash()
+      */
+    void setHash(String hash) {
+        throw new GitHubAppException('Setting hash manually is not allowed.')
     }
 }
