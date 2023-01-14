@@ -25,10 +25,8 @@ import java.time.Instant
 
 /**
   A flexible token cache with pluggable backend storage which encrypts the
-  cache before storing it in the backend.  By default, this uses a file-based
-  backend storage on
-  <a href="https://docs.kernel.org/filesystems/tmpfs.html" target=_blank><tt>/dev/shm</tt> filesystem</a>
-  which is in-memory file storage so very fast.
+  cache before storing it in the backend.  By default, this uses a Linux file-based
+  backend storage; refer to <tt>{@link #cacheFile}</tt>.
   */
 class EphemeralTokenCache implements EphemeralTokenCredential, ReadonlyTokenCredential {
     /**
@@ -48,14 +46,14 @@ class EphemeralTokenCache implements EphemeralTokenCredential, ReadonlyTokenCred
       @see #loadCache Instantiates loadCache closure
       @see #saveCache Instantiates saveCache closure
       @Warning If an empty <tt>String</tt> or <tt>null</tt> is returned by
-               <tt>resolvePrivateKeyString</tt>, then encryption at rest is
+               <tt>resolvePrivateKeyString()</tt>, then encryption at rest is
                disabled.  This is intended to provide flexibility.  The cache
                entries contain sensitive API tokens and should be encrypted at
-               rest if not by built-in, then by the backend service.
+               rest; if not encrypted by <tt>CipherMap</tt>, then encrypted by
+               the backend service.
       @param resolvePrivateKeyString An executable <tt>Closure</tt> that takes
                                      no parameters and returns a PKCS1 or PKCS8
-                                     formatted RSA private key as a
-                                     <tt>String</tt>.
+                                     PEM formatted RSA private key.
       */
     EphemeralTokenCache(Closure resolvePrivateKeyString) {
         setupClosures(resolvePrivateKeyString)
@@ -66,9 +64,16 @@ class EphemeralTokenCache implements EphemeralTokenCredential, ReadonlyTokenCred
       a private key is insecurely stored on disk if no 3rd party credential
       backend is used.
 
-      @see net.gleske.jervis.tools.CipherMap
-      @param resolvePrivateKeyString A PKCS1 or PKCS8 formatted RSA private key
-                                     as a <tt>String</tt>.
+      <p>This constructor is provided for convenience and is equavalent to the
+      following closure constructor.</p>
+
+<pre><code>
+new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
+</code></pre>
+
+      @see #EphemeralTokenCache(groovy.lang.Closure)
+      @param resolvePrivateKeyString Path to a file which contains a PKCS1 or
+                                     PKCS8 PEM formatted RSA private key.
       */
     EphemeralTokenCache(String privateKeyPath) {
         this({->
@@ -186,75 +191,72 @@ class EphemeralTokenCache implements EphemeralTokenCredential, ReadonlyTokenCred
 
     /**
       The path to a lock file which serializes read and write access to
-      persistent cache where tokens issued by GitHub App are stored.
+      persistent cache where issued tokens are stored.
 
-      Defaults to <tt>/dev/shm/jervis-gh-app-token-cache.lock</tt>.  On Linux,
-      <tt>/dev/shm</tt> is similar to <tt>/tmp</tt> but is a RAM disk so very
-      fast.
+      @default <tt>/dev/shm/jervis-token-cache.lock</tt>
+      @see <a href="https://docs.kernel.org/filesystems/tmpfs.html" target=_blank><tt>/dev/shm</tt> filesystem</a> which is in-memory file storage so very fast
+      @see #cacheFile
       */
     String cacheLockFile = '/dev/shm/jervis-token-cache.lock'
 
     /**
       The path to the persistent cache file if this class is initialized with
       encryption at rest.
+
+      @default <tt>/dev/shm/jervis-token-cache.yml</tt>
+      @see <a href="https://docs.kernel.org/filesystems/tmpfs.html" target=_blank><tt>/dev/shm</tt> filesystem</a> which is in-memory file storage so very fast
       */
     String cacheFile = '/dev/shm/jervis-token-cache.yml'
 
     /**
       A closure which should return a <tt>String</tt> from loading the cache.
-      Persistent caching of tokens is optional.
-
-      <h2>Sample usage</h2>
-
-      <p><b>WARNING:</b> The cache entries contain sensitive API tokens and
-      should be encrypted at rest.  This example is plain text tokens.  It is
-      recommended to encrypt at rest.  Refer to <tt>{@link #getPrivateKey}</tt>
-      which includes an example for encrypting at rest.</p>
-
-      <p>This example shows an insecure file cache. Both <tt>loadCache</tt> and
-      <tt>saveCache</tt> must be set for caching to activate.</p>
-
+      Persistent caching of tokens is optional.  Before this is called a file
+      lock is obtained on a lock file.
+      @default
 <pre><code>
-import net.gleske.jervis.remotes.creds.EphemeralTokenCache
-
-// Instantiate without encryption at rest.
-EphemeralTokenCache tokenCred = new EphemeralTokenCache({-&gt; ''})
-
-tokenCred.loadCache = {-&gt;
-    File f = new File('/dev/shm/cache.yml')
+{-&gt;
+    File f = new File(this.cacheFile)
     if(!f.exists()) {
         return ''
     }
     f.text
 }
-
-tokenCred.saveCache = { String cache -&gt;
-    // initialize file with private permissions
-    ['/bin/sh', '-ec', 'touch /dev/shm/cache.yml; chmod 600 /dev/shm/cache.yml'].execute()
-    // write out cache
-    new File('/dev/shm/cache.yml').withWriter('UTF-8') { Writer w -&gt;
-        w &lt;&lt; cache + '\n'
-    }
-}
 </code></pre>
+      @see #cacheFile
+      @see #cacheLockFile
       */
     Closure loadCache
 
     /**
       A closure which which should support a <tt>String</tt> parameter used to
-      optionally persist a cache.  See <tt>{@link #loadCache}</tt> (plaintext)
-      or <tt>{@link #getPrivateKey}</tt> (encrypted at rest) for an example.
+      optionally persist a cache.  Before this is called a file lock is obtained on a lock file.
+      @default
+<pre><code>
+{ String cache -&gt;
+    File f = new File(this.cacheFile)
+    // initialize file with private permissions
+    if(!f.exists()) {
+        ['/bin/sh', '-ec', "touch '&#36;{this.cacheFile}'; chmod 600 '&#36;{this.cacheFile}'"].execute()
+    }
+    // write out cache
+    f.withWriter('UTF-8') { Writer w -&gt;
+        w &lt;&lt; cache
+    }
+}
+</code></pre>
+      @see #cacheFile
+      @see #cacheLockFile
       */
     Closure saveCache
 
     /**
-      A closure that returns an RSA private key used to encipher the cache for
-      storing API tokens issued by GitHub App for encryption at rest.
-      Encryption privided by <tt>CipherMap</tt>.
+      A closure that returns a PKCS1 or PKCS8 PEM formatted RSA private key as
+      a <tt>String</tt> used to encipher the cache for encryption at rest.
 
       <h2>Sample usage</h2>
 
-      <p>This assumes a private key is insecurely stored as a file.</p>
+      <p>This assumes a private key is insecurely stored as a file.  Ideally,
+      the private key is stored in a 3rd party credentials backend.</p>
 
 <pre><code>
 import net.gleske.jervis.remotes.creds.EphemeralTokenCache
@@ -266,13 +268,13 @@ EphemeralTokenCache cred = new EphemeralTokenCache({-&gt; new File('path/to/priv
 cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
 </pre></code>
 
-      @see net.gleske.jervis.tools.CipherMap
+      @see net.gleske.jervis.tools.CipherMap CipherMap provides encryption at rest
       */
     Closure getPrivateKey = {-> '' }
 
     /**
       The time buffer before a renewal is forced.  This is to account for clock
-      drift and is customizable by the client.
+      drift and is customizable by the client.  The value is number of seconds.
 
       @default 30
       */
@@ -280,15 +282,20 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
 
     /**
       Customize the number of SHA-256 hash iterations performed during AES
-      encryption operations.  Default: <tt>0</tt> iterations.
+      encryption operations.  Due to encryption strength, <tt>CipherMap</tt>
+      automatically rotating keys, and the short-lived nature of the ephemeral
+      tokens this value is lowered from the <tt>DEFAULT_AES_ITERATIONS</tt>.
 
+      @default 0
       @see net.gleske.jervis.tools.SecurityIO#DEFAULT_AES_ITERATIONS
+      @see net.gleske.jervis.tools.CipherMap CipherMap provides encryption at rest
       */
     Integer hash_iterations = 0
 
     /**
       Returns renew buffer.  Does not allow renew buffer to be undefined or go below zero.
 
+      @see #renew_buffer
       @return <tt>0</tt> or a <tt>renew_buffer</tt> greater than <tt>0</tt>.
       */
     Long getRenew_buffer() {
@@ -302,9 +309,11 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
     /**
       Checks if a token is expired.
 
+      @see #getRenew_buffer()
+      @see #isExpired(java.time.Instant)
       @param hash A hash used for performing a lookup on an internal token
                   cache.
-      @return Returns <tt>true</tt> if the GitHub token is expired requiring
+      @return Returns <tt>true</tt> if the issued token is expired requiring
               another to be issued.
       */
     Boolean isExpired(String hash) {
@@ -323,7 +332,9 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
     /**
       Checks if a token is expired.
 
-      @return Returns <tt>true</tt> if the GitHub token is expired requiring
+      @see #getRenew_buffer()
+      @see #isExpired(java.time.Instant)
+      @return Returns <tt>true</tt> if the issued token is expired requiring
               another to be issued.
       */
     Boolean isExpired() {
@@ -334,11 +345,12 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
     }
 
     /**
-      Checks if a token is expired.
+      Checks if the provided time has passed.
 
+      @see #getRenew_buffer()
+      @see java.time.Instant#now()
       @param expires Check if this instant is expired based on
-                     <tt>{@link #getRenew_buffer()}</tt> and
-                     <tt>{@link java.time.Instant#now()}</tt>.
+                     <tt>getRenew_buffer()</tt> and <tt>Instant.now</tt>.
       @return Returns <tt>true</tt> if the GitHub token is expired requiring
               another to be issued.
       */
@@ -372,6 +384,7 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
       A new token has been issued so this method will update the backend cache
       to store the new token.  This method will also remove expired tokens
       before persisting the cache.
+      @see #getRenew_buffer()
       */
     void updateTokenWith(String token, String expiration, String hash) {
         this.hash = hash
