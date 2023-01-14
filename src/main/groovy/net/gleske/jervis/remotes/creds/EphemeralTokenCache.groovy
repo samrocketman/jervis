@@ -150,7 +150,9 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
         if(privateKey) {
             this.cipherMap = new CipherMap(privateKey)
             this.cipherMap.hash_iterations = this.hash_iterations
-            this.cipherMap << data
+            if(data) {
+                this.cipherMap << data
+            }
         }
         if(this.cipherMap) {
             temp = this.cipherMap.getPlainMap()
