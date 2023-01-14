@@ -16,7 +16,7 @@
 
 package net.gleske.jervis.remotes.creds
 
-import net.gleske.jervis.remotes.interfaces.GitHubAppTokenCredential
+import net.gleske.jervis.remotes.interfaces.EphemeralTokenCredential
 import net.gleske.jervis.tools.CipherMap
 import net.gleske.jervis.tools.LockableFile
 import net.gleske.jervis.tools.YamlOperator
@@ -25,11 +25,11 @@ import java.time.Instant
 
 /**
   A basic implementation of the
-  <tt>{@link net.gleske.jervis.remotes.interfaces.GitHubAppTokenCredential}</tt>.
+  <tt>{@link net.gleske.jervis.remotes.interfaces.EphemeralTokenCredential}</tt>.
   In general, a more secure credential implementation is suggested.  For an
-  example, see <tt>GitHubAppTokenCredential</tt> API documentation for examples.
+  example, see <tt>EphemeralTokenCredential</tt> API documentation for examples.
   */
-class EphemeralTokenCache implements GitHubAppTokenCredential, ReadonlyTokenCredential {
+class EphemeralTokenCache implements EphemeralTokenCredential, ReadonlyTokenCredential {
 
     EphemeralTokenCache(Closure resolvePrivateKeyString) {
         setupClosures(resolvePrivateKeyString)

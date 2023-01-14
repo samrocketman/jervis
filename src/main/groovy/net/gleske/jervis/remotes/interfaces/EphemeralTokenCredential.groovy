@@ -20,7 +20,7 @@ package net.gleske.jervis.remotes.interfaces
   Provides a high level interface for ephemeral API tokens issued by a GitHub
   App installation.
   */
-interface GitHubAppTokenCredential extends TokenCredential {
+interface EphemeralTokenCredential extends TokenCredential {
 
     /**
       Checks if a token is expired.  This method will be called first before any

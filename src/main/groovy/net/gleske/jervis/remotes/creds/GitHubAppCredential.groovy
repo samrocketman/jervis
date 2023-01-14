@@ -19,7 +19,7 @@ package net.gleske.jervis.remotes.creds
 import net.gleske.jervis.exceptions.GitHubAppException
 import net.gleske.jervis.remotes.SimpleRestServiceSupport
 import net.gleske.jervis.remotes.interfaces.GitHubAppRsaCredential
-import net.gleske.jervis.remotes.interfaces.GitHubAppTokenCredential
+import net.gleske.jervis.remotes.interfaces.EphemeralTokenCredential
 import net.gleske.jervis.tools.SecurityIO
 
 /**
@@ -54,7 +54,7 @@ new GitHubAppCredential(rsaCred, tokenCred).getToken()
   */
 class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceSupport {
     private GitHubAppRsaCredential rsaCredential
-    private GitHubAppTokenCredential tokenCredential
+    private EphemeralTokenCredential tokenCredential
 
     /**
       Optionally set an installation ID for a GitHub app.  Set this to avoid
@@ -155,7 +155,7 @@ github_app.scope = [repositories: ["repo1", "repo2"], permissions: [contents: "r
                              data to disk in Jenkins pipelines.  Refer to the
                              interface for a recommended example.
       */
-    GitHubAppCredential(GitHubAppRsaCredential rsaCredential, GitHubAppTokenCredential tokenCredential) {
+    GitHubAppCredential(GitHubAppRsaCredential rsaCredential, EphemeralTokenCredential tokenCredential) {
         String rsaApiUrl = addTrailingSlash(rsaCredential.getApiUri())
         this.github_api_url = (rsaApiUrl == this.DEFAULT_GITHUB_API) ? this.DEFAULT_GITHUB_API : rsaApiUrl
         this.rsaCredential = rsaCredential
