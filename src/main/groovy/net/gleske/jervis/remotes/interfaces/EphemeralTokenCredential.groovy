@@ -17,8 +17,8 @@
 package net.gleske.jervis.remotes.interfaces
 
 /**
-  Provides a high level interface for ephemeral API tokens issued by a GitHub
-  App installation.
+  Provides a high level interface for ephemeral API tokens issued by a
+  time-limited token issuing service.
   */
 interface EphemeralTokenCredential extends TokenCredential {
 
@@ -27,18 +27,19 @@ interface EphemeralTokenCredential extends TokenCredential {
       other.  A hash will be provided in case there's a backend cache.  This
       method could load from the cache before returning the <tt>Boolean</tt>.
 
-      @param hash Unique to the token provided by
+      @param hash Unique to the token provided by issuer.  For an example see
                   <tt>{@link net.gleske.jervis.remotes.creds.GitHubAppCredential#getHash()}</tt>.
-                  It can be used for caching and restoring cached tokens.
-      @return Returns <tt>true</tt> if the GitHub token is expired requiring
-              another to be issued.
+                  It is used for storing and retrieving issued tokens from the
+                  backend cache.
+      @return Returns <tt>true</tt> if the token is expired requiring another
+              to be issued.
       */
     Boolean isExpired(String hash)
 
     /**
       Checks if a token is expired.
-      @return Returns <tt>true</tt> if the GitHub token is expired requiring
-              another to be issued.
+      @return Returns <tt>true</tt> if the token is expired requiring another
+              to be issued.
       */
     Boolean isExpired()
 
@@ -46,12 +47,15 @@ interface EphemeralTokenCredential extends TokenCredential {
       Update all three properties with a repeatable unique hash provided in case
       backend caching is used.
 
-      @param token An ephemeral GitHub token issued by a GitHub App.
+      @param token An ephemeral token issued by a a token issuer.  See
+                   <tt>{@link net.gleske.jervis.remotes.creds.GitHubAppCredential}</tt>
+                   for an example of a token issuer.
       @param expiration The instant a token expires.  The format must be
                         <tt>{@link java.time.format.DateTimeFormatter#ISO_INSTANT}</tt>.
-      @param hash A unique hash meant to be used with a backend cache.  The hash
-             is built from the GitHub App ID, GitHub App Installation ID, and the
-             requested scopes.
+      @param hash Unique to the token provided by issuer.  For an example see
+                  <tt>{@link net.gleske.jervis.remotes.creds.GitHubAppCredential#getHash()}</tt>.
+                  It is used for storing and retrieving issued tokens from the
+                  backend cache.
       */
     void updateTokenWith(String token, String expiration, String hash)
 
@@ -61,8 +65,8 @@ interface EphemeralTokenCredential extends TokenCredential {
     String getExpiration()
 
     /**
-      Sets when an ephemeral GitHub API token will expire.  A quick parsing
-      check can be performed with <tt>{@link java.time.Instant}</tt>.
+      Sets when an ephemeral token will expire.  A quick parsing check can be
+      performed with <tt>{@link java.time.Instant}</tt>.
 
 <pre><code class="language-groovy">
 void setExpiration(String expiration) {
