@@ -389,7 +389,16 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
               another to be issued.
       */
     Boolean isExpired(Instant expires) {
-        Long renewAt = expires.epochSecond - getRenew_buffer()
+        isExpired(expires, getRenew_buffer())
+    }
+
+    /**
+      Similar to other isExpired methods but allows passing in the renew_buffer
+      as an argument.
+      */
+    private Boolean isExpired(Instant expires, Long renew_before) {
+        Long renewBefore = (renew_before && renew_before > 0) ? renew_before : 0
+        Long renewAt = expires.epochSecond - renewBefore
         Instant now = new Date().toInstant()
         now.epochSecond >= renewAt
     }
@@ -402,8 +411,11 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
     private void cleanupCache() {
         // Find expired cache entries.
         List cleanup = this.cache.findAll { hash, entry ->
-            (entry in Map) &&
-            (!entry?.expires_at || isExpired(Instant.parse(entry.expires_at)))
+            if(!(entry in Map)) {
+                return false
+            }
+            Long renewBefore = entry?.renew_buffer ?: 0
+            (!entry?.expires_at || isExpired(Instant.parse(entry.expires_at), renewBefore))
         }.collect { hash, entry ->
             hash
         } ?: []
@@ -428,6 +440,7 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
             this.cache[hash].token = token
             setExpiration(expiration)
             this.cache[hash].expires_at = expiration
+            this.cache[hash].renew_buffer = getRenew_buffer()
             // Removes expired cache entries
             cleanupCache()
             trySaveCache()
