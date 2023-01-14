@@ -219,10 +219,10 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
       The path to the persistent cache file if this class is initialized with
       encryption at rest.
 
-      @default <tt>/dev/shm/jervis-token-cache.yml</tt>
+      @default <tt>/dev/shm/jervis-token-cache.yaml</tt>
       @see <a href="https://docs.kernel.org/filesystems/tmpfs.html" target=_blank><tt>/dev/shm</tt> filesystem</a> which is in-memory file storage so very fast
       */
-    String cacheFile = '/dev/shm/jervis-token-cache.yml'
+    String cacheFile = '/dev/shm/jervis-token-cache.yaml'
 
     /**
       A centralized lock obtained in order to serialize loading and persisting
