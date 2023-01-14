@@ -27,29 +27,38 @@ import net.gleske.jervis.tools.SecurityIO
 
   <h2>Sample usage</h2>
 <pre><code>
+import net.gleske.jervis.remotes.creds.EphemeralTokenCache
 import net.gleske.jervis.remotes.creds.GitHubAppCredential
 import net.gleske.jervis.remotes.creds.GitHubAppRsaCredentialImpl
-import net.gleske.jervis.remotes.creds.EphemeralTokenCache
 
-GitHubAppRsaCredentialImpl rsaCred = new GitHubAppRsaCredentialImpl('123456', new File('private-key.pem').text)
-EphemeralTokenCache tokenCred = new EphemeralTokenCache()
-tokenCred.loadCache = {-&gt;
-    File f = new File('/tmp/cache.yml')
-    if(!f.exists()) {
-        return [:]
-    }
-    def cache = net.gleske.jervis.tools.YamlOperator.loadYamlFrom(f)
-    (cache in Map) ? cache : [:]
-}
-tokenCred.saveCache = { Map cache -&gt;
-    File f = new File('/tmp/cache.yml')
-    net.gleske.jervis.tools.YamlOperator.writeObjToYaml(f, cache)
+import java.time.Instant
+
+// Configure the private key downloaded from GitHub App.
+GitHubAppRsaCredentialImpl rsaCred = new GitHubAppRsaCredentialImpl('123456', new File('app-private-key.pem').text)
+rsaCred.owner = 'gh-organization'
+
+// Configure encrypted token storage
+EphemeralTokenCache tokenCred = new EphemeralTokenCache('src/test/resources/rsa_keys/good_id_rsa_4096')
+
+// a small timing function
+Long time(Closure c) {
+    Instant before = Instant.now()
+    c()
+    Instant after = Instant.now()
+    after.epochSecond - before.epochSecond
 }
 
 // Issue a token; if called multiple times then this token will retrieve the
 // token from the cache.  It will issue a new token if the existing token
 // expires.
-new GitHubAppCredential(rsaCred, tokenCred).getToken()
+println("Execution time: ${time { println('GitHub token: ' + new GitHubAppCredential(rsaCred, tokenCred).getToken()) }} second(s).")
+println('Try again...')
+println("Execution time: ${time { println('GitHub token: ' + new GitHubAppCredential(rsaCred, tokenCred).getToken()) }} second(s).")
+
+println('\n' + ['='*80, 'Encrypted cache below', '='*80].join('\n') + '\n')
+
+// Read the encrypted cache which is an encrypted YAML document.
+println(new File(tokenCred.cacheFile).text)
 </code></pre>
   */
 class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceSupport {
