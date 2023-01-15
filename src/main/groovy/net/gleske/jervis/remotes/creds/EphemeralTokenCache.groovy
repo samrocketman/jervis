@@ -389,14 +389,15 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
               another to be issued.
       */
     Boolean isExpired(Instant expires) {
-        isExpired(expires, getRenew_buffer())
+        checkExpiration(expires, getRenew_buffer())
     }
 
     /**
       Similar to other isExpired methods but allows passing in the renew_buffer
       as an argument.
+      @return <tt>true</tt> if expired or <tt>false</tt> if valid.
       */
-    private Boolean isExpired(Instant expires, Long renew_before) {
+    private Boolean checkExpiration(Instant expires, Long renew_before) {
         Long renewBefore = (renew_before && renew_before > 0) ? renew_before : 0
         Long renewAt = expires.epochSecond - renewBefore
         Instant now = new Date().toInstant()
@@ -415,7 +416,7 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
                 return false
             }
             Long renewBefore = entry?.renew_buffer ?: 0
-            (!entry?.expires_at || isExpired(Instant.parse(entry.expires_at), renewBefore))
+            (!entry?.expires_at || checkExpiration(Instant.parse(entry.expires_at), renewBefore))
         }.collect { hash, entry ->
             hash
         } ?: []
