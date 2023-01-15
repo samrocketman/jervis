@@ -175,15 +175,28 @@ The following methods and fields have been renamed or removed.
   - Added support for adding headers to all requests via `GitHub.headers` field.
   - Updated client HTTP headers to match GitHub v3 REST API version
     `2022-11-28`.
+- New [`CipherMap`][CipherMap] utility class meant to transparently provide
+  strong encryption for map objects.
+- New [`EphemeralTokenCache`][EphemeralTokenCache] credential which is an
+  encrypted cache meant to store ephemeral API tokens issued by services such as
+  GitHub App or any other time-limited token service.  The intention of the
+  cache is to reuse issued tokens in order to reduce API requests.
+- GitHub App authentication now available via the following classes.
+  - [`EphemeralTokenCache`][EphemeralTokenCache] provides token storage and
+    automatic cleanup of expired tokens.
+  - [`GitHubAppRsaCredentialImpl`][GitHubAppRsaCredentialImpl]
+  - [`GitHubAppCredential`][GitHubAppCredential] a credential meant for API
+    clients such as [`GitHub`][GitHub] or [`GitHubGraphQL`][GitHubGraphQL].
+    Credential rotation is handled automatically and transparent to the client.
 
 ### Bug fixes:
 
 - Major bugfix: support for more HTTP methods which have no content in the
   response.
 - Bugfix: Groovy 3.0.5 YAML `additional_toolchains` order was not preserved.
-  This change makes Jervis compatible with Groovy 2.4, 2.5, and 3.0 series of
-  releases.  Jenkins LTS currently uses Groovy 2.4.21 so this is more of a
-  future-proofing fix than a bug for existing usage.
+  This change makes Jervis compatible with Groovy 2.4, 2.5, 2.6, and 3.0, and
+  4.0 series of releases.  Jenkins LTS currently uses Groovy 2.4.21 so this is
+  more of a future-proofing fix than a bug for existing usage.
 - Minor bugfix around cipherlist loading in LifecycleGenerator.  Discovered via
   100% test coverage goal.
 
@@ -197,8 +210,12 @@ The following methods and fields have been renamed or removed.
 - Upgraded to Gradle 7.6
 - Added support for building on OpenJDK 11 and OpenJDK 17.  OpenJDK 17 requires
   Gradle 3 or higher.
-- Added support for building on Groovy versions 2.4 through 4.0.
+- Extended support for building and running on Groovy versions 2.4 through 4.0.
 
+[CipherMap]: src/main/groovy/net/gleske/jervis/tools/CipherMap.groovy
+[EphemeralTokenCache]: src/main/groovy/net/gleske/jervis/remotes/creds/EphemeralTokenCache.groovy
+[GitHubAppCredential]: src/main/groovy/net/gleske/jervis/remotes/creds/GitHubAppCredential.groovy
+[GitHubAppRsaCredentialImpl]: src/main/groovy/net/gleske/jervis/remotes/creds/GitHubAppRsaCredentialImpl.groovy
 [GitHub]: src/main/groovy/net/gleske/jervis/remotes/GitHub.groovy
 [StaticMocking]: src/test/groovy/net/gleske/jervis/remotes/StaticMocking.groovy
 [TokenCredential]: src/main/groovy/net/gleske/jervis/remotes/interfaces/TokenCredential.groovy
