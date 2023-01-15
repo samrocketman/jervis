@@ -62,9 +62,9 @@ class EphemeralTokenCache implements EphemeralTokenCredential, ReadonlyTokenCred
     }
 
     /**
-      An ephemeral token cache which provides encryption at rest.  This assumes
-      a private key is insecurely stored on disk if no 3rd party credential
-      backend is used.
+      Creates an ephemeral token cache from a private key on disk.  This
+      assumes a private key is insecurely stored on disk if no 3rd party
+      credential backend is used.
 
       <p>This constructor is provided for convenience and is equavalent to the
       following closure constructor.</p>
@@ -73,6 +73,11 @@ class EphemeralTokenCache implements EphemeralTokenCredential, ReadonlyTokenCred
 new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
 </code></pre>
 
+      @Warning Because the private key is insecurely stored on disk this is not
+               truly encryption at rest.  Encryption at rest requires the
+               decryption keys are not immediately available in plain form.
+               This constructor is intended to ease testing and provide an easy
+               way to experiment with the class interactively.
       @see #EphemeralTokenCache(groovy.lang.Closure)
       @param resolvePrivateKeyString Path to a file which contains a PKCS1 or
                                      PKCS8 PEM formatted RSA private key.
