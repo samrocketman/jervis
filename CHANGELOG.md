@@ -59,7 +59,8 @@ def call() {
 If you define `admin*` vars you'll have to convert them to NonCPS.  The
 following is a list of vars now requiring `NonCPS` annotation.
 
-- `vars/adminLibraryResource.groovy`
+- `vars/adminLibraryResource.groovy`; refer to
+  [`loadCustomResource`][loadCustomResource]
 
 <a name="2.0-major-api-changes"></a>
 ### Major API changes
@@ -127,7 +128,7 @@ The following methods and fields have been renamed or removed.
   - [`isBuilding`](vars/isBuilding.groovy)
   - [`isPRBuild`](vars/isPRBuild.groovy)
   - [`isTagBuild`](vars/isTagBuild.groovy)
-  - [`loadCustomResource`](vars/loadCustomResource.groovy)
+  - [`loadCustomResource`][loadCustomResource]
   - [`prepareJervisLifecycleGenerator`](vars/prepareJervisLifecycleGenerator.groovy)
   - [`prepareJervisPipelineGenerator`](vars/prepareJervisPipelineGenerator.groovy)
 
@@ -213,6 +214,7 @@ The following methods and fields have been renamed or removed.
 - Extended support for building and running on Groovy versions 2.4 through 4.0.
 
 [CipherMap]: src/main/groovy/net/gleske/jervis/tools/CipherMap.groovy
+[loadCustomResource]: vars/loadCustomResource.groovy
 [EphemeralTokenCache]: src/main/groovy/net/gleske/jervis/remotes/creds/EphemeralTokenCache.groovy
 [GitHubAppCredential]: src/main/groovy/net/gleske/jervis/remotes/creds/GitHubAppCredential.groovy
 [GitHubAppRsaCredentialImpl]: src/main/groovy/net/gleske/jervis/remotes/creds/GitHubAppRsaCredentialImpl.groovy
