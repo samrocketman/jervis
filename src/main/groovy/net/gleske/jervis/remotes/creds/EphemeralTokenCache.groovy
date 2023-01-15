@@ -30,6 +30,48 @@ import java.time.format.DateTimeParseException
   backend storage; refer to <tt>{@link #cacheFile}</tt>.  This is intentionally
   designed for shared use by multiple unrelated token issuers.  This provides
   centralized generic storage for all ephemeral tokens.
+
+  <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
+
+  <p>Basic sample usage using keys on disk for storage.</p>
+<pre><code>
+import net.gleske.jervis.remotes.creds.EphemeralTokenCache
+
+EphemeralTokenCache tokenCred = new EphemeralTokenCache('src/test/resources/rsa_keys/good_id_rsa_4096')
+</code></pre>
+
+  <p>However, ideally you would load the private key from a more secure
+  credential backend such as HashiCorp Vault or Jenkins.  The following example
+  is for reading the credential from Jenkins.</p>
+
+<pre><code>
+import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey
+import com.cloudbees.plugins.credentials.CredentialsProvider
+import jenkins.model.Jenkins
+
+import net.gleske.jervis.exceptions.KeyPairDecodeException
+import net.gleske.jervis.remotes.creds.EphemeralTokenCache
+
+// Dynamically load an RSA private key from Jenkins.  Key must be 2048-bit or
+// greater; 4096-bit recommended.
+String credentialId = 'some-credential-id'
+EphemeralTokenCache tokenCred = new EphemeralTokenCache({-&gt;
+    CredentialsProvider.lookupCredentials(BasicSSHUserPrivateKey, Jenkins.instance, Jenkins.instance.ACL.SYSTEM).find {
+        it.id == credentialId
+    }.with { jenkinsCred -&gt;
+        if(!jenkinsCred?.getPrivateKey()) {
+            // Throw an exception because this class will disable encryption if
+            // the credential does not exist i.e. returns null
+            throw new KeyPairDecodeException("Private key ${credentialId} must not be null.")
+        }
+        // return private
+        jenkinsCred.getPrivateKey()
+    }
+})
+</code></pre>
   */
 class EphemeralTokenCache implements EphemeralTokenCredential, ReadonlyTokenCredential {
     /**
@@ -97,7 +139,8 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
     private void setupClosures(Closure privateKeyClosure) {
         String privateKey = privateKeyClosure()
         if(privateKey) {
-            // quickly test private key strength (it will throw an exception for a weak key)
+            // Quickly test validity and private key strength (it will throw an
+            // exception for a weak key)
             new CipherMap(privateKey)
             this.getPrivateKey = privateKeyClosure
         }
