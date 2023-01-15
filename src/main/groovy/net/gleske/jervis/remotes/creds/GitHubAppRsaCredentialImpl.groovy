@@ -24,18 +24,29 @@ import net.gleske.jervis.tools.SecurityIO
   <tt>{@link net.gleske.jervis.remotes.interfaces.GitHubAppRsaCredential}</tt>.
   In general, a more secure credential implementation is suggested.  For an
   example, see <tt>GitHubAppRsaCredential</tt> API documentation for examples.
+
+  <h2>Sample usage</h2>
+<pre><code>
+import net.gleske.jervis.remotes.creds.GitHubAppRsaCredentialImpl
+
+GitHubAppRsaCredentialImpl rsaCred = new GitHubAppRsaCredentialImpl('123456', new File('github-app-private-key.pem').text)
+// Update owner to query app installations
+rsaCred.owner = 'samrocketman'
+</code>
   */
 
 class GitHubAppRsaCredentialImpl implements GitHubAppRsaCredential {
     /**
       The GitHub App ID for a GitHub credential.
+      @default null
       */
-    String appID
+    final String appID
 
     /**
       The GitHub API URL for querying GitHub App API in case of self-hosted
       GitHub Enterprise.
 
+      @default DEFAULT_GITHUB_API from GitHubAppCredential
       @see net.gleske.jervis.remotes.creds.GitHubAppCredential#DEFAULT_GITHUB_API
       */
     String apiUri = GitHubAppCredential.DEFAULT_GITHUB_API
@@ -43,17 +54,45 @@ class GitHubAppRsaCredentialImpl implements GitHubAppRsaCredential {
     /**
       When querying for App installations this is necessary to select the
       install for a user or organization where the GitHub App is installed.
+      @default Empty String <tt>''</tt>
       */
     String owner = ''
 
     /**
-      A private key for a GitHub App necessary for signing JSON web tokens.
+      Sets the owner.
+      @param owner An owner to query installation ID from a GitHub app.
       */
-    String privateKey
+    void setOwner(String owner) {
+        this.owner = owner
+        recalculateId()
+    }
 
+    /**
+      A private key for a GitHub App necessary for signing JSON web tokens.
+      @default null
+      */
+    final String privateKey
+
+    /**
+      Instantiates an RSA credential for a GitHub App used to generate API
+      tokens.
+      @param github_app_id An app ID for a GitHub App.
+      @param private_key An RSA private key associated with the github_app_id
+                         used to generate API tokens.  Format is PKCS1 or PKCS8
+                         PEM RSA private key.
+      */
     GitHubAppRsaCredentialImpl(String github_app_id, String private_key) {
         this.appID = github_app_id
         this.privateKey = private_key
+    }
+
+    /**
+      Recalculates the ID for this credential.
+      */
+    private void recalculateId() {
+        // recalculate ID
+        this.id = ''
+        getId()
     }
 
     private String id
