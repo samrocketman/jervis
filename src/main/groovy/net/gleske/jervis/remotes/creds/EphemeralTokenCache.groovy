@@ -27,7 +27,9 @@ import java.time.format.DateTimeParseException
 /**
   A flexible token cache with pluggable backend storage which encrypts the
   cache before storing it in the backend.  By default, this uses a Linux file-based
-  backend storage; refer to <tt>{@link #cacheFile}</tt>.
+  backend storage; refer to <tt>{@link #cacheFile}</tt>.  This is intentionally
+  designed for shared use by multiple unrelated token issuers.  This provides
+  centralized generic storage for all ephemeral tokens.
   */
 class EphemeralTokenCache implements EphemeralTokenCredential, ReadonlyTokenCredential {
     /**
