@@ -212,6 +212,7 @@ The following methods and fields have been renamed or removed.
 - Added support for building on OpenJDK 11 and OpenJDK 17.  OpenJDK 17 requires
   Gradle 3 or higher.
 - Extended support for building and running on Groovy versions 2.4 through 4.0.
+- API docs now have syntax highlighting in sample usage code blocks.
 
 [CipherMap]: src/main/groovy/net/gleske/jervis/tools/CipherMap.groovy
 [loadCustomResource]: vars/loadCustomResource.groovy
