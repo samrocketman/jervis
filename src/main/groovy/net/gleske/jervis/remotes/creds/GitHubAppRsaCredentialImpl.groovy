@@ -26,30 +26,82 @@ import net.gleske.jervis.tools.SecurityIO
   example, see <tt>GitHubAppRsaCredential</tt> API documentation for examples.
 
   <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
 <pre><code>
 import net.gleske.jervis.remotes.creds.GitHubAppRsaCredentialImpl
 
 GitHubAppRsaCredentialImpl rsaCred = new GitHubAppRsaCredentialImpl('123456', new File('github-app-private-key.pem').text)
 // Update owner to query app installations
 rsaCred.owner = 'samrocketman'
-</code>
+</code></pre>
+
   */
 
 class GitHubAppRsaCredentialImpl implements GitHubAppRsaCredential {
     /**
       The GitHub App ID for a GitHub credential.
+      */
+    private final String appID
+
+    /**
+      The GitHub App ID for a GitHub credential.
       @default null
       */
-    final String appID
+    String getAppID() {
+        this.appID
+    }
+
+    /**
+      A custom closure meant for resolving the private key dynamically from a
+      secured credential backend.
+      <h2>Sample usage</h2>
+      <p>The following example illustrates Jenkins credentials backend.
+      However, you can use any backend for the closure such as HashiCorp
+      Vault.</p>
+<pre><code>
+import com.cloudbees.plugins.credentials.CredentialsProvider
+import jenkins.model.Jenkins
+import org.jenkinsci.plugins.github_branch_source.GitHubAppCredentials
+
+import net.gleske.jervis.remotes.creds.GitHubAppRsaCredentialImpl
+
+GitHubAppCredentials appCred = CredentialsProvider.lookupCredentials(GitHubAppCredentials, Jenkins.instance, Jenkins.instance.ACL.SYSTEM).find {
+    it.id == 'some-credential-id'
+}
+
+// Set the private key to an empty string because it is unused.  Get all values
+// from the backend Jenkins credential.
+GitHubAppRsaCredentialImpl rsaCred = new GitHubAppRsaCredentialImpl(appCred.appID, '', appCred.apiUri)
+rsaCred.resolvePrivateKey = {-&gt;
+    appCred.privateKey.plainText
+}
+
+// Update owner to query app installations
+rsaCred.owner = appCred.owner ?: ''
+</code></pre>
+      @default null
+      */
+    Closure resolvePrivateKey
 
     /**
       The GitHub API URL for querying GitHub App API in case of self-hosted
       GitHub Enterprise.
 
-      @default DEFAULT_GITHUB_API from GitHubAppCredential
       @see net.gleske.jervis.remotes.creds.GitHubAppCredential#DEFAULT_GITHUB_API
       */
-    String apiUri = GitHubAppCredential.DEFAULT_GITHUB_API
+    private final String apiUri
+
+    /**
+      The GitHub API URL for querying GitHub App API in case of self-hosted
+      GitHub Enterprise.
+
+      @see net.gleske.jervis.remotes.creds.GitHubAppCredential#DEFAULT_GITHUB_API
+      */
+    String getApiUri() {
+        this.apiUri
+    }
 
     /**
       When querying for App installations this is necessary to select the
@@ -68,22 +120,35 @@ class GitHubAppRsaCredentialImpl implements GitHubAppRsaCredential {
     }
 
     /**
-      A private key for a GitHub App necessary for signing JSON web tokens.
-      @default null
+      A private key for a GitHub App necessary for signing JSON Web Tokens (JWT).
       */
-    final String privateKey
+    private final String privateKey
+
+    /**
+      A private key for a GitHub App necessary for signing JSON Web Tokens (JWT).
+      @return A PKCS1 or PKCS8 PEM formatted RSA private key.
+      */
+    String getPrivateKey() {
+        if(this.resolvePrivateKey) {
+            return resolvePrivateKey()
+        }
+        this.privateKey
+    }
 
     /**
       Instantiates an RSA credential for a GitHub App used to generate API
       tokens.
+      @see net.gleske.jervis.remotes.creds.GitHubAppCredential#DEFAULT_GITHUB_API
       @param github_app_id An app ID for a GitHub App.
       @param private_key An RSA private key associated with the github_app_id
                          used to generate API tokens.  Format is PKCS1 or PKCS8
                          PEM RSA private key.
+      @param api_url A custom URL to the GitHub API for GitHub Enterprise.
       */
-    GitHubAppRsaCredentialImpl(String github_app_id, String private_key) {
+    GitHubAppRsaCredentialImpl(String github_app_id, String private_key, String api_uri = GitHubAppCredential.DEFAULT_GITHUB_API) {
         this.appID = github_app_id
         this.privateKey = private_key
+        this.apiUri = api_uri
     }
 
     /**
@@ -91,26 +156,29 @@ class GitHubAppRsaCredentialImpl implements GitHubAppRsaCredential {
       */
     private void recalculateId() {
         // recalculate ID
-        this.id = ''
+        this.hash = ''
         getId()
     }
 
-    private String id
+    /**
+      A hash unique to this credential.
+      */
+    private String hash
 
     /**
       An ID unique to this credential.
       */
     String getId() {
-        if(!this.id) {
-            this.id = SecurityIO.sha256Sum(
+        if(!this.hash) {
+            this.hash = SecurityIO.sha256Sum(
                 [
                     this.apiUri,
                     this.appID,
                     this.owner,
-                    this.privateKey
+                    getPrivateKey()
                 ].join('\n')
             )
         }
-        this.id
+        this.hash
     }
 }
