@@ -258,14 +258,6 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
     String cacheLockFile = '/dev/shm/jervis-token-cache.lock'
 
     /**
-      Skip obtaining a file lock before persisting the cache.  By default,
-      cache is handled by file locking.  If you
-      wish to handle serialization of cache persistence yourself then disable
-      this behavior otherwise you may risk deadlock.
-      */
-    Boolean skipFileLock = false
-
-    /**
       The path to the persistent cache file if this class is initialized with
       encryption at rest.
 
@@ -276,9 +268,9 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
 
     /**
       A centralized lock obtained in order to serialize loading and persisting
-      backend cache.  Since the backend cache is file-based by default this
-      lock is also file-based by default.  You can replace the default with a
-      distributed lock.
+      backend cache.  Since the backend cache is file-based, this lock is also
+      file-based by default.  You can replace the default with a distributed
+      lock.
       @default
 <pre><code>
 { Closure body -&gt;
