@@ -146,6 +146,8 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
 // Limit scope to readonly access to two repositories
 github_app.scope = [repositories: ['repo1', 'repo2'], permissions: [contents: 'read']]
 </code></pre>
+      @default <tt>[:]</tt> or no scope which means it will get the full scope
+               of the GitHub App.
       */
     Map scope = [:]
 
