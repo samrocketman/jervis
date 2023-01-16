@@ -836,15 +836,21 @@ println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
       @see #encryptWithAES256(byte[], byte[], java.lang.String, java.lang.Integer) encryptWithAES256 AES enciphering details
       @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-5E8F4099-779F-4484-9A95-F1CEA167601A" target=_blank>Java Cryptography Architecture (JCA) Reference Guide for <tt>SecretKeyFactory</tt> class</a>
       @see <a href="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html#secretkeyfactory-algorithms" target=_blank><tt>SecretKeyFactory</tt> algorithm names</a>
+      @see <a href="https://www.nist.gov/publications/recommendation-password-based-key-derivation-part-1-storage-applications" target=_blank>Recommendation for Password-Based Key Derivation Part 1: Storage Applications</a>;
+           Published: December 22, 2010; Citation: Special Publication (NIST SP) - 800-132
+
+
       @param passphrase A passphrase used to generate AES keys for encryption.
-                        The passphrase creates an AES using
+                        The passphrase creates an AES key using
                         <tt>PBKDF2WithHmacSHA256</tt>, a salt created from
                         passphrase checksum, and variable PBKDF2 iterations
-                        based on passphrase checksum.  The PBKDF2 iterations are
-                        between <tt>100100</tt> and <tt>960000</tt>.
+                        based on passphrase checksum.  The PBKDF2 iterations
+                        are between <tt>100100</tt> and <tt>960000</tt>.
       @param data Data to be encrypted.
       @param hash_iterations The number of iterations the AES-256 initialization
-                             vector (IV) is hashed with SHA-256.
+                             vector (IV) is hashed with SHA-256.  The minimum
+                             iterations allowed is 1 for password-based
+                             encryption.
       */
     static String encryptWithAES256(String passphrase, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         // sha256Sum should always return lower case but forcing toLowerCase
@@ -852,7 +858,8 @@ println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
         String salt = sha256Sum(passphrase).toLowerCase()
         byte[] b_secret = passwordKeyDerivation(passphrase, salt)
         byte[] b_iv = salt.substring(0, 16).getBytes('UTF-8')
-        encodeBase64(encryptWithAES256(b_secret, b_iv, data, hash_iterations))
+        Integer iterations = (hash_iterations > 0) hash_iterations : 1
+        encodeBase64(encryptWithAES256(b_secret, b_iv, data, iterations))
     }
 
     /**
@@ -866,7 +873,9 @@ println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
                         encrypt method for more details.
       @param data Base64 encoded ciphertext to be decrypted.
       @param hash_iterations The number of iterations the AES-256 initialization
-                             vector (IV) is hashed with SHA-256.
+                             vector (IV) is hashed with SHA-256.  The minimum
+                             iterations allowed is 1 for password-based
+                             encryption.
       */
     static String decryptWithAES256(String passphrase, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         // sha256Sum should always return lower case but forcing toLowerCase
@@ -875,6 +884,7 @@ println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
         byte[] b_secret = passwordKeyDerivation(passphrase, salt)
         byte[] b_iv = salt.substring(0, 16).getBytes('UTF-8')
         byte[] b_data = decodeBase64Bytes(data)
-        decryptWithAES256(b_secret, b_iv, b_data, hash_iterations)
+        Integer iterations = (hash_iterations > 0) hash_iterations : 1
+        decryptWithAES256(b_secret, b_iv, b_data, iterations)
     }
 }
