@@ -270,9 +270,17 @@ github_app.scope = [repositories: ['repo1', 'repo2'], permissions: [contents: 'r
     /**
       This method will throw an exception because the hash calculation is
       dynamic and must not be set.
+      @param hash An empty string or null is allowed to force hash
+                  recalculation.  Any other value will throw an exception.
       @see #getHash()
+      @see net.gleske.jervis.exceptions.GitHubAppException
       */
-    void setHash(String hash) {
-        throw new GitHubAppException('Setting hash manually is not allowed.')
+    void setHash(String hash) throws GitHubAppException {
+        if(!hash) {
+            this.hash = hash
+        }
+        else {
+            throw new GitHubAppException('Setting hash manually is not allowed.')
+        }
     }
 }
