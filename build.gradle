@@ -166,15 +166,6 @@ artifacts {
     archives javadocJar, sourcesJar, testJar, testSourcesJar
 }
 
-signing {
-    required { gradle.taskGraph.hasTask("uploadArchives") }
-    def signingKey = findProperty("signingKey")
-    def signingPassword = findProperty("signingPassword")
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign configurations.archives
-    //sign publishing.publications.mavenJava
-}
-
 publishing {
     repositories {
         maven {
@@ -188,12 +179,20 @@ publishing {
         }
     }
     publications {
-        mavenJava(MavenPublication) {
+        binary(MavenPublication) {
+            artifact jar
+        }
+        binaryAndSources(MavenPublication) {
+            artifact jar
+            artifact javadocJar
+            artifact sourcesJar
+            artifact testJar
+            artifact testSourcesJar
             pom {
                 name = 'Jervis'
                 packaging = 'jar'
                 // optionally artifactId can be defined here
-                description = 'Travis-like Jenkins job generation using Jenkins Job DSL plugin groovy scripts. Reads .travis.yml and generates a job in Jenkins.'
+                description = 'Self service Jenkins job generation using Jenkins Job DSL plugin groovy scripts. Reads .jervis.yml and generates a job in Jenkins.'
                 url = 'https://github.com/samrocketman/jervis'
 
                 licenses {
@@ -219,6 +218,30 @@ publishing {
             }
         }
     }
+}
+
+// ./gradlew publish
+tasks.withType(PublishToMavenRepository) {
+    onlyIf("publishing to maven central") {
+        publication == publishing.publications.binaryAndSources
+    }
+}
+
+// ./gradlew publishToMavenLocal
+tasks.withType(PublishToMavenLocal) {
+    onlyIf("publishing only jar") {
+        publication == publishing.publications.binary
+    }
+}
+
+// signing must go after publishing block
+signing {
+    required { gradle.taskGraph.hasTask("uploadArchives") && !gradle.taskGraph.hasTask("uploadArchives") }
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    //sign configurations.archives
+    sign publishing.publications.binaryAndSources
 }
 
 // disable Gradle metadata in maven publishing
