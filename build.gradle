@@ -166,6 +166,15 @@ artifacts {
     archives javadocJar, sourcesJar, testJar, testSourcesJar
 }
 
+jar {
+    manifest {
+        attributes 'Library-Name': rootProject.name,
+                   'Library-Version': version,
+                   'Library-Source': 'https://github.com/samrocketman/jervis',
+                   'Library-Git-Hash': ['git', 'rev-parse', 'HEAD'].execute()?.text?.trim()
+    }
+}
+
 publishing {
     repositories {
         maven {
