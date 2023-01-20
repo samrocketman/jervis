@@ -276,11 +276,11 @@ github_app.scope = [repositories: ['repo1', 'repo2'], permissions: [contents: 'r
       @see net.gleske.jervis.exceptions.GitHubAppException
       */
     void setHash(String hash) throws GitHubAppException {
-        if(!hash) {
-            this.hash = hash
+        if(hash) {
+            throw new GitHubAppException('Setting hash manually is not allowed.')
         }
         else {
-            throw new GitHubAppException('Setting hash manually is not allowed.')
+            this.hash = hash
         }
     }
 }
