@@ -36,8 +36,8 @@ import org.yaml.snakeyaml.scanner.ScannerException
   in FIPS 180-4, FIPS 186-4, FIPS 197, and FIPS 198-1.  FIPS 202 was considered
   but not currently used.  The author of this class made a best-effort towards
   understanding these standards and implementing them in code.  However,
-  there's no warranty on correctness or 3rd party certification.  As a reminder
-  to reference the license of this project before use.</p>
+  there's no warranty on correctness or 3rd party certification.  As a
+  reminder, please reference the license of this project before use.</p>
 
   <p>Some other high level details include.</p>
 
