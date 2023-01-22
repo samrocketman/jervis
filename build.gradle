@@ -43,13 +43,6 @@ if(Integer.parseInt(ext.groovyVersion.tokenize('.').first()) > 3) {
     ext.groovyPackage = 'org.codehaus.groovy'
 }
 
-
-//Apparently cobertura is only accurate at Java 1.6 byte code and earlier
-//However, this caused a bug that if this library is used on JDK7+ and then
-//throws a groovy exception.  Instead, an IncompatibleClassChangeError is thrown.
-//http://blog.proxerd.pl/article/how-to-fix-incompatibleclasschangeerror-for-your-groovy-projects-running-on-jdk7
-//sourceCompatibility = 1.6
-
 apply from: 'file:gradle/groovydoc.gradle'
 apply from: 'file:gradle/jervis.gradle'
 
@@ -74,7 +67,7 @@ configurations.all {
 }
 
 dependencies {
-    //compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    //implementation "${groovyPackage}:groovy-all:${groovyVersion}"
     implementation "${groovyPackage}:groovy-ant:${groovyVersion}"
     implementation "${groovyPackage}:groovy-groovydoc:${groovyVersion}"
     implementation "${groovyPackage}:groovy-json:${groovyVersion}"
@@ -104,10 +97,6 @@ test {
     minHeapSize = '128m'
     maxHeapSize = '512m'
 
-    //MaxPermSize was removed from Java 1.8
-    // set JVM arguments for the test JVM(s)
-    //jvmArgs '-XX:MaxPermSize=256m'
-
     // listen to events in the test execution lifecycle
     beforeTest { descriptor ->
         logger.lifecycle('Running test: ' + descriptor)
@@ -119,7 +108,7 @@ test {
     }
 }
 
-//http://swalsh.org/blog/2014/07/17/running-the-groovy-console-from-gradle/
+//https://github.com/s992/gatsby-blog/blob/master/src/content/posts/2014-07-17-running-the-groovy-console-from-gradle/index.md
 task( console, dependsOn: "classes", type: JavaExec ) {
     mainClass = "groovy.ui.Console"
     classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
@@ -262,7 +251,7 @@ tasks.withType(GenerateModuleMetadata) {
 jar.dependsOn tasks.findAll { task -> task.name.endsWith('Jar') }
 
 //disable optimizations for accurate branch coverage
-//http://pbetkier.blogspot.com/2014/08/groovy-code-coverage-issues.html
+//https://pbetkier.github.io/2014/08/07/groovy-code-coverage-issues.html
 gradle.taskGraph.whenReady { graph ->
     if(graph.hasTask(':test')) {
         compileTestGroovy.groovyOptions.configurationScript = file('gradle/groovyTestCompilerConfig.groovy')
@@ -312,4 +301,4 @@ project.tasks["sonarqube"].dependsOn "check"
 project.tasks["sonarqube"].dependsOn "jacocoTestReport"
 
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
-//generate gradlew with: ./gradlew wrapper --gradle-version 5.6.3
+//generate gradlew with: ./gradlew wrapper --gradle-version 7.6
