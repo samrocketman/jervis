@@ -473,4 +473,12 @@ class SecurityIOTest extends GroovyTestCase {
     @Test public void test_SecurityIO_null_keySize() {
         assert security.rsa_keysize == 0
     }
+    @Test public void test_SecurityIO_randomBytes_size() {
+        assert SecurityIO.randomBytes(5).size() == 5
+        assert SecurityIO.randomBytes(2).size() == 2
+    }
+    @Test public void test_SecurityIO_randomBytesBase64_size() {
+        assert SecurityIO.decodeBase64Bytes(SecurityIO.randomBytesBase64(5)).size() == 5
+        assert SecurityIO.decodeBase64Bytes(SecurityIO.randomBytesBase64(2)).size() == 2
+    }
 }
