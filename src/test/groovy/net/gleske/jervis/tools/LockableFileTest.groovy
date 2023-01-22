@@ -58,4 +58,17 @@ class LockableFileTest extends GroovyAssert {
         // Test reading
         assert (new LockableFile(tempfile).getTextWithLock()) == 'friend'
     }
+    @Test public void test_LockableFile_lockWaitSleep() {
+        String tempfile = [(folder.root.path - ~'/$'), 'file2'].join('/')
+        assert folder.root.exists()
+        assert !(new File(tempfile).exists())
+        LockableFile lockFile = new LockableFile(tempfile)
+        assert lockFile.lockWaitSleep == 500
+        lockFile.lockWaitSleep = 0
+        assert lockFile.lockWaitSleep == 500
+        lockFile.lockWaitSleep = -1
+        assert lockFile.lockWaitSleep == 500
+        lockFile.lockWaitSleep = 1000
+        assert lockFile.lockWaitSleep == 1000
+    }
 }

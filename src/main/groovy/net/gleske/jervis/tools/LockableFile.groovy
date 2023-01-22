@@ -35,7 +35,7 @@ class LockableFile extends File {
     Integer lockWaitSleep = 500
 
     void setLockWaitSleep(Integer value) {
-        if(!value || value <= 0) {
+        if(!value || value < 0) {
             lockWaitSleep = 500
             return
         }
