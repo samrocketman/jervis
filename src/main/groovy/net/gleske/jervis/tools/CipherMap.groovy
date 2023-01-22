@@ -55,19 +55,29 @@ import org.yaml.snakeyaml.scanner.ScannerException
   </li>
   <li>
     The data is encrypted with AES-256 CBC with PKCS5 padding.  The cipher
-    secret and IV are the inputs for encryption and decryption.  The random
-    IV is hashed with 5000 iterations of SHA-256 before provided as an
-    input.
+    secret and IV are the inputs for encryption and decryption.
+  </li>
+  <li>
+    The random IV is hashed with 5000 iterations of SHA-256 (let's call this
+    initialization hash) and the resulting hash is passed into PBKDF2 with Hmac
+    SHA-256 (PBKDF for short).  The PBKDF has variable iterations based on the
+    provided initialization hash.  The iterations for PBKDF range from 100100
+    to 960000 iterations.  Since this is configurable via
+    <tt>{@link #hash_iterations}</tt> it's possible to fully disable this
+    behavior (setting <tt>hash_iterations</tt> to zero) and only use the
+    provided secret and IV unmodified.
   </li>
   <li>
     After encryption, the encrypted value is signed with an RS256 signature
-    Base64Url encoded.
+    (which is RSA-SHA-256 Base64Url encoded).  This signature is later used
+    before decryption.  Decryption will only occur if the signature is valid.
+    An empty map is the default if the signature is invalid.
   </li>
   <li>
-    The cipher secret and IV infrequently change to protect against RSA
-    attack utilizing Chinese Remainder Theorem.  The cipher secret and IV
-    are rotated if the secrets are older than 30 days when data is newly
-    encrypted.
+    The cipher secret and IV infrequently change to protect against RSA attack
+    utilizing Chinese Remainder Theorem.  The cipher secret and IV are
+    automatically rotated if the secrets (secret/IV) are older than 30 days
+    when data is encrypted.
   </li>
   </ul>
 
