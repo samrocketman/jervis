@@ -350,7 +350,7 @@ println "Key size: ${security.rsa_keysize}"
                set.  If no private key, then returns <tt>0</tt>.
      */
     Integer getRsa_keysize() {
-        key_pair?.private.modulus.bitLength() ?: 0
+        key_pair?.private?.modulus?.bitLength() ?: 0
     }
 
     /**
