@@ -858,7 +858,7 @@ println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
         String salt = sha256Sum(passphrase).toLowerCase()
         byte[] b_secret = passwordKeyDerivation(passphrase, salt)
         byte[] b_iv = salt.substring(0, 16).getBytes('UTF-8')
-        Integer iterations = (hash_iterations > 0) hash_iterations : 1
+        Integer iterations = (hash_iterations > 0) ? hash_iterations : 1
         encodeBase64(encryptWithAES256(b_secret, b_iv, data, iterations))
     }
 
@@ -884,7 +884,7 @@ println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
         byte[] b_secret = passwordKeyDerivation(passphrase, salt)
         byte[] b_iv = salt.substring(0, 16).getBytes('UTF-8')
         byte[] b_data = decodeBase64Bytes(data)
-        Integer iterations = (hash_iterations > 0) hash_iterations : 1
+        Integer iterations = (hash_iterations > 0) ? hash_iterations : 1
         decryptWithAES256(b_secret, b_iv, b_data, iterations)
     }
 }

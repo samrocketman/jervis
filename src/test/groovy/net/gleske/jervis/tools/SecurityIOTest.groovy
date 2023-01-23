@@ -523,4 +523,12 @@ class SecurityIOTest extends GroovyTestCase {
         assert plaintext == SecurityIO.decryptWithAES256(secret, iv, ciphertext, 0)
         assert plaintext == SecurityIO.decryptWithAES256Base64(secretB64, ivB64, ciphertextB64, 0)
     }
+    @Test public void test_SecurityIO_AES_passphrase() {
+        String passphrase = 'correct horse battery staple'
+        String plaintext = 'https://xkcd.com/936/'
+        String ciphertext = SecurityIO.encryptWithAES256(passphrase, plaintext, 0)
+        assert ciphertext == SecurityIO.encryptWithAES256(passphrase, plaintext, 1)
+        assert ciphertext != SecurityIO.encryptWithAES256(passphrase, plaintext, 2)
+        assert plaintext == SecurityIO.decryptWithAES256(passphrase, ciphertext, 1)
+    }
 }
