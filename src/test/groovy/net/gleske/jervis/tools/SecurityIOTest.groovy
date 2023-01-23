@@ -496,13 +496,31 @@ class SecurityIOTest extends GroovyTestCase {
         assert ciphertext1 == SecurityIO.encryptWithAES256(secret, iv, plaintext, 1)
         assert plaintext == SecurityIO.decryptWithAES256(secret, iv, ciphertext1, 1)
 
+        byte[] ciphertext2 = SecurityIO.encryptWithAES256(secret, iv, plaintext, 2)
+        assert plaintext == SecurityIO.decryptWithAES256(secret, iv, ciphertext2, 2)
+
         byte[] ciphertext3 = SecurityIO.encryptWithAES256(secret, iv, plaintext, 3)
         assert plaintext == SecurityIO.decryptWithAES256(secret, iv, ciphertext3, 3)
         assert plaintext != SecurityIO.decryptWithAES256(secret, iv, ciphertext3, 0)
-
+    }
+    @Test public void test_SecurityIO_AES_short_secret() {
         // test with shortened input bytes
-        secret = 'short'.bytes
-        byte[] ciphertext4 = SecurityIO.encryptWithAES256(secret, iv, plaintext, 0)
-        assert plaintext == SecurityIO.decryptWithAES256(secret, iv, ciphertext4, 0)
+        byte[] secret = 'short'.bytes
+        byte[] iv = SecurityIO.randomBytes(16)
+        String plaintext = 'some secret message'
+        byte[] ciphertext = SecurityIO.encryptWithAES256(secret, iv, plaintext, 0)
+        assert plaintext == SecurityIO.decryptWithAES256(secret, iv, ciphertext, 0)
+    }
+    @Test public void test_SecurityIO_AES_Base64() {
+        byte[] secret = SecurityIO.randomBytes(32)
+        String secretB64 = SecurityIO.encodeBase64(secret)
+        byte[] iv = SecurityIO.randomBytes(16)
+        String ivB64 = SecurityIO.encodeBase64(iv)
+        String plaintext = 'some secret message'
+        byte[] ciphertext = SecurityIO.encryptWithAES256(secret, iv, plaintext, 0)
+        String ciphertextB64 = SecurityIO.encodeBase64(ciphertext)
+        assert ciphertextB64 == SecurityIO.encryptWithAES256Base64(secretB64, ivB64, plaintext, 0)
+        assert plaintext == SecurityIO.decryptWithAES256(secret, iv, ciphertext, 0)
+        assert plaintext == SecurityIO.decryptWithAES256Base64(secretB64, ivB64, ciphertextB64, 0)
     }
 }
