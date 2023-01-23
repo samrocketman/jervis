@@ -481,4 +481,28 @@ class SecurityIOTest extends GroovyTestCase {
         assert SecurityIO.decodeBase64Bytes(SecurityIO.randomBytesBase64(5)).size() == 5
         assert SecurityIO.decodeBase64Bytes(SecurityIO.randomBytesBase64(2)).size() == 2
     }
+    @Test public void test_SecurityIO_AES_main_cipher() {
+        byte[] secret = SecurityIO.randomBytes(32)
+        byte[] iv = SecurityIO.randomBytes(16)
+        String plaintext = 'some secret message'
+
+        byte[] ciphertext0 = SecurityIO.encryptWithAES256(secret, iv, plaintext, 0)
+        assert plaintext != ciphertext0
+        assert ciphertext0 == SecurityIO.encryptWithAES256(secret, iv, plaintext, 0)
+        assert plaintext == SecurityIO.decryptWithAES256(secret, iv, ciphertext0, 0)
+
+        byte[] ciphertext1 = SecurityIO.encryptWithAES256(secret, iv, plaintext, 1)
+        assert ciphertext0 != ciphertext1
+        assert ciphertext1 == SecurityIO.encryptWithAES256(secret, iv, plaintext, 1)
+        assert plaintext == SecurityIO.decryptWithAES256(secret, iv, ciphertext1, 1)
+
+        byte[] ciphertext3 = SecurityIO.encryptWithAES256(secret, iv, plaintext, 3)
+        assert plaintext == SecurityIO.decryptWithAES256(secret, iv, ciphertext3, 3)
+        assert plaintext != SecurityIO.decryptWithAES256(secret, iv, ciphertext3, 0)
+
+        // test with shortened input bytes
+        secret = 'short'.bytes
+        byte[] ciphertext4 = SecurityIO.encryptWithAES256(secret, iv, plaintext, 0)
+        assert plaintext == SecurityIO.decryptWithAES256(secret, iv, ciphertext4, 0)
+    }
 }

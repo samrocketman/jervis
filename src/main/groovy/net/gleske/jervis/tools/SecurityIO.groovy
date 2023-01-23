@@ -750,15 +750,15 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       @param input Bytes to be repeated.
       */
     static byte[] padForAES256(byte[] input) {
-        if(input.size() >= 256) {
+        if(input.size() >= 32) {
             return input
         }
-        Integer n = 256 / input.size() + 1
-        List b_list = []
+        Integer n = (32 / (input.size() + 1)) + 1
+        List b_list = [input]
         n.times {
             b_list << input
         }
-        b_list.flatten()[0..255]
+        b_list.flatten()[0..31]
     }
 
     /**
