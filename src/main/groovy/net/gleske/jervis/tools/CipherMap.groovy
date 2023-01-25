@@ -141,7 +141,7 @@ class CipherMap implements Serializable {
 
       @see net.gleske.jervis.tools.SecurityIO#DEFAULT_AES_ITERATIONS
       */
-    Integer hash_iterations = SecurityIO.DEFAULT_AES_ITERATIONS
+    Integer hash_iterations
 
     /**
       The time limit in seconds before AES secret and IV need to be rotated.
@@ -159,6 +159,19 @@ class CipherMap implements Serializable {
       @param privateKey A PKCS1 or PKCS8 private key PEM.
       */
     CipherMap(String privateKey) {
+        this(privateKey, SecurityIO.DEFAULT_AES_ITERATIONS)
+    }
+
+    /**
+      Instantiates a new CipherMap object with the given private key.  This is
+      used for asymmetric encryption wrapping symmetric encryption.
+
+      @see #hash_iterations
+      @param privateKey A PKCS1 or PKCS8 private key PEM.
+      @param hash_iterations Customize the hash iterations on instantiation.
+      */
+    CipherMap(String privateKey, Integer hash_iterations) {
+        this.hash_iterations = hash_iterations
         this.security = new SecurityIO(privateKey)
         initialize()
     }
@@ -171,6 +184,18 @@ class CipherMap implements Serializable {
       */
     CipherMap(File privateKey) {
         this(privateKey.text)
+    }
+
+    /**
+      Instantiates a new CipherMap object with the given private key.  This is
+      used for asymmetric encryption wrapping symmetric encryption.
+
+      @see #hash_iterations
+      @param privateKey A PKCS1 or PKCS8 private key.
+      @param hash_iterations Customize the hash iterations on instantiation.
+      */
+    CipherMap(File privateKey, Integer hash_iterations) {
+        this(privateKey.text, hash_iterations)
     }
 
     /**

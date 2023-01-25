@@ -198,8 +198,7 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
         String data = this.loadCache()
         String privateKey = this.getPrivateKey()
         if(privateKey) {
-            this.cipherMap = new CipherMap(privateKey)
-            this.cipherMap.hash_iterations = this.hash_iterations
+            this.cipherMap = new CipherMap(privateKey, this.hash_iterations)
             if(data) {
                 this.cipherMap << data
             }

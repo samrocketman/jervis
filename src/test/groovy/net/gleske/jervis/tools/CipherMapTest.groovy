@@ -31,8 +31,7 @@ class CipherMapTest extends GroovyTestCase {
             URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
             privateKey = url.content.text
         }
-        ciphermap = new CipherMap(privateKey)
-        ciphermap.hash_iterations = 0
+        ciphermap = new CipherMap(privateKey, 0)
     }
     @After protected void tearDown() {
         ciphermap = null
@@ -55,8 +54,7 @@ class CipherMapTest extends GroovyTestCase {
     @Test public void test_CipherMap_leftShift_CipherMap() {
         ciphermap.plainMap = [hello: 'friend']
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
-        CipherMap cmap2 = new CipherMap(new File(url.file))
-        cmap2.hash_iterations = 0
+        CipherMap cmap2 = new CipherMap(new File(url.file), 0)
         cmap2.plainMap = [hello: 'world', goodbye: 'friend']
         cmap2 << ciphermap
         assert cmap2.plainMap == [hello: 'friend', goodbye: 'friend']
