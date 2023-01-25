@@ -259,13 +259,13 @@ class CipherMap implements Serializable {
 
     private void initialize() {
         this.hidden = [
-            age: Instant.now().toString(),
-            cipher: newCipher(),
+            age: '',
+            cipher: ['', ''],
             data: '',
             signature: ''
         ]
-        // Encrypt the cipher age now that the secrets are available.
-        this.hidden.age = encrypt(this.hidden.age)
+        // Initialize encrypted store
+        setPlainMap([:])
     }
 
     /**
@@ -316,7 +316,7 @@ class CipherMap implements Serializable {
     private void rotateSecrets() {
         Long age
         try {
-            age = Instant.parse(decrypt(this.hidden.age)).epochSecond
+            age = (this.hidden.age) ? Instant.parse(decrypt(this.hidden.age)).epochSecond : 0
         }
         catch(BadPaddingException|DateTimeParseException ignored) {
             age = 0
@@ -327,8 +327,8 @@ class CipherMap implements Serializable {
                 return
             }
         }
-        this.hidden.age = encrypt(Instant.now().toString())
         this.hidden.cipher = newCipher()
+        this.hidden.age = encrypt(Instant.now().toString())
     }
 
     /**

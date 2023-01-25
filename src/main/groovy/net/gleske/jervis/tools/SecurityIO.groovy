@@ -737,6 +737,16 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
         encodeBase64(encryptWithAES256(b_secret, b_iv, data, hash_iterations))
     }
 
+    /**
+      Takes Base64 encoded secret and IV and decrypts the provided Base64
+      encoded <tt>String</tt> data.
+
+      @see #encryptWithAES256(byte[], byte[], java.lang.String, java.lang.Integer)
+      @param secret Base64 encoded binary secret.
+      @param iv Base64 encoded binary initialization vector (IV).
+      @param data Base64 encoded encrypted bytes to decrypt.
+      @return A <tt>String</tt> which is plaintext.
+      */
     static String decryptWithAES256Base64(String secret, String iv, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         byte[] b_secret = decodeBase64Bytes(secret)
         byte[] b_iv = decodeBase64Bytes(iv)
