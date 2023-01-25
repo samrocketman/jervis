@@ -21,7 +21,6 @@ import java.security.SignatureException
 import java.time.Instant
 import java.time.format.DateTimeParseException
 import javax.crypto.BadPaddingException
-import org.yaml.snakeyaml.scanner.ScannerException
 
 /**
   Strong encrypted storage backend used for encrypting a <tt>Map</tt> at rest.
@@ -303,11 +302,11 @@ class CipherMap implements Serializable {
             }
             def parsedObj = YamlOperator.loadYamlFrom(input)
             if(!verifyCipherObj(parsedObj)) {
-                throw new ScannerException('CipherMap verification failed')
+                throw new JervisException('CipherMap verification failed')
             }
             this.hidden = parsedObj
         }
-        catch(ScannerException ignored) {
+        catch(JervisException ignored) {
             // Caught exception thrown directly or thrown from
             // YamlOperator.loadYamlFrom
             initialize()

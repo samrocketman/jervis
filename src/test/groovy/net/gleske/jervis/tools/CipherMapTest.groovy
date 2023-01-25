@@ -16,6 +16,9 @@
 package net.gleske.jervis.tools
 //the CipherMapTest() class automatically sees the CipherMap() class because they're in the same package
 
+import net.gleske.jervis.exceptions.JervisException
+import net.gleske.jervis.tools.YamlOperator
+
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -43,5 +46,60 @@ class CipherMapTest extends GroovyTestCase {
         assert ciphermap.plainMap == [:]
         ciphermap << ciphertext
         assert ciphermap.plainMap == plainTextMap
+    }
+    @Test public void test_CipherMap_file() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
+        ciphermap = new CipherMap(new File(url.file))
+        assert ciphermap.plainMap == [:]
+    }
+    @Test public void test_CipherMap_leftShift_CipherMap() {
+        ciphermap.plainMap = [hello: 'friend']
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
+        CipherMap cmap2 = new CipherMap(new File(url.file))
+        cmap2.hash_iterations = 0
+        cmap2.plainMap = [hello: 'world', goodbye: 'friend']
+        cmap2 << ciphermap
+        assert cmap2.plainMap == [hello: 'friend', goodbye: 'friend']
+    }
+    @Test public void test_CipherMap_leftShift_bad_data() {
+        shouldFail(JervisException) {
+            ciphermap << 3
+        }
+
+        ciphermap.plainMap = [some: 'data']
+        ciphermap << ''
+        assert ciphermap.plainMap == [:]
+
+        ciphermap.plainMap = [some: 'data']
+        ciphermap << 'a: b'
+        assert ciphermap.plainMap == [:]
+
+        ciphermap.plainMap = [some: 'data']
+        ciphermap << '''\
+            age: ''
+            cipher: ''
+            data: ''
+            signature: ''
+            '''.stripIndent()
+        assert ciphermap.plainMap == [:]
+
+        ciphermap.plainMap = [some: 'data']
+        ciphermap << '''\
+            age: 23
+            cipher:
+              - ''
+              - ''
+            data: ''
+            signature: ''
+            '''.stripIndent()
+        assert ciphermap.plainMap == [:]
+
+        ciphermap.plainMap = [hello: 'friend']
+        String ciphertext = ciphermap.toString()
+        Map cipheryaml = YamlOperator.loadYamlFrom(ciphertext)
+        cipheryaml.age = 'corrupt the signature'
+        // fail signature
+        ciphermap << YamlOperator.writeObjToYaml(cipheryaml)
+        assert ciphermap.plainMap == [:]
     }
 }
