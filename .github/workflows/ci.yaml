@@ -18,10 +18,16 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        groovy: [ '2.4.21', '4.0.6']
+        groovy:
+          - 2.4.21
+          - 2.5.21
+          - 3.0.14
+          - 4.0.8
         java: [ '11', '17' ]
         exclude:
-          - groovy: '2.4.21'
+          - groovy: 2.4.21
+            java: '17'
+          - groovy: 2.5.21
             java: '17'
     name: Java ${{ matrix.java }} Groovy ${{ matrix.groovy }}
     steps:
