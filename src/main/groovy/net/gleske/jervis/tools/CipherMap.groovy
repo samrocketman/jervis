@@ -173,7 +173,6 @@ class CipherMap implements Serializable {
     CipherMap(String privateKey, Integer hash_iterations) {
         this.hash_iterations = hash_iterations
         this.security = new SecurityIO(privateKey)
-        initialize()
     }
 
     /**
@@ -289,8 +288,6 @@ class CipherMap implements Serializable {
             data: '',
             signature: ''
         ]
-        // Initialize encrypted store
-        setPlainMap([:])
     }
 
     /**
@@ -320,25 +317,23 @@ class CipherMap implements Serializable {
         if(![String, CipherMap].any { input in it }) {
             throw new JervisException("Cannot leftShift type ${input.getClass()}")
         }
-        try {
-            if(input in CipherMap) {
-                setPlainMap(getPlainMap() + input.plainMap)
-                return
-            }
-            def parsedObj = YamlOperator.loadYamlFrom(input)
-            if(!verifyCipherObj(parsedObj)) {
-                throw new JervisException('CipherMap verification failed')
-            }
-            this.hidden = parsedObj
+        if(input in CipherMap) {
+            setPlainMap(getPlainMap() + input.plainMap)
+            return
         }
-        catch(JervisException ignored) {
-            // Caught exception thrown directly or thrown from
-            // YamlOperator.loadYamlFrom
-            initialize()
+        def parsedObj = YamlOperator.loadYamlFrom(input)
+        if(!verifyCipherObj(parsedObj)) {
+            // wipe the data since leftShift should overwrite
+            this.hidden = null
+            return
         }
+        this.hidden = parsedObj
     }
 
     private void rotateSecrets() {
+        if(!this.hidden) {
+            initialize()
+        }
         Long age
         try {
             age = (this.hidden.age) ? Instant.parse(decrypt(this.hidden.age)).epochSecond : 0
@@ -379,7 +374,7 @@ class CipherMap implements Serializable {
       @returns A map consisting of standard java class objects.
       */
     Map getPlainMap() {
-        if(!hidden.data) {
+        if(!hidden?.data) {
             return [:]
         }
         YamlOperator.loadYamlFrom(decrypt(this.hidden.data)).secure_field
