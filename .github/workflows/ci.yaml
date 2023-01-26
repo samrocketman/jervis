@@ -21,12 +21,12 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
+        java: [ '11', '17' ]
         groovy:
           - ${{ vars.GROOVY_2_4 }}
           - ${{ vars.GROOVY_2_5 }}
           - ${{ vars.GROOVY_3_0 }}
           - ${{ vars.GROOVY_4_0 }}
-        java: [ '11', '17' ]
         exclude:
           - groovy: ${{ vars.GROOVY_2_4 }}
             java: '17'
