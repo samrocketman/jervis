@@ -108,7 +108,6 @@ class CipherMapTest extends GroovyTestCase {
         ciphermap << YamlOperator.writeObjToYaml(cipheryaml)
         assert ciphermap.plainMap == [:]
     }
-    // TODO fix test
     @Test public void test_CipherMap_rewrap_data_with_same_secrets() {
         ciphermap.plainMap = [some: 'data']
         Map yaml1 = YamlOperator.loadYamlFrom(ciphermap.toString())
@@ -119,6 +118,13 @@ class CipherMapTest extends GroovyTestCase {
         assert yaml1.cipher[1] == yaml2.cipher[1]
         assert yaml1.data != yaml2.data
         assert yaml1.signature != yaml2.signature
+    }
+    @Test public void test_CipherMap_null_instantiation() {
+        assert ciphermap.hidden == null
+        assert ciphermap.plainMap == [:]
+        // and return empty map on empty data instead of decryption
+        ciphermap.hidden = [data: '']
+        assert ciphermap.plainMap == [:]
     }
     // TODO test rotating secrets due to age
 }
