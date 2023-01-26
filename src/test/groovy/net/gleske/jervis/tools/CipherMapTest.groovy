@@ -19,6 +19,8 @@ package net.gleske.jervis.tools
 import net.gleske.jervis.exceptions.JervisException
 import net.gleske.jervis.tools.YamlOperator
 
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -46,7 +48,7 @@ class CipherMapTest extends GroovyTestCase {
         ciphermap << ciphertext
         assert ciphermap.plainMap == plainTextMap
     }
-    @Test public void test_CipherMap_file() {
+    @Test public void test_CipherMap_constructor_file() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
         ciphermap = new CipherMap(new File(url.file))
         assert ciphermap.plainMap == [:]
@@ -55,7 +57,7 @@ class CipherMapTest extends GroovyTestCase {
         assert ciphermap.plainMap == [:]
         assert ciphermap.hash_iterations == 3
     }
-    @Test public void test_CipherMap_string() {
+    @Test public void test_CipherMap_constructor_string() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
         ciphermap = new CipherMap(url.content.text)
         assert ciphermap.plainMap == [:]
@@ -139,5 +141,36 @@ class CipherMapTest extends GroovyTestCase {
         ciphermap.hidden = [data: '']
         assert ciphermap.plainMap == [:]
     }
-    // TODO test rotating secrets due to age
+    @Test public void test_CipherMap_rotating_expired_secret_and_iv() {
+        ciphermap.plainMap = [leeroy: 'jenkins']
+
+        // manipulate the encrypted payload to be "older than 30 days"
+        Map old = YamlOperator.loadYamlFrom(ciphermap.toString())
+        old.age = ciphermap.encrypt(Instant.now().minus(31, ChronoUnit.DAYS).toString())
+        old.signature = ciphermap.security.signRS256Base64Url(ciphermap.signedData(old))
+
+        // retrieve encrypted data from expired secrets (shouldn't rotate)
+        ciphermap << YamlOperator.writeObjToYaml(old)
+        assert ciphermap.plainMap == [leeroy: 'jenkins']
+        Map intermediate = YamlOperator.loadYamlFrom(ciphermap.toString())
+        assert old.age == intermediate.age
+        assert old.cipher[0] == intermediate.cipher[0]
+        assert old.cipher[1] == intermediate.cipher[1]
+
+        // Encrypt data which should force secrets rotation
+        ciphermap.plainMap = ciphermap.plainMap
+        assert ciphermap.plainMap == [leeroy: 'jenkins']
+        Map rotated = YamlOperator.loadYamlFrom(ciphermap.toString())
+        assert old.age != rotated.age
+        assert old.cipher[0] != rotated.cipher[0]
+        assert old.cipher[1] != rotated.cipher[1]
+
+        // Update encrypted data which should not rotate secrets
+        ciphermap.plainMap = ciphermap.plainMap + [bert: 'ernie']
+        assert ciphermap.plainMap == [leeroy: 'jenkins', bert: 'ernie']
+        Map updated = YamlOperator.loadYamlFrom(ciphermap.toString())
+        assert rotated.age == updated.age
+        assert rotated.cipher[0] == updated.cipher[0]
+        assert rotated.cipher[1] == updated.cipher[1]
+    }
 }

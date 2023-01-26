@@ -291,7 +291,7 @@ class SecurityIOTest extends GroovyTestCase {
         security = new SecurityIO(url.content.text)
         String jwt_token = security.getGitHubJWT('1234', 2, 30)
         Map payload = YamlOperator.loadYamlFrom(security.decodeBase64Bytes(jwt_token.tokenize('.')[1]))
-        Integer now = Instant.now().getEpochSecond()
+        Long now = Instant.now().getEpochSecond()
 
         // validate we our JWT is not expired
         assert now > payload.iat
@@ -305,7 +305,7 @@ class SecurityIOTest extends GroovyTestCase {
         security = new SecurityIO(url.content.text)
         String jwt_token = security.getGitHubJWT('1234', 1, 120)
         Map payload = YamlOperator.loadYamlFrom(security.decodeBase64Bytes(jwt_token.tokenize('.')[1]))
-        Integer now = Instant.now().getEpochSecond()
+        Long now = Instant.now().getEpochSecond()
 
         // Verify due to drift and expiration our JWT is expired
         assert now > payload.iat
