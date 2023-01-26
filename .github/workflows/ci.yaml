@@ -6,15 +6,17 @@ on:
     branches:
       - main
     paths:
-      - src/**
       - build.gradle
       - gradle.properties
+      - src/**
+      - vars/**
   pull_request:
     types: [opened, synchronize]
     paths:
-      - src/**
       - build.gradle
       - gradle.properties
+      - src/**
+      - vars/**
 
 jobs:
   build:
