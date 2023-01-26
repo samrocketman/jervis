@@ -1,12 +1,5 @@
 name: Unit Tests
 
-# Latest versions of Groovy
-env:
-  GROOVY_2_4: 2.4.21
-  GROOVY_2_5: 2.5.21
-  GROOVY_3_0: 3.0.14
-  GROOVY_4_0: 4.0.8
-
 # Trigger
 on:
   push:
@@ -29,15 +22,15 @@ jobs:
     strategy:
       matrix:
         groovy:
-          - ${{ env.GROOVY_2_4 }}
-          - ${{ env.GROOVY_2_5 }}
-          - ${{ env.GROOVY_3_0 }}
-          - ${{ env.GROOVY_4_0 }}
+          - ${{ vars.GROOVY_2_4 }}
+          - ${{ vars.GROOVY_2_5 }}
+          - ${{ vars.GROOVY_3_0 }}
+          - ${{ vars.GROOVY_4_0 }}
         java: [ '11', '17' ]
         exclude:
-          - groovy: ${{ env.GROOVY_2_4 }}
+          - groovy: ${{ vars.GROOVY_2_4 }}
             java: '17'
-          - groovy: ${{ env.GROOVY_2_5 }}
+          - groovy: ${{ vars.GROOVY_2_5 }}
             java: '17'
     name: Java ${{ matrix.java }} Groovy ${{ matrix.groovy }}
     steps:
@@ -47,10 +40,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
-      - if: ${{ !(matrix.groovy == env.GROOVY_4_0 && matrix.java == '17') }}
+      - if: ${{ !(matrix.groovy == vars.GROOVY_4_0 && matrix.java == '17') }}
         name: Unit Tests
         run: GROOVY_VERSION=${{ matrix.groovy }} ./gradlew check
-      - if: ${{ matrix.groovy == env.GROOVY_4_0 && matrix.java == '17' }}
+      - if: ${{ matrix.groovy == vars.GROOVY_4_0 && matrix.java == '17' }}
         name: Coveralls Test Coverage
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
