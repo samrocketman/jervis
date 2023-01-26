@@ -1,7 +1,7 @@
 # Jervis: Jenkins as a service
 
 [![Maven Central Release][status-release]][maven-release]
-[![Build Status][status-build]][jervis-travis]
+[![Build Status][status-build]][jervis-ci]
 [![Coverage Status][status-coverage]][jervis-coveralls]
 
 * *Project status:* [released to maven central][maven-release].
@@ -203,10 +203,10 @@ See [SonarQube README](sonarqube/README.md).
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jenkins]: https://jenkins-ci.org/
 [jervis-api-docs]: http://sam.gleske.net/jervis-api/
+[jervis-ci]: https://github.com/samrocketman/jervis/actions?query=branch%3Amain
 [jervis-coveralls]: https://coveralls.io/github/samrocketman/jervis
 [jervis-docker]: https://github.com/samrocketman/docker-jenkins-jervis
 [jervis-jenkins-bootstrap]: https://github.com/samrocketman/jenkins-bootstrap-jervis
-[jervis-travis]: https://travis-ci.org/samrocketman/jervis
 [jervis-wiki-build-tools]: https://github.com/samrocketman/jervis/wiki/Supported-Tools
 [jervis-wiki-languages]: https://github.com/samrocketman/jervis/wiki/Supported-Languages
 [jervis-wiki-overview]: https://github.com/samrocketman/jervis/wiki/Build-overview
@@ -218,7 +218,7 @@ See [SonarQube README](sonarqube/README.md).
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
 [pipeline]: https://jenkins.io/doc/book/pipeline/shared-libraries/
 [scm-filter-jervis]: https://plugins.jenkins.io/scm-filter-jervis/
-[status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=main
+[status-build]: https://img.shields.io/github/actions/workflow/status/samrocketman/jervis/ci.yaml?branch=main
 [status-coverage]: https://coveralls.io/repos/github/samrocketman/jervis/badge.svg?branch=main
 [status-release]: https://img.shields.io/maven-central/v/net.gleske/jervis?color=success
 [travis-yaml]: http://docs.travis-ci.com/user/build-configuration/
