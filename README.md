@@ -1,6 +1,6 @@
 # Jervis: Jenkins as a service
 
-[![Maven Central Release][status-release]][maven-badge]
+[![Maven Central Release][status-release]][maven-release]
 [![Build Status][status-build]][jervis-travis]
 [![Coverage Status][status-coverage]][jervis-coveralls]
 
@@ -214,14 +214,13 @@ See [SonarQube README](sonarqube/README.md).
 [json-lifecycles]: resources/lifecycles-ubuntu1604-stable.json
 [json-platforms]: resources/platforms.json
 [json-toolchains]: resources/toolchains-ubuntu1604-stable.json
-[maven-badge]: https://github.com/jirutka/maven-badges
 [maven-release]: https://search.maven.org/search?q=g:net.gleske%20AND%20a:jervis&core=gav
 [milestone-progress]: https://github.com/samrocketman/jervis/milestones
 [pipeline]: https://jenkins.io/doc/book/pipeline/shared-libraries/
 [scm-filter-jervis]: https://plugins.jenkins.io/scm-filter-jervis/
 [status-build]: https://travis-ci.org/samrocketman/jervis.svg?branch=main
 [status-coverage]: https://coveralls.io/repos/github/samrocketman/jervis/badge.svg?branch=main
-[status-release]: https://maven-badges.herokuapp.com/maven-central/net.gleske/jervis/badge.svg
+[status-release]: https://img.shields.io/maven-central/v/net.gleske/jervis?color=success
 [travis-yaml]: http://docs.travis-ci.com/user/build-configuration/
 [travis]: https://travis-ci.org/
 [watch-repo]: https://help.github.com/articles/watching-repositories/
