@@ -39,8 +39,3 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: GROOVY_VERSION=${{ matrix.groovy }} ./gradlew coveralls
-      - if: ${{ matrix.groovy == '4.0.6' && matrix.java == '17' }}
-        name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
