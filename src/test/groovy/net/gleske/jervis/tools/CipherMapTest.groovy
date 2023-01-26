@@ -50,6 +50,19 @@ class CipherMapTest extends GroovyTestCase {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
         ciphermap = new CipherMap(new File(url.file))
         assert ciphermap.plainMap == [:]
+        assert ciphermap.hash_iterations == 5000
+        ciphermap = new CipherMap(new File(url.file), 3)
+        assert ciphermap.plainMap == [:]
+        assert ciphermap.hash_iterations == 3
+    }
+    @Test public void test_CipherMap_string() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
+        ciphermap = new CipherMap(url.content.text)
+        assert ciphermap.plainMap == [:]
+        assert ciphermap.hash_iterations == 5000
+        ciphermap = new CipherMap(url.content.text, 4)
+        assert ciphermap.plainMap == [:]
+        assert ciphermap.hash_iterations == 4
     }
     @Test public void test_CipherMap_leftShift_CipherMap() {
         ciphermap.plainMap = [hello: 'friend']
