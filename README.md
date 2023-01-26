@@ -1,8 +1,9 @@
 # Jervis: Jenkins as a service
 
-[![Maven Central Release][status-release]][maven-release]
 [![Build Status][status-build]][jervis-ci]
 [![Coverage Status][status-coverage]][jervis-coveralls]
+[![Maven Central Release][status-release]][maven-release]
+![GitHub commits since latest release (by date)][commits-since]
 
 * *Project status:* [released to maven central][maven-release].
 * *Currently Targeted platforms:*
@@ -199,6 +200,7 @@ See [SonarQube README](sonarqube/README.md).
     See the License for the specific language governing permissions and
     limitations under the License.
 
+[commits-since]: https://img.shields.io/github/commits-since/samrocketman/jervis/latest/main
 [jenkins-plugin-docker]: https://wiki.jenkins-ci.org/display/JENKINS/Docker+Plugin
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jenkins]: https://jenkins-ci.org/
