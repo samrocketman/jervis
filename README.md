@@ -3,7 +3,7 @@
 [![Build Status][status-build]][jervis-ci]
 [![Coverage Status][status-coverage]][jervis-coveralls]
 [![Maven Central Release][status-release]][maven-release]
-![GitHub commits since latest release (by date)][commits-since]
+[![GH commits since latest release][commits-since]][commits-since-diff]
 
 * *Project status:* [released to maven central][maven-release].
 * *Currently Targeted platforms:*
@@ -201,6 +201,7 @@ See [SonarQube README](sonarqube/README.md).
     limitations under the License.
 
 [commits-since]: https://img.shields.io/github/commits-since/samrocketman/jervis/latest/main
+[commits-since-diff]: https://github.com/samrocketman/jervis/compare/jervis-1.7...HEAD
 [jenkins-plugin-docker]: https://wiki.jenkins-ci.org/display/JENKINS/Docker+Plugin
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jenkins]: https://jenkins-ci.org/
