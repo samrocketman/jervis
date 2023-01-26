@@ -32,7 +32,7 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
       - name: Unit Test Coverage
-        run: GROOVY_VERSION=${{ matrix.groovy }} ./gradlew jacocoTestReport
+        run: GROOVY_VERSION=${{ matrix.groovy }} ./gradlew coveralls
       - if: ${{ matrix.groovy == '4.0.6' && matrix.java == '17' }}
         name: Coveralls
         uses: coverallsapp/github-action@master

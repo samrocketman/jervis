@@ -7,7 +7,7 @@ buildscript {
 
 plugins {
     id "org.sonarqube" version "3.4.0.2513"
-    id 'com.github.kt3k.coveralls' version '2.8.4'
+    id 'com.github.kt3k.coveralls' version '2.12.0'
     id 'groovy'
     id 'jacoco'
     id 'maven-publish'
@@ -299,6 +299,7 @@ sonarqube {
 }
 project.tasks["jacocoTestReport"].dependsOn "check"
 project.tasks["sonarqube"].dependsOn "jacocoTestReport"
+project.tasks["coveralls"].dependsOn "jacocoTestReport"
 
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 //generate gradlew with: ./gradlew wrapper --gradle-version 7.6
