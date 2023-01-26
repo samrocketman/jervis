@@ -23,7 +23,7 @@ jobs:
         exclude:
           - groovy: '2.4.21'
             java: '17'
-    name: Java ${{ matrix.Java }} sample
+    name: Java ${{ matrix.java }} Groovy ${{ matrix.groovy }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup java
@@ -31,7 +31,13 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
-      - name: Unit Test Coverage
+      - if: ${{ !(matrix.groovy == '4.0.6' && matrix.java == '17') }}
+        name: Unit Tests
+        run: GROOVY_VERSION=${{ matrix.groovy }} ./gradlew check
+      - if: ${{ matrix.groovy == '4.0.6' && matrix.java == '17' }}
+        name: Coveralls Test Coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: GROOVY_VERSION=${{ matrix.groovy }} ./gradlew coveralls
       - if: ${{ matrix.groovy == '4.0.6' && matrix.java == '17' }}
         name: Coveralls
