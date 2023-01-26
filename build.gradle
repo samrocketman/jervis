@@ -297,7 +297,7 @@ sonarqube {
         }
     }
 }
-project.tasks["sonarqube"].dependsOn "check"
+project.tasks["jacocoTestReport"].dependsOn "check"
 project.tasks["sonarqube"].dependsOn "jacocoTestReport"
 
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
