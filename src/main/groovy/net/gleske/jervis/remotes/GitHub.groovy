@@ -161,6 +161,14 @@ class GitHub implements JervisRemote, SimpleRestServiceSupport {
         apiFetch(path)
     }
 
+    /**
+      Passthrough func to apiFetch in SimpleRestServiceSupport
+      @return     A <tt>Map</tt> or <tt>List</tt> from the parsed JSON response.
+    */
+    public def apiFetch(String path = '', Map http_headers = [:], String http_method = 'GET', String data = '') {
+        apiFetch(path, http_headers, http_method, data)
+    }
+
     /*
      * public functions
      */
