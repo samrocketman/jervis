@@ -15,6 +15,7 @@
 # Docker version 20.10.18, build b40c2f6
 
 set -exo pipefail
+exit
 
 function dockerImageExists() {
   [ -n "$(docker images -q "$1")" ]
