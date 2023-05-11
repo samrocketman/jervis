@@ -14,36 +14,25 @@
    limitations under the License.
    */
 /**
-  This step allows shared pipeline libraries to retrieve variables set in the
-  runtime binding of the calling user's pipeline.
+  This step allows shared pipeline libraries to set variables in the runtime
+  binding of the calling user's pipeline.
 
-  Returns the contents of the variable in the binding (of any type).  This step
-  makes it easier to access user pipeline data beyond being a functional-only
-  context.
-
-  Let's say a user has the following code in their Jenkinsfile.
+  If in a scripted pipeline this is equivalent to:
 
         some_variable = 'foo'
 
     USAGE:
-        getUserBinding('some_variable')
-
-            returns String 'foo'
+        setUserBinding('some_variable', 'foo')
   */
 
 import hudson.model.Run
 
 @NonCPS
-def getBuildBinding(Run run, String bindingVar) {
-    run.execution.shell.context.with { b ->
-        if(!b.hasVariable(bindingVar)) {
-            return null
-        }
-        b.getVariable(bindingVar)
-    }
+def setBuildBinding(Run run, String bindingVar, def content) {
+    run.execution.shell.context.setVariable(bindingVar, content)
 }
 
 @NonCPS
-def call(String bindingVar) {
-    getBuildBinding(currentBuild.rawBuild, bindingVar)
+def call(String bindingVar, def content) {
+    setBuildBinding(currentBuild.rawBuild, bindingVar, content)
 }

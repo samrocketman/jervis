@@ -14,10 +14,8 @@
    limitations under the License.
    */
 /**
-  hasGlobalResource will check to see if a file exists in the resources
-  directory of any shared library.  This will allow for conditional
-  libraryResource steps.  Skip attempting to load the resource if it doesn't
-  exist.
+  readGlobalResource is similar to libraryResource; except it will skip
+  printing an echo statement.  Returns an empty string if it doesn't exist.
   */
 import hudson.model.Run
 import org.jenkinsci.plugins.workflow.libs.LibrariesAction
@@ -27,15 +25,22 @@ import org.jenkinsci.plugins.workflow.libs.LibraryRecord
   Check if a global library provides a resource.
  */
 @NonCPS
-Boolean lookForGlobalLibraryResource(Run run, String resourceFile) {
+String lookForGlobalLibraryResource(Run run, String resourceFile) {
     def action = run.getAction(LibrariesAction)
+    String contents = ''
     action.libraries.any { LibraryRecord library ->
         File file = new File(run.getRootDir(), "libs/${library.name}/resources/${resourceFile}")
+        if(file.exists()) {
+            contents = file.text
+        }
+        // exit loop early
         file.exists()
     }
+    contents
 }
 
 @NonCPS
-Boolean call(String resourceFile) {
+String call(String resourceFile) {
     lookForGlobalLibraryResource(currentBuild.rawBuild, resourceFile)
 }
+
