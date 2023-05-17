@@ -515,7 +515,7 @@ vault.discoverKVMounts()
             if(enableCas) {
                 try {
                     secretMeta = apiFetch("${mount}/metadata/${subpath}") ?: [:]
-                } catch(IOException ignore) {
+                } catch(IOException ignored) {
                     // 40X exceptions for invalid paths ignored
                 }
                 data['options'] = [cas: (secretMeta?.data?.current_version ?: 0)]
