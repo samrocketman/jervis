@@ -923,6 +923,30 @@ env:
       <tt>defaultValue</tt>.  Guarantees that what is returned is the same type as
       <tt>defaultValue</tt>.  This is used to get optional keys from YAML or JSON
       files.
+      <h5>Code Example</h5>
+<pre><code>
+import static net.gleske.jervis.lang.LifecycleGenerator.getObjectValue
+
+Map hexKeys = [ 'hello.io': 'world', 'hello': ['jervis.io{': 'friend'], friend: [name: 'dog']]
+
+// Do a normal lookup with a hierarchy of keys
+assert getObjectValue(hexKeys, 'friend.name', '') == 'dog'
+
+// Do a normal lookup with a hierarchy of keys; but result is not a List so
+// falls back to default
+assert getObjectValue(hexKeys, 'friend.name', ['item']) == ['item']
+
+// top level lookup; but the key has a period in it
+assert getObjectValue(hexKeys, 'hello\\.io', '') == 'world'
+
+// top level lookup; but the period is already escaped with a hex code.
+assert getObjectValue(hexKeys, 'hello%{2e}io', '') == 'world'
+
+// A hierarchy of keys but some of the child keys have special characters
+assert getObjectValue(hexKeys, 'hello.jervis\\.io\\{', '') == 'friend'
+</code></pre>
+
+In the above example, notice that some characters can be escaped.  For example, if the key has a period in its name it is escaped with <tt>\\.</tt>.  Any character can be escaped this way.
 
       @param object A <tt>Map</tt> which was likely created from a YAML or JSON file.
       @param key A <tt>String</tt> with keys and subkeys separated by periods which is
@@ -950,26 +974,47 @@ env:
       </ol>
      */
     public static final Object getObjectValue(Map object, String key, Object defaultValue) {
-        if(key.indexOf('.') >= 0) {
-            String key1 = key.split('\\.', 2)[0]
-            String key2 = key.split('\\.', 2)[1]
-            if(object.get(key1) != null && object.get(key1) instanceof Map) {
-                return getObjectValue(object.get(key1), key2, defaultValue)
+        // START OF ENCODER AND DECODER SETUP
+        // find all backslash charachters and replace them with hex encoded values
+        Map encoder = [:]
+        key.eachMatch('\\\\.') {
+            String matchedChar = it - ~'\\\\'
+            encoder["\\Q${it}\\E".toString()] = "%{${matchedChar.bytes.encodeHex()}}".toString()
+        }
+        String encodedKey = key
+        encoder.each { k , v -> encodedKey = encodedKey.replaceAll(k, v) }
+        //encodedKey now has hex variants
+
+        // set a map of hex expressions to decode for lookups
+        Map decoder = encodedKey.findAll('%\\{([^}]+)\\}') { [("\\Q${it[0]}\\E".toString()): (new String(it[1].decodeHex()))] }?.sum() ?: [:]
+        // END OF ENCODER AND DECODER SETUP
+
+        String primary = encodedKey
+        if(encodedKey.indexOf('.') >= 0) {
+            primary = encodedKey.split('\\.', 2)[0]
+            String subkey = encodedKey.split('\\.', 2)[1]
+            // decode the primary hex variants
+            decoder.each { k, v -> primary = primary.replaceAll(k, v) }
+            if(object.get(primary) != null && object.get(primary) instanceof Map) {
+                return getObjectValue(object.get(primary), subkey, defaultValue)
             }
             else {
                 return defaultValue
             }
         }
 
+        // decode the primary hex variants
+        decoder.each { k, v -> primary = primary.replaceAll(k, v) }
+
         //try returning the value casted as the same type as defaultValue
         try {
-            if(object.get(key) == null || ((defaultValue instanceof String) && ((object.get(key) instanceof Map) || (object.get(key) instanceof List)))) {
+            if(object.get(primary) == null || ((defaultValue instanceof String) && ((object.get(primary) instanceof Map) || (object.get(primary) instanceof List)))) {
                 return defaultValue
             }
-            if((defaultValue instanceof Boolean) && (object.get(key) == 'false')) {
+            if((defaultValue instanceof Boolean) && (object.get(primary) == 'false')) {
                 return false
             }
-            return object.get(key).asType(defaultValue.getClass())
+            return object.get(primary).asType(defaultValue.getClass())
         }
         catch(IllegalArgumentException|ClassCastException ignored) {
             return defaultValue

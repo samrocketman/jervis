@@ -481,6 +481,15 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert 'default'.equals(generator.getObjectValue(example, 'key1', 'default'))
         assert 'default'.equals(generator.getObjectValue(example, 'key2', 'default'))
     }
+    @Test public void test_LifecycleGenerator_getObjectValue_allow_conflicting_and_custom_lookup_paths() {
+        Map hexKeys = [ 'hello.io': 'world', 'hello': ['jervis.io{': 'friend']]
+
+        assert generator.getObjectValue(hexKeys, 'hello', 'hi') == 'hi'
+        assert generator.getObjectValue(hexKeys, 'hello\\.io', '') == 'world'
+        assert generator.getObjectValue(hexKeys, 'hello\\.io', []) == []
+        assert generator.getObjectValue(hexKeys, 'hello.jervis.io{', '') == ''
+        assert generator.getObjectValue(hexKeys, 'hello.jervis\\.io\\{', '') == 'friend'
+    }
     @Test public void test_LifecycleGenerator_loadPlatforms() {
         assert null.equals(generator.platform_obj)
         URL url = this.getClass().getResource('/good_platforms_simple.json');
