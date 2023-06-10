@@ -22,19 +22,28 @@ import org.junit.Test
 
 class EphemeralTokenCacheTest extends GroovyTestCase {
 
-    /*
+    EphemeralTokenCache tokenCache
+
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
+        this.tokenCache = new EphemeralTokenCache({-> ''})
+        tokenCache.loadCache = null
+        tokenCache.saveCache = null
+        tokenCache.obtainLock = null
     }
     //tear down after every test
     @After protected void tearDown() {
+        this.tokenCache = null
         super.tearDown()
     }
-    */
     @Test public void test_EphemeralTokenCache_fail_instantiation() {
         shouldFail(IllegalStateException) {
             new EphemeralTokenCache()
         }
+    }
+    @Test public void test_EphemeralTokenCache_isExpired_without_existing() {
+        String hash = 'fake'
+        assert this.tokenCache.isExpired(hash) == true
     }
 }
