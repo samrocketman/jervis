@@ -16,6 +16,8 @@
 package net.gleske.jervis.remotes.creds
 //the EphemeralTokenCacheTest() class automatically sees the EphemeralTokenCache() class because they're in the same package
 
+import net.gleske.jervis.exceptions.TokenException
+
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -61,5 +63,15 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
         // with 30 second renew buffer
         this.tokenCache.renew_buffer = 30
         assert this.tokenCache.isExpired(hash) == true
+    }
+    @Test public void test_EphemeralTokenCache_updateTokenWith_protect_renew_buffer_misconfiguration() {
+        String hash = 'fake'
+        String tenSecondsFromNow = Instant.now().plus(10, ChronoUnit.SECONDS).toString()
+        shouldFail(TokenException) {
+            this.tokenCache.updateTokenWith('sometoken', tenSecondsFromNow, hash)
+        }
+        this.tokenCache.renew_buffer = 0
+        this.tokenCache.updateTokenWith('sometoken', tenSecondsFromNow, hash)
+        assert this.tokenCache.token == 'sometoken'
     }
 }

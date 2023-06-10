@@ -16,6 +16,7 @@
 
 package net.gleske.jervis.remotes.creds
 
+import net.gleske.jervis.exceptions.TokenException
 import net.gleske.jervis.remotes.interfaces.EphemeralTokenCredential
 import net.gleske.jervis.tools.CipherMap
 import net.gleske.jervis.tools.LockableFile
@@ -482,6 +483,9 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
       @see java.time.format.DateTimeParseException
       */
     void updateTokenWith(String token, String expiration, String hash) throws DateTimeParseException {
+        if(isExpired(Instant.parse(expiration))) {
+            throw new TokenException("Cannot update cache with an already expired token.  You may want to adjust the renew_buffer below ${this.renew_buffer} second(s).")
+        }
         this.hash = hash
         tryLock {
             tryLoadCache()
