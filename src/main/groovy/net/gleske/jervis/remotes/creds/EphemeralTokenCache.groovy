@@ -30,6 +30,12 @@ import java.time.format.DateTimeParseException
   backend storage; refer to <tt>{@link #cacheFile}</tt>.  This is intentionally
   designed for shared use by multiple unrelated token issuers.  This provides
   centralized generic storage for all ephemeral tokens.
+  
+  This class, when instantiated, represents a single token which has an expiration
+  and automated rotation.  The backend cache is a shared resource amongst many
+  unique tokens with expirations.  The purpose is to reduce API calls to 3rd party
+  services to request new tokens be issued.  Reuse already issued tokens if they're
+  still valid or request a rotation for tokens that have expired.
 
   <h2>Sample usage</h2>
   <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
