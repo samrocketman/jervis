@@ -146,4 +146,9 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
         this.tokenCache.cacheLockFile = 'hello.yaml'
         assert this.tokenCache.cacheLockFile == 'hello.yaml'
     }
+    @Test public void test_EphemeralTokenCache_null_expiration() {
+        assert this.tokenCache.expiration == null
+        assert this.tokenCache.isExpired() == true
+        assert this.tokenCache.isExpired('fakehash') == true
+    }
 }
