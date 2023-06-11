@@ -31,6 +31,8 @@ ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.21'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
 ext.snakeYamlVersion = '1.33'
+ext.bouncyCastleVersion = '1.73'
+ext.codeNarcVersion = '3.2.0'
 
 if(JavaVersion.current() == JavaVersion.VERSION_17 && Integer.parseInt(ext.groovyVersion.tokenize('.').first()) < 3) {
     throw new GradleException("When using Java 17 you must use Groovy 3 or higher.  Found Groovy " + ext.groovyVersion)
@@ -73,16 +75,16 @@ dependencies {
     implementation "${groovyPackage}:groovy-json:${groovyVersion}"
     implementation "${groovyPackage}:groovy-templates:${groovyVersion}"
     implementation "${groovyPackage}:groovy:${groovyVersion}"
-    implementation 'org.bouncycastle:bcpkix-jdk18on:1.72'
+    implementation "org.bouncycastle:bcpkix-jdk18on:${bouncyCastleVersion}"
     implementation "org.yaml:snakeyaml:${snakeYamlVersion}"
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation "${groovyPackage}:groovy-test:${groovyVersion}"
     testImplementation "${groovyPackage}:groovy-console:${groovyVersion}"
     if(groovyVersion.tokenize('.').first() == '4') {
-        testImplementation 'org.codenarc:CodeNarc:3.1.0-groovy-4.0'
+        testImplementation "org.codenarc:CodeNarc:${codeNarcVersion}-groovy-4.0"
     } else {
-        testImplementation 'org.codenarc:CodeNarc:3.1.0'
+        testImplementation "org.codenarc:CodeNarc:${codeNarcVersion}"
     }
     // CodeNarc throws stderr messages about SLF4J so this dependency makes the
     // stderr go away.
