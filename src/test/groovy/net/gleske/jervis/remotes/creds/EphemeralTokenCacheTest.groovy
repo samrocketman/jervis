@@ -17,6 +17,7 @@ package net.gleske.jervis.remotes.creds
 //the EphemeralTokenCacheTest() class automatically sees the EphemeralTokenCache() class because they're in the same package
 
 import net.gleske.jervis.exceptions.TokenException
+import net.gleske.jervis.tools.YamlOperator
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -204,6 +205,10 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
         this.tokenCache.cache = [:]
         this.tokenCache.updateTokenWith('sometoken2', thirtyFiveSecondsFromNow, '30sHash')
         assert this.tokenCache.cache.keySet().toList() == ['10sHash', '30sHash']
+
+        // verify cache is plain text
+        Map dataOnDisk = YamlOperator.loadYamlFrom(new File('build/tmp/cache.yaml'))
+        dataOnDisk.keySet().toList() == ['10sHash', '30sHash']
     }
 
     @Test public void test_EphemeralTokenCache_encrypted_persistent_cache_closure() {
@@ -239,5 +244,36 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
         shouldFail(TokenException) {
             this.tokenCache.isExpired('10sHash')
         }
+    }
+    @Test public void test_EphemeralTokenCache_encrypted_persistent_cache_file() {
+        // potentially clean up files on disk before test
+        new File('build/tmp/cache-encrypted.yaml').with { f ->
+            if(f.exists()) {
+                f.delete()
+            }
+        }
+
+        // create new instance with plain text file backend
+        this.tokenCache = new EphemeralTokenCache('src/test/resources/rsa_keys/good_id_rsa_2048')
+        this.tokenCache.cacheFile = 'build/tmp/cache-encrypted.yaml'
+        this.tokenCache.cacheLockFile = 'build/tmp/cache.lock'
+        this.tokenCache.renew_buffer = 0
+
+        // update a token
+        String tenSecondsFromNow = Instant.now().plus(10, ChronoUnit.SECONDS).toString()
+        this.tokenCache.updateTokenWith('sometoken', tenSecondsFromNow, '10sHash')
+        assert (new File('build/tmp/cache-encrypted.yaml').exists())
+        assert !this.tokenCache.isExpired()
+
+        // load from persistent cache and update it
+        String thirtyFiveSecondsFromNow = Instant.now().plus(35, ChronoUnit.SECONDS).toString()
+        // pull from cache on disk and update
+        this.tokenCache.cache = [:]
+        this.tokenCache.updateTokenWith('sometoken2', thirtyFiveSecondsFromNow, '30sHash')
+        assert this.tokenCache.cache.keySet().toList() == ['10sHash', '30sHash']
+
+        // verify cache is encrypted by CipherMap
+        Map dataOnDisk = YamlOperator.loadYamlFrom(new File('build/tmp/cache-encrypted.yaml'))
+        dataOnDisk.keySet().toList() == ['age', 'cipher', 'data', 'signature']
     }
 }
