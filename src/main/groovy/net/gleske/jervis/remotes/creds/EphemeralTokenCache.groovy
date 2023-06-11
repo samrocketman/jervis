@@ -132,8 +132,8 @@ class EphemeralTokenCache implements EphemeralTokenCredential, ReadonlyTokenCred
     }
 
     /**
-      Creates an ephemeral token cache from a private key on disk.  This
-      assumes a private key is insecurely stored on disk if no 3rd party
+      Creates an encrypted ephemeral token cache from a private key on disk.
+      This assumes a private key is insecurely stored on disk if no 3rd party
       credential backend is used.
 
       <p>This constructor is provided for convenience and is equavalent to the
