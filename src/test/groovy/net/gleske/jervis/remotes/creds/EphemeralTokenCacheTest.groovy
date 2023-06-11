@@ -205,4 +205,39 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
         this.tokenCache.updateTokenWith('sometoken2', thirtyFiveSecondsFromNow, '30sHash')
         assert this.tokenCache.cache.keySet().toList() == ['10sHash', '30sHash']
     }
+
+    @Test public void test_EphemeralTokenCache_encrypted_persistent_cache_closure() {
+        // potentially clean up files on disk before test
+        new File('build/tmp/cache-encrypted.yaml').with { f ->
+            if(f.exists()) {
+                f.delete()
+            }
+        }
+
+        // create new instance with plain text file backend
+        this.tokenCache = new EphemeralTokenCache({->
+            this.getClass().getResource('/rsa_keys/good_id_rsa_2048').content.text
+        })
+        this.tokenCache.cacheFile = 'build/tmp/cache-encrypted.yaml'
+        this.tokenCache.cacheLockFile = 'build/tmp/cache.lock'
+        this.tokenCache.renew_buffer = 0
+
+        // update a token
+        String tenSecondsFromNow = Instant.now().plus(10, ChronoUnit.SECONDS).toString()
+        this.tokenCache.updateTokenWith('sometoken', tenSecondsFromNow, '10sHash')
+        assert (new File('build/tmp/cache-encrypted.yaml').exists())
+        assert !this.tokenCache.isExpired()
+
+        // corrupt in-memory cache but it should be ignored if checking against hash.
+        this.tokenCache.cache = [:]
+        // pull from cache on disk
+        assert !this.tokenCache.isExpired('10sHash')
+
+        // throw decryption error due to unexpected empty private key
+        this.tokenCache.cache = [:]
+        this.tokenCache.getPrivateKey = {-> ''}
+        shouldFail(TokenException) {
+            this.tokenCache.isExpired('10sHash')
+        }
+    }
 }
