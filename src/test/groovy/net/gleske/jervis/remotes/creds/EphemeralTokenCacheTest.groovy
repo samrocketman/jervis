@@ -108,6 +108,18 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
         assert this.tokenCache.cache.keySet().toList() == ['customType', '30sHash']
         assert this.tokenCache.cache['customType'] == 'somestring'
     }
+    @Test public void test_EphemeralTokenCache_updateTokenWith_cleanup_remove_when_missing_expiration() {
+        String tenSecondsFromNow = Instant.now().plus(10, ChronoUnit.SECONDS).toString()
+        String thirtyFiveSecondsFromNow = Instant.now().plus(35, ChronoUnit.SECONDS).toString()
+
+        this.tokenCache.renew_buffer = 0
+        this.tokenCache.updateTokenWith('sometoken', tenSecondsFromNow, '10sHash')
+        this.tokenCache.cache['10sHash'].remove('expires_at')
+        assert this.tokenCache.cache.keySet().toList() == ['10sHash']
+        this.tokenCache.renew_buffer = 30
+        this.tokenCache.updateTokenWith('sometoken2', thirtyFiveSecondsFromNow, '30sHash')
+        assert this.tokenCache.cache.keySet().toList() == ['30sHash']
+    }
     @Test public void test_EphemeralTokenCache_updateTokenWith_setCacheFile() {
         assert this.tokenCache.cacheFile == '/dev/shm/jervis-token-cache.yaml'
         shouldFail(TokenException) {
