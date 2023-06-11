@@ -475,7 +475,7 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
       @return <tt>true</tt> if expired or <tt>false</tt> if valid.
       */
     private Boolean checkExpiration(Instant expires, Long renew_before) {
-        Long renewBefore = (renew_before && renew_before > 0) ? renew_before : 0
+        Long renewBefore = (renew_before > 0) ? renew_before : 0
         Long renewAt = expires.epochSecond - renewBefore
         Instant now = new Date().toInstant()
         now.epochSecond >= renewAt

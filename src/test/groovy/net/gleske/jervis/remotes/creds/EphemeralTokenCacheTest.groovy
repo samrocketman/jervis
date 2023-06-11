@@ -74,6 +74,17 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
         this.tokenCache.updateTokenWith('sometoken', tenSecondsFromNow, hash)
         assert this.tokenCache.token == 'sometoken'
     }
+    @Test public void test_EphemeralTokenCache_updateTokenWith_negative_renew_buffer_misconfiguration() {
+        assert this.tokenCache.renew_buffer == 30
+        this.tokenCache.renew_buffer = -1
+        assert this.tokenCache.renew_buffer == 0
+        this.tokenCache.renew_buffer = null
+        assert this.tokenCache.renew_buffer == 0
+        this.tokenCache.renew_buffer = 0
+        assert this.tokenCache.renew_buffer == 0
+        this.tokenCache.renew_buffer = 5
+        assert this.tokenCache.renew_buffer == 5
+    }
     @Test public void test_EphemeralTokenCache_updateTokenWith_mixed_cache_with_renew_buffers_and_cleanup() {
         String tenSecondsFromNow = Instant.now().plus(10, ChronoUnit.SECONDS).toString()
         String thirtyFiveSecondsFromNow = Instant.now().plus(35, ChronoUnit.SECONDS).toString()
