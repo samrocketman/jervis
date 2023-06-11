@@ -489,11 +489,11 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
     private void cleanupCache() {
         // Find expired cache entries.
         List cleanup = this.cache.findAll { hash, entry ->
-            if(!(entry in Map)) {
-                return false
+            if(!(entry in Map) || !entry?.expires_at) {
+                return true
             }
             Long renewBefore = entry?.renew_buffer ?: 0
-            (!entry?.expires_at || checkExpiration(Instant.parse(entry.expires_at), renewBefore))
+            checkExpiration(Instant.parse(entry.expires_at), renewBefore)
         }.collect { hash, entry ->
             hash
         } ?: []
