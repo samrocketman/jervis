@@ -94,4 +94,18 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
         assert this.tokenCache.cache['30sHash'].renew_buffer == 30
         assert this.tokenCache.token == 'sometoken3'
     }
+    @Test public void test_EphemeralTokenCache_updateTokenWith_cleanup_skip_type_mismatch() {
+        String tenSecondsFromNow = Instant.now().plus(10, ChronoUnit.SECONDS).toString()
+        String thirtyFiveSecondsFromNow = Instant.now().plus(35, ChronoUnit.SECONDS).toString()
+
+        this.tokenCache.renew_buffer = 0
+        this.tokenCache.updateTokenWith('sometoken', tenSecondsFromNow, '10sHash')
+        this.tokenCache.cache['customType'] = 'somestring'
+        this.tokenCache.cache['10sHash'].renew_buffer = 30
+        assert this.tokenCache.cache.keySet().toList() == ['10sHash', 'customType']
+        this.tokenCache.renew_buffer = 30
+        this.tokenCache.updateTokenWith('sometoken2', thirtyFiveSecondsFromNow, '30sHash')
+        assert this.tokenCache.cache.keySet().toList() == ['customType', '30sHash']
+        assert this.tokenCache.cache['customType'] == 'somestring'
+    }
 }
