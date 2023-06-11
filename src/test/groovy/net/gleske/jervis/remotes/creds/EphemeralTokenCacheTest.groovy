@@ -90,6 +90,9 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
         String thirtyFiveSecondsFromNow = Instant.now().plus(35, ChronoUnit.SECONDS).toString()
 
         this.tokenCache.renew_buffer = 0
+        shouldFail(TokenException) {
+            this.tokenCache.updateTokenWith('', tenSecondsFromNow, '10sHash')
+        }
         this.tokenCache.updateTokenWith('sometoken', tenSecondsFromNow, '10sHash')
         this.tokenCache.renew_buffer = 30
         this.tokenCache.updateTokenWith('sometoken2', thirtyFiveSecondsFromNow, '30sHash')

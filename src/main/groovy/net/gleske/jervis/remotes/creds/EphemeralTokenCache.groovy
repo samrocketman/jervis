@@ -434,7 +434,7 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
                 tryLoadCache()
             }
         }
-        if(!getExpiration() || !getToken()) {
+        if(!getExpiration()) {
             return true
         }
         isExpired()
@@ -514,6 +514,9 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
     void updateTokenWith(String token, String expiration, String hash) throws DateTimeParseException {
         if(isExpired(Instant.parse(expiration))) {
             throw new TokenException("Cannot update cache with an already expired token.  You may want to adjust the renew_buffer below ${this.renew_buffer} second(s).")
+        }
+        if(!token) {
+            throw new TokenException('Updated token must not be empty or null.')
         }
         this.hash = hash
         tryLock {
