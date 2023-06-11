@@ -47,6 +47,9 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
             new EphemeralTokenCache()
         }
     }
+    @Test public void test_EphemeralTokenCache_empty_private_key() {
+        assert this.tokenCache.getPrivateKey() == ''
+    }
     @Test public void test_EphemeralTokenCache_isExpired_without_existing() {
         String hash = 'fake'
         assert this.tokenCache.isExpired(hash) == true
