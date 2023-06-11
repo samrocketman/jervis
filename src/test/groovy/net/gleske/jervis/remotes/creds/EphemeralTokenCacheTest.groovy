@@ -32,7 +32,9 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
-        this.tokenCache = new EphemeralTokenCache({-> ''})
+        Boolean usePlainTextCache = true
+        this.tokenCache = new EphemeralTokenCache(usePlainTextCache)
+        // in-memory cache by default
         tokenCache.loadCache = null
         tokenCache.saveCache = null
         tokenCache.obtainLock = null
@@ -45,6 +47,11 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
     @Test public void test_EphemeralTokenCache_fail_instantiation() {
         shouldFail(IllegalStateException) {
             new EphemeralTokenCache()
+        }
+    }
+    @Test public void test_EphemeralTokenCache_fail_empty_private_key() {
+        shouldFail(TokenException) {
+            new EphemeralTokenCache({-> ''})
         }
     }
     @Test public void test_EphemeralTokenCache_empty_private_key() {

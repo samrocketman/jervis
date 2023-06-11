@@ -98,18 +98,37 @@ class EphemeralTokenCache implements EphemeralTokenCredential, ReadonlyTokenCred
       @see #loadCache Instantiates loadCache closure
       @see #obtainLock Instantiates obtainLock closure
       @see #saveCache Instantiates saveCache closure
-      @Warning If an empty <tt>String</tt> or <tt>null</tt> is returned by
-               <tt>resolvePrivateKeyString()</tt>, then encryption at rest is
-               disabled.  This is intended to provide flexibility.  The cache
-               entries contain sensitive API tokens and should be encrypted at
-               rest; if not encrypted by <tt>CipherMap</tt>, then encrypted by
-               the backend service.
+      @see net.gleske.jervis.exceptions.TokenException
       @param resolvePrivateKeyString An executable <tt>Closure</tt> that takes
                                      no parameters and returns a PKCS1 or PKCS8
-                                     PEM formatted RSA private key.
+                                     PEM formatted RSA private key.  If this
+                                     ever returns null or empty string, then a
+                                     <tt>TokenException</tt> will be thrown.
       */
-    EphemeralTokenCache(Closure resolvePrivateKeyString) {
+    EphemeralTokenCache(Closure resolvePrivateKeyString) throws TokenException {
         setupClosures(resolvePrivateKeyString)
+    }
+
+    /**
+      An ephemeral token cache which provides no encryption at rest.  If using
+      this, then you should update the <tt>loadCache</tt> and <tt>saveCache</tt>
+      closures to use something other than a file-based backend.
+
+      @see #EphemeralTokenCache(groovy.lang.Closure)
+      @see #loadCache Instantiates loadCache closure
+      @see #saveCache Instantiates saveCache closure
+      @see net.gleske.jervis.exceptions.TokenException
+      @Warning Encryption at rest is disabled.  This is intended to provide
+               flexibility.  The cache entries contain sensitive API tokens and
+               should be encrypted at rest; if not encrypted by
+               <tt>CipherMap</tt>, then encrypted by the backend service.
+      @param allowEmptyPrivateKey Uses a plain text cache if <tt>true</tt>.  It
+                                  will throw a <tt>TokenException</tt> if
+                                  <tt>false</tt>.
+      */
+    EphemeralTokenCache(Boolean allowEmptyPrivateKey) throws TokenException {
+        this.allowEmptyPrivateKey = allowEmptyPrivateKey
+        setupClosures({-> ''})
     }
 
     /**
@@ -150,6 +169,9 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
             // exception for a weak key)
             new CipherMap(privateKey)
             this.getPrivateKey = privateKeyClosure
+        }
+        else if(!this.allowEmptyPrivateKey) {
+            throw new TokenException('Private key is empty when user intends persistent cache to be encrypted.')
         }
         this.loadCache = {->
             File f = new File(this.cacheFile)
@@ -195,6 +217,11 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
     private String hash
 
     /**
+      Forces the user to declare they want an unencrypted cache.
+      */
+    private Boolean allowEmptyPrivateKey = false
+
+    /**
       Load cache if both loading and saving cache are configured.
       */
     private void tryLoadCache() {
@@ -209,6 +236,9 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
             if(data) {
                 this.cipherMap << data
             }
+        }
+        else if(!this.allowEmptyPrivateKey) {
+            throw new TokenException('Private key is empty when user intends persistent cache to be encrypted.')
         }
         if(this.cipherMap) {
             temp = this.cipherMap.getPlainMap()
