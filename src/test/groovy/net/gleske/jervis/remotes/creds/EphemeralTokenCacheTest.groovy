@@ -168,4 +168,41 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
         assert this.tokenCache.isExpired() == true
         assert this.tokenCache.isExpired('fakehash') == true
     }
+    @Test public void test_EphemeralTokenCache_persistent_cache() {
+        // potentially clean up files on disk before test
+        new File('build/tmp/cache.yaml').with { f ->
+            if(f.exists()) {
+                f.delete()
+            }
+        }
+
+        Boolean usePlainTextCache = true
+
+        // create new instance with plain text file backend
+        this.tokenCache = new EphemeralTokenCache(usePlainTextCache)
+        this.tokenCache.cacheFile = 'build/tmp/cache.yaml'
+        this.tokenCache.cacheLockFile = 'build/tmp/cache.lock'
+        this.tokenCache.renew_buffer = 0
+
+        // update a token
+        String tenSecondsFromNow = Instant.now().plus(10, ChronoUnit.SECONDS).toString()
+        this.tokenCache.updateTokenWith('sometoken', tenSecondsFromNow, '10sHash')
+        assert (new File('build/tmp/cache.yaml').exists())
+        assert !this.tokenCache.isExpired()
+
+        // corrupt in-memory cache but it should be ignored if checking against hash.
+        this.tokenCache.cache['10sHash'].renew_buffer = 30
+        assert this.tokenCache.isExpired()
+        assert this.tokenCache.isExpired('10sHash')
+        this.tokenCache.cache = [:]
+        // pull from cache on disk
+        assert !this.tokenCache.isExpired('10sHash')
+
+        // load from persistent cache and update it
+        String thirtyFiveSecondsFromNow = Instant.now().plus(35, ChronoUnit.SECONDS).toString()
+        // pull from cache on disk and update
+        this.tokenCache.cache = [:]
+        this.tokenCache.updateTokenWith('sometoken2', thirtyFiveSecondsFromNow, '30sHash')
+        assert this.tokenCache.cache.keySet().toList() == ['10sHash', '30sHash']
+    }
 }

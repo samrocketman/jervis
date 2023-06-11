@@ -153,9 +153,10 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
                                      PKCS8 PEM formatted RSA private key.
       */
     EphemeralTokenCache(String privateKeyPath) {
-        this({->
+        Closure resolvePrivateKeyString = {->
             new File(privateKeyPath).text
-        })
+        }
+        setupClosures(resolvePrivateKeyString)
     }
 
     /**
@@ -243,7 +244,7 @@ new EphemeralTokenCache({-&gt; new File(privateKeyPath).text })
         if(this.cipherMap) {
             temp = this.cipherMap.getPlainMap()
         }
-        else {
+        else if(data) {
             temp = YamlOperator.loadYamlFrom(data)
         }
         this.cache = temp.withDefault { key -> [:] }
@@ -434,16 +435,25 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
     }
 
     /**
-      Returns renew buffer.  Does not allow renew buffer to be undefined or go below zero.
+      Returns renew buffer for the current token.
 
       @see #renew_buffer
       @return <tt>0</tt> or a <tt>renew_buffer</tt> greater than <tt>0</tt>.
       */
     Long getRenew_buffer() {
+        this.cache[this.hash]?.renew_buffer ?: this.renew_buffer
+    }
+
+    /**
+      Sets a renew buffer.  Does not allow renew buffer to be undefined or go below zero.
+      */
+    void setRenew_buffer(Long renew_buffer) {
         if(!renew_buffer || renew_buffer <= 0) {
-            return 0
+            this.renew_buffer = 0
         }
-        this.renew_buffer
+        else {
+            this.renew_buffer = renew_buffer
+        }
     }
 
 
@@ -554,7 +564,7 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
             this.cache[hash].token = token
             setExpiration(expiration)
             this.cache[hash].expires_at = expiration
-            this.cache[hash].renew_buffer = getRenew_buffer()
+            this.cache[hash].renew_buffer = this.renew_buffer
             // Removes expired cache entries
             cleanupCache()
             trySaveCache()
