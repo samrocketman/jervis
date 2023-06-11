@@ -53,6 +53,10 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
         shouldFail(TokenException) {
             new EphemeralTokenCache({-> ''})
         }
+        // read "empty" file
+        shouldFail(TokenException) {
+            new EphemeralTokenCache('/dev/null')
+        }
     }
     @Test public void test_EphemeralTokenCache_empty_private_key() {
         assert this.tokenCache.getPrivateKey() == ''
