@@ -375,6 +375,35 @@ cred.getPrivateKey = {-&gt; new File('path/to/private_key').text }
     Integer hash_iterations = 0
 
     /**
+      Set cache file location when the cache is saved to local disk.
+
+      @see #cacheFile
+      @param cacheFile A local filesystem path to a YAML file.  The contents
+                       will be YAML.
+      */
+    void setCacheFile(String cacheFile) {
+        if(cacheFile == this.cacheLockFile) {
+            throw new TokenException('cacheFile and cacheLockFile must not be the same.')
+        }
+        this.cacheFile = cacheFile
+    }
+
+    /**
+      Set cache lock file location when the cache is saved to local disk.
+
+      @see #cacheLockFile
+      @param cacheLockFile A local filesystem path to a file.  This will be used
+                           for file locking to serialize reading and updating
+                           the local <tt>{@link #cacheFile}</tt>.
+      */
+    void setCacheLockFile(String cacheLockFile) {
+        if(cacheLockFile == this.cacheFile) {
+            throw new TokenException('cacheFile and cacheLockFile must not be the same.')
+        }
+        this.cacheLockFile = cacheLockFile
+    }
+
+    /**
       Returns renew buffer.  Does not allow renew buffer to be undefined or go below zero.
 
       @see #renew_buffer

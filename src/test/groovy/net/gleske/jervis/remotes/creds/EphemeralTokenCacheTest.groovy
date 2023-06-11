@@ -108,4 +108,20 @@ class EphemeralTokenCacheTest extends GroovyTestCase {
         assert this.tokenCache.cache.keySet().toList() == ['customType', '30sHash']
         assert this.tokenCache.cache['customType'] == 'somestring'
     }
+    @Test public void test_EphemeralTokenCache_updateTokenWith_setCacheFile() {
+        assert this.tokenCache.cacheFile == '/dev/shm/jervis-token-cache.yaml'
+        shouldFail(TokenException) {
+            this.tokenCache.cacheFile = '/dev/shm/jervis-token-cache.lock'
+        }
+        this.tokenCache.cacheFile = 'hello.yaml'
+        assert this.tokenCache.cacheFile == 'hello.yaml'
+    }
+    @Test public void test_EphemeralTokenCache_updateTokenWith_setCacheLockFile() {
+        assert this.tokenCache.cacheLockFile == '/dev/shm/jervis-token-cache.lock'
+        shouldFail(TokenException) {
+            this.tokenCache.cacheLockFile = '/dev/shm/jervis-token-cache.yaml'
+        }
+        this.tokenCache.cacheLockFile = 'hello.yaml'
+        assert this.tokenCache.cacheLockFile == 'hello.yaml'
+    }
 }
