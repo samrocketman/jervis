@@ -30,12 +30,11 @@ class GitHubAppRsaCredentialImplTest extends GroovyTestCase {
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
-        // setup
         this.cred = new GitHubAppRsaCredentialImpl('some app', 'fake private key')
     }
     //tear down after every test
     @After protected void tearDown() {
-        // tear down
+        this.cred = null
         super.tearDown()
     }
     @Test public void test_GitHubAppRsaCredentialImpl_basic_checks() {
@@ -48,6 +47,10 @@ class GitHubAppRsaCredentialImplTest extends GroovyTestCase {
     @Test public void test_GitHubAppRsaCredentialImpl_key_closure() {
         assert cred.id == 'a1796c2d4cf34fb91f027fe47243190061532ebecfc921b4ccfe72a2ffa2f0e8'
         cred.resolvePrivateKey = {-> 'another key' }
+        assert cred.id == '1119abc281c15bab6071494ddbdac304b0f2b29ba2c693e37b15f2a900a01274'
+    }
+    @Test public void test_GitHubAppRsaCredentialImpl_key_closure_constructor() {
+        this.cred = new GitHubAppRsaCredentialImpl('some app', {-> 'another key' })
         assert cred.id == '1119abc281c15bab6071494ddbdac304b0f2b29ba2c693e37b15f2a900a01274'
     }
 }

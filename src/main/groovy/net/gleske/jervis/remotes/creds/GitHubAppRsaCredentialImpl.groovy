@@ -170,6 +170,25 @@ rsaCred.owner = appCred.owner ?: ''
     }
 
     /**
+      Instantiates an RSA credential for a GitHub App used to generate API
+      tokens.
+      @see net.gleske.jervis.remotes.creds.GitHubAppCredential#DEFAULT_GITHUB_API
+      @see <a href="https://jwt.io/" target=_blank>About JSON Web Tokens</a>
+      @param github_app_id An app ID for a GitHub App.
+      @param resolvePrivateKey A closure that returns a PKCS1 or PKCS8 PEM
+                               formatted RSA private key as a <tt>String</tt>.
+                               It is used to create a JSON Web Token (JWT) for
+                               interacting with the GitHub API on behalf of the
+                               GitHub App.
+      @param api_url A custom URL to the GitHub API for GitHub Enterprise.
+      */
+    GitHubAppRsaCredentialImpl(String github_app_id, Closure resolvePrivateKey, String api_uri = GitHubAppCredential.DEFAULT_GITHUB_API) {
+        this.appID = github_app_id
+        this.resolvePrivateKey = resolvePrivateKey
+        this.apiUri = api_uri
+    }
+
+    /**
       Recalculates the ID for this credential.
       */
     private void recalculateId() {
