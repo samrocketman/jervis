@@ -26,15 +26,18 @@ class GitHubAppRsaCredentialImplTest extends GroovyTestCase {
 
 
     GitHubAppRsaCredentialImpl cred
+    String preCalculatedId
 
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
         this.cred = new GitHubAppRsaCredentialImpl('some app', 'fake private key')
+        this.preCalculatedId = this.cred.id
     }
     //tear down after every test
     @After protected void tearDown() {
         this.cred = null
+        this.preCalculatedId = null
         super.tearDown()
     }
     @Test public void test_GitHubAppRsaCredentialImpl_basic_checks() {
@@ -42,15 +45,30 @@ class GitHubAppRsaCredentialImplTest extends GroovyTestCase {
         assert cred.owner == ''
         assert cred.appID == 'some app'
         assert cred.privateKey == 'fake private key'
-        assert cred.id == 'a1796c2d4cf34fb91f027fe47243190061532ebecfc921b4ccfe72a2ffa2f0e8'
+        assert cred.id == preCalculatedId
     }
     @Test public void test_GitHubAppRsaCredentialImpl_key_closure() {
-        assert cred.id == 'a1796c2d4cf34fb91f027fe47243190061532ebecfc921b4ccfe72a2ffa2f0e8'
+        assert cred.id == preCalculatedId
         cred.resolvePrivateKey = {-> 'another key' }
         assert cred.id == '1119abc281c15bab6071494ddbdac304b0f2b29ba2c693e37b15f2a900a01274'
     }
     @Test public void test_GitHubAppRsaCredentialImpl_key_closure_constructor() {
         this.cred = new GitHubAppRsaCredentialImpl('some app', {-> 'another key' })
         assert cred.id == '1119abc281c15bab6071494ddbdac304b0f2b29ba2c693e37b15f2a900a01274'
+    }
+    @Test public void test_GitHubAppRsaCredentialImpl_owner() {
+        this.cred.owner = 'some owner'
+        assert cred.id != preCalculatedId
+        assert this.cred.owner == 'some owner'
+    }
+    @Test public void test_GitHubAppRsaCredentialImpl_apiUri() {
+        this.cred = new GitHubAppRsaCredentialImpl('some app', 'fake private key', 'https://ghe.example.com/api/v3')
+        assert this.cred.id != preCalculatedId
+        assert this.cred.apiUri == 'https://ghe.example.com/api/v3'
+    }
+    @Test public void test_GitHubAppRsaCredentialImpl_apiUri_closure() {
+        this.cred = new GitHubAppRsaCredentialImpl('some app', {-> 'another key' }, 'https://ghe.example.com/api/v3')
+        assert this.cred.id == 'a34f6591ea71f5c96eb70c12df04ce78269deb793b901bc8bb3ea7b0df9cb2f2'
+        assert this.cred.apiUri == 'https://ghe.example.com/api/v3'
     }
 }
