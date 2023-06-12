@@ -78,12 +78,28 @@ rsaCred.resolvePrivateKey = {-&gt;
     appCred.privateKey.plainText
 }
 
-// Update owner to query app installations
+// Update owner to query app installation@see https://jwt.io/ About JSON Web Tokenss
 rsaCred.owner = appCred.owner ?: ''
 </code></pre>
       @default null
       */
     Closure resolvePrivateKey
+
+    /**
+      Setter for custom closure meant for private key lookup.  This will
+      recalculate <tt>{@link #getId()}</tt>.
+
+      @see <a href="https://jwt.io/" target=_blank>About JSON Web Tokens</a>
+      @param resolvePrivateKey A closure that returns a PKCS1 or PKCS8 PEM
+                               formatted RSA private key as a <tt>String</tt>.
+                               It is used to create a JSON Web Token (JWT) for
+                               interacting with the GitHub API on behalf of the
+                               GitHub App.
+      */
+    void setResolvePrivateKey(Closure resolvePrivateKey) {
+        this.resolvePrivateKey = resolvePrivateKey
+        recalculateId()
+    }
 
     /**
       The GitHub API URL for querying GitHub App API in case of self-hosted
@@ -126,6 +142,8 @@ rsaCred.owner = appCred.owner ?: ''
 
     /**
       A private key for a GitHub App necessary for signing JSON Web Tokens (JWT).
+
+      @see <a href="https://jwt.io/" target=_blank>About JSON Web Tokens</a>
       @return A PKCS1 or PKCS8 PEM formatted RSA private key.
       */
     String getPrivateKey() {

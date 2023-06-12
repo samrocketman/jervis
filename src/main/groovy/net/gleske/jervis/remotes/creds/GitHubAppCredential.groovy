@@ -231,6 +231,7 @@ github_app.scope = [repositories: ['repo1', 'repo2'], permissions: [contents: 'r
     /**
       Sets the RSA credential used for authentication.
       @see #getToken()
+      @see <a href="https://jwt.io/" target=_blank>About JSON Web Tokens</a>
       @param cred A GitHub App RSA key used to generate a JSON Web Token (JWT)
                   for issuing API credentials.
       */
