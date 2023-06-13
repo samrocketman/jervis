@@ -151,7 +151,7 @@ approle_service.getToken()
 approle_service.renewToken()
 approle_batch.getToken()
 approle_batch.getToken()
-wapprole_batch.renewToken()
+approle_batch.renewToken()
 </code></pre>
   */
 class VaultAppRoleCredentialTest extends GroovyTestCase {
