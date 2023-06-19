@@ -59,11 +59,11 @@ class YamlOperator {
 
     /**
       Convert a POJO consisting of standard Java classes into a YAML string.
-      @param yamlToSerialize A map object consisting of standard Java class
-                             instance objects.
+      @param yamlToSerialize A POJO consisting of standard Java class instance
+                             objects.
       @return A YAML-spec String.
       */
-    static String writeObjToYaml(Map yamlToSerialize) {
+    static String writeObjToYaml(def yamlToSerialize) {
         DumperOptions options = new DumperOptions()
         options.setIndent(2)
         options.setPrettyFlow(true)
@@ -71,7 +71,7 @@ class YamlOperator {
         options.setIndicatorIndent(2);
         options.setIndentWithIndicator(true);
         def yaml = new Yaml(new SafeConstructor(new LoaderOptions()), new Representer(), options)
-        yaml.dumpAsMap(yamlToSerialize)
+        yaml.dump(yamlToSerialize)
     }
 
     /**
@@ -79,10 +79,10 @@ class YamlOperator {
       file.  This will overwrite the provided file if it exists.
 
       @param destFile A file where the YAML output will be written.
-      @param yamlToSerialize A map object consisting of standard Java class
-                             instance objects.
+      @param yamlToSerialize A POJO consisting of standard Java class instance
+                             objects.
       */
-    static void writeObjToYaml(File destFile, Map yamlToSerialize) {
+    static void writeObjToYaml(File destFile, def yamlToSerialize) {
         destFile.withWriter('UTF-8') { Writer w ->
             w << writeObjToYaml(yamlToSerialize)
         }
