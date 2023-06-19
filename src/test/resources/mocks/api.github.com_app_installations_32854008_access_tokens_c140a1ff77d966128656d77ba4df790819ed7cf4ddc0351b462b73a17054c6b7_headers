@@ -1,0 +1,42 @@
+null:
+  - HTTP/1.1 201 Created
+Server:
+  - GitHub.com
+Access-Control-Allow-Origin:
+  - '*'
+X-Content-Type-Options:
+  - nosniff
+x-github-api-version-selected:
+  - '2022-11-28'
+Date:
+  - Mon, 19 Jun 2023 21:03:20 GMT
+Referrer-Policy:
+  - origin-when-cross-origin, strict-origin-when-cross-origin
+X-Frame-Options:
+  - deny
+Strict-Transport-Security:
+  - max-age=31536000; includeSubdomains; preload
+Access-Control-Expose-Headers:
+  - ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
+    X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes,
+    X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation,
+    Sunset
+Cache-Control:
+  - public, max-age=60, s-maxage=60
+X-GitHub-Media-Type:
+  - github.v3; format=json
+ETag:
+  - '"5747c0ecd546a73e9f9e739f9f640da707e136ce4d901568ebe17ea6aebcaca1"'
+Content-Security-Policy:
+  - default-src 'none'
+Vary:
+  - Accept-Encoding, Accept, X-Requested-With
+  - Accept
+X-XSS-Protection:
+  - '0'
+Content-Length:
+  - '312'
+X-GitHub-Request-Id:
+  - 9062:04AB:10E607E:224BEA8:6490C298
+Content-Type:
+  - application/json; charset=utf-8

@@ -16,22 +16,122 @@
 package net.gleske.jervis.remotes.creds
 //the GitHubAppCredentialTest() class automatically sees the GitHubAppCredential() class because they're in the same package
 
+import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 import net.gleske.jervis.exceptions.GitHubAppException
 
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class GitHubAppCredentialTest extends GroovyTestCase {
+/**
+  This class tests the <tt>{@link net.gleske.jervis.remotes.creds.GitHubAppCredential}</tt>
+  class.  This uses auto-generated mock data using real API responses.
 
+  <h2>Generate Mock Data</h2>
+
+  Mock data has already been generated.  This is the script which captured mock
+  data.
+
+<pre><code>
+import static net.gleske.jervis.remotes.StaticMocking.recordMockUrls
+import net.gleske.jervis.remotes.SimpleRestServiceSupport
+
+if(!binding.hasVariable('url')) {
+    String persistStr
+    url = persistStr
+}
+if(binding.hasVariable('request_meta')) {
+    request_meta.clear()
+} else {
+    request_meta = [:]
+}
+
+if(binding.hasVariable('request_history')) {
+    request_history.clear()
+} else {
+    request_history = []
+}
+
+// Record URL API data to files as mock data
+recordMockUrls(url, URL, request_meta, true, 'SHA-256', request_history)
+
+import net.gleske.jervis.remotes.creds.EphemeralTokenCache
+import net.gleske.jervis.remotes.creds.GitHubAppCredential
+import net.gleske.jervis.remotes.creds.GitHubAppRsaCredentialImpl
+import net.gleske.jervis.tools.YamlOperator
+
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+
+
+// Configure the private key downloaded from GitHub App.
+GitHubAppRsaCredentialImpl rsaCred = new GitHubAppRsaCredentialImpl('173962', new File('github-app.pem').text)
+rsaCred.owner = 'sgleske-test'
+
+// Configure in-memory token storage
+EphemeralTokenCache tokenCred = new EphemeralTokenCache(true)
+tokenCred.loadCache = null
+tokenCred.saveCache = null
+tokenCred.obtainLock = null
+
+GitHubAppCredential app = new GitHubAppCredential(rsaCred, tokenCred)
+
+app.token
+app.token
+
+rsaCred.owner = 'samrocketman'
+app.hash = ''
+app.ownerIsUser = true
+app.installation_id = null
+app.token
+
+// SANITIZE sensitive information and reduce mock data
+// update mock data to represent reponses 500 years in the future to simplify mocking responses
+request_history.each { Map request -&gt;
+    Map response = YamlOperator.loadYamlFrom(request.response)
+    Boolean updateFile = false
+    if(response.token) {
+        response.token = 'some-token'
+        updateFile = true
+    }
+    if(response.expires_at) {
+        Long fiveHundredYearsInDays = 182500
+        response.expires_at = Instant.now().plus(fiveHundredYearsInDays, ChronoUnit.DAYS).toString()
+        updateFile = true
+    }
+    if(response?.app_id &amp;&amp; response?.account?.login) {
+        response = [id: response.id]
+        updateFile = true
+    }
+    if(updateFile) {
+        request.response = YamlOperator.writeObjToYaml(response)
+        YamlOperator.writeObjToYaml((new File(request.mock_file)), response)
+    }
+}
+
+null
+</code></pre>
+  */
+class GitHubAppCredentialTest extends GroovyTestCase {
+    String hash = '7bb84c7e30164139b00e7f95fd0e801bfdfe190f7ffca08cc77ae0d8438be02b'
     GitHubAppCredential app
     GitHubAppRsaCredentialImpl rsaCred
     EphemeralTokenCache tokenCred
-    String hash = '7bb84c7e30164139b00e7f95fd0e801bfdfe190f7ffca08cc77ae0d8438be02b'
+
+    // mock tracking variables
+    def myvault
+    def url
+    Map request_meta = [:]
+    List request_history = []
+    List metaResult() {
+        [request_history*.url.inspect(), request_history*.method.inspect(), request_history*.data.inspect(), request_history*.response_code.inspect()]
+    }
 
     //set up before every test
     @Before protected void setUp() {
         super.setUp()
+        // mock network
+        mockStaticUrl(url, URL, request_meta, true, 'SHA-256', request_history)
         // use in-memory token cache
         this.tokenCred = new EphemeralTokenCache(true)
         this.tokenCred.loadCache = null
@@ -83,5 +183,33 @@ class GitHubAppCredentialTest extends GroovyTestCase {
         shouldFail(GitHubAppException) {
             app.hash = 'overwrite hash'
         }
+    }
+    @Test public void test_GitHubAppCredential_getToken_user() {
+        rsaCred.owner = 'samrocketman'
+        app.ownerIsUser = true
+        app.hash = ''
+
+        assert app.jwtToken == null
+        app.token == 'some-token'
+        assert app.jwtToken != null
+
+        List urls = ['https://api.github.com/users/samrocketman/installation', 'https://api.github.com/app/installations/38741780/access_tokens']
+        List methods = ['GET', 'POST']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+    }
+
+    @Test public void test_GitHubAppCredential_getToken_org() {
+        rsaCred.owner = 'sgleske-test'
+        app.hash = ''
+
+        assert app.jwtToken == null
+        app.token == 'some-token'
+        assert app.jwtToken != null
+
+        List urls = ['https://api.github.com/orgs/sgleske-test/installation', 'https://api.github.com/app/installations/32854008/access_tokens']
+        List methods = ['GET', 'POST']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
     }
 }

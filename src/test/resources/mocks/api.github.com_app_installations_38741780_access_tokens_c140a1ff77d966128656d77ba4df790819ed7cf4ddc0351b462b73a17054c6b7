@@ -1,0 +1,11 @@
+token: some-token
+expires_at: '2523-02-18T21:03:21.011905Z'
+permissions:
+  administration: read
+  contents: read
+  deployments: read
+  metadata: read
+  pull_requests: read
+  repository_hooks: write
+  statuses: write
+repository_selection: all
