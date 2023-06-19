@@ -70,7 +70,7 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
       extra API calls.  Querying for the app installation.  This ID is used
       when issuing ephemeral GitHub API tokens.
       */
-    private String installation_id
+    String installation_id
 
     /**
       A JSON Web Token (JWT) issued for GitHub App API authentication.
@@ -97,9 +97,6 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
         } else {
             this.installation_id = apiFetch('app/installations')?.first()?.id
         }
-        if(!this.installation_id) {
-            throw new GitHubAppException('No GitHub App installations found.  Did you install the GitHub App after creating it?')
-        }
     }
 
 
@@ -111,8 +108,11 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
 
       @return An installation ID for the installed GitHub App.
       */
-    private String getInstallation_id() {
+    String getInstallation_id() {
         resolveInstallationId()
+        if(!this.installation_id) {
+            throw new GitHubAppException('No GitHub App installations found.  Did you install the GitHub App after creating it?')
+        }
         this.installation_id
     }
 

@@ -212,4 +212,21 @@ class GitHubAppCredentialTest extends GroovyTestCase {
         assert request_history*.url == urls
         assert request_history*.method == methods
     }
+    @Test public void test_GitHubAppCredential_installation_id() {
+        assert app.@installation_id == null
+        assert app.installation_id == '38741780'
+        List urls = ['https://api.github.com/app/installations']
+        List methods = ['GET']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+    }
+    @Test public void test_GitHubAppCredential_installation_id_preset() {
+        app.installation_id = 'foo'
+        assert app.installation_id == 'foo'
+        // no network communication due to preset
+        List urls = []
+        List methods = []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+    }
 }

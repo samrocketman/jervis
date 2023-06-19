@@ -1,5 +1,5 @@
 token: some-token
-expires_at: '2523-02-18T21:03:21.011905Z'
+expires_at: '2523-02-18T22:51:47.533293Z'
 permissions:
   administration: read
   contents: read
