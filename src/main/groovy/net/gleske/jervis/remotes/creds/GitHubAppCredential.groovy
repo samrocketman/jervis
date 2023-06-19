@@ -90,14 +90,12 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
         if(this.installation_id) {
             return
         }
-        List installations = apiFetch('app/installations')
         String installOwner = rsaCredential.getOwner()
         if(installOwner) {
-            this.installation_id = installations.find {
-                it?.account?.login == installOwner || it?.account?.slug == installOwner
-            }?.id
+            String installation = (ownerIsUser) ? "users/${installOwner}/installation" : "orgs/${installOwner}/installation"
+            this.installation_id = apiFetch(installation)?.id
         } else {
-            this.installation_id = installations.first().id
+            this.installation_id = apiFetch('app/installations')?.first()?.id
         }
         if(!this.installation_id) {
             throw new GitHubAppException('No GitHub App installations found.  Did you install the GitHub App after creating it?')
@@ -150,6 +148,13 @@ github_app.scope = [repositories: ['repo1', 'repo2'], permissions: [contents: 'r
                of the GitHub App.
       */
     Map scope = [:]
+
+    /**
+      Find app installation for user instead of organization.
+
+      @default <tt>false</tt>
+      */
+    Boolean ownerIsUser = false
 
     /**
       Creates a new instance of a <tt>GitHubAppCredential</tt> meant to serve
