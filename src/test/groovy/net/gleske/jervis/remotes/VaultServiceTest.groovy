@@ -36,7 +36,6 @@ import org.junit.Test
 
 <pre><code>
 import static net.gleske.jervis.remotes.StaticMocking.recordMockUrls
-import net.gleske.jervis.remotes.SimpleRestServiceSupport
 
 if(!binding.hasVariable('url')) {
     String persistStr
@@ -57,7 +56,7 @@ if(binding.hasVariable('request_history')) {
 import net.gleske.jervis.remotes.interfaces.TokenCredential
 import net.gleske.jervis.remotes.VaultService
 
-TokenCredential creds = [getToken: {-> 'some token' }] as TokenCredential
+TokenCredential creds = [getToken: {-&gt; 'some token' }] as TokenCredential
 VaultService myvault = new VaultService('http://vault:8200/v1/', creds)
 
 myvault.discoverKVMounts()
@@ -110,8 +109,8 @@ if(init_secret) {
 }
 
 // Reset discovered mounts in order to capture API responses
-myvault.@mountVersions = [:]
-myvault.@cas_required = []
+myvault.&#64;mountVersions = [:]
+myvault.&#64;cas_required = []
 
 // Record URL API data to files as mock data
 recordMockUrls(url, URL, request_meta, true, 'SHA-256', request_history)
