@@ -287,6 +287,8 @@ request_history
                     temp_request_meta['url'] = mockedUrl
                     temp_request_meta['response_headers'] = response_headers
                     temp_request_meta['response_code'] = response_code
+                    temp_request_meta['mock_file'] = "src/test/resources/mocks/${file}".toString()
+                    temp_request_meta['mock_header_file'] = "src/test/resources/mocks/${file}_headers".toString()
                     request_history << temp_request_meta
                     // create an empty file for any API query
                     File responseFile = new File("src/test/resources/mocks/${file}")
