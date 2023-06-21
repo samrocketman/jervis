@@ -19,6 +19,7 @@ package net.gleske.jervis.remotes.creds
 import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 import net.gleske.jervis.exceptions.GitHubAppException
 
+import java.time.Instant
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -203,14 +204,44 @@ class GitHubAppCredentialTest extends GroovyTestCase {
         assert request_history*.method == methods
     }
 
-    @Test public void test_GitHubAppCredential_getToken_org() {
+    @Test public void test_GitHubAppCredential_getToken_org_cached() {
         rsaCred.owner = 'sgleske-test'
         app.hash = ''
 
         assert app.jwtToken == null
-        app.token == 'some-token'
+        // should populate urls
+        assert app.token == 'some-token'
         assert app.jwtToken != null
+        // check against cached version (no additional urls)
+        assert app.token == 'some-token'
 
+        List urls = ['https://api.github.com/orgs/sgleske-test/installation', 'https://api.github.com/app/installations/32854008/access_tokens']
+        List methods = ['GET', 'POST']
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+    }
+    @Test public void test_GitHubAppCredential_getToken_org_expired() {
+        rsaCred.owner = 'sgleske-test'
+        app.hash = ''
+        // pre-populate cache with a good token
+        app.@tokenCredential.@cache = [
+            (app.hash): [
+                token: 'good-token',
+                expires_at: '2523-02-18T22:51:47.533293Z',
+                renew_buffer: 30
+            ]
+        ]
+
+        // return good cached token instead of getting from network
+        assert app.token == 'good-token'
+        assert request_history*.url == []
+        assert request_history*.method == []
+
+        // intentionally expire the token
+        app.@tokenCredential.@cache[app.hash]['expires_at'] = Instant.now().toString()
+
+        // check for expired token renewal
+        assert app.token == 'some-token'
         List urls = ['https://api.github.com/orgs/sgleske-test/installation', 'https://api.github.com/app/installations/32854008/access_tokens']
         List methods = ['GET', 'POST']
         assert request_history*.url == urls
