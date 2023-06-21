@@ -72,13 +72,26 @@ class StaticMocking {
         http://flyingtomoon.com/tag/mocking/
         http://groovy.329449.n5.nabble.com/Groovy-metaclass-invokeConstructor-td5716360.html
      */
-    static def mockStaticUrl(String mockedUrl, Class<URL> clazz, Map request_meta = [:], Boolean checksumMocks = false, String checksumAlgorithm = 'SHA-256', List request_history = []) {
-        def mc = clazz.metaClass
+    static def mockStaticUrl(String mockedUrl, Class<URL> clazz,
+            Map request_meta = [:], Boolean checksumMocks = false,
+            String checksumAlgorithm = 'SHA-256', List request_history = [],
+            Map custom_responses = [:]) {
+        def mc = clazz.getMetaClass()
         mc.invokeMethod = { String name, args ->
-            mc.getMetaMethod(name, args).invoke(delegate, args)
+            // choose mock or fall back to class default
+            if(name != 'getTheClass' && delegate.getTheClass() in clazz) {
+                mc.getMetaMethod(name, args)?.invoke(delegate, args)
+            }
+            else {
+                // call the real method instead of the mocked meta method
+                mc.getMethods().find {
+                    it.name == name && it.isValidMethod(args.toList()*.class as Class[])
+                }?.invoke(delegate, args)
+            }
         }
         mc.getProperty = { String name  ->
-            mc.getMetaProperty(name).getProperty(delegate)
+            mc.getMetaProperty(name)?.getProperty(delegate) ?:
+                mc.getProperty(delegate, name)
         }
         mc.constructor = { String url ->
             request_meta['url'] = url
@@ -99,6 +112,10 @@ class StaticMocking {
                     request_meta.data = request_meta.data.toString() ?: ''
                     Map header_fields = [(null): Collections.unmodifiableList(['HTTP/1.1 200 OK'])]
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
+                    if(file in custom_responses.keySet()) {
+                        //throw new Exception( custom_responses.get(file) )
+                        file = custom_responses.get(file)
+                    }
                     File headersFile = new File("src/test/resources/mocks/${file}_headers")
                     if(!headersFile.exists()) {
                         file = urlToMockFileName(mockedUrl, request_meta.data, checksumMocks, checksumAlgorithm)
@@ -119,6 +136,8 @@ class StaticMocking {
                     temp_request_meta['url'] = mockedUrl
                     temp_request_meta['response_headers'] = response_headers
                     temp_request_meta['response_code'] = Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
+                    temp_request_meta['mock_file'] = "src/test/resources/mocks/${file}".toString()
+                    temp_request_meta['mock_header_file'] = "src/test/resources/mocks/${file}_headers".toString()
                     request_history << temp_request_meta
                     response_headers
                 },
@@ -148,6 +167,9 @@ class StaticMocking {
                 getContentLengthLong: {->
                     request_meta.data = request_meta.data.toString() ?: ''
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
+                    if(file in custom_responses.keySet()) {
+                        file = custom_responses.get(file)
+                    }
                     File responseFile = new File("src/test/resources/mocks/${file}")
                     if(!responseFile.exists()) {
                         file = urlToMockFileName(mockedUrl, request_meta.data, checksumMocks, checksumAlgorithm)
@@ -159,6 +181,9 @@ class StaticMocking {
                     request_meta.data = request_meta.data.toString() ?: ''
                     // Create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
+                    if(file in custom_responses.keySet()) {
+                        file = custom_responses.get(file)
+                    }
                     File responseFile = new File("src/test/resources/mocks/${file}")
                     if(!responseFile.exists()) {
                         file = urlToMockFileName(mockedUrl, request_meta.data, checksumMocks, checksumAlgorithm)
@@ -246,7 +271,7 @@ request_history
         mc.invokeMethod = { String name, args ->
             mc.getMetaMethod(name, args).invoke(delegate, args)
         }
-        mc.getProperty = {String name  ->
+        mc.getProperty = { String name  ->
             mc.getMetaProperty(name).getProperty(delegate)
         }
         mc.constructor = { String url ->
@@ -271,7 +296,7 @@ request_history
                     request_meta.data = request_meta.data.toString() ?: ''
                     // write output to connection request
                     if(request_meta.conn.getDoOutput()) {
-                        request_meta.conn.outputStream.withWriter { writer ->
+                        request_meta.conn.getOutputStream().withWriter { writer ->
                             writer << request_meta.data
                         }
                     }

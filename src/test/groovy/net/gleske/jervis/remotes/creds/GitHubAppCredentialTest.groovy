@@ -123,6 +123,7 @@ class GitHubAppCredentialTest extends GroovyTestCase {
     def url
     Map request_meta = [:]
     List request_history = []
+    Map custom_responses = [(null): null]
     List metaResult() {
         [request_history*.url.inspect(), request_history*.method.inspect(), request_history*.data.inspect(), request_history*.response_code.inspect()]
     }
@@ -131,7 +132,7 @@ class GitHubAppCredentialTest extends GroovyTestCase {
     @Before protected void setUp() {
         super.setUp()
         // mock network
-        mockStaticUrl(url, URL, request_meta, true, 'SHA-256', request_history)
+        mockStaticUrl(url, URL, request_meta, true, 'SHA-256', request_history, custom_responses)
         // use in-memory token cache
         this.tokenCred = new EphemeralTokenCache(true)
         this.tokenCred.loadCache = null
@@ -146,6 +147,9 @@ class GitHubAppCredentialTest extends GroovyTestCase {
         this.rsaCred = null
         this.tokenCred = null
         this.app = null
+        request_meta.clear()
+        request_history.clear()
+        custom_responses.clear()
         super.tearDown()
     }
     @Test public void test_GitHubAppCredential_hash_consistency() {
@@ -226,6 +230,20 @@ class GitHubAppCredentialTest extends GroovyTestCase {
         // no network communication due to preset
         List urls = []
         List methods = []
+        assert request_history*.url == urls
+        assert request_history*.method == methods
+    }
+    @Test public void test_GitHubAppCredential_installation_id_fail() {
+        custom_responses.put(
+            'api.github.com_app_installations_94cd1485322def4aff1733b599cf889ac1b65536a13aaa7e19963fa6c6cdd344',
+            'api.github.com_app_installations_empty')
+        assert app.@installation_id == null
+        shouldFail(GitHubAppException) {
+            app.installation_id
+        }
+        assert app.@installation_id == null
+        List urls = ['https://api.github.com/app/installations']
+        List methods = ['GET']
         assert request_history*.url == urls
         assert request_history*.method == methods
     }
