@@ -95,14 +95,7 @@ class GitHubAppCredential implements ReadonlyTokenCredential, SimpleRestServiceS
             String installation = (ownerIsUser) ? "users/${installOwner}/installation" : "orgs/${installOwner}/installation"
             this.installation_id = apiFetch(installation)?.id
         } else {
-            this.installation_id = apiFetch('app/installations').with {
-                if(it.size() > 0) {
-                    it.first().id
-                }
-                else {
-                    null
-                }
-            }
+            this.installation_id = apiFetch('app/installations')?.find()?.id
         }
     }
 
