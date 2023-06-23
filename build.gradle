@@ -23,6 +23,11 @@ compileJava {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
+compileGroovy {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
 group = 'net.gleske'
 archivesBaseName = 'jervis'
 version = "${version}"
