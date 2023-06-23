@@ -21,7 +21,7 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import org.yaml.snakeyaml.constructor.ConstructorException
+import org.yaml.snakeyaml.error.MarkedYAMLException
 
 class YamlOperatorTest extends GroovyAssert {
     @Rule public TemporaryFolder folder = new TemporaryFolder()
@@ -76,19 +76,19 @@ class YamlOperatorTest extends GroovyAssert {
     }
     @Test public void test_YamlOperator_loadYamlFrom_malicious1() {
         String yaml = '!!javax.script.ScriptEngineManager [!!java.net.URLClassLoader [[!!java.net.URL ["http://localhost"]]]]'
-        shouldFail(ConstructorException) {
+        shouldFail(MarkedYAMLException) {
             YamlOperator.loadYamlFrom(yaml)
         }
     }
     @Test public void test_YamlOperator_loadYamlFrom_malicious2() {
         String yaml = 'somekey: !!javax.script.ScriptEngineManager [!!java.net.URLClassLoader [[!!java.net.URL ["http://localhost"]]]]'
-        shouldFail(ConstructorException) {
+        shouldFail(MarkedYAMLException) {
             YamlOperator.loadYamlFrom(yaml)
         }
     }
     @Test public void test_YamlOperator_loadYamlFrom_malicious3() {
         String yaml = 'somekey:\n  - !!javax.script.ScriptEngineManager [!!java.net.URLClassLoader [[!!java.net.URL ["http://localhost"]]]]'
-        shouldFail(ConstructorException) {
+        shouldFail(MarkedYAMLException) {
             YamlOperator.loadYamlFrom(yaml)
         }
     }
