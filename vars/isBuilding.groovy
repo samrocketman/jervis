@@ -108,5 +108,5 @@ def call(def filters) {
 
 @NonCPS
 void call() {
-    throw new Exception('ERROR: this step must be called with arguments.  e.g. branch, pr, tag, cron, or manually')
+    throw new Exception('ERROR: isBuilding() step must be called with arguments.  e.g. branch, pr, tag, cron, or manually')
 }
