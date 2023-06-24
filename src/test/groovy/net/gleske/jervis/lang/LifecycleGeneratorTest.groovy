@@ -519,6 +519,8 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert generator.getObjectValue(json, 'bye', true) == false
         assert generator.getObjectValue(json, 'friend', false) == true
         assert generator.getObjectValue(json, 'bye', false) == false
+        assert generator.getObjectValue(json, 'bye', [[], [:]]) == []
+        assert generator.getObjectValue(json, 'bye', [[:], []]) == [:]
     }
     @Test public void test_LifecycleGenerator_getObjectValue_quoted_periods() {
         Map json = [
