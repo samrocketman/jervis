@@ -927,14 +927,22 @@ env:
 <pre><code>
 import static net.gleske.jervis.lang.LifecycleGenerator.getObjectValue
 
-Map hexKeys = [ 'hello.io': 'world', 'hello': ['jervis.io{': 'friend'], friend: [name: 'dog']]
+Map hexKeys = [
+    'hello.io': 'world',
+    hello: ['jervis.io{': 'friend'],
+    friend: [name: 'dog']
+]
 
 // Do a normal lookup with a hierarchy of keys
 assert getObjectValue(hexKeys, 'friend.name', '') == 'dog'
 
 // Do a normal lookup with a hierarchy of keys; but result is not a List so
 // falls back to default
-assert getObjectValue(hexKeys, 'friend.name', ['item']) == ['item']
+assert getObjectValue(hexKeys, 'friend.name', [['item']]) == ['item']
+
+// The above is not to be confused with a List of default fallbacks.  Which
+// would result in the dog being returned.
+assert getObjectValue(hexKeys, 'friend.name', ['item']) == 'dog'
 
 // top level lookup; but the key has a period in it
 assert getObjectValue(hexKeys, 'hello\\.io', '') == 'world'
@@ -944,9 +952,31 @@ assert getObjectValue(hexKeys, 'hello%{2e}io', '') == 'world'
 
 // A hierarchy of keys but some of the child keys have special characters
 assert getObjectValue(hexKeys, 'hello.jervis\\.io\\{', '') == 'friend'
+
+// quoting works, too
+assert getObjectValue(hexKeys, '"hello.io"', '') == 'world'
+assert getObjectValue(hexKeys, 'hello."jervis.io"{', '') == 'friend'
+
+// you can request fallback expressions by separting expressions with ' // '
+assert getObjectValue(hexKeys, 'hello."jervis.io"{ // friend', [:]) == [name: 'dog']
+
+// Check the hello key for multiple types and if none, then return the first
+// default.  The following will check for a String or a List as the default.
+assert getObjectValue(hexKeys, 'hello', [ '', [] ]) == ''
+
+// and now the same using both search fallback and default fallback
+assert getObjectValue(hexKeys, 'hello // friend.name', [ '', [] ]) == 'dog'
 </code></pre>
 
-In the above example, notice that some characters can be escaped.  For example, if the key has a period in its name it is escaped with <tt>\\.</tt>.  Any character can be escaped this way.
+      <h5>Other notable features</h5>
+
+      <p>In the above example, notice that some characters can be escaped.  For example, if the key has a period in its name it is escaped with <tt>\\.</tt>.  Any character can be escaped this way.</p>
+
+      <p><tt>key</tt> can take multiple fallback expressions if you separate expressions with <tt> // </tt>.</p>
+
+      <p><tt>defaultValue</tt> can take multiple fallback defaults.  So you can search for multiple types on a single path falling back to ones you support.</p>
+
+      <p>If you need a List of items to be the <tt>defaultValue</tt>, then you must nest it within a List such as <tt>[['item']]</tt>.  This List contains a List of one item.</p>
 
       @param object A <tt>Map</tt> which was likely created from a YAML or JSON file.
       @param key A <tt>String</tt> with keys and subkeys separated by periods which is
@@ -956,6 +986,12 @@ In the above example, notice that some characters can be escaped.  For example, 
               same type as <tt>defaultValue</tt>.  This function has three coercion
               behaviors which is not the same as Groovy:
       <ol class="numbered">
+        <li>
+          If <tt>defaultValue</tt> is a non-zero list of items, then each item
+          in the list will be treated as a series of fallback defaults.  If no
+          default matchies the search then the first item of the list becomes
+          the returned default.
+        </li>
         <li>
           If the <tt>defaultValue</tt> is an instance of <tt>String</tt> and the
           retrieved key is an instance of <tt>Map</tt>, then <tt>defaultValue</tt> is
@@ -974,9 +1010,20 @@ In the above example, notice that some characters can be escaped.  For example, 
       </ol>
      */
     public static final Object getObjectValue(Map object, String key, Object defaultValue) {
+        getObjectValueRecurse(object, key, defaultValue, 0)
+    }
+
+    /**
+      This non-public method is used to control recusion for returning default
+      values.
+
+      @param recursionDepth Ignore this parameter.  It is used internally by
+                            this method to short circuit recursion.
+      */
+    private static final Object getObjectValueRecurse(Map object, String key, Object defaultValue, Integer recursionDepth) {
         if(key.contains(' // ')) {
             List keyResults = key.tokenize(' // ').collect {
-                getObjectValue(object, it, defaultValue)
+                getObjectValueRecurse(object, it, defaultValue, 0)
             }
             return keyResults.findAll {
                 if(defaultValue in List && defaultValue.size() > 0) {
@@ -995,9 +1042,9 @@ In the above example, notice that some characters can be escaped.  For example, 
                 return defaultValue
             }
         }
-        if(defaultValue in List && defaultValue.size() > 0) {
+        if(recursionDepth == 0 && defaultValue in List && defaultValue.size() > 0) {
             List defaultValueResults = defaultValue.collect {
-                [it, getObjectValue(object, key, it)]
+                [it, getObjectValueRecurse(object, key, it, recursionDepth + 1)]
             }
             return defaultValueResults.find {
                 it[1] != null && it[0] != it[1]
@@ -1039,7 +1086,7 @@ In the above example, notice that some characters can be escaped.  For example, 
             // decode the primary hex variants
             decoder.each { k, v -> primary = primary.replaceAll(k, v) }
             if(object.get(primary) != null && object.get(primary) instanceof Map) {
-                return getObjectValue(object.get(primary), subkey, defaultValue)
+                return getObjectValueRecurse(object.get(primary), subkey, defaultValue, recursionDepth + 1)
             }
             else {
                 return defaultValue

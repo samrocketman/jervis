@@ -531,6 +531,25 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert benchmark == generator.getObjectValue(json, 'python."2\\.7"', [])
         assert benchmark == generator.getObjectValue(json, 'python."2.7"', [])
     }
+    @Test public void test_LifecycleGenerator_getObjectValue_groovydoc_examples() {
+        Map hexKeys = [
+            'hello.io': 'world',
+            hello: ['jervis.io{': 'friend'],
+            friend: [name: 'dog']
+        ]
+
+        assert generator.getObjectValue(hexKeys, 'friend.name', '') == 'dog'
+        assert generator.getObjectValue(hexKeys, 'friend.name', ['item']) == 'dog'
+        assert generator.getObjectValue(hexKeys, 'friend.name', [['item']]) == ['item']
+        assert generator.getObjectValue(hexKeys, 'hello\\.io', '') == 'world'
+        assert generator.getObjectValue(hexKeys, 'hello%{2e}io', '') == 'world'
+        assert generator.getObjectValue(hexKeys, 'hello.jervis\\.io\\{', '') == 'friend'
+        assert generator.getObjectValue(hexKeys, '"hello.io"', '') == 'world'
+        assert generator.getObjectValue(hexKeys, 'hello."jervis.io"{', '') == 'friend'
+        assert generator.getObjectValue(hexKeys, 'hello."jervis.io"{ // friend', [:]) == [name: 'dog']
+        assert generator.getObjectValue(hexKeys, 'hello', [ '', [] ]) == ''
+        assert generator.getObjectValue(hexKeys, 'hello // friend.name', [ '', [] ]) == 'dog'
+    }
     @Test public void test_LifecycleGenerator_loadPlatforms() {
         assert null.equals(generator.platform_obj)
         URL url = this.getClass().getResource('/good_platforms_simple.json');
