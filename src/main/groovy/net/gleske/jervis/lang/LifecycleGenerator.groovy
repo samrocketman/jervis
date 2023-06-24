@@ -1011,6 +1011,20 @@ In the above example, notice that some characters can be escaped.  For example, 
             encoder["\\Q${it}\\E".toString()] = "%{${matchedChar.bytes.encodeHex()}}".toString()
         }
         String encodedKey = key
+        // replace backslash characters first
+        encoder.each { k , v -> encodedKey = encodedKey.replaceAll(k, v) }
+        // add quoted samples to replacements within encoder
+        encodedKey.findAll( '"[^"]+"' ).each {
+            encoder["\\Q${it}\\E".toString()] = it[1..-2].replaceAll('\\.', '\\\\\\\\.')
+        }
+        // quoted strings and add their replacement to the encoder
+        encoder.each { k , v -> encodedKey = encodedKey.replaceAll(k, v) }
+        // update encoder with new escaped characters after quote replacement
+        encodedKey.eachMatch('\\\\.') {
+            String matchedChar = it - ~'\\\\'
+            encoder["\\Q${it}\\E".toString()] = "%{${matchedChar.bytes.encodeHex()}}".toString()
+        }
+        // produce the final string with all portions escaped
         encoder.each { k , v -> encodedKey = encodedKey.replaceAll(k, v) }
         //encodedKey now has hex variants
 

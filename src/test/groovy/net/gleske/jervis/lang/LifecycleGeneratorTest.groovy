@@ -493,7 +493,9 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     @Test public void test_LifecycleGenerator_getObjectValue_fallbacks_and_multiple_defaults() {
         Map json = [
             python: ['2.7': ['hello', 'world']],
-            type: [hello: 'world']
+            type: [hello: 'world'],
+            friend: 'true',
+            bye: 'false'
         ]
 
         assert generator.getObjectValue(json, 'type // type.hello // python.2\\.7', ['', []]) == 'world'
@@ -502,8 +504,32 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert generator.getObjectValue(json, 'type.hello // python.2\\.7', ['', []]) == 'world'
         assert generator.getObjectValue(json, 'python.2\\.7 // type.hello', [[], '']) == ['hello', 'world']
         assert generator.getObjectValue(json, 'python.2\\.7 // type.hello', ['', []]) == ['hello', 'world']
+
+        // no fallback but multiple defaults
         assert generator.getObjectValue(json, 'python.2\\.7', ['', []]) == ['hello', 'world']
         assert generator.getObjectValue(json, 'python.2\\.7', [[], '']) == ['hello', 'world']
+
+        // fallbacks with single default
+        assert generator.getObjectValue(json, 'type // type.hello // python.2\\.7', '') == 'world'
+        assert generator.getObjectValue(json, 'type // type.hello // python.2\\.7', []) == ['hello', 'world']
+        assert generator.getObjectValue(json, 'type.hello // python.2\\.7', true) == true
+        assert generator.getObjectValue(json, 'type.hello // python.2\\.7', false) == true
+        assert generator.getObjectValue(json, 'type.hello // python.2\\.7', [:]) == [:]
+        assert generator.getObjectValue(json, 'friend', true) == true
+        assert generator.getObjectValue(json, 'bye', true) == false
+        assert generator.getObjectValue(json, 'friend', false) == true
+        assert generator.getObjectValue(json, 'bye', false) == false
+    }
+    @Test public void test_LifecycleGenerator_getObjectValue_quoted_periods() {
+        Map json = [
+            python: ['2.7': ['hello', 'world']],
+            type: [hello: 'world']
+        ]
+
+        def benchmark = generator.getObjectValue(json, 'python.2\\.7', [])
+        assert benchmark == ['hello', 'world']
+        assert benchmark == generator.getObjectValue(json, 'python."2\\.7"', [])
+        assert benchmark == generator.getObjectValue(json, 'python."2.7"', [])
     }
     @Test public void test_LifecycleGenerator_loadPlatforms() {
         assert null.equals(generator.platform_obj)
