@@ -974,6 +974,35 @@ In the above example, notice that some characters can be escaped.  For example, 
       </ol>
      */
     public static final Object getObjectValue(Map object, String key, Object defaultValue) {
+        if(key.contains(' // ')) {
+            List keyResults = key.tokenize(' // ').collect {
+                getObjectValue(object, it, defaultValue)
+            }
+            return keyResults.findAll {
+                if(defaultValue in List && defaultValue.size() > 0) {
+                    !(it in defaultValue)
+                }
+                else {
+                    it != defaultValue
+                }
+            }.with {
+                if(it.size() > 0) {
+                    return it.first()
+                }
+                if(defaultValue in List && defaultValue.size() > 0) {
+                    return defaultValue.first()
+                }
+                return defaultValue
+            }
+        }
+        if(defaultValue in List && defaultValue.size() > 0) {
+            List defaultValueResults = defaultValue.collect {
+                [it, getObjectValue(object, key, it)]
+            }
+            return defaultValueResults.find {
+                it[1] != null && it[0] != it[1]
+            }?.get(1) ?: defaultValue.first()
+        }
         // START OF ENCODER AND DECODER SETUP
         // find all backslash charachters and replace them with hex encoded values
         Map encoder = [:]

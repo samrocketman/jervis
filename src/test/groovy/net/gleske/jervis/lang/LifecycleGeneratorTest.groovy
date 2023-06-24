@@ -490,6 +490,21 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert generator.getObjectValue(hexKeys, 'hello.jervis.io{', '') == ''
         assert generator.getObjectValue(hexKeys, 'hello.jervis\\.io\\{', '') == 'friend'
     }
+    @Test public void test_LifecycleGenerator_getObjectValue_fallbacks_and_multiple_defaults() {
+        Map json = [
+            python: ['2.7': ['hello', 'world']],
+            type: [hello: 'world']
+        ]
+
+        assert generator.getObjectValue(json, 'type // type.hello // python.2\\.7', ['', []]) == 'world'
+        assert generator.getObjectValue(json, 'type // type.hello // python.2\\.7', [[], '']) == 'world'
+        assert generator.getObjectValue(json, 'type.hello // python.2\\.7', [[], '']) == 'world'
+        assert generator.getObjectValue(json, 'type.hello // python.2\\.7', ['', []]) == 'world'
+        assert generator.getObjectValue(json, 'python.2\\.7 // type.hello', [[], '']) == ['hello', 'world']
+        assert generator.getObjectValue(json, 'python.2\\.7 // type.hello', ['', []]) == ['hello', 'world']
+        assert generator.getObjectValue(json, 'python.2\\.7', ['', []]) == ['hello', 'world']
+        assert generator.getObjectValue(json, 'python.2\\.7', [[], '']) == ['hello', 'world']
+    }
     @Test public void test_LifecycleGenerator_loadPlatforms() {
         assert null.equals(generator.platform_obj)
         URL url = this.getClass().getResource('/good_platforms_simple.json');
