@@ -18,6 +18,14 @@ if(JavaVersion.current() != JavaVersion.VERSION_11 && JavaVersion.current() != J
     throw new GradleException("This project requires Java 11 or Java 17, but it's running on "+JavaVersion.current())
 }
 
+/*
+   Groovy 2.4.21 supports bytecode Java 1.8 and lower.  Do not use higher
+   bytecode values else it will default to Java 1.5.  Jenkins would need to
+   upgrade core version of Groovy before higher bytecode versions are
+   available.
+
+   https://github.com/groovy/GMavenPlus/issues/256
+*/
 compileJava {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
