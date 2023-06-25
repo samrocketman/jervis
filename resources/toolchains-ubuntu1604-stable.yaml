@@ -1,36 +1,14 @@
 toolchains:
-  c:
-    - env
-    - compiler
-  cpp:
-    - env
-    - compiler
-  erlang:
-    - env
-    - otp_release
-  go:
-    - env
-    - go_import_path
-    - go
-  groovy:
-    - env
-    - jdk
-  java:
-    - env
-    - jdk
-  node_js:
-    - env
-    - node_js
-  python:
-    - env
-    - python
-  ruby:
-    - gemfile
-    - env
-    - rvm
-    - jdk
-  shell:
-    - env
+  c: [ env, compiler ]
+  cpp: [ env, compiler ]
+  erlang: [ env, otp_release ]
+  go: [ env, go_import_path, go ]
+  groovy: [ env, jdk ]
+  java: [ env, jdk ]
+  node_js: [ env, node_js ]
+  python: [ env, python ]
+  ruby: [ gemfile, env, rvm, jdk ]
+  shell: [ env ]
 agent_custom_setup:
   friendlyLabel: false
   matrix: disabled
