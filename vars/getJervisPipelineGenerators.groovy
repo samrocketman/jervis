@@ -17,7 +17,7 @@
    This var takes two parameters: owner and repos.  repos can be a String or
    List.  It builds a HashMap of pipeline generator objects.
  */
-import static net.gleske.jervis.lang.LifecycleGenerator.getObjectValue
+import static net.gleske.jervis.tools.YamlOperator.getObjectValue
 import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
 import net.gleske.jervis.lang.LifecycleGenerator
 import net.gleske.jervis.lang.PipelineGenerator

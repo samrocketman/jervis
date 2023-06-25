@@ -156,7 +156,7 @@ class YamlOperator {
       files.
       <h5>Code Example</h5>
 <pre><code>
-import static net.gleske.jervis.lang.LifecycleGenerator.getObjectValue
+import static net.gleske.jervis.tools.YamlOperator.getObjectValue
 
 Map hexKeys = [
     'hello.io': 'world',

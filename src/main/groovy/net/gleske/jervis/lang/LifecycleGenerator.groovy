@@ -15,7 +15,6 @@
    */
 package net.gleske.jervis.lang
 
-import static net.gleske.jervis.tools.YamlOperator.getObjectValue
 import net.gleske.jervis.exceptions.JervisException
 import net.gleske.jervis.exceptions.PlatformValidationException
 import net.gleske.jervis.exceptions.SecurityException
@@ -388,7 +387,7 @@ class LifecycleGenerator implements Serializable {
         if(!lifecycle_obj.supportedLanguage(this.yaml_language) || !toolchain_obj.supportedLanguage(this.yaml_language)) {
             throw new UnsupportedLanguageException(this.yaml_language)
         }
-        def cipherobj = getObjectValue(jervis_yaml, 'jenkins.secrets', new Object())
+        def cipherobj = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.secrets', new Object())
         if(cipherobj instanceof List) {
             //load encrypted properties
             cipherobj.each { c ->
@@ -410,9 +409,9 @@ class LifecycleGenerator implements Serializable {
         //allow ordered loading additional toolchains into a language key
         List additional_toolchains = []
         toolchain_obj.toolchains["toolchains"][yaml_language].with { List toolchainList ->
-            List yaml_additional_toolchains = getObjectValue(jervis_yaml, 'additional_toolchains', [])
-            if(getObjectValue(jervis_yaml, 'additional_toolchains', '')) {
-                yaml_additional_toolchains = [getObjectValue(jervis_yaml, 'additional_toolchains', '')]
+            List yaml_additional_toolchains = YamlOperator.getObjectValue(jervis_yaml, 'additional_toolchains', [])
+            if(YamlOperator.getObjectValue(jervis_yaml, 'additional_toolchains', '')) {
+                yaml_additional_toolchains = [YamlOperator.getObjectValue(jervis_yaml, 'additional_toolchains', '')]
             }
             additional_toolchains += (yaml_additional_toolchains - toolchainList).findAll {
                 it in toolchain_obj.matrix_toolchain_list
@@ -432,10 +431,10 @@ class LifecycleGenerator implements Serializable {
         yaml_matrix_axes = toolchain_obj.toolchains["toolchains"][yaml_language].findAll { String toolchain ->
             toolchain_obj.supportedMatrix(yaml_language, toolchain) &&
             (
-                (getObjectValue(jervis_yaml, toolchain, []).size() > 1) ||
+                (YamlOperator.getObjectValue(jervis_yaml, toolchain, []).size() > 1) ||
                 (
                     toolchain_obj.toolchainType(toolchain) == 'advanced' &&
-                    (getObjectValue(jervis_yaml, "${toolchain}.matrix", []).size() > 1)
+                    (YamlOperator.getObjectValue(jervis_yaml, "${toolchain}.matrix", []).size() > 1)
                 )
             )
         } ?: []
@@ -977,10 +976,10 @@ env:
             throw new PlatformValidationException('Must load the platforms file first.')
         }
         jervis_yaml = YamlOperator.loadYamlFrom(raw_yaml) ?: [:]
-        this.label_platform = getObjectValue(jervis_yaml, 'jenkins.platform', platform_obj.platforms['defaults']['platform'])
-        this.label_os = getObjectValue(jervis_yaml, 'jenkins.os', platform_obj.platforms['defaults']['os'])
-        setLabel_stability(getObjectValue(jervis_yaml, 'jenkins.unstable', platform_obj.platforms['defaults']['stability']))
-        setLabel_sudo(getObjectValue(jervis_yaml, 'jenkins.sudo', platform_obj.platforms['defaults']['sudo']))
+        this.label_platform = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.platform', platform_obj.platforms['defaults']['platform'])
+        this.label_os = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.os', platform_obj.platforms['defaults']['os'])
+        setLabel_stability(YamlOperator.getObjectValue(jervis_yaml, 'jenkins.unstable', platform_obj.platforms['defaults']['stability']))
+        setLabel_sudo(YamlOperator.getObjectValue(jervis_yaml, 'jenkins.sudo', platform_obj.platforms['defaults']['sudo']))
     }
 
     /**
@@ -995,7 +994,7 @@ env:
             labels = [this.label_stability, this.label_platform, this.label_os, this.label_sudo, labels].join(' && ')
         }
         //build on additional labels
-        def additional_labels = getObjectValue(jervis_yaml, 'jenkins.additional_labels', new Object())
+        def additional_labels = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.additional_labels', new Object())
         if(additional_labels instanceof String) {
             labels += " && ${additional_labels}"
         }
@@ -1105,7 +1104,7 @@ env:
       @see #getJenkinsfile()
      */
     public boolean isPipelineJob() {
-        getObjectValue(jervis_yaml, 'jenkins.pipeline_jenkinsfile', '') || 'Jenkinsfile' in folder_listing
+        YamlOperator.getObjectValue(jervis_yaml, 'jenkins.pipeline_jenkinsfile', '') || 'Jenkinsfile' in folder_listing
     }
 
     /**
@@ -1115,6 +1114,6 @@ env:
       @see #isPipelineJob()
      */
     public String getJenkinsfile() {
-        getObjectValue(jervis_yaml, 'jenkins.pipeline_jenkinsfile', 'Jenkinsfile')
+        YamlOperator.getObjectValue(jervis_yaml, 'jenkins.pipeline_jenkinsfile', 'Jenkinsfile')
     }
 }

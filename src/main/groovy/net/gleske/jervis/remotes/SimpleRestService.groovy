@@ -118,10 +118,10 @@ class SimpleRestService {
     static def apiFetch(URL api_url, Map http_headers = [:], String http_method = 'GET', String data = '') {
         http_headers['Content-Type'] = http_headers['Content-Type'] ?: 'application/json'
         Boolean parse_json = http_headers['Content-Type'] == 'application/json'
-        parse_json = net.gleske.jervis.lang.LifecycleGenerator.getObjectValue(http_headers, 'Parse-JSON', parse_json)
+        parse_json = net.gleske.jervis.tools.YamlOperator.getObjectValue(http_headers, 'Parse-JSON', parse_json)
         Boolean response_code = (http_method == 'DELETE')
-        response_code = net.gleske.jervis.lang.LifecycleGenerator.getObjectValue(http_headers, 'Response-Code', response_code)
-        Boolean only_response_headers = net.gleske.jervis.lang.LifecycleGenerator.getObjectValue(http_headers, 'Response-Headers', false)
+        response_code = net.gleske.jervis.tools.YamlOperator.getObjectValue(http_headers, 'Response-Code', response_code)
+        Boolean only_response_headers = net.gleske.jervis.tools.YamlOperator.getObjectValue(http_headers, 'Response-Headers', false)
         if(!response_code && http_method == 'HEAD') {
             only_response_headers = true
         }

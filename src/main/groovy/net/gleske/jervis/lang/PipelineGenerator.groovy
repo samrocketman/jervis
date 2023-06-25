@@ -17,7 +17,7 @@ package net.gleske.jervis.lang
 
 import java.util.regex.Pattern
 import net.gleske.jervis.exceptions.PipelineGeneratorException
-import static net.gleske.jervis.lang.LifecycleGenerator.getObjectValue
+import static net.gleske.jervis.tools.YamlOperator.getObjectValue
 
 /**
   This class offers helper forunctions for using Jervis in the context of a
