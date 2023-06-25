@@ -1,0 +1,41 @@
+toolchains:
+  java:
+    - env
+    - jdk
+  python:
+    - env
+    - python
+  ruby:
+    - gemfile
+    - env
+    - rvm
+    - jdk
+  shell:
+    - env
+compiler:
+  default_ivalue: gcc
+  friendlyLabel: true
+  gcc: |-
+    export CXX="g++"
+    export CC="gcc"
+  clang: |-
+    export CXX="clang++"
+    export CC="clang"
+env:
+  matrix: advanced
+  '*': export ${jervis_toolchain_ivalue}
+gemfile:
+  default_ivalue: ${PWD}/Gemfile
+  '*': export BUNDLE_GEMFILE="${jervis_toolchain_ivalue}"
+jdk:
+  default_ivalue: openjdk7
+  openjdk6: more commands
+  openjdk7: some commands
+python:
+  default_ivalue: '2.7'
+  matrix: advanced
+  '2.6': more commands
+  '2.7': some commands
+rvm:
+  default_ivalue: 1.9.3
+  '*': some commands

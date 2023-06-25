@@ -237,4 +237,49 @@ class ToolchainValidatorTest extends GroovyTestCase {
         toolchains.load_JSON(url.getFile())
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(toolchains)
     }
+    //test YAML supportedLanguage()
+    @Test public void test_ToolchainValidator_supportedLanguage_yes_yaml() {
+        URL url = this.getClass().getResource('/good_toolchains_simple.yaml');
+        toolchains.load_JSON(url.getFile())
+        assert true == toolchains.supportedLanguage('ruby')
+    }
+    @Test public void test_ToolchainValidator_supportedLanguage_no_yaml() {
+        URL url = this.getClass().getResource('/good_toolchains_simple.yaml');
+        toolchains.load_JSON(url.getFile())
+        assert false == toolchains.supportedLanguage('derpy')
+    }
+    //test supportedToolchain()
+    @Test public void test_ToolchainValidator_supportedToolchain_yes_yaml() {
+        URL url = this.getClass().getResource('/good_toolchains_simple.yaml');
+        toolchains.load_JSON(url.getFile())
+        assert true == toolchains.supportedToolchain('jdk')
+    }
+    @Test public void test_ToolchainValidator_supportedToolchain_no_yaml() {
+        URL url = this.getClass().getResource('/good_toolchains_simple.yaml');
+        toolchains.load_JSON(url.getFile())
+        assert false == toolchains.supportedToolchain('derpy')
+    }
+    //test supportedTool()
+    @Test public void test_ToolchainValidator_supportedTool_yes_yaml() {
+        URL url = this.getClass().getResource('/good_toolchains_simple.yaml');
+        toolchains.load_JSON(url.getFile())
+        assert true == toolchains.supportedTool('jdk','openjdk7')
+        assert true == toolchains.supportedTool('rvm','derpy')
+    }
+    @Test public void test_ToolchainValidator_supportedTool_no_yaml() {
+        URL url = this.getClass().getResource('/good_toolchains_simple.yaml');
+        toolchains.load_JSON(url.getFile())
+        assert false == toolchains.supportedTool('jdk','derpy')
+    }
+    //test supportedMatrix()
+    @Test public void test_ToolchainValidator_supportedMatrix_yes_yaml() {
+        URL url = this.getClass().getResource('/good_toolchains_simple.yaml');
+        toolchains.load_JSON(url.getFile())
+        assert true == toolchains.supportedMatrix('ruby', 'rvm')
+    }
+    @Test public void test_ToolchainValidator_supportedMatrix_no_yaml() {
+        URL url = this.getClass().getResource('/good_toolchains_simple.yaml');
+        toolchains.load_JSON(url.getFile())
+        assert false == toolchains.supportedMatrix('ruby','derpy')
+    }
 }
