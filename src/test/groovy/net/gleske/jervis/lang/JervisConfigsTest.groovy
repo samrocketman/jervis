@@ -20,6 +20,7 @@ package net.gleske.jervis.lang
 //package.
 
 import net.gleske.jervis.exceptions.JervisException
+import net.gleske.jervis.tools.YamlOperator
 
 import org.junit.Test
 
@@ -29,37 +30,20 @@ import org.junit.Test
   */
 class JervisConfigsTest extends GroovyTestCase {
     /**
-      Abstracted validateLifecyclesString in case an admin needs to test
-      multiple files.
-      */
-    private void validateLifecyclesString(String json) {
-        def lifecycle_obj = new LifecycleValidator()
-        lifecycle_obj.load_JSONString(json)
-        lifecycle_obj.validate()
-    }
-    /**
-      Abstracted validateToolchainsString in case an admin needs to test
-      multiple files.
-      */
-    private void validateToolchainsString(String json) {
-        def toolchain_obj = new ToolchainValidator()
-        toolchain_obj.load_JSONString(json)
-        toolchain_obj.validate()
-    }
-    /**
       Abstracted validatePlatformsString in case an admin needs to test
       multiple files.
       */
-    private void validatePlatformsString(String json) {
+    private void validatePlatformsString(String yaml) {
         def platform_obj = new PlatformValidator()
-        platform_obj.load_JSONString(json)
+        platform_obj.load_JSONString(yaml)
         platform_obj.validate()
     }
+
     /**
       A function for linting all toolchains bash scripts in a
       LifecycleGenerator object.
      */
-    private void validateLifecycleGeneratorBashSyntax(LifecycleGenerator generator) {
+    private void validateLifecycleGeneratorBashSyntax(String osName, LifecycleGenerator generator) {
         List skip_keys = ['default_ivalue', 'secureSupport', 'friendlyLabel', 'comment', 'matrix']
         //cycle through all permutations of the toolchains file and check bash syntax
         generator.toolchain_obj.languages.each {
@@ -87,8 +71,8 @@ class JervisConfigsTest extends GroovyTestCase {
                         proc2.waitFor()
                         proc2.waitForProcessOutput(stdout, stderr)
                         if(proc2.exitValue()) {
-                            //syntax check failed so alert which section of the toolchains.json file failed.
-                            throw new JervisException("Toolchains bash syntax error when testing: ${language} > ${toolchain} > ${toolchain_value}\n\nYAML sample:\n${sample_yaml}\n\nBash error:\n" + stderr.toString())
+                            //syntax check failed so alert which section of the toolchains.yaml file failed.
+                            throw new JervisException("${osName}: Toolchains bash syntax error when testing: ${language} > ${toolchain} > ${toolchain_value}\n\nYAML sample:\n${sample_yaml}\n\nBash error:\n" + stderr.toString())
                         }
                     }
                 }
@@ -97,36 +81,28 @@ class JervisConfigsTest extends GroovyTestCase {
     }
 
     /**
-      Test and validate production lifecycles.json.
-     */
-    @Test public void test_JervisConfigsTest_validate_lifecycles_ubuntu1604_stable_config() {
-        URL url = this.getClass().getResource('/lifecycles-ubuntu1604-stable.json');
-        validateLifecyclesString(url.content.text)
-    }
-    /**
-      Test and validate production toolchains.json.
-     */
-    @Test public void test_JervisConfigsTest_validate_toolchains_ubuntu1604_stable_config() {
-        URL url = this.getClass().getResource('/toolchains-ubuntu1604-stable.json');
-        validateToolchainsString(url.content.text)
-    }
-    /**
-      Test and validate production platforms.json.
+      Test and validate production platforms.yaml.
      */
     @Test public void test_JervisConfigsTest_validate_platforms_config() {
-        URL url = this.getClass().getResource('/platforms.json');
+        URL url = this.getClass().getResource('/platforms.yaml');
         validatePlatformsString(url.content.text)
     }
+
     /**
       Runs through every toolchain configuration to ensure there's no bash
       syntax errors.
      */
     @Test public void test_JervisConfigsTest_toolchains_ubuntu1604_stable_bash_syntax_check() {
-        def generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/lifecycles-ubuntu1604-stable.json');
-        generator.loadLifecyclesString(url.content.text)
-        url = this.getClass().getResource('/toolchains-ubuntu1604-stable.json');
-        generator.loadToolchainsString(url.content.text)
-        validateLifecycleGeneratorBashSyntax(generator)
+        URL url = this.getClass().getResource('/platforms.yaml');
+        YamlOperator.loadYamlFrom(url.content.text).supprted_platforms.each { platform, oses ->
+            oses.collect { os, languages ->
+                def generator = new LifecycleGenerator()
+                url = this.getClass().getResource("/lifecycles-${os}-stable.yaml");
+                generator.loadLifecyclesString(url.content.text)
+                url = this.getClass().getResource("/toolchains-${os}-stable.yaml");
+                generator.loadToolchainsString(url.content.text)
+                validateLifecycleGeneratorBashSyntax(generator)
+            }
+        }
     }
 }
