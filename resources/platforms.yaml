@@ -1,23 +1,19 @@
 defaults:
   platform: docker
-  os: ubuntu1604
+  os: ubuntu2204
   stability: stable
   sudo: sudo
 supported_platforms:
   docker:
-    ubuntu1604:
+    ubuntu2204:
       friendlyName: Ubuntu 16.04
       language:
-        - groovy
         - java
         - python
-        - ruby
         - shell
       toolchain:
         - env
-        - gemfile
-        - rvm
-        - python
         - jdk
+        - python
 restrictions: {
   }

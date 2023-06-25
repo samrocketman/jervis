@@ -1,3 +1,6 @@
+#
+# THIS IS NO LONGER REFERENCED; KEPT FOR ADDING FUTURE SUPPORT
+#
 toolchains:
   c: [ env, compiler ]
   cpp: [ env, compiler ]

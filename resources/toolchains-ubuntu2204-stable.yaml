@@ -1,0 +1,100 @@
+toolchains:
+  java: [ env, jdk ]
+  python: [ env, python ]
+  shell: [ env ]
+agent_custom_setup:
+  friendlyLabel: false
+  matrix: disabled
+  comment: Allows us to configure custom setup commands for every agent.
+  default_ivalue: /bin/true
+  '*': ${jervis_toolchain_ivalue}
+docker:
+  default_ivalue: disabled
+  friendlyLabel: true
+  matrix: disabled
+  comment: For hosts supporting docker in docker.
+  enabled: |-
+    # for admins to set a Docker registry mirror such as Nexus
+    REGISTRY_MIRROR=""
+    if ! groups | grep docker; then
+      groups
+      echo 'ERROR: current user is not a part of the "docker" group' >&2
+      exit 1
+    fi
+    # start the docker daemon which uses /var/lib/docker
+    dockerd_args=()
+    if [-n "${REGISTRY_MIRROR:-}" ]; then
+      dockerd_args+=( --registry-mirror "${REGISTRY_MIRROR:-}" )
+    fi
+    pgrep dockerd || sudo -i nohup dockerd "${dockerd_args[@]}" -D &> ~/docker.log &
+    # wait for docker daemon to finish starting
+    function wait_for_docker() {
+      local count=0
+      until curl -fL --unix-socket /var/run/docker.sock http://localhost/info; do
+        (( count=count+1 ))
+        if [ "${count}" -gt 300 ]; then
+          ps aux
+          sudo /bin/bash -c 'ls -l /proc/$(pgrep dockerd)/fd'
+          echo 'Docker daemon did not start.' >&2
+          [ ! -f nohup.out ] || cat nohup.out >&2
+          return 1
+        fi
+        sleep 1
+      done
+    }; wait_for_docker
+    groups
+    if type -P rpm &> /dev/null; then
+      rpm -q --info "$(rpm -q --whatprovides "$(type -P docker)")"
+    fi
+    docker info
+  disabled: ''
+env:
+  matrix: advanced
+  '*': export ${jervis_toolchain_ivalue}
+jdk:
+  default_ivalue: openjdk8
+  friendlyLabel: true
+  openjdk8: |-
+    export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+    export PATH="${JAVA_HOME}/bin:${PATH}"
+    java -Xmx32m -version
+    javac -J-Xmx32m -version
+  openjdk11: |-
+    export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
+    export PATH="${JAVA_HOME}/bin:${PATH}"
+    java -Xmx32m -version
+    javac -J-Xmx32m -version
+  openjdk17: |-
+    export JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
+    export PATH="${JAVA_HOME}/bin:${PATH}"
+    java -Xmx32m -version
+    javac -J-Xmx32m -version
+  openjdk18: |-
+    export JAVA_HOME="/usr/lib/jvm/java-18-openjdk-amd64"
+    export PATH="${JAVA_HOME}/bin:${PATH}"
+    java -Xmx32m -version
+    javac -J-Xmx32m -version
+  openjdk19: |-
+    export JAVA_HOME="/usr/lib/jvm/java-19-openjdk-amd64"
+    export PATH="${JAVA_HOME}/bin:${PATH}"
+    java -Xmx32m -version
+    javac -J-Xmx32m -version
+python:
+  default_ivalue: '2.7'
+  friendlyLabel: true
+  '3.10': |-
+    set +x
+    python3.10 -m venv /tmp/venv3.10
+    echo "$ source \"/tmp/venv3.10/bin/activate\""
+    source "/tmp/venv3.10/bin/activate"
+    set -x
+    python --version
+    pip --version
+  '3.11': |-
+    set +x
+    python3.10 -m venv /tmp/venv3.10
+    echo "$ source \"/tmp/venv3.10/bin/activate\""
+    source "/tmp/venv3.10/bin/activate"
+    set -x
+    python --version
+    pip --version
