@@ -50,7 +50,7 @@
     },
     "rvm": {
         "default_ivalue": "1.9.3",
-        "cleanup": "foo",
+        "cleanup": {"hello": "foo"},
         "*": [
             "some commands"
         ]

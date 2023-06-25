@@ -406,6 +406,7 @@ class LifecycleGenerator implements Serializable {
         //avoid throwing a NullPointer exception if the user forgets to call obj.folder_listing to load a list of files.
         //just load an empty file list by default initially that can then be overridden.
         this.setFolder_listing([])
+
         //allow ordered loading additional toolchains into a language key
         List additional_toolchains = []
         toolchain_obj.toolchains["toolchains"][yaml_language].with { List toolchainList ->
@@ -419,7 +420,7 @@ class LifecycleGenerator implements Serializable {
         }
         toolchain_obj.toolchains["toolchains"][yaml_language] += additional_toolchains
 
-        // go through any toolchains that may be left; order i's not guaranteed
+        // go through any toolchains that may be left; order is not guaranteed
         // but will likely remain the order in which they're in the YAML file.
         yaml_keys.each { key ->
             if((key in toolchain_obj.toolchains) && !(key in toolchain_obj.toolchains["toolchains"][yaml_language])) {
@@ -624,12 +625,21 @@ env:
       @return        A list of strings which contain bash commands that have had string interpolation done.
      */
     private List interpolate_ivalue(List cmds, String ivalue) {
-        def z = []
-        cmds.each{ z << it.replace('${jervis_toolchain_ivalue}',ivalue) }
-        z
+        cmds.collect {
+            it.replace('${jervis_toolchain_ivalue}', ivalue)
+        }
     }
 
-    /*
+    /**
+      toolchainScript will always be a List or String.
+      @param script A List or String from a toolchains JSON or YAML file.
+      @return A List of Strings where the script is one line per item.
+      */
+    private List toolchainScript(def script) {
+        (script in List) ? script : script.tokenize('\n')
+    }
+
+    /**
        This is an abstracted function to generate matrix and non-matrix toolchains.
        @param toolchain      A toolchain that comes from the matrix build toolchain order for a given language.
        @param toolchain_keys The known keys for a given toolchain to look up <tt>*</tt> or a given toolchain value.
@@ -638,6 +648,7 @@ env:
      */
     private String toolchainBuilder(String toolchain, String[] toolchain_keys, List chain, Boolean matrix) throws UnsupportedToolException {
         String output = ''
+        List toolchainScriptList
         if(matrix) {
             output += "case \${${toolchain}} in\n"
             for(int i=0; i < chain.size(); i++) {
@@ -654,11 +665,13 @@ env:
                     output += "  ${toolchain}${i})\n"
                 }
                 if(tempchain in toolchain_keys) {
-                    output += '    ' + toolchain_obj.toolchains[toolchain][tempchain].join('\n    ') + '\n    ;;\n'
+                    toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(toolchain_obj.toolchains, "\"${toolchain}\".\"${tempchain}\"", [[], '']))
+                    output += '    ' + toolchainScriptList.join('\n    ') + '\n    ;;\n'
                 }
                 else {
                     //assume using "*" key
-                    output += '    ' + this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], tempchain).join('\n    ') + '\n    ;;\n'
+                    toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(toolchain_obj.toolchains, "\"${toolchain}\".\\*", [[], '']))
+                    output += '    ' + this.interpolate_ivalue(toolchainScriptList, tempchain).join('\n    ') + '\n    ;;\n'
                 }
             }
             output += 'esac\n'
@@ -669,11 +682,13 @@ env:
                     throw new UnsupportedToolException("${toolchain}: ${it}")
                 }
                 if(it in toolchain_keys) {
-                    output += toolchain_obj.toolchains[toolchain][it].join('\n') + '\n'
+                    toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(toolchain_obj.toolchains, "\"${toolchain}\".\"${it}\"", [[], '']))
+                    output += toolchainScriptList.join('\n') + '\n'
                 }
                 else {
                     //assume using "*" key
-                    output += this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], it).join('\n') + '\n'
+                    toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(toolchain_obj.toolchains, "\"${toolchain}\".\\*", [[], '']))
+                    output += this.interpolate_ivalue(toolchainScriptList, it).join('\n') + '\n'
                 }
             }
         }
@@ -690,6 +705,7 @@ env:
         def toolchains_order = toolchain_obj.toolchains['toolchains'][yaml_language]
         HashMap cleanup = [:]
         String output = '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n'
+        List toolchainScriptList
         toolchains_order.each { toolchain ->
             String[] toolchain_keys = toolchain_obj.toolchains[toolchain].keySet() as String[]
             if('cleanup' in toolchain_obj.toolchains[toolchain]) {
@@ -751,11 +767,13 @@ env:
                 String default_ivalue = toolchain_obj.toolchains[toolchain].default_ivalue
                 if(default_ivalue) {
                     if(default_ivalue in toolchain_keys) {
-                        output += toolchain_obj.toolchains[toolchain][default_ivalue].join('\n') + '\n'
+                        toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(toolchain_obj.toolchains, "\"${toolchain}\".\"${default_ivalue}\"", [[], '']))
+                        output += toolchainScriptList.join('\n') + '\n'
                     }
                     else {
                         //assume using "*" key
-                        output += this.interpolate_ivalue(toolchain_obj.toolchains[toolchain]['*'], default_ivalue).join('\n') + '\n'
+                        toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(toolchain_obj.toolchains, "\"${toolchain}\".\\*", [[], '']))
+                        output += this.interpolate_ivalue(toolchainScriptList, default_ivalue).join('\n') + '\n'
                     }
                 }
             }

@@ -203,31 +203,41 @@ class ToolchainValidator implements Serializable {
                 }
             }
         }
-        for(int i=0; i<toolchain_list.size(); i++) {
-            if('toolchains' == toolchain_list[i]) {
-                continue
+
+        // validate toolchain keys, their script, and other fields
+        toolchains.each { String tool, Map toolMap ->
+            if(tool == 'toolchains') {
+                return
             }
-            def toolchain_ivalue = toolchains[toolchain_list[i]].keySet() as String[]
-            if('default_ivalue' in toolchain_ivalue) {
-                def default_ivalue = toolchains[toolchain_list[i]]['default_ivalue']
-                if(!(default_ivalue in toolchain_ivalue) && !('*' in toolchain_ivalue)) {
-                    throw new ToolchainMissingKeyException("${toolchain_list[i]}.default_ivalue.${default_ivalue} is missing.  " +
-                            "Must have one of the two following keys: ${toolchain_list[i]}.${default_ivalue} or ${toolchain_list[i]}.*.")
+            List toolchain_ivalue = toolMap.keySet().toList()
+            toolMap.each { toolVersion, script ->
+                if(toolVersion == 'friendlyLabel') {
+                    if(!(script in Boolean)) {
+                        throw new ToolchainBadValueInKeyException("${tool}.friendlyLabel must be a String and must have one of three values: disabled, simple, advanced.")
+                    }
                 }
-            }
-            if('matrix' in toolchain_ivalue) {
-                def matrix = toolchains[toolchain_list[i]]['matrix']
-                if(!(matrix instanceof String) || !(matrix in ['disabled', 'simple', 'advanced'])) {
-                    throw new ToolchainBadValueInKeyException("${toolchain_list[i]}.matrix must be a String and must have one of three values: disabled, simple, advanced.")
+                else if(toolVersion == 'default_ivalue') {
+                    def default_ivalue = script
+                    // default_ivalue should exist as a tool or wildcard
+                    if(!(default_ivalue in String) || !([default_ivalue, '*'].any { it in toolchain_ivalue })) {
+                        throw new ToolchainMissingKeyException("${tool}.default_ivalue.${default_ivalue} is missing.  " +
+                                "Must have one of the two following keys: ${tool}.${default_ivalue} or ${tool}.* (i.e. wildcard).")
+                    }
                 }
-            }
-            if('cleanup' in toolchain_ivalue) {
-                def cleanup = toolchains[toolchain_list[i]]['cleanup']
-                if(!(cleanup instanceof List) || (false in cleanup.collect { it instanceof String })) {
-                    throw new ToolchainBadValueInKeyException("${toolchain_list[i]}.cleanup must be a List of Strings.")
+                else if(toolVersion == 'matrix') {
+                    if(!([String, ['disabled', 'simple', 'advanced']].every { script in it })) {
+                        throw new ToolchainBadValueInKeyException("${tool}.matrix must be a String and must have one of three values: disabled, simple, advanced.")
+                    }
+                }
+                else {
+                    // any remaining tool scripts including 'cleanup'
+                    if(([String, List].every { !(script in it) }) || ((script in List) && !script.every { it in String })) {
+                        throw new ToolchainBadValueInKeyException("${tool}.${toolVersion} must be a String or List of Strings.")
+                    }
                 }
             }
         }
+
         return true
     }
 
