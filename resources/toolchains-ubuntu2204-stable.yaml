@@ -48,6 +48,11 @@ docker:
     fi
     docker info
   disabled: ''
+download_utilities:
+  friendlyLabel: true
+  '*': |-
+    case '${jervis_toolchain_ivalue}' in *yq*) export force_yq=1 ;; esac
+    /usr/local/bin/download-utilities.sh /usr/local/download-utilities.yml ${jervis_toolchain_ivalue}
 env:
   matrix: advanced
   '*': export ${jervis_toolchain_ivalue}
