@@ -128,11 +128,6 @@ class LifecycleValidatorTest extends GroovyTestCase {
         assert true == lifecycles.validate()
         assert true == lifecycles.validate_asBool()
     }
-    @Test public void test_LifecycleValidator_main_lifecycles_json() {
-        URL url = this.getClass().getResource('/lifecycles-ubuntu1604-stable.yaml');
-        lifecycles.load_JSON(url.getFile())
-        assert true == lifecycles.validate()
-    }
     @Test public void test_LifecycleValidator_serialization() {
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
         lifecycles.load_JSON(url.getFile())

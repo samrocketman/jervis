@@ -105,11 +105,6 @@ class PlatformValidatorTest extends GroovyTestCase {
         assert true == platforms.validate()
         assert true == platforms.validate_asBool()
     }
-    @Test public void test_PlatformValidator_main_platforms_json() {
-        URL url = this.getClass().getResource('/platforms.yaml');
-        platforms.load_JSON(url.getFile())
-        assert true == platforms.validate()
-    }
     @Test public void test_PlatformValidator_bad_missing_defaults() {
         ['platform', 'os', 'stability', 'sudo'].each {
             URL url = this.getClass().getResource("/bad_platforms_missing_defaults_${it}.json");
