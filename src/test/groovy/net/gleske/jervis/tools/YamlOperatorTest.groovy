@@ -94,28 +94,28 @@ class YamlOperatorTest extends GroovyAssert {
     }
     @Test public void test_YamlOperator_getObjectValue() {
         Map example = [key1: [subkey1: 'string']]
-        assert 'string'.equals(generator.getObjectValue(example, 'key1.subkey1', 'default'))
-        assert 'default'.equals(generator.getObjectValue(example, 'key2.subkey1', 'default'))
-        assert 2.equals(generator.getObjectValue(example, 'key1.subkey1', 2))
+        assert 'string'.equals(YamlOperator.getObjectValue(example, 'key1.subkey1', 'default'))
+        assert 'default'.equals(YamlOperator.getObjectValue(example, 'key2.subkey1', 'default'))
+        assert 2.equals(YamlOperator.getObjectValue(example, 'key1.subkey1', 2))
     }
     @Test public void test_YamlOperator_getObjectValue_false_bug() {
         Map example = [key1: [subkey1: 'false']]
-        assert false == generator.getObjectValue(example, 'key1.subkey1', false)
-        assert false == generator.getObjectValue(example, 'key1.subkey1', true)
+        assert false == YamlOperator.getObjectValue(example, 'key1.subkey1', false)
+        assert false == YamlOperator.getObjectValue(example, 'key1.subkey1', true)
     }
     @Test public void test_YamlOperator_getObjectValue_type_bug() {
         Map example = [key1: [subkey1: 'string'],key2: ["a", "b"]]
-        assert 'default'.equals(generator.getObjectValue(example, 'key1', 'default'))
-        assert 'default'.equals(generator.getObjectValue(example, 'key2', 'default'))
+        assert 'default'.equals(YamlOperator.getObjectValue(example, 'key1', 'default'))
+        assert 'default'.equals(YamlOperator.getObjectValue(example, 'key2', 'default'))
     }
     @Test public void test_YamlOperator_getObjectValue_allow_conflicting_and_custom_lookup_paths() {
         Map hexKeys = [ 'hello.io': 'world', 'hello': ['jervis.io{': 'friend']]
 
-        assert generator.getObjectValue(hexKeys, 'hello', 'hi') == 'hi'
-        assert generator.getObjectValue(hexKeys, 'hello\\.io', '') == 'world'
-        assert generator.getObjectValue(hexKeys, 'hello\\.io', []) == []
-        assert generator.getObjectValue(hexKeys, 'hello.jervis.io{', '') == ''
-        assert generator.getObjectValue(hexKeys, 'hello.jervis\\.io\\{', '') == 'friend'
+        assert YamlOperator.getObjectValue(hexKeys, 'hello', 'hi') == 'hi'
+        assert YamlOperator.getObjectValue(hexKeys, 'hello\\.io', '') == 'world'
+        assert YamlOperator.getObjectValue(hexKeys, 'hello\\.io', []) == []
+        assert YamlOperator.getObjectValue(hexKeys, 'hello.jervis.io{', '') == ''
+        assert YamlOperator.getObjectValue(hexKeys, 'hello.jervis\\.io\\{', '') == 'friend'
     }
     @Test public void test_YamlOperator_getObjectValue_fallbacks_and_multiple_defaults() {
         Map json = [
@@ -125,33 +125,33 @@ class YamlOperatorTest extends GroovyAssert {
             bye: 'false'
         ]
 
-        assert generator.getObjectValue(json, 'type // type.hello // python.2\\.7', ['', []]) == 'world'
-        assert generator.getObjectValue(json, 'type // type.hello // python.2\\.7', [[], '']) == 'world'
-        assert generator.getObjectValue(json, 'type.hello // python.2\\.7', [[], '']) == 'world'
-        assert generator.getObjectValue(json, 'type.hello // python.2\\.7', ['', []]) == 'world'
-        assert generator.getObjectValue(json, 'python.2\\.7 // type.hello', [[], '']) == ['hello', 'world']
-        assert generator.getObjectValue(json, 'python.2\\.7 // type.hello', ['', []]) == ['hello', 'world']
+        assert YamlOperator.getObjectValue(json, 'type // type.hello // python.2\\.7', ['', []]) == 'world'
+        assert YamlOperator.getObjectValue(json, 'type // type.hello // python.2\\.7', [[], '']) == 'world'
+        assert YamlOperator.getObjectValue(json, 'type.hello // python.2\\.7', [[], '']) == 'world'
+        assert YamlOperator.getObjectValue(json, 'type.hello // python.2\\.7', ['', []]) == 'world'
+        assert YamlOperator.getObjectValue(json, 'python.2\\.7 // type.hello', [[], '']) == ['hello', 'world']
+        assert YamlOperator.getObjectValue(json, 'python.2\\.7 // type.hello', ['', []]) == ['hello', 'world']
 
         // no fallback but multiple defaults
-        assert generator.getObjectValue(json, 'python.2\\.7', ['', []]) == ['hello', 'world']
-        assert generator.getObjectValue(json, 'python.2\\.7', [[], '']) == ['hello', 'world']
+        assert YamlOperator.getObjectValue(json, 'python.2\\.7', ['', []]) == ['hello', 'world']
+        assert YamlOperator.getObjectValue(json, 'python.2\\.7', [[], '']) == ['hello', 'world']
 
         // fallbacks with single default
-        assert generator.getObjectValue(json, 'type // type.hello // python.2\\.7', '') == 'world'
-        assert generator.getObjectValue(json, 'type // type.hello // python.2\\.7', []) == ['hello', 'world']
-        assert generator.getObjectValue(json, 'type.hello // python.2\\.7', true) == true
-        assert generator.getObjectValue(json, 'type.hello // python.2\\.7', false) == true
-        assert generator.getObjectValue(json, 'type.hello // python.2\\.7', [:]) == [:]
-        assert generator.getObjectValue(json, 'friend', true) == true
-        assert generator.getObjectValue(json, 'bye', true) == false
-        assert generator.getObjectValue(json, 'friend', false) == true
-        assert generator.getObjectValue(json, 'bye', false) == false
-        assert generator.getObjectValue(json, 'bye', [[], [:]]) == []
-        assert generator.getObjectValue(json, 'bye', [[:], []]) == [:]
-        assert generator.getObjectValue(json, 'friend // bye', [[:], []]) == [:]
-        assert generator.getObjectValue(json, 'bye // friend', [[:], []]) == [:]
-        assert generator.getObjectValue(json, 'friend // bye', [[], [:]]) == []
-        assert generator.getObjectValue(json, 'bye // friend', [[], [:]]) == []
+        assert YamlOperator.getObjectValue(json, 'type // type.hello // python.2\\.7', '') == 'world'
+        assert YamlOperator.getObjectValue(json, 'type // type.hello // python.2\\.7', []) == ['hello', 'world']
+        assert YamlOperator.getObjectValue(json, 'type.hello // python.2\\.7', true) == true
+        assert YamlOperator.getObjectValue(json, 'type.hello // python.2\\.7', false) == true
+        assert YamlOperator.getObjectValue(json, 'type.hello // python.2\\.7', [:]) == [:]
+        assert YamlOperator.getObjectValue(json, 'friend', true) == true
+        assert YamlOperator.getObjectValue(json, 'bye', true) == false
+        assert YamlOperator.getObjectValue(json, 'friend', false) == true
+        assert YamlOperator.getObjectValue(json, 'bye', false) == false
+        assert YamlOperator.getObjectValue(json, 'bye', [[], [:]]) == []
+        assert YamlOperator.getObjectValue(json, 'bye', [[:], []]) == [:]
+        assert YamlOperator.getObjectValue(json, 'friend // bye', [[:], []]) == [:]
+        assert YamlOperator.getObjectValue(json, 'bye // friend', [[:], []]) == [:]
+        assert YamlOperator.getObjectValue(json, 'friend // bye', [[], [:]]) == []
+        assert YamlOperator.getObjectValue(json, 'bye // friend', [[], [:]]) == []
     }
     @Test public void test_YamlOperator_getObjectValue_quoted_periods() {
         Map json = [
@@ -159,10 +159,10 @@ class YamlOperatorTest extends GroovyAssert {
             type: [hello: 'world']
         ]
 
-        def benchmark = generator.getObjectValue(json, 'python.2\\.7', [])
+        def benchmark = YamlOperator.getObjectValue(json, 'python.2\\.7', [])
         assert benchmark == ['hello', 'world']
-        assert benchmark == generator.getObjectValue(json, 'python."2\\.7"', [])
-        assert benchmark == generator.getObjectValue(json, 'python."2.7"', [])
+        assert benchmark == YamlOperator.getObjectValue(json, 'python."2\\.7"', [])
+        assert benchmark == YamlOperator.getObjectValue(json, 'python."2.7"', [])
     }
     @Test public void test_YamlOperator_getObjectValue_groovydoc_examples() {
         Map hexKeys = [
@@ -171,16 +171,16 @@ class YamlOperatorTest extends GroovyAssert {
             friend: [name: 'dog']
         ]
 
-        assert generator.getObjectValue(hexKeys, 'friend.name', '') == 'dog'
-        assert generator.getObjectValue(hexKeys, 'friend.name', ['item']) == 'dog'
-        assert generator.getObjectValue(hexKeys, 'friend.name', [['item']]) == ['item']
-        assert generator.getObjectValue(hexKeys, 'hello\\.io', '') == 'world'
-        assert generator.getObjectValue(hexKeys, 'hello%{2e}io', '') == 'world'
-        assert generator.getObjectValue(hexKeys, 'hello.jervis\\.io\\{', '') == 'friend'
-        assert generator.getObjectValue(hexKeys, '"hello.io"', '') == 'world'
-        assert generator.getObjectValue(hexKeys, 'hello."jervis.io"{', '') == 'friend'
-        assert generator.getObjectValue(hexKeys, 'hello."jervis.io"{ // friend', [:]) == [name: 'dog']
-        assert generator.getObjectValue(hexKeys, 'hello', [ '', [] ]) == ''
-        assert generator.getObjectValue(hexKeys, 'hello // friend.name', [ '', [] ]) == 'dog'
+        assert YamlOperator.getObjectValue(hexKeys, 'friend.name', '') == 'dog'
+        assert YamlOperator.getObjectValue(hexKeys, 'friend.name', ['item']) == 'dog'
+        assert YamlOperator.getObjectValue(hexKeys, 'friend.name', [['item']]) == ['item']
+        assert YamlOperator.getObjectValue(hexKeys, 'hello\\.io', '') == 'world'
+        assert YamlOperator.getObjectValue(hexKeys, 'hello%{2e}io', '') == 'world'
+        assert YamlOperator.getObjectValue(hexKeys, 'hello.jervis\\.io\\{', '') == 'friend'
+        assert YamlOperator.getObjectValue(hexKeys, '"hello.io"', '') == 'world'
+        assert YamlOperator.getObjectValue(hexKeys, 'hello."jervis.io"{', '') == 'friend'
+        assert YamlOperator.getObjectValue(hexKeys, 'hello."jervis.io"{ // friend', [:]) == [name: 'dog']
+        assert YamlOperator.getObjectValue(hexKeys, 'hello', [ '', [] ]) == ''
+        assert YamlOperator.getObjectValue(hexKeys, 'hello // friend.name', [ '', [] ]) == 'dog'
     }
 }
