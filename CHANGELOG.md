@@ -88,9 +88,9 @@ The following methods and fields have been renamed or removed.
 
 The following methods have moved.
 
-| Method         | Old class | New class |
-| -------------- | --------- | --------- |
-| getObjectValue | `net.gleske.jervis.lang.LifecycleGenerator` | `net.gleske.jervis.tools.YamlOperator` |
+| Method           | Old class | New class |
+| ---------------- | --------- | --------- |
+| `getObjectValue` | `net.gleske.jervis.lang.LifecycleGenerator` | `net.gleske.jervis.tools.YamlOperator` |
 
 ### Warnings:
 
