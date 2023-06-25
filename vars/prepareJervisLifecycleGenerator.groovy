@@ -129,14 +129,14 @@ void call(LifecycleGenerator generator, String github_credentials) {
        Initialize generator object from GitHub API.
      */
     String project = currentBuild.rawBuild.parent.parent.sources[0].source.with { "${it.repoOwner}/${it.repository}" }
-    generator.loadPlatformsString(loadCustomResource('platforms.json'))
+    generator.loadPlatformsString(loadCustomResource('platforms.yaml'))
     String branch = ((isPRBuild()) ? "refs/pull/${env.CHANGE_ID}/head" : env.BRANCH_NAME)
 
     initializeGenerator(generator, project, branch, github_credentials).with {
         String os_stability = "${generator.label_os}-${generator.label_stability}"
         finalizeGenerator(generator,
-            loadCustomResource("lifecycles-${os_stability}.json"),
-            loadCustomResource("toolchains-${os_stability}.json"),
+            loadCustomResource("lifecycles-${os_stability}.yaml"),
+            loadCustomResource("toolchains-${os_stability}.yaml"),
             it[0],
             it[1],
             currentBuild.rawBuild.parent.parent.fullName.split('/')[0])

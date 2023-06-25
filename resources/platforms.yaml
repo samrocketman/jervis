@@ -1,0 +1,23 @@
+defaults:
+  platform: docker
+  os: ubuntu1604
+  stability: stable
+  sudo: sudo
+supported_platforms:
+  docker:
+    ubuntu1604:
+      friendlyName: Ubuntu 16.04
+      language:
+        - groovy
+        - java
+        - python
+        - ruby
+        - shell
+      toolchain:
+        - env
+        - gemfile
+        - rvm
+        - python
+        - jdk
+restrictions: {
+  }
