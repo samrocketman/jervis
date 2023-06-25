@@ -29,12 +29,14 @@ s/toolchainValidator/ToolchainValidator/g
 s/lifecycleGenerator/LifecycleGenerator/g
 s/platformValidator/PlatformValidator/g
 s/securityIO/SecurityIO/g
+s/net\.gleske\.jervis\.lang\.LifecycleGenerator\.getObjectValue/net.gleske.jervis.tools.YamlOperator.getObjectValue/g
+s/net\.gleske\.jervis\.lang\.lifecycleGenerator\.getObjectValue/net.gleske.jervis.tools.YamlOperator.getObjectValue/g
 ```
 
 Usage of the sedfile is the following.
 
 ```bash
-find * -type f -name '*.groovy' -exec sed -i -f ../sedfile {} +
+find * -type f -name '*.groovy' -exec sed -i -f /tmp/sedfile {} +
 ```
 
 Manually search for and change the following methods.  See [Major API changes
