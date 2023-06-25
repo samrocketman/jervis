@@ -8,6 +8,7 @@ on:
     paths:
       - build.gradle
       - gradle.properties
+      - resources/**
       - src/**
       - vars/**
   pull_request:
@@ -15,6 +16,7 @@ on:
     paths:
       - build.gradle
       - gradle.properties
+      - resources/**
       - src/**
       - vars/**
 
