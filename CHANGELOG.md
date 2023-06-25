@@ -86,11 +86,18 @@ The following methods and fields have been renamed or removed.
 | `SecurityIO` | `setId_rsa_keysize()` | Removed            |
 | `SecurityIO` | `id_rsa_keysize`      | Removed            |
 
+The following methods have moved.
+
+| Method         | Old class | New class |
+| -------------- | --------- | --------- |
+| getObjectValue | `net.gleske.jervis.lang.LifecycleGenerator` | `net.gleske.jervis.tools.YamlOperator` |
+
 ### Warnings:
 
-- All vendors of JDK 1.8 is dropped in this release.
-- OpenJDK11 is the bytecode compatibility going forward to match the Jenkins
-  project.
+- Support for all vendors of JDK 1.8 is dropped in this release.
+- OpenJDK11 or OpenJDK17 is build runtime and OpenJDK8 is the bytecode
+  compatibility going forward to match the Jenkins project.  Groovy 2.4 does not
+  support higher than OpenJDK8 bytecode.
 - Function `getJervisYamlFiles(String owner, String repository)` within class
   `net.gleske.jervis.remotes.GitHubGraphQL` used to default to `master` branch.
   It now defaults to `main` branch.
