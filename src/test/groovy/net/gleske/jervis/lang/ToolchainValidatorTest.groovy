@@ -178,6 +178,14 @@ class ToolchainValidatorTest extends GroovyTestCase {
         assert false == toolchains.isFriendlyLabel('env')
         assert true == toolchains.isFriendlyLabel('rvm')
     }
+    @Test public void test_ToolchainValidator_isFriendlyLabel_bad_type() {
+        URL url = this.getClass().getResource('/bad_toolchains_friendly.json');
+        toolchains.load_JSON(url.getFile())
+        shouldFail(ToolchainBadValueInKeyException) {
+            toolchains.validate()
+        }
+        assert false == toolchains.validate_asBool()
+    }
     @Test public void test_ToolchainValidator_formerly_good_toolchains_simple() {
         //this test is for migrations from jervis-0.9 to 0.10 because advanced matrices were introduced
         URL url = this.getClass().getResource('/bad_toolchains_formerly_good_toolchains_simple.json');

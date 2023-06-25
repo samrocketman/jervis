@@ -1,0 +1,35 @@
+{
+    "toolchains": {
+        "java": ["env", "jdk"],
+        "ruby": ["gemfile", "env", "rvm", "jdk"]
+    },
+    "env": {
+        "matrix": "advanced",
+        "*": [
+            "export ${jervis_toolchain_ivalue}"
+        ]
+    },
+    "gemfile": {
+        "default_ivalue": "${PWD}/Gemfile",
+        "*": [
+            "export BUNDLE_GEMFILE=\"${jervis_toolchain_ivalue}\""
+        ]
+    },
+    "jdk": {
+        "default_ivalue": "openjdk7",
+        "friendlyLabel": 6,
+        "openjdk6": [
+            "more commands"
+        ],
+        "openjdk7": [
+            "some commands"
+        ]
+    },
+    "rvm": {
+        "default_ivalue": "1.9.3",
+        "friendlyLabel": true,
+        "*": [
+            "some commands"
+        ]
+    }
+}
