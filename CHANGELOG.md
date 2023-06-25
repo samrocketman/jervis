@@ -64,6 +64,12 @@ following is a list of vars now requiring `NonCPS` annotation.
 - `vars/adminLibraryResource.groovy`; refer to
   [`loadCustomResource`][loadCustomResource]
 
+### Migrating JSON to YAML
+
+platforms, lifecycles, and toolchains have migrated from JSON to YAML.  Users tend to define these files themselves.  As a result, [a migration script][migrate-yaml-platforms] has been created.  Run the migration script for your given prefix.
+
+[migrate-yaml-platforms]: https://github.com/samrocketman/jervis/issues/142#issuecomment-1605691587
+
 <a name="2.0-major-api-changes"></a>
 ### Major API changes
 
