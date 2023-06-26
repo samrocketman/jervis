@@ -15,6 +15,7 @@ You can use GNU `sed` to migrate code.  The following is a `sedfile` of
 expressions.
 
 ```
+s/ \+$//
 s/pipelineGeneratorTest/PipelineGeneratorTest/g
 s/platformValidatorTest/PlatformValidatorTest/g
 s/lifecycleGeneratorTest/LifecycleGeneratorTest/g
@@ -29,8 +30,7 @@ s/toolchainValidator/ToolchainValidator/g
 s/lifecycleGenerator/LifecycleGenerator/g
 s/platformValidator/PlatformValidator/g
 s/securityIO/SecurityIO/g
-s/net\.gleske\.jervis\.lang\.LifecycleGenerator\.getObjectValue/net.gleske.jervis.tools.YamlOperator.getObjectValue/g
-s/net\.gleske\.jervis\.lang\.lifecycleGenerator\.getObjectValue/net.gleske.jervis.tools.YamlOperator.getObjectValue/g
+s/net\.gleske\.jervis\.lang\.[Ll]ifecycleGenerator\([ .]getObjectValue\)/net.gleske.jervis.tools.YamlOperator\1/g
 ```
 
 Usage of the sedfile is the following.
