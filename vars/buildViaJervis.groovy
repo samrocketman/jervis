@@ -87,5 +87,6 @@ def call() {
             error 'This build has failed.  No user-defined pipelines will be run.'
         }
     }
+    setUserBinding('jervis_global_pipeline_generator', pipeline_generator)
     pipeline_generator
 }

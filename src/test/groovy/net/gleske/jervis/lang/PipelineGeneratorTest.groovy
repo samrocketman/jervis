@@ -1513,4 +1513,20 @@ class PipelineGeneratorTest extends GroovyTestCase {
         List result = [['python':'python0', 'jdk':'jdk0'], ['python':'python1', 'jdk':'jdk0'], ['python':'python0', 'jdk':'jdk1'], ['python':'python1', 'jdk':'jdk1']]
         assert pipeline_generator.getBuildableMatrixAxes() == result
     }
+    @Test public void test_PipelineGenerator_getYaml() {
+        String yaml = '''
+            |language: java
+            |jdk:
+            |  - openjdk6
+            |  - openjdk7
+            |env:
+            |  - foo=hello
+            |  - foo=world
+        '''.stripMargin().trim()
+        generator.loadYamlString(yaml)
+        def pipeline_generator = new PipelineGenerator(generator)
+        assert pipeline_generator.getYaml().language == 'java'
+        assert pipeline_generator.getYaml().jdk == ['openjdk6', 'openjdk7']
+        assert pipeline_generator.getYaml().env == ['foo=hello', 'foo=world']
+    }
 }

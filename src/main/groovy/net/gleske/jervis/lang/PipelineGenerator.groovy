@@ -69,7 +69,7 @@ class PipelineGenerator implements Serializable {
       A lifecycle generator which has already been instantiated and processed
       lifecycle, toolchains, and platforms JSON as well as Jervis YAML.
      */
-    private def generator
+    LifecycleGenerator generator
 
     /**
       A set of collections which a global pipeline library might support.
@@ -502,5 +502,14 @@ pipeline_generator.stashMap['html']['includes']
         else {
             [:]
         }
+    }
+
+    /**
+      Get Jervis YAML from the pipeline generator.
+
+      @return An instance of <tt>{@link net.gleske.jervis.lang.LifecycleGenerator}</tt>.
+      */
+    Map getYaml() {
+        generator.jervis_yaml
     }
 }
