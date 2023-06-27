@@ -123,6 +123,9 @@ The following methods have moved.
 
 #### Pipeline DSL scripts changes in the `vars/` folder
 
+- Jervis steps read from platforms, lifecycles, and toolchains YAML instead of
+  JSON.
+- Matrix building nodes reordered so it is wrapped in stages.
 - New `hasGlobalResource()` step which can be used to conditionally load
   resources from `libraryResource` step.  Allows a pipeline developer to only
   call `libraryResource` if it exists.  Normally `libraryResource` step will
@@ -133,7 +136,8 @@ The following methods have moved.
   meta info.
 - New `getJervisPipelineGenerators()` which can read multiple repositories and
   return `.jervis.yml` pipeline objects for each repository in one API call.
-- `isBuilding()` more reliable now that it is built into Jervis with unit tests.  Several bugs were fixed while reaching 100% test coverage.
+- `isBuilding()` more reliable now that it is built into Jervis with unit tests.
+  Several bugs were fixed while reaching 100% test coverage.
 - `loadCustomResource()` has some new behavior.  It first loads
   `adminLibraryResource`, then checks for the resource in the global config
   files plugin, and finally falls back to `libraryResource`.  It can also skip
@@ -142,7 +146,8 @@ The following methods have moved.
   // skip loading adminLibraryResource
   loadCustomResource('resource-name', true)
   ```
-- The following vars are now fully `NonCPS`.  These vars can be called from within other `NonCPS` annotated methods in shared pipelines.
+- The following vars are now fully `NonCPS`.  These vars can be called from
+  within other `NonCPS` annotated methods in shared pipelines.
   - [`getBuildContextMap`](vars/getBuildContextMap.groovy)
   - [`getJervisPipelineGenerators`](vars/getJervisPipelineGenerators.groovy)
   - [`getUserBinding`](vars/getUserBinding.groovy)
@@ -212,12 +217,6 @@ The following methods have moved.
   - [`GitHubAppCredential`][GitHubAppCredential] a credential meant for API
     clients such as [`GitHub`][GitHub] or [`GitHubGraphQL`][GitHubGraphQL].
     Credential rotation is handled automatically and transparent to the client.
-
-### Pipeline DSL scripts changes in the `vars/` folder:
-
-- Matrix building nodes reordered so it is wrapped in stages.
-- Jervis steps read from platforms, lifecycles, and toolchains YAML instead of
-  JSON.
 
 ### Bug fixes:
 
