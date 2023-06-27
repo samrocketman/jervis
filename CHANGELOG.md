@@ -3,7 +3,7 @@
 This file contains all of the notable changes from Jervis releases.  For the
 full change log see the commit log.
 
-# jervis 2.0
+# jervis 2.0 - Jun 27th, 2023
 
 This is a new major release.  From an end user perspective, all behavior for 1.x
 and 0.x YAML files is still supported.  However, there are major API changes
