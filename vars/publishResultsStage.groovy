@@ -67,6 +67,17 @@ def processDefaultPublishable(def item, String publishable) {
     }
 }
 
+def optionalStage(Boolean shouldStage, Closure body) {
+    if(shouldStage) {
+        stage('Publish results') {
+            body()
+        }
+    }
+    else {
+        body()
+    }
+}
+
 def call(LifecycleGenerator generator, PipelineGenerator pipeline_generator) {
     List publishableItems = pipeline_generator.publishableItems
     if(publishableItems) {
@@ -87,6 +98,8 @@ def call(LifecycleGenerator generator, PipelineGenerator pipeline_generator) {
                 }
             }
         }
-        parallel(tasks)
+        optionalStage(!generator.isMatrixBuild()) {
+            parallel(tasks)
+        }
     }
 }
