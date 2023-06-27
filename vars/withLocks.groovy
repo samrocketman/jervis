@@ -162,17 +162,13 @@ int getLockLimit(Map settings, String lockName) {
 @NonCPS
 int getLockIndex(Map settings, String lockName) {
     Integer lockIndex = -1
+    if(!(limit in settings.keySet())) {
+        return lockIndex
+    }
     String lockKey = "${lockName}_index"
-    lock('test') {
     def resolvedIndex = getUserBinding("jervis_${lockKey}".toString())
-    if(!(resolvedIndex in Integer)) {
-        lockIndex = 0
-    }
-    else {
-        lockIndex = resolvedIndex + 1
-        setUserBinding("jervis_${lockKey}".toString(), lockIndex)
-    }
-    }
+    lockIndex = (resolvedIndex in Integer) ? resolvedIndex + 1 : 0
+    setUserBinding("jervis_${lockKey}".toString(), lockIndex)
     lockIndex
 }
 
