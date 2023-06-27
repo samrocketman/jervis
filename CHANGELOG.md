@@ -213,6 +213,12 @@ The following methods have moved.
     clients such as [`GitHub`][GitHub] or [`GitHubGraphQL`][GitHubGraphQL].
     Credential rotation is handled automatically and transparent to the client.
 
+### Pipeline DSL scripts changes in the `vars/` folder:
+
+- Matrix building nodes reordered so it is wrapped in stages.
+- Jervis steps read from platforms, lifecycles, and toolchains YAML instead of
+  JSON.
+
 ### Bug fixes:
 
 - Major bugfix: support for more HTTP methods which have no content in the
