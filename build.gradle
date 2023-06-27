@@ -142,32 +142,22 @@ task( update_vscode, dependsOn: "classes" ) {
 }
 
 //Maven Central uploads
-task javadocJar(type: Jar, dependsOn: groovydoc) {
-    classifier = 'javadoc'
-    from groovydoc.destinationDir
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
 task testJar(type: Jar, dependsOn: testClasses) {
-    classifier = 'tests'
+    archiveClassifier = 'tests'
     includes = ['net/gleske/**/*.class']
     excludes = ['*.json', 'mocks/**/*', '**/*Test$_*.class', '**/*Test.class']
     from sourceSets.test.output
 }
 
 task testSourcesJar(type: Jar) {
-    classifier = 'tests-sources'
+    archiveClassifier = 'tests-sources'
     includes = ['net/gleske/**/*.groovy']
     excludes = ['**/*Test.groovy']
     from sourceSets.test.allSource
 }
 
 artifacts {
-    archives javadocJar, sourcesJar, testJar, testSourcesJar
+    archives testJar, testSourcesJar
 }
 
 jar {
@@ -193,12 +183,10 @@ publishing {
     }
     publications {
         binary(MavenPublication) {
-            artifact jar
+            from components.java
         }
         binaryAndSources(MavenPublication) {
-            artifact jar
-            artifact javadocJar
-            artifact sourcesJar
+            from components.java
             artifact testJar
             artifact testSourcesJar
             pom {
