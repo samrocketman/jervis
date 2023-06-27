@@ -163,6 +163,7 @@ int getLockLimit(Map settings, String lockName) {
 int getLockIndex(Map settings, String lockName) {
     Integer lockIndex = -1
     String lockKey = "${lockName}_index"
+    lock('test') {
     def resolvedIndex = getUserBinding("jervis_${lockKey}".toString())
     if(!(resolvedIndex in Integer)) {
         lockIndex = 0
@@ -170,6 +171,7 @@ int getLockIndex(Map settings, String lockName) {
     else {
         lockIndex = resolvedIndex + 1
         setUserBinding("jervis_${lockKey}".toString(), lockIndex)
+    }
     }
     lockIndex
 }
