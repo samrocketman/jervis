@@ -29,7 +29,7 @@ def call(def global_scm, LifecycleGenerator generator, PipelineGenerator pipelin
         Map stashMap = pipeline_generator.getStashMap(matrix_axis)
         tasks[stageIdentifier] = {
             stage("Build axis ${stageIdentifier}") {
-                withLocks(obtain_lock: 'jervis', limit: 2) {
+                withLocks(obtain_lock: 'jervis', limit: 2, printLocks: true) {
                 jervisBuildNode(pipeline_generator, label) {
                     Boolean failed_stage = false
                     withEnvSecretWrapper(pipeline_generator, axisEnvList) {
