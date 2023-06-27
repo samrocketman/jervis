@@ -3,6 +3,13 @@
 This file contains all of the notable changes from Jervis releases.  For the
 full change log see the commit log.
 
+# jervis 2.1 - Jun 27th, 2023
+
+:boom: Publishing bugfix - the published pom.xml for v2.0 did not have any
+dependencies listed.  This patch-release fixes the published pom.
+
+See Jervis 2.0 release notes for breaking changes.
+
 # jervis 2.0 - Jun 27th, 2023
 
 This is a new major release.  From an end user perspective, all behavior for 1.x
