@@ -162,7 +162,7 @@ int getLockLimit(Map settings, String lockName) {
 @NonCPS
 int getLockIndex(Map settings, String lockName) {
     Integer lockIndex = -1
-    if(!(limit in settings.keySet())) {
+    if(!('limit' in settings.keySet())) {
         return lockIndex
     }
     String lockKey = "${lockName}_index"
