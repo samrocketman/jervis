@@ -70,25 +70,23 @@ def processDefaultPublishable(def item, String publishable) {
 def call(LifecycleGenerator generator, PipelineGenerator pipeline_generator) {
     List publishableItems = pipeline_generator.publishableItems
     if(publishableItems) {
-        stage("Publish results") {
-            //unstash and publish in parallel
-            Map tasks = [failFast: true]
-            for(String publishable : publishableItems) {
-                // This "publish" variable is required because of how CPS
-                // strangely behaves with tasks and looping.  Without it,
-                // pipeline makes publishable null in tasks oddly.
-                String publish = publishable
-                tasks["${publish}"] = {
-                    try {
-                        unstash publish
-                        processDefaultPublishable(pipeline_generator.getPublishable(publish), publish)
-                    }
-                    catch(e) {
-                        currentBuild.result = 'FAILURE'
-                    }
+        //unstash and publish in parallel
+        Map tasks = [failFast: true]
+        for(String publishable : publishableItems) {
+            // This "publish" variable is required because of how CPS
+            // strangely behaves with tasks and looping.  Without it,
+            // pipeline makes publishable null in tasks oddly.
+            String publish = publishable
+            tasks["${publish}"] = {
+                try {
+                    unstash publish
+                    processDefaultPublishable(pipeline_generator.getPublishable(publish), publish)
+                }
+                catch(e) {
+                    currentBuild.result = 'FAILURE'
                 }
             }
-            parallel(tasks)
         }
+        parallel(tasks)
     }
 }

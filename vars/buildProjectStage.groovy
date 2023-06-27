@@ -23,29 +23,26 @@ import net.gleske.jervis.lang.PipelineGenerator
 
 def call(def global_scm, LifecycleGenerator generator, PipelineGenerator pipeline_generator, String script_header, String script_footer) {
     Map stashMap = pipeline_generator.stashMap
-    stage("Build Project") {
-        checkout global_scm
-        withEnvSecretWrapper(pipeline_generator) {
-            Exception ex
-            String environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
-            echo "ENVIRONMENT:\n    ${environment_string}"
-            try {
-                sh(script: [
-                    script_header,
-                    generator.generateAll(),
-                    script_footer
-                ].join('\n').toString())
-            }
-            catch(e) {
-                ex = e
-            }
-            for(String name : stashMap.keySet()) {
-                stash allowEmpty: stashMap[name]['allow_empty'], includes: stashMap[name]['includes'], name: name, useDefaultExcludes: stashMap[name]['use_default_excludes']
-            }
-            if(ex) {
-                echo 'Build failed.'
-                throw ex
-            }
+    withEnvSecretWrapper(pipeline_generator) {
+        Exception ex
+        String environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
+        echo "ENVIRONMENT:\n    ${environment_string}"
+        try {
+            sh(script: [
+                script_header,
+                generator.generateAll(),
+                script_footer
+            ].join('\n').toString())
+        }
+        catch(e) {
+            ex = e
+        }
+        for(String name : stashMap.keySet()) {
+            stash allowEmpty: stashMap[name]['allow_empty'], includes: stashMap[name]['includes'], name: name, useDefaultExcludes: stashMap[name]['use_default_excludes']
+        }
+        if(ex) {
+            echo 'Build failed.'
+            throw ex
         }
     }
 }

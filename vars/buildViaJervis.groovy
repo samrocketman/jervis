@@ -71,20 +71,23 @@ def call() {
         matrixBuildProjectStage(global_scm, generator, pipeline_generator, script_header, script_footer)
     }
 
+    String stage_name = generator.isMatrixBuild() ? 'Publish results' : 'Build Project'
 
-    jervisBuildNode(pipeline_generator, generator.labels) {
-        if(!generator.isMatrixBuild()) {
-            try {
-                buildProjectStage(global_scm, generator, pipeline_generator, script_header, script_footer)
+    stage(stage_name) {
+        jervisBuildNode(pipeline_generator, generator.labels) {
+            if(!generator.isMatrixBuild()) {
+                try {
+                    buildProjectStage(global_scm, generator, pipeline_generator, script_header, script_footer)
+                }
+                catch(e) {
+                    currentBuild.result = 'FAILURE'
+                }
             }
-            catch(e) {
-                currentBuild.result = 'FAILURE'
-            }
-        }
-        publishResultsStage(generator, pipeline_generator)
+            publishResultsStage(generator, pipeline_generator)
 
-        if(currentBuild.result == 'FAILURE') {
-            error 'This build has failed.  No user-defined pipelines will be run.'
+            if(currentBuild.result == 'FAILURE') {
+                error 'This build has failed.  No user-defined pipelines will be run.'
+            }
         }
     }
     setUserBinding('jervis_global_pipeline_generator', pipeline_generator)

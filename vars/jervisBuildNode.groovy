@@ -27,6 +27,7 @@ def call(PipelineGenerator pipeline_generator, String label, Closure body) {
     }
     else {
         node(label) {
+            checkout scm
             body()
         }
     }
