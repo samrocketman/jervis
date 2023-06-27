@@ -25,7 +25,7 @@ void initializeGenerator(PipelineGenerator pipeline_generator) {
     // what collections are supported?
     pipeline_generator.supported_collections = [
         'artifacts',
-        //'cobertura',
+        'cobertura',
         'html',
         'junit'
     ]
@@ -43,7 +43,6 @@ void initializeGenerator(PipelineGenerator pipeline_generator) {
             excludes: '',
             skip_on_pr: true
         ],
-        /*
         cobertura: [
             autoUpdateHealth: false,
             autoUpdateStability: false,
@@ -58,7 +57,6 @@ void initializeGenerator(PipelineGenerator pipeline_generator) {
             lineCoverageTargets: '80, 0, 0',
             conditionalCoverageTargets: '70, 0, 0'
         ],
-        */
         html: [
             allowMissing: false,
             alwaysLinkToLastBuild: false,
@@ -94,12 +92,11 @@ void initializeGenerator(PipelineGenerator pipeline_generator) {
     //   attempt to collect.
     String cobertura_targets_regex = '([0-9]*\\.?[0-9]*,? *){3}[^,]$'
     pipeline_generator.collect_settings_validation = [
-        /*
         cobertura: [
             methodCoverageTargets: cobertura_targets_regex,
             lineCoverageTargets: cobertura_targets_regex,
             conditionalCoverageTargets: cobertura_targets_regex
-        ],*/
+        ],
         html: [
             path: '''^[^,\\:*?"'<>|]+$'''
         ]

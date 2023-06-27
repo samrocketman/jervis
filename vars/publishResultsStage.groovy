@@ -33,7 +33,6 @@ def processDefaultPublishable(def item, String publishable) {
                              defaultExcludes: item['defaultExcludes'],
                              caseSensitive: item['caseSensitive']
             break
-        /*
         case 'cobertura':
             cobertura coberturaReportFile: item['path'],
                       autoUpdateHealth: item['autoUpdateHealth'],
@@ -49,7 +48,6 @@ def processDefaultPublishable(def item, String publishable) {
                       lineCoverageTargets: item['lineCoverageTargets'],
                       conditionalCoverageTargets: item['conditionalCoverageTargets']
             break
-        */
         case 'html':
             publishHTML allowMissing: item['allowMissing'],
                         alwaysLinkToLastBuild: item['alwaysLinkToLastBuild'],

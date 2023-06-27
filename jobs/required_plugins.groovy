@@ -33,7 +33,7 @@ void detect(Set required_plugins) {
 Set required_plugins = [
     'bouncycastle-api',
     'cloudbees-folder',
-    //'cobertura',
+    'cobertura',
     'credentials',
     'git',
     'github',
