@@ -211,7 +211,7 @@ publishing {
                 licenses {
                     license {
                         name = 'Apache License, Version 2.0'
-                        url  = 'https://raw.githubusercontent.com/samrocketman/jervis/master/LICENSE'
+                        url  = 'https://raw.githubusercontent.com/samrocketman/jervis/main/LICENSE'
                     }
                 }
 
