@@ -86,11 +86,18 @@ The following classes have been renamed.
 
 The following methods and fields have been renamed or removed.
 
-| Class        | Old method name       | New method name    |
-| ------------ | --------------------- | ------------------ |
-| `SecurityIO` | `getId_rsa_keysize()` | `getRsa_keysize()` |
-| `SecurityIO` | `setId_rsa_keysize()` | Removed            |
-| `SecurityIO` | `id_rsa_keysize`      | Removed            |
+| Class                | Old method name       | New method name    |
+| -------------------- | --------------------- | ------------------ |
+| `LifecycleValidator` | `load_JSON()`         | `loadYamlFile()`   |
+| `LifecycleValidator` | `load_JSONString()`   | `loadYamlString()` |
+| `PlatformValidator`  | `load_JSON()`         | `loadYamlFile()`   |
+| `PlatformValidator`  | `load_JSONString()`   | `loadYamlString()` |
+| `SecurityIO`         | `getId_rsa_keysize()` | `getRsa_keysize()` |
+| `SecurityIO`         | `setId_rsa_keysize()` | Removed            |
+| `SecurityIO`         | `id_rsa_keysize`      | Removed            |
+| `ToolchainValidator` | `load_JSON()`         | `loadYamlFile()`   |
+| `ToolchainValidator` | `load_JSONString()`   | `loadYamlString()` |
+
 
 The following methods have moved.
 

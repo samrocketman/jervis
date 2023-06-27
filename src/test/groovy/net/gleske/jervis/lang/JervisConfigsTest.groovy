@@ -35,7 +35,7 @@ class JervisConfigsTest extends GroovyTestCase {
       */
     private void validatePlatformsString(String yaml) {
         def platform_obj = new PlatformValidator()
-        platform_obj.load_JSONString(yaml)
+        platform_obj.loadYamlString(yaml)
         platform_obj.validate()
     }
 

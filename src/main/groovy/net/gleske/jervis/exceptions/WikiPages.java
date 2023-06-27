@@ -59,7 +59,7 @@ WikiPages.metaClass.static.getLifecyclesSpec = {->'https://wiki.example.com/life
 import net.gleske.jervis.lang.LifecycleValidator
 
 def x = new LifecycleValidator()
-x.load_JSONString("""
+x.loadYamlString("""
 {
     "ruby": {
         "defaultKey": "rake1",

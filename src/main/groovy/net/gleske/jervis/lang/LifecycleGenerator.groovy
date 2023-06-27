@@ -310,7 +310,7 @@ class LifecycleGenerator implements Serializable {
      */
     public void loadLifecycles(String file) {
         this.lifecycle_obj = new LifecycleValidator()
-        this.lifecycle_obj.load_JSON(file)
+        this.lifecycle_obj.loadYamlFile(file)
         this.lifecycle_obj.validate()
     }
 
@@ -324,7 +324,7 @@ class LifecycleGenerator implements Serializable {
      */
     public void loadLifecyclesString(String yaml) {
         this.lifecycle_obj = new LifecycleValidator()
-        this.lifecycle_obj.load_JSONString(yaml)
+        this.lifecycle_obj.loadYamlString(yaml)
         this.lifecycle_obj.validate()
     }
 
@@ -339,7 +339,7 @@ class LifecycleGenerator implements Serializable {
      */
     public void loadToolchains(String file) {
         this.toolchain_obj = new ToolchainValidator()
-        this.toolchain_obj.load_JSON(file)
+        this.toolchain_obj.loadYamlFile(file)
         this.toolchain_obj.validate()
     }
 
@@ -354,7 +354,7 @@ class LifecycleGenerator implements Serializable {
      */
     public void loadToolchainsString(String yaml) {
         this.toolchain_obj = new ToolchainValidator()
-        this.toolchain_obj.load_JSONString(yaml)
+        this.toolchain_obj.loadYamlString(yaml)
         this.toolchain_obj.validate()
     }
 
@@ -960,7 +960,7 @@ env:
      */
     public void loadPlatforms(String file) {
         this.platform_obj = new PlatformValidator()
-        this.platform_obj.load_JSON(file)
+        this.platform_obj.loadYamlFile(file)
         this.platform_obj.validate()
     }
 
@@ -977,7 +977,7 @@ env:
      */
     public void loadPlatformsString(String json) {
         this.platform_obj = new PlatformValidator()
-        this.platform_obj.load_JSONString(json)
+        this.platform_obj.loadYamlString(json)
         this.platform_obj.validate()
     }
 

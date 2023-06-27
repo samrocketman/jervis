@@ -36,11 +36,11 @@ class LifecycleValidatorTest extends GroovyTestCase {
         lifecycles = null
         super.tearDown()
     }
-    @Test public void test_LifecycleValidator_load_JSON() {
+    @Test public void test_LifecycleValidator_loadYamlFile() {
         assert lifecycles.lifecycles == null
         assert lifecycles.languages == null
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
-        lifecycles.load_JSON(url.getFile())
+        lifecycles.loadYamlFile(url.getFile())
         assert lifecycles.lifecycles instanceof Map
         assert lifecycles.languages instanceof String[]
         assert lifecycles.lifecycles['groovy']['friendlyName'] == 'Groovy'
@@ -48,13 +48,13 @@ class LifecycleValidatorTest extends GroovyTestCase {
         assert 'ruby' in lifecycles.languages
         assert 'java' in lifecycles.languages
     }
-    @Test public void test_LifecycleValidator_load_JSONString() {
+    @Test public void test_LifecycleValidator_loadYamlString() {
         assert lifecycles.lifecycles == null
         assert lifecycles.languages == null
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
         String contents = new File(url.getFile()).getText()
         //use a string this time
-        lifecycles.load_JSONString(contents)
+        lifecycles.loadYamlString(contents)
         assert lifecycles.lifecycles instanceof Map
         assert lifecycles.languages instanceof String[]
         assert lifecycles.lifecycles['groovy']['friendlyName'] == 'Groovy'
@@ -65,18 +65,18 @@ class LifecycleValidatorTest extends GroovyTestCase {
     //test supportedLanguage()
     @Test public void test_LifecycleValidator_supportedLanguage_yes() {
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
-        lifecycles.load_JSON(url.getFile())
+        lifecycles.loadYamlFile(url.getFile())
         assert true == lifecycles.supportedLanguage('groovy')
     }
     @Test public void test_LifecycleValidator_supportedLanguage_no() {
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
-        lifecycles.load_JSON(url.getFile())
+        lifecycles.loadYamlFile(url.getFile())
         assert false == lifecycles.supportedLanguage('derpy')
     }
     //test against invalid lifecycle files
     @Test public void test_LifecycleValidator_bad_lifecycles_missing_defaultKey() {
         URL url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
-        lifecycles.load_JSON(url.getFile())
+        lifecycles.loadYamlFile(url.getFile())
         shouldFail(LifecycleMissingKeyException) {
             lifecycles.validate()
         }
@@ -84,7 +84,7 @@ class LifecycleValidatorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleValidator_bad_lifecycles_missing_fileExistsCondition() {
         URL url = this.getClass().getResource('/bad_lifecycles_missing_fileExistsCondition.json');
-        lifecycles.load_JSON(url.getFile())
+        lifecycles.loadYamlFile(url.getFile())
         shouldFail(LifecycleMissingKeyException) {
             lifecycles.validate()
         }
@@ -92,7 +92,7 @@ class LifecycleValidatorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleValidator_bad_lifecycles_missing_friendlyName() {
         URL url = this.getClass().getResource('/bad_lifecycles_missing_friendlyName.json');
-        lifecycles.load_JSON(url.getFile())
+        lifecycles.loadYamlFile(url.getFile())
         shouldFail(LifecycleMissingKeyException) {
             lifecycles.validate()
         }
@@ -100,7 +100,7 @@ class LifecycleValidatorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleValidator_bad_lifecycles_resolve_defaultKey() {
         URL url = this.getClass().getResource('/bad_lifecycles_resolve_defaultKey.json');
-        lifecycles.load_JSON(url.getFile())
+        lifecycles.loadYamlFile(url.getFile())
         shouldFail(LifecycleMissingKeyException) {
             lifecycles.validate()
         }
@@ -108,7 +108,7 @@ class LifecycleValidatorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleValidator_bad_lifecycles_resolve_fallbackKey() {
         URL url = this.getClass().getResource('/bad_lifecycles_resolve_fallbackKey.json');
-        lifecycles.load_JSON(url.getFile())
+        lifecycles.loadYamlFile(url.getFile())
         shouldFail(LifecycleMissingKeyException) {
             lifecycles.validate()
         }
@@ -116,7 +116,7 @@ class LifecycleValidatorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleValidator_bad_lifecycles_resolve_infinite_loop() {
         URL url = this.getClass().getResource('/bad_lifecycles_resolve_infinite_loop.json');
-        lifecycles.load_JSON(url.getFile())
+        lifecycles.loadYamlFile(url.getFile())
         shouldFail(LifecycleInfiniteLoopException) {
             lifecycles.validate()
         }
@@ -124,17 +124,17 @@ class LifecycleValidatorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleValidator_good_lifecycles_simple() {
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
-        lifecycles.load_JSON(url.getFile())
+        lifecycles.loadYamlFile(url.getFile())
         assert true == lifecycles.validate()
         assert true == lifecycles.validate_asBool()
     }
     @Test public void test_LifecycleValidator_serialization() {
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
-        lifecycles.load_JSON(url.getFile())
+        lifecycles.loadYamlFile(url.getFile())
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(lifecycles)
     }
-    @Test public void test_LifecycleValidator_load_JSONString_invalid_language_lifecycle() {
-        lifecycles.load_JSONString('hello: world')
+    @Test public void test_LifecycleValidator_loadYamlString_invalid_language_lifecycle() {
+        lifecycles.loadYamlString('hello: world')
         shouldFail(LifecycleMissingKeyException) {
             lifecycles.validate()
         }

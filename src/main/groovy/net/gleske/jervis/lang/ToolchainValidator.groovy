@@ -38,7 +38,7 @@ import net.gleske.jervis.tools.YamlOperator
 import net.gleske.jervis.lang.ToolchainValidator
 
 def toolchains = new ToolchainValidator()
-toolchains.load_JSON('resources/toolchains-ubuntu1604-stable.json')
+toolchains.loadYamlFile('resources/toolchains-ubuntu1604-stable.json')
 println 'Does the file validate? ' + toolchains.validate()
 println 'Supported build matrices by language include:'
 toolchains.languages.each { language ->
@@ -80,8 +80,8 @@ class ToolchainValidator implements Serializable {
       <tt>{@link #languages}</tt>.
       @param file A <tt>String</tt> which is a path to a toolchains file.
      */
-    public void load_JSON(String file) {
-        load_JSONString(new File(file).text)
+    public void loadYamlFile(String file) {
+        loadYamlString(new File(file).text)
     }
 
     /**
@@ -93,7 +93,7 @@ class ToolchainValidator implements Serializable {
       DSL Plugin.
       @param json A <tt>String</tt> the contents of a toolchains file.
      */
-    public void load_JSONString(String json) {
+    public void loadYamlString(String json) {
         toolchains = YamlOperator.loadYamlFrom(json) ?: [:]
         toolchain_list = toolchains.keySet() as String[]
         matrix_toolchain_list = toolchain_list.findAll { String toolchain ->

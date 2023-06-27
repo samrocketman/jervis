@@ -38,7 +38,7 @@ import net.gleske.jervis.tools.YamlOperator
 import net.gleske.jervis.lang.PlatformValidator
 
 def platforms = new PlatformValidator()
-platforms.load_JSON('resources/platforms.json')
+platforms.loadYamlFile('resources/platforms.json')
 println 'Does the file validate? ' + platforms.validate()
 //List supported platforms and operating systems
 platforms.platforms['supported_platforms'].sort { k, v -> k }.each { platform, os ->
@@ -60,12 +60,12 @@ class PlatformValidator implements Serializable {
     /**
       Load the JSON of a platforms file and parse it.  This should be the first
       function called after class instantiation.  Alternately,
-      <tt>{@link #load_JSONString()}</tt> can be called instead.  It populates
+      <tt>{@link #loadYamlString()}</tt> can be called instead.  It populates
       <tt>{@link #platforms}</tt>.
       @param file A <tt>String</tt> which is a path to a platforms file.
      */
-    public void load_JSON(String file) {
-        load_JSONString(new File(file).text)
+    public void loadYamlFile(String file) {
+        loadYamlString(new File(file).text)
     }
 
     /**
@@ -75,7 +75,7 @@ class PlatformValidator implements Serializable {
       method from the Jenkins Job DSL Plugin.
       @param json A <tt>String</tt> containing the contents of a platforms file.
      */
-    public void load_JSONString(String json) {
+    public void loadYamlString(String json) {
         platforms = YamlOperator.loadYamlFrom(json) ?: [:]
     }
 
