@@ -110,34 +110,39 @@ class LifecycleValidator implements Serializable {
       @return <tt>true</tt> if the lifecycles file validates.  If the lifecycles file fails validation then it will throw a <tt>{@link net.gleske.jervis.exceptions.LifecycleValidationException}</tt>.
      */
     public Boolean validate() throws LifecycleMissingKeyException, LifecycleBadValueInKeyException, LifecycleInfiniteLoopException {
-        lifecycles.keySet().each {
-            def tools = lifecycles[it].keySet() as String[]
-            if(!('defaultKey' in tools)) {
-                throw new LifecycleMissingKeyException([it,'defaultKey'].join('.'))
+        lifecycles.each { language, lifecycleMap ->
+            if(!(lifecycleMap in Map)) {
+                throw new LifecycleMissingKeyException([language, 'must contain a Map but found:', lifecycleMap.getClass()].join(' '))
             }
-            if(!('friendlyName' in tools)) {
-                throw new LifecycleMissingKeyException([it,'friendlyName'].join('.'))
+            if(!(lifecycleMap.defaultKey in String)) {
+                throw new LifecycleMissingKeyException([language,'defaultKey'].join('.'))
             }
-            if(!(lifecycles[it]['defaultKey'] in tools)) {
-                throw new LifecycleMissingKeyException([it,'defaultKey',lifecycles[it]['defaultKey']].join('.'))
+            if(!(lifecycleMap.friendlyName in String)) {
+                throw new LifecycleMissingKeyException([language, 'friendlyName'].join('.'))
             }
-            def current_key = lifecycles[it]['defaultKey']
-            def count=0
-            while(current_key != null) {
-                def cycles = lifecycles[it][current_key].keySet() as String[]
-                if('fallbackKey' in cycles) {
-                    if(!(lifecycles[it][current_key]['fallbackKey'] in tools)) {
-                        throw new LifecycleMissingKeyException([it,current_key,'fallbackKey',lifecycles[it][current_key]['fallbackKey']].join('.'))
+            String current_key = lifecycleMap.defaultKey
+            if(!(current_key in lifecycleMap.keySet())) {
+                throw new LifecycleMissingKeyException([language, 'defaultKey', current_key].join('.'))
+            }
+            Integer count = 0
+            while(current_key) {
+                Map cycles = YamlOperator.getObjectValue(lifecycles, "\"${language}\".\"${current_key}\"", [:])
+                if(!cycles) {
+                    break
+                }
+                if(cycles.fallbackKey) {
+                    if(!(cycles.fallbackKey in lifecycleMap.keySet())) {
+                        throw new LifecycleMissingKeyException([language, current_key, 'fallbackKey', cycles.fallbackKey].join('.'))
                     }
-                    if(!('fileExistsCondition' in cycles)) {
-                        throw new LifecycleMissingKeyException([it,current_key,'fileExistsCondition'].join('.') + ' required by ' + [it,current_key,'fallbackKey'].join('.'))
+                    if(!cycles.fileExistsCondition) {
+                        throw new LifecycleMissingKeyException([language, current_key, 'fileExistsCondition'].join('.') + ' required by ' + [language, current_key, 'fallbackKey'].join('.'))
                     }
                 }
                 count++
                 if(count > 1000) {
-                    throw new LifecycleInfiniteLoopException([it,current_key].join('.'))
+                    throw new LifecycleInfiniteLoopException([language, current_key].join('.'))
                 }
-                current_key = lifecycles[it][current_key]['fallbackKey']
+                current_key = cycles.fallbackKey
             }
         }
         return true

@@ -101,7 +101,7 @@ class JervisConfigsTest extends GroovyTestCase {
                 generator.loadLifecyclesString(url.content.text)
                 url = this.getClass().getResource("/toolchains-${os}-stable.yaml");
                 generator.loadToolchainsString(url.content.text)
-                validateLifecycleGeneratorBashSyntax(generator)
+                validateLifecycleGeneratorBashSyntax(os, generator)
             }
         }
     }

@@ -1,5 +1,6 @@
 toolchains:
   java: [ env, jdk ]
+  groovy: [ env, jdk ]
   python: [ env, python ]
   shell: [ env ]
 agent_custom_setup:
@@ -85,7 +86,7 @@ jdk:
     java -Xmx32m -version
     javac -J-Xmx32m -version
 python:
-  default_ivalue: '2.7'
+  default_ivalue: '3.10'
   friendlyLabel: true
   '3.10': |-
     set +x
