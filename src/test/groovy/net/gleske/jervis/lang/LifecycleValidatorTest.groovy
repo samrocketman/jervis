@@ -133,4 +133,11 @@ class LifecycleValidatorTest extends GroovyTestCase {
         lifecycles.load_JSON(url.getFile())
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(lifecycles)
     }
+    @Test public void test_LifecycleValidator_load_JSONString_invalid_language_lifecycle() {
+        lifecycles.load_JSONString('hello: world')
+        shouldFail(LifecycleMissingKeyException) {
+            lifecycles.validate()
+        }
+        assert false == lifecycles.validate_asBool()
+    }
 }
