@@ -94,7 +94,7 @@ class JervisConfigsTest extends GroovyTestCase {
      */
     @Test public void test_JervisConfigsTest_toolchains_ubuntu1604_stable_bash_syntax_check() {
         URL url = this.getClass().getResource('/platforms.yaml');
-        YamlOperator.loadYamlFrom(url.content.text).supprted_platforms.each { platform, oses ->
+        YamlOperator.loadYamlFrom(url.content.text).supported_platforms.each { platform, oses ->
             oses.collect { os, languages ->
                 def generator = new LifecycleGenerator()
                 url = this.getClass().getResource("/lifecycles-${os}-stable.yaml");

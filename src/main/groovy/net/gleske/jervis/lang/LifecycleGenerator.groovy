@@ -322,9 +322,9 @@ class LifecycleGenerator implements Serializable {
 
       @param json A <tt>String</tt> containing JSON which is from a lifecycles file.
      */
-    public void loadLifecyclesString(String json) {
+    public void loadLifecyclesString(String yaml) {
         this.lifecycle_obj = new LifecycleValidator()
-        this.lifecycle_obj.load_JSONString(json)
+        this.lifecycle_obj.load_JSONString(yaml)
         this.lifecycle_obj.validate()
     }
 
@@ -352,9 +352,9 @@ class LifecycleGenerator implements Serializable {
 
       @param json A <tt>String</tt> containing JSON which is from a toolchains file.
      */
-    public void loadToolchainsString(String json) {
+    public void loadToolchainsString(String yaml) {
         this.toolchain_obj = new ToolchainValidator()
-        this.toolchain_obj.load_JSONString(json)
+        this.toolchain_obj.load_JSONString(yaml)
         this.toolchain_obj.validate()
     }
 
