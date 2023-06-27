@@ -28,11 +28,8 @@ def call(def global_scm, LifecycleGenerator generator, PipelineGenerator pipelin
         List axisEnvList = matrix_axis.collect { k, v -> "${k}=${v}" }
         Map stashMap = pipeline_generator.getStashMap(matrix_axis)
         tasks[stageIdentifier] = {
-            jervisBuildNode(pipeline_generator, label) {
-                stage("Checkout SCM") {
-                    checkout global_scm
-                }
-                stage("Build axis ${stageIdentifier}") {
+            stage("Build axis ${stageIdentifier}") {
+                jervisBuildNode(pipeline_generator, label) {
                     Boolean failed_stage = false
                     withEnvSecretWrapper(pipeline_generator, axisEnvList) {
                         String environment_string = sh(script: 'env | LC_ALL=C sort', returnStdout: true).split('\n').join('\n    ')
