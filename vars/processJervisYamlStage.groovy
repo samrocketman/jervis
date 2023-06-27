@@ -17,6 +17,7 @@
   This will process Jervis YAML in a Jenkins pipeline stage.
  */
 
+import static net.gleske.jervis.tools.YamlOperator.getObjectValue
 import net.gleske.jervis.lang.LifecycleGenerator
 import net.gleske.jervis.lang.PipelineGenerator
 
@@ -39,7 +40,7 @@ def call(LifecycleGenerator generator, Closure body) {
         def pipeline_generator = new PipelineGenerator(generator)
         prepareJervisPipelineGenerator(pipeline_generator)
         //attempt to get the private key else return an empty string
-        String credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
+        String credentials_id = getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
         if(credentials_id) {
             echo "DECRYPTED PROPERTIES\n${printDecryptedProperties(generator, credentials_id)}"
         }

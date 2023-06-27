@@ -31,6 +31,7 @@ s/lifecycleGenerator/LifecycleGenerator/g
 s/platformValidator/PlatformValidator/g
 s/securityIO/SecurityIO/g
 s/net\.gleske\.jervis\.lang\.[Ll]ifecycleGenerator\([ .]getObjectValue\)/net.gleske.jervis.tools.YamlOperator\1/g
+s/generator\.getObjectValue/net.gleske.jervis.tools.YamlOperator.getObjectValue/g
 ```
 
 Usage of the sedfile is the following.

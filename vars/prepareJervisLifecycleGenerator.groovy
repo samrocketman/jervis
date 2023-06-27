@@ -17,6 +17,7 @@
 // static imports always first according to CodeNarc
 import static jenkins.bouncycastle.api.PEMEncodable.decode
 
+import static net.gleske.jervis.tools.YamlOperator.getObjectValue
 import net.gleske.jervis.exceptions.SecurityException
 import net.gleske.jervis.lang.LifecycleGenerator
 import net.gleske.jervis.remotes.GitHub
@@ -112,7 +113,7 @@ void finalizeGenerator(LifecycleGenerator generator, String lifecycles_json, Str
     generator.loadToolchainsString(toolchains_json)
     generator.loadYamlString(jervis_yaml)
     generator.folder_listing = folder_listing
-    String secrets_credentials_id = generator.getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
+    String secrets_credentials_id = getObjectValue(generator.jervis_yaml, 'jenkins.secrets_id', '')
     String private_key_contents = getFolderRSAKeyCredentials(jenkins_folder, secrets_credentials_id)
     if(secrets_credentials_id && !private_key_contents) {
         throw new SecurityException("Could not find private key using Jenkins Credentials ID: ${secrets_credentials_id}")

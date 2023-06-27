@@ -31,7 +31,7 @@ import net.gleske.scmfilter.credential.GraphQLTokenCredential
 
   Sample usage:
       getJervisPipelineGenerators(owner: 'samrocketman', repos: ['repo1', 'repo2'])
-    
+
     TODO: continue migration to support multiple branches and multiple YAML
           files in those branches.
   */
