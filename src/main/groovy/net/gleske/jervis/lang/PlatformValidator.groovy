@@ -38,12 +38,12 @@ import net.gleske.jervis.tools.YamlOperator
 import net.gleske.jervis.lang.PlatformValidator
 
 def platforms = new PlatformValidator()
-platforms.loadYamlFile('resources/platforms.json')
+platforms.loadYamlFile('resources/platforms.yaml')
 println 'Does the file validate? ' + platforms.validate()
 //List supported platforms and operating systems
-platforms.platforms['supported_platforms'].sort { k, v -> k }.each { platform, os ->
+platforms.platforms['supported_platforms'].sort { k, v -&gt; k }.each { platform, os -&gt;
     println "Platform '${platform}' includes operating systems:"
-    os.sort { k, v -> k }.each { o, s ->
+    os.sort { k, v -&gt; k }.each { o, s -&gt;
         println "    ${o} (Supported languages: ${s['language'].sort().join(', ')})"
     }
 }
@@ -58,7 +58,7 @@ class PlatformValidator implements Serializable {
     Map platforms
 
     /**
-      Load the JSON of a platforms file and parse it.  This should be the first
+      Load the YAML of a platforms file and parse it.  This should be the first
       function called after class instantiation.  Alternately,
       <tt>{@link #loadYamlString()}</tt> can be called instead.  It populates
       <tt>{@link #platforms}</tt>.
@@ -69,14 +69,14 @@ class PlatformValidator implements Serializable {
     }
 
     /**
-      Parse the JSON which is the contents of a platforms file.  It populates
+      Parse the YAML which is the contents of a platforms file.  It populates
       <tt>{@link #platforms}</tt>.  This is required in order to use the
       <a href="https://github.com/samrocketman/jervis/issues/43#issuecomment-73638215" target="_blank"><tt>readFileFromWorkspace</tt></a>
       method from the Jenkins Job DSL Plugin.
-      @param json A <tt>String</tt> containing the contents of a platforms file.
+      @param yaml A <tt>String</tt> containing the contents of a platforms file.
      */
-    public void loadYamlString(String json) {
-        platforms = YamlOperator.loadYamlFrom(json) ?: [:]
+    public void loadYamlString(String yaml) {
+        platforms = YamlOperator.loadYamlFrom(yaml) ?: [:]
     }
 
     /**
@@ -103,7 +103,7 @@ class PlatformValidator implements Serializable {
                 throw new PlatformMissingKeyException("${it} - Must exist as a root key.")
             }
             if(!(platforms[it] instanceof Map)) {
-                throw new PlatformBadValueInKeyException("${it} - Must be a JSON Object.")
+                throw new PlatformBadValueInKeyException("${it} - Must be a YAML Object.")
             }
         }
         //validate defaults root key for keys, types, and  values
@@ -121,7 +121,7 @@ class PlatformValidator implements Serializable {
             throw new PlatformMissingKeyException(['supported_platforms', default_platform].join('.') + ' - Missing default platform.')
         }
         if(!(platforms['supported_platforms'][default_platform] instanceof Map)) {
-            throw new PlatformBadValueInKeyException("supported_platforms.${default_platform} - Must be a JSON Object.")
+            throw new PlatformBadValueInKeyException("supported_platforms.${default_platform} - Must be a YAML Object.")
         }
         if(!platforms['supported_platforms'][default_platform].containsKey(default_os)) {
             throw new PlatformMissingKeyException(['supported_platforms', default_platform, default_os].join('.') + ' - Missing default OS.')
@@ -136,22 +136,22 @@ class PlatformValidator implements Serializable {
         (platforms['supported_platforms'].keySet() as String[]).each {
             String platform = it
             if(!(platforms['supported_platforms'][platform] instanceof Map)) {
-                throw new PlatformBadValueInKeyException("supported_platforms.${platform} - Must be a JSON Object.")
+                throw new PlatformBadValueInKeyException("supported_platforms.${platform} - Must be a YAML Object.")
             }
             if((platforms['supported_platforms'][platform].keySet() as String[]).size() <= 0) {
-                throw new PlatformBadValueInKeyException("supported_platforms.${platform} - JSON Object must not be empty.")
+                throw new PlatformBadValueInKeyException("supported_platforms.${platform} - YAML Object must not be empty.")
             }
             (platforms['supported_platforms'][platform].keySet() as String[]).each {
                 String os = it
                 if(!(platforms['supported_platforms'][platform][os] instanceof Map)) {
-                    throw new PlatformBadValueInKeyException(['supported_platforms', platform, os].join('.') + ' - Must be a JSON Object.')
+                    throw new PlatformBadValueInKeyException(['supported_platforms', platform, os].join('.') + ' - Must be a YAML Object.')
                 }
                 ['language', 'toolchain'].each {
                     if(!platforms['supported_platforms'][platform][os].containsKey(it)) {
                         throw new PlatformMissingKeyException(['supported_platforms', platform, os, it].join('.'))
                     }
                     else if(!(platforms['supported_platforms'][platform][os][it] instanceof List)) {
-                        throw new PlatformBadValueInKeyException(['supported_platforms', platform, os, it].join('.') + ' - Must be a JSON Array.')
+                        throw new PlatformBadValueInKeyException(['supported_platforms', platform, os, it].join('.') + ' - Must be a YAML Array.')
                     }
                 }
             }
@@ -160,7 +160,7 @@ class PlatformValidator implements Serializable {
         (platforms['restrictions'].keySet() as String[]).each {
             String platform = it
             if(!(platforms['restrictions'][platform] instanceof Map)) {
-                throw new PlatformBadValueInKeyException(['restrictions', platform].join('.') + ' - Must be a JSON Object.')
+                throw new PlatformBadValueInKeyException(['restrictions', platform].join('.') + ' - Must be a YAML Object.')
             }
             if(!platforms['supported_platforms'].containsKey(platform)) {
                 throw new PlatformMissingKeyException(['supported_platforms', platform].join('.') + ' - Missing restricted platform.')
@@ -168,7 +168,7 @@ class PlatformValidator implements Serializable {
             ['only_organizations', 'only_projects'].each {
                 if(platforms['restrictions'][platform].containsKey(it)) {
                     if(!(platforms['restrictions'][platform][it] instanceof List)) {
-                        throw new PlatformBadValueInKeyException(['restrictions', platform, it].join('.') + ' - Must be a JSON Array.')
+                        throw new PlatformBadValueInKeyException(['restrictions', platform, it].join('.') + ' - Must be a YAML Array.')
                     }
                 }
             }

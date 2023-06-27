@@ -54,38 +54,33 @@ package net.gleske.jervis.exceptions;
 
 <pre><code class="language-groovy">
 import net.gleske.jervis.exceptions.WikiPages
-WikiPages.metaClass.static.getLifecyclesSpec = {->'https://wiki.example.com/lifecycle_explanation.html'}
+WikiPages.metaClass.static.getLifecyclesSpec = {-&gt; 'https://wiki.example.com/lifecycle_explanation.html'}
 
 import net.gleske.jervis.lang.LifecycleValidator
 
-def x = new LifecycleValidator()
-x.loadYamlString("""
-{
-    "ruby": {
-        "defaultKey": "rake1",
-        "rake1": {
-            "fileExistsCondition": "Gemfile.lock",
-            "fallbackKey": "rake2",
-            "env": "export BUNDLE_GEMFILE=\$PWD/Gemfile",
-            "install": "bundle install --jobs=3 --retry=3 --deployment",
-            "script": "bundle exec rake"
-        },
-        "rake2": {
-            "env": "export BUNDLE_GEMFILE=\$PWD/Gemfile",
-            "install": "bundle install --jobs=3 --retry=3",
-            "script": "bundle exec rake"
-        }
-    }
-}
-""".toString())
-x.validate()
+LifecycleValidator lifecycles = new LifecycleValidator()
+lifecycles.loadYamlString('''
+ruby:
+  defaultKey: rake1
+  rake1:
+    fileExistsCondition: Gemfile.lock
+    fallbackKey: rake2
+    env: export BUNDLE_GEMFILE=$PWD/Gemfile
+    install: bundle install --jobs=3 --retry=3 --deployment
+    script: bundle exec rake
+  rake2:
+    env: export BUNDLE_GEMFILE=$PWD/Gemfile
+    install: bundle install --jobs=3 --retry=3
+    script: bundle exec rake
+''')
+lifecycles.validate()
 </code></pre>
 
   The important part of the above example is the following excerpt.
 
 <pre><code class="language-groovy">
 import net.gleske.jervis.exceptions.WikiPages
-WikiPages.metaClass.static.getLifecyclesSpec = {->'https://wiki.example.com/lifecycle_explanation.html'}
+WikiPages.metaClass.static.getLifecyclesSpec = {-&gt; 'https://wiki.example.com/lifecycle_explanation.html'}
 
 import net.gleske.jervis.lang.LifecycleValidator
 </code></pre>

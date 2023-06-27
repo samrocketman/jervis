@@ -61,12 +61,12 @@ jenkins:
 """
 
 def generator = new LifecycleGenerator()
-generator.loadPlatforms('resources/platforms.json')
+generator.loadPlatforms('resources/platforms.yaml')
 generator.preloadYamlString(yaml)
 //os_stability requires preloadYamlString() to be called
 def os_stability = "${generator.label_os}-${generator.label_stability}"
-generator.loadLifecycles("resources/lifecycles-${os_stability}.json")
-generator.loadToolchains("resources/toolchains-${os_stability}.json")
+generator.loadLifecycles("resources/lifecycles-${os_stability}.yaml")
+generator.loadToolchains("resources/toolchains-${os_stability}.yaml")
 generator.loadYamlString(yaml)
 generator.folder_listing = ['Gemfile.lock']
 println 'Exclude filter is...'
@@ -304,7 +304,7 @@ class LifecycleGenerator implements Serializable {
       Load a lifecycles file so that default scripts can be generated.  Lifecycles
       provide the build portions of the script.  This project comes with a lifecycles
       file.  The lifecycles file in this repository relative to the repository root is
-      <tt>/src/main/resources/lifecycles.json</tt>.
+      <tt>/src/main/resources/lifecycles.yaml</tt>.
 
       @param file A path to a lifecycles file.
      */
@@ -315,12 +315,12 @@ class LifecycleGenerator implements Serializable {
     }
 
     /**
-      Load a lifecycles JSON <tt>String</tt> so that default scripts can be generated.
+      Load a lifecycles YAML <tt>String</tt> so that default scripts can be generated.
       Lifecycles provide the build portions of the script.  This project comes with a
       lifecycles file.  The lifecycles file in this repository relative to the
-      repository root is <tt>/src/main/resources/lifecycles.json</tt>.
+      repository root is <tt>/src/main/resources/lifecycles.yaml</tt>.
 
-      @param json A <tt>String</tt> containing JSON which is from a lifecycles file.
+      @param yaml A <tt>String</tt> containing YAML which is from a lifecycles file.
      */
     public void loadLifecyclesString(String yaml) {
         this.lifecycle_obj = new LifecycleValidator()
@@ -333,7 +333,7 @@ class LifecycleGenerator implements Serializable {
       provide the default tool setup of the script (e.g. what version of Java will be
       used).  This project comes with a toolchains file.  The toolchains file in this
       repository relative to the repository root is
-      <tt>/src/main/resources/toolchains.json</tt>.
+      <tt>/src/main/resources/toolchains.yaml</tt>.
 
       @param file A path to a toolchains file.
      */
@@ -344,13 +344,13 @@ class LifecycleGenerator implements Serializable {
     }
 
     /**
-      Load a toolchains JSON <tt>String</tt> so that default scripts can be generated.
+      Load a toolchains YAML <tt>String</tt> so that default scripts can be generated.
       Toolchains provide the default tool setup of the script (e.g. what version of
       Java will be used).  This project comes with a toolchains file.  The toolchains
       file in this repository relative to the repository root is
-      <tt>/src/main/resources/toolchains.json</tt>.
+      <tt>/src/main/resources/toolchains.yaml</tt>.
 
-      @param json A <tt>String</tt> containing JSON which is from a toolchains file.
+      @param yaml A <tt>String</tt> containing YAML which is from a toolchains file.
      */
     public void loadToolchainsString(String yaml) {
         this.toolchain_obj = new ToolchainValidator()
@@ -632,7 +632,7 @@ env:
 
     /**
       toolchainScript will always be a List or String.
-      @param script A List or String from a toolchains JSON or YAML file.
+      @param script A List or String from a toolchains YAML file.
       @return A List of Strings where the script is one line per item.
       */
     private List toolchainScript(def script) {
@@ -763,7 +763,7 @@ env:
                 }
             }
             else {
-                //falling back to default behavior in toolchains.json because user has not defined it in their YAML.
+                //falling back to default behavior in toolchains.yaml because user has not defined it in their YAML.
                 String default_ivalue = toolchain_obj.toolchains[toolchain].default_ivalue
                 if(default_ivalue) {
                     if(default_ivalue in toolchain_keys) {
@@ -954,7 +954,7 @@ env:
       access, and even operating system.  This could be used to load lifecycles and
       toolchains by platform and OS.  This project comes with a platforms file.  The
       platforms file in this repository relative to the repository root is
-      <tt>/src/main/resources/platforms.json</tt>.
+      <tt>/src/main/resources/platforms.yaml</tt>.
 
       @param file A path to a platforms file.
      */
@@ -965,19 +965,19 @@ env:
     }
 
     /**
-      Load a platforms JSON <tt>String</tt> so that advanced labels can be generated
+      Load a platforms YAML <tt>String</tt> so that advanced labels can be generated
       for multiple platforms.  A platform could be a local datacenter or a cloud
       providor.  The platforms file allows labels to be generated which include
       stability, sudo access, and even operating system.  This could be used to load
       lifecycles and toolchains by platform and OS.  This project comes with a
       platforms file.  The platforms file in this repository relative to the
-      repository root is <tt>/src/main/resources/platforms.json</tt>.
+      repository root is <tt>/src/main/resources/platforms.yaml</tt>.
 
-      @param json A <tt>String</tt> containing JSON which is from a platforms file.
+      @param yaml A <tt>String</tt> containing YAML which is from a platforms file.
      */
-    public void loadPlatformsString(String json) {
+    public void loadPlatformsString(String yaml) {
         this.platform_obj = new PlatformValidator()
-        this.platform_obj.loadYamlString(json)
+        this.platform_obj.loadYamlString(yaml)
         this.platform_obj.validate()
     }
 

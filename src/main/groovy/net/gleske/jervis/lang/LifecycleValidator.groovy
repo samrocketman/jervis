@@ -39,7 +39,7 @@ import net.gleske.jervis.tools.YamlOperator
 import net.gleske.jervis.lang.LifecycleValidator
 
 def lifecycles = new LifecycleValidator()
-lifecycles.loadYamlFile('resources/lifecycles-ubuntu1604-stable.json')
+lifecycles.loadYamlFile('resources/lifecycles-ubuntu2204-stable.yaml')
 println 'Does the file validate? ' + lifecycles.validate()
 print 'Supported languages include:\n    '
 println lifecycles.languages.collect {
@@ -60,7 +60,7 @@ class LifecycleValidator implements Serializable {
     String[] languages
 
     /**
-      Load the JSON of a lifecycles file and parse it.  This should be the first
+      Load the YAML of a lifecycles file and parse it.  This should be the first
       function called after class instantiation.  Alternately,
       <tt>{@link #loadYamlString()}</tt> can be called instead.  It populates
       <tt>{@link #lifecycles}</tt> and <tt>{@link #languages}</tt>.
@@ -71,15 +71,15 @@ class LifecycleValidator implements Serializable {
     }
 
     /**
-      Parse the JSON which is the contents of a lifecycles file.  It populates
+      Parse the YAML which is the contents of a lifecycles file.  It populates
       <tt>{@link #lifecycles}</tt> and <tt>{@link #languages}</tt>.  This is required
       in order to use the
       <a href="https://github.com/samrocketman/jervis/issues/43#issuecomment-73638215" target="_blank"><tt>readFileFromWorkspace</tt></a>
       method from the Jenkins Job DSL Plugin.
-      @param json A <tt>String</tt> containing the contents of a lifecycles file.
+      @param yaml A <tt>String</tt> containing the contents of a lifecycles file.
      */
-    public void loadYamlString(String json) {
-        lifecycles = YamlOperator.loadYamlFrom(json) ?: [:]
+    public void loadYamlString(String yaml) {
+        lifecycles = YamlOperator.loadYamlFrom(yaml) ?: [:]
         languages = lifecycles.keySet() as String[];
     }
 

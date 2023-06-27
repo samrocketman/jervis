@@ -33,8 +33,8 @@ import net.gleske.jervis.lang.LifecycleGenerator
 import net.gleske.jervis.lang.PipelineGenerator
 
 def generator = new LifecycleGenerator()
-generator.loadLifecyclesString(new File('resources/lifecycles-ubuntu1604-stable.json').text)
-generator.loadToolchainsString(new File('resources/toolchains-ubuntu1604-stable.json').text)
+generator.loadLifecyclesString(new File('resources/lifecycles-ubuntu2204-stable.yaml').text)
+generator.loadToolchainsString(new File('resources/toolchains-ubuntu2204-stable.yaml').text)
 
 generator.loadYamlString('''
 language: groovy
@@ -55,9 +55,9 @@ jenkins:
 '''.trim())
 def pipeline_generator = new PipelineGenerator(generator)
 pipeline_generator.supported_collections = ['artifacts']
-pipeline_generator.getBuildableMatrixAxes().each { axis ->
+pipeline_generator.getBuildableMatrixAxes().each { axis -&gt;
     if(pipeline_generator.getStashMap(axis)) {
-        println "stash ${axis}  --->  ${pipeline_generator.getStashMap(axis)}"
+        println "stash ${axis}  ---&gt;  ${pipeline_generator.getStashMap(axis)}"
     }
 }
 println "Buildable matrices: " + pipeline_generator.getBuildableMatrixAxes().size()
@@ -67,7 +67,7 @@ class PipelineGenerator implements Serializable {
 
     /**
       A lifecycle generator which has already been instantiated and processed
-      lifecycle, toolchains, and platforms JSON as well as Jervis YAML.
+      lifecycle, toolchains, and platforms YAML as well as Jervis YAML.
      */
     LifecycleGenerator generator
 
@@ -137,8 +137,8 @@ jenkins:
 '''.trim()
 
 def generator = new LifecycleGenerator()
-generator.loadLifecyclesString(new File('resources/lifecycles-ubuntu1604-stable.json').text)
-generator.loadToolchainsString(new File('resources/toolchains-ubuntu1604-stable.json').text)
+generator.loadLifecyclesString(new File('resources/lifecycles-ubuntu2204-stable.yaml').text)
+generator.loadToolchainsString(new File('resources/toolchains-ubuntu2204-stable.yaml').text)
 
 generator.loadYamlString(yaml)
 def pipeline_generator = new PipelineGenerator(generator)

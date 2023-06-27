@@ -38,12 +38,12 @@ import net.gleske.jervis.tools.YamlOperator
 import net.gleske.jervis.lang.ToolchainValidator
 
 def toolchains = new ToolchainValidator()
-toolchains.loadYamlFile('resources/toolchains-ubuntu1604-stable.json')
+toolchains.loadYamlFile('resources/toolchains-ubuntu2204-stable.yaml')
 println 'Does the file validate? ' + toolchains.validate()
 println 'Supported build matrices by language include:'
-toolchains.languages.each { language ->
+toolchains.languages.each { language -&gt;
     print "    ${language}:\n        "
-    println toolchains.toolchain_list.findAll { tool ->
+    println toolchains.toolchain_list.findAll { tool -&gt;
         (tool == 'toolchains')? false : toolchains.supportedMatrix(language, tool)
     }.join('\n        ')
 }
@@ -74,7 +74,7 @@ class ToolchainValidator implements Serializable {
     String[] languages
 
     /**
-      Load the JSON of a toolchains file and parse it.  This should be the first
+      Load the YAML of a toolchains file and parse it.  This should be the first
       function called after class instantiation.  It populates
       <tt>{@link #toolchains}</tt>, <tt>{@link #toolchain_list}</tt>, and
       <tt>{@link #languages}</tt>.
@@ -85,16 +85,16 @@ class ToolchainValidator implements Serializable {
     }
 
     /**
-      Parse the JSON which is the contents of a toolchains file.  It populates
+      Parse the YAML which is the contents of a toolchains file.  It populates
       <tt>{@link #toolchains}</tt>, <tt>{@link #toolchain_list}</tt>, and
       <tt>{@link #languages}</tt>.  This is required in order to use the
       <a href="https://github.com/samrocketman/jervis/issues/43#issuecomment-73638215" target="_blank"><tt>readFileFromWorkspace</tt></a>
       method from the Jenkins Job.
       DSL Plugin.
-      @param json A <tt>String</tt> the contents of a toolchains file.
+      @param yaml A <tt>String</tt> the contents of a toolchains file.
      */
-    public void loadYamlString(String json) {
-        toolchains = YamlOperator.loadYamlFrom(json) ?: [:]
+    public void loadYamlString(String yaml) {
+        toolchains = YamlOperator.loadYamlFrom(yaml) ?: [:]
         toolchain_list = toolchains.keySet() as String[]
         matrix_toolchain_list = toolchain_list.findAll { String toolchain ->
             toolchainType(toolchain) != 'disabled'
@@ -191,7 +191,7 @@ class ToolchainValidator implements Serializable {
         if(!this.supportedToolchain('toolchains')) {
             throw new ToolchainMissingKeyException('toolchains')
         }
-        //check for "advanced" env missing the matrix key in toolchains.json; now a requirement
+        //check for "advanced" env missing the matrix key in toolchains.yaml; now a requirement
         if(('env' in toolchains) && !('matrix' in toolchains['env'])) {
             throw new ToolchainMissingKeyException('env.matrix; env must be updated to include a "matrix: advanced" key.')
         }
