@@ -10,6 +10,16 @@ dependencies listed.  This patch-release fixes the published pom.
 
 See Jervis 2.0 release notes for breaking changes.
 
+Jervis API changes (breaking)
+
+- `LifecycleGenerator.loadPlatforms` is renamed to
+  `LifecycleGenerator.loadPlatformsFile`
+
+Pipeline changes:
+
+- `loadCustomResource` var no longer throws an exception.  If a file does not
+  exist it will return `null` instead of String contents.
+
 # jervis 2.0 - Jun 27th, 2023
 
 This is a new major release.  From an end user perspective, all behavior for 1.x
