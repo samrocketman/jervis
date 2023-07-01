@@ -124,17 +124,17 @@ class LifecycleGenerator implements Serializable {
     /**
       An instance of the <tt>{@link net.gleske.jervis.lang.LifecycleValidator}</tt> class which has loaded a lifecycles file.
      */
-    def lifecycle_obj
+    LifecycleValidator lifecycle_obj
 
     /**
       An instance of the <tt>{@link net.gleske.jervis.lang.ToolchainValidator}</tt> class which has loaded a toolchains file.
      */
-    def toolchain_obj
+    ToolchainValidator toolchain_obj
 
     /**
       An instance of the <tt>{@link net.gleske.jervis.lang.PlatformValidator}</tt> class which as loaded a platforms file.
      */
-    def platform_obj
+    PlatformValidator platform_obj
 
     /**
       This is a folder listing of the root of the repository so that scripts can be
