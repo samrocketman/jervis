@@ -98,7 +98,12 @@ import net.gleske.jervis.tools.FilterByContext
 @NonCPS
 def call(def filters) {
     Map context = getBuildContextMap()
-    FilterByContext shouldFilter = new FilterByContext(context, filters)
+    FilterByContext shouldFilter
+    if(!filters) {
+        shouldFilter = new FilterByContext(context)
+    } else {
+        shouldFilter = new FilterByContext(context, filters)
+    }
     Boolean result = shouldFilter.allowBuild
     if(result && [filters, context.metadata[filters]].every { it in String }) {
         return context.metadata[filters]
