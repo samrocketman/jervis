@@ -47,7 +47,10 @@ String call(String resource, Boolean skipAdmin = false) {
     else if(loadConfigFileResource(resource)) {
         loadConfigFileResource(resource)
     }
-    else {
+    else if(hasGlobalResource(resource)) {
         libraryResource(resource)
+    }
+    else {
+        null
     }
 }
