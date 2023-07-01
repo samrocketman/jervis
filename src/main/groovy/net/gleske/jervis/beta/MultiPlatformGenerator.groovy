@@ -10,11 +10,15 @@ class MultiPlatformGenerator {
     }
 
     MultiPlatformGenerator(MultiPlatformValidator platforms) {
+        this.platforms = platforms.platforms
+        this.operating_systems = platforms.operating_systems
         this.platforms_obj = platforms
     }
 
     Map rawJervisYaml
 
+    List platforms = []
+    List operating_systems = []
     String defaultPlatform
     String defaultOS
     // TODO: figure out how to expose platforms and operating systems object
@@ -40,6 +44,22 @@ class MultiPlatformGenerator {
         // TODO return for default OS
     }
 
+    /**
+      Remove any keys which match a platform or operating system name from the
+      top-level key of the provided Map.  This will also perform a deep-copy on
+      the Map before removing any keys to ensure that a Map is not modified
+      in-place.
+      @param map A map which should be modified.
+      @return A new Map with any keys whiched matched platform or OS removed.
+      */
+    private Map removePlatformOsKeys(Map map) {
+        Map copy = YamlOperator.deepCopy(map)
+        [this.platforms, this.operating_systems].flatten().each { String key ->
+            copy.remove(key)
+        }
+        // return
+        copy
+    }
 
     void loadJervisYamlString(String jervisYaml) {
         def parsedJervisYaml = YamlOperator.loadYamlFrom(jervisYaml)
@@ -47,26 +67,35 @@ class MultiPlatformGenerator {
             // TODO throw new MultiPlatformException or JervisYamlException
             throw new Exception("Jervis YAML must be a YAML object but is YAML ${parsedJervisYaml.getClass()}")
         }
-        this.raw_jervis_yaml = parsedJervisYaml
         // TODO call validator on raw jervis yaml
-        // see 'TODO: validation for raw_jervis_yaml'
+        // see 'TODO: validation for rawJervisYaml'
+        this.rawJervisYaml = parsedJervisYaml
 
         // initialize platforms
-        Map platforms = YamlOperator.getObjectValue(raw_jervis_yaml, 'jenkins.platform', [[], '']).with {
-            // TODO replace [''] with platforms.yaml default
-           (it in String ? [it] : it) ?: ['']
-        }*.trim()
-        Map operating_systems = YamlOperator.getObjectValue(raw_jervis_yaml, 'jenkins.os', [[], '']).with {
-            // TODO replace [''] with platforms.yaml default
-           (it in String ? [it] : it) ?: ['']
-        }*.trim()
+        List user_platform = YamlOperator.getObjectValue(rawJervisYaml, 'jenkins.platform', [[], '']).with {
+            (it in List) ? it : [it]
+        }.findAll {
+            it.trim()
+        }
+        if(!user_platform) {
+            user_platform << YamlOperator.getObjectValue(platforms_obj.platform_obj.platforms, 'defaults.platform', '')
+        }
+
+        List user_os = YamlOperator.getObjectValue(rawJervisYaml, 'jenkins.os', [[], '']).with {
+            (it in List) ? it : [it]
+        }.findAll {
+            it.trim()
+        }
+        if(!user_platform) {
+            user_platform << YamlOperator.getObjectValue(platforms_obj.platform_obj.platforms, 'defaults.os', '')
+        }
 
         // get a List of platform / operating system pairs
-        [platforms, operating_systems].combinations().collect {
+        [user_platform, user_os].combinations().collect {
           [platform: it[0], os: it[1]]
         }.each { Map current ->
             // perform a deep copy on original YAML in order to update it
-            this.platform_jervis_yaml[current.platform][current.os] = YamlOperator.deepCopy(raw_jervis_yaml).withDefault {
+            this.platform_jervis_yaml[current.platform][current.os] = YamlOperator.deepCopy(rawJervisYaml).withDefault {
                 [:].withDefault { [:] }
             }
             // For each platform and OS; flatten the YAML into a simpler text
@@ -76,34 +105,22 @@ class MultiPlatformGenerator {
                 jervis_yaml.jenkins.platform = current.platform
                 jervis_yaml.jenkins.os = current.os
                 // ORDER of merging platform and operating system keys
-                // Note: use jervis_yaml.putAll to merge maps
                 // More specific to least specific
                 // - platform.os
                 // - os
                 // - platform
 
-                // TODO: load in platforms and operating systems YAML because processing further is too hard
-
-                /*
-                Map merge = YamlOperator.deepCopy(YamlOperator.getObjectValue(jervis_yaml, "\"${current.platform}\".\"${current.os}\"", [:]))
-                if(merge) {
+                [
+                    "\"${current.platform}\".\"${current.os}\"",
+                    "\"${current.os}\"",
+                    "\"${current.platform}\""
+                ].each { String searchString ->
+                    Map merge = YamlOperator.getObjectValue(jervis_yaml, searchString, [:])
                     jervis_yaml.putAll(merge)
                 }
-                jervis_yaml[current.platform].remove(current.os)
-                merge = YamlOperator.deepCopy(YamlOperator.getObjectValue(jervis_yaml, "\"${current.platform}\"", [:]))
-                if(merge) {
-                    jervis_yaml.putAll(merge)
-                }
-                merge = YamlOperator.deepCopy(YamlOperator.getObjectValue(jervis_yaml, "\"${current.platform}\"", [:]))
-                if(merge) {
-                    jervis_yaml.putAll(merge)
-                }
-                */
-                // TODO: for all top-level keys which match OS or platform,
-                // remove them platforms.yaml must be used as the source of
-                // truth.  This must be done last.
             }
-            println "platform: ${current.platform}, os: ${current.os}"
+            // remove user-overridden platforms and OS setings.
+            this.platform_jervis_yaml[current.platform][current.os] = removePlatformOsKeys(this.platform_jervis_yaml[current.platform][current.os])
         }
     }
     // TODO: implement a ToolchainsValidator

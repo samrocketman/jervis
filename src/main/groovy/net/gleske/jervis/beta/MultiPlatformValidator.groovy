@@ -25,6 +25,7 @@ class MultiPlatformValidator {
       An instance of the <tt>{@link net.gleske.jervis.lang.PlatformValidator}</tt> class which as loaded a platforms file.
      */
     PlatformValidator platform_obj
+    List platforms = []
     List operating_systems = []
 
     MultiPlatformValidator() {
@@ -46,6 +47,7 @@ class MultiPlatformValidator {
         this.platform_obj = new PlatformValidator()
         this.platform_obj.loadYamlString(yaml)
         this.platform_obj.validate()
+        this.platforms = this.platform_obj.platforms.supported_platforms.keySet().toList()
         this.operating_systems = this.platform_obj.platforms.supported_platforms.collect { k, v ->
             v.keySet().toList()
         }.flatten().sort().unique()
