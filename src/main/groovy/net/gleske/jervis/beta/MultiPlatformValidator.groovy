@@ -1,20 +1,24 @@
 package net.gleske.jervis.beta
+import net.gleske.jervis.lang.LifecycleGenerator
 import net.gleske.jervis.lang.LifecycleValidator
+import net.gleske.jervis.lang.PipelineGenerator
 import net.gleske.jervis.lang.PlatformValidator
 import net.gleske.jervis.lang.ToolchainValidator
-import net.gleske.jervis.lang.LifecycleGenerator
-import net.gleske.jervis.lang.PipelineGenerator
 
 /**
+
+import net.gleske.jervis.beta.MultiPlatformValidator
+
 MultiPlatformValidator platforms = new MultiPlatformValidator()
-plaforms.loadPlatformsString(yaml)
-plaforms.getToolchainFiles().each { String fileName ->
-    platform.loadToolchainsString(fileName, new File("resources/${fileName}.yaml"))
+platforms.loadPlatformsString(new File('resources/platforms.yaml').text)
+platforms.getToolchainFiles().each { String fileName ->
+    platforms.loadToolchainsString(fileName, new File("resources/${fileName}.yaml").text)
 }
-plaforms.getLifecycleFiles().each { String fileName ->
-    platform.loadLifecyclesString(fileName, new File("resources/${fileName}.yaml"))
+platforms.getLifecycleFiles().each { String fileName ->
+    platforms.loadLifecyclesString(fileName, new File("resources/${fileName}.yaml").text)
 }
-platforms.getGeneratorFromJervis(yaml: 
+platforms.getGeneratorFromJervis(yaml: 'language: shell')
+
   */
 class MultiPlatformValidator {
     /**
@@ -23,8 +27,11 @@ class MultiPlatformValidator {
     PlatformValidator platform_obj
     List operating_systems = []
 
-    Map<String, LifecycleValidator> lifecycles
-    Map<String, ToolchainValidator> toolchains
+    MultiPlatformValidator() {
+    }
+
+    Map<String, LifecycleValidator> lifecycles = [:]
+    Map<String, ToolchainValidator> toolchains = [:]
 
     /**
       Load a platforms YAML <tt>String</tt> so that advanced labels can be generated
@@ -39,7 +46,7 @@ class MultiPlatformValidator {
         this.platform_obj = new PlatformValidator()
         this.platform_obj.loadYamlString(yaml)
         this.platform_obj.validate()
-        this.operating_systems = this.platform_obj.collect { k, v ->
+        this.operating_systems = this.platform_obj.platforms.supported_platforms.collect { k, v ->
             v.keySet().toList()
         }.flatten().sort().unique()
 
@@ -118,7 +125,7 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
       */
     LifecycleGenerator getGeneratorFromJervis(Map options) {
         LifecycleGenerator generator = new LifecycleGenerator()
-        generator.platforms_obj = this.platforms_obj
+        generator.platform_obj = this.platform_obj
         if(options.yaml) {
             generator.preloadYamlString(options.yaml)
             generator.lifecycle_obj = this.lifecycles[generator.label_os]
