@@ -183,4 +183,15 @@ class YamlOperatorTest extends GroovyAssert {
         assert YamlOperator.getObjectValue(hexKeys, 'hello', [ '', [] ]) == ''
         assert YamlOperator.getObjectValue(hexKeys, 'hello // friend.name', [ '', [] ]) == 'dog'
     }
+    @Test public void test_YamlOperator_deepCopy() {
+        Map map = [
+            'hello.io': 'world',
+            hello: ['jervis': 'friend'],
+            friend: [name: 'dog']
+        ]
+        Map copy = YamlOperator.deepCopy(map)
+        copy.hello.jervis = 'amazing'
+        assert copy.hello.jervis == 'amazing'
+        assert map.hello.jervis == 'friend'
+    }
 }

@@ -341,4 +341,20 @@ assert getObjectValue(hexKeys, 'hello // friend.name', [ '', [] ]) == 'dog'
             return defaultValue
         }
     }
+
+    /**
+      Performs a deep clone of an object created from <tt>YamlOperator</tt>.
+      This method serializes and deserializes the object to perform a deep
+      copy; there's no cross-map references.  i.e. modifying child keys in one
+      <tt>HashMap</tt> should not modify child keys in another.
+
+      <tt>{@link java.util.HashMap#clone--}</tt> only shallow copies and does
+      not account Maps within child keys.
+
+      @param m An object that was parsed from YAML using <tt>YamlOperator</tt>
+      @return A new instance of the Map and child keys as a 1:1 copy.
+      */
+    static def deepCopy(def m) {
+        loadYamlFrom(writeObjToYaml(m))
+    }
 }
