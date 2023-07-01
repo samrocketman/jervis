@@ -1,8 +1,17 @@
 package net.gleske.jervis.beta
 
 import net.gleske.jervis.tools.YamlOperator
+import net.gleske.jervis.lang.PlatformValidator
 
 class MultiPlatformGenerator {
+    final MultiPlatformValidator platforms_obj
+    private MultiPlatformGenerator() {
+        throw new IllegalStateException('ERROR: This class must be instantiated with a MultiPlatformValidator.')
+    }
+
+    MultiPlatformGenerator(MultiPlatformValidator platforms) {
+        this.platforms_obj = platforms
+    }
 
     Map rawJervisYaml
 
@@ -30,6 +39,7 @@ class MultiPlatformGenerator {
     Map getJervisYaml() {
         // TODO return for default OS
     }
+
 
     void loadJervisYamlString(String jervisYaml) {
         def parsedJervisYaml = YamlOperator.loadYamlFrom(jervisYaml)
@@ -96,14 +106,6 @@ class MultiPlatformGenerator {
             println "platform: ${current.platform}, os: ${current.os}"
         }
     }
-    // TODO: validation for raw_jervis_yaml
-    //   - A platform MUST NOT contain any platform keys
-    //   - An OS within a platform MUST NOT contain any platform keys
-    //   - An OS as a top-level key MUST NOT contain any platform keys
-    //   - An OS MUST NOT contain a key with a valid OS
-    //   - If jenkins.platform is a List, then each item MUST be a String
-    //   - If jenkins.os is a List, then each item MUST be a String
-    // ELSE this will cause confusion for the user because they won't have an
-    // understanding of YAML parsing internals when there's unexpected
-    // behavior.
+    // TODO: implement a ToolchainsValidator
+
 }
