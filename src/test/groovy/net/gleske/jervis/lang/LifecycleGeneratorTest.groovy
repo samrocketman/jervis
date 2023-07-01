@@ -465,10 +465,10 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         generator.label_sudo = 'required'
         assert 'sudo'.equals(generator.label_sudo)
     }
-    @Test public void test_LifecycleGenerator_loadPlatforms() {
+    @Test public void test_LifecycleGenerator_loadPlatformsFile() {
         assert null.equals(generator.platform_obj)
         URL url = this.getClass().getResource('/good_platforms_simple.json');
-        generator.loadPlatforms(url.getFile())
+        generator.loadPlatformsFile(url.getFile())
         assert !null.equals(generator.platform_obj)
         assert generator.platform_obj.class == PlatformValidator
     }
@@ -486,7 +486,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
             generator.preloadYamlString(yaml)
         }
         URL url = this.getClass().getResource('/good_platforms_simple.json');
-        generator.loadPlatforms(url.getFile())
+        generator.loadPlatformsFile(url.getFile())
         generator.preloadYamlString(yaml)
         assert 'docker'.equals(generator.label_platform)
         assert 'ubuntu1404'.equals(generator.label_os)
@@ -498,7 +498,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString(yaml)
         assert 'language:ruby && gemfile && env && rvm && jdk'.equals(generator.getLabels())
         URL url = this.getClass().getResource('/good_platforms_simple.json');
-        generator.loadPlatforms(url.getFile())
+        generator.loadPlatformsFile(url.getFile())
         generator.preloadYamlString(yaml)
         generator.loadYamlString(yaml)
         assert 'stable && docker && ubuntu1404 && sudo && language:ruby && gemfile && env && rvm && jdk'.equals(generator.getLabels())
@@ -514,7 +514,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     @Test public void test_LifecycleGenerator_isRestricted() {
         String yaml = 'language: ruby'
         URL url = this.getClass().getResource('/good_platforms_simple.json');
-        generator.loadPlatforms(url.getFile())
+        generator.loadPlatformsFile(url.getFile())
         generator.preloadYamlString(yaml)
         assert !generator.isRestricted('samrocketman/derp')
         assert !generator.isRestricted('samrocketman/jervis')
@@ -524,7 +524,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert true == generator.isSupportedPlatform()
         String yaml = 'language: ruby'
         URL url = this.getClass().getResource('/good_platforms_simple.json');
-        generator.loadPlatforms(url.getFile())
+        generator.loadPlatformsFile(url.getFile())
         generator.preloadYamlString(yaml)
         generator.loadYamlString(yaml)
         assert true == generator.isSupportedPlatform()
@@ -541,7 +541,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert false == generator.isSupportedPlatform()
         generator.yaml_language = tmp
         url = this.getClass().getResource('/good_platforms_optional.json');
-        generator.loadPlatforms(url.getFile())
+        generator.loadPlatformsFile(url.getFile())
         generator.preloadYamlString(yaml)
         assert false == generator.isSupportedPlatform()
     }
@@ -731,7 +731,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleGenerator_serialization() {
         URL url = this.getClass().getResource('/good_platforms_simple.json');
-        generator.loadPlatforms(url.getFile())
+        generator.loadPlatformsFile(url.getFile())
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(generator)
     }
     @Test public void test_LifecycleGenerator_matrix_fullName_by_friendly() {

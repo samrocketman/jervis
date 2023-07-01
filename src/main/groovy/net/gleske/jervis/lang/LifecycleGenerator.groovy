@@ -61,7 +61,7 @@ jenkins:
 """
 
 def generator = new LifecycleGenerator()
-generator.loadPlatforms('resources/platforms.yaml')
+generator.loadPlatformsFile('resources/platforms.yaml')
 generator.preloadYamlString(yaml)
 //os_stability requires preloadYamlString() to be called
 def os_stability = "${generator.label_os}-${generator.label_stability}"
@@ -958,7 +958,7 @@ env:
 
       @param file A path to a platforms file.
      */
-    public void loadPlatforms(String file) {
+    public void loadPlatformsFile(String file) {
         this.platform_obj = new PlatformValidator()
         this.platform_obj.loadYamlFile(file)
         this.platform_obj.validate()
@@ -985,7 +985,7 @@ env:
       Preload Jervis YAML for the purpose of loading lifecycles files for other
       platforms and operating systems.  <b>Please note</b>: you must call
       <tt>{@link #loadPlatformsString(java.lang.String)}</tt> or
-      <tt>{@link #loadPlatforms(java.lang.String)}</tt> before calling this function.
+      <tt>{@link #loadPlatformsFile(java.lang.String)}</tt> before calling this function.
 
       @param raw_yaml A <tt>String</tt> which contains Jervis YAML to be parsed.
      */

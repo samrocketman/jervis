@@ -39,7 +39,7 @@ class PipelineGeneratorTest extends GroovyTestCase {
     }
     @Test public void test_PipelineGenerator_serialization() {
         URL url = this.getClass().getResource('/good_platforms_simple.json');
-        generator.loadPlatforms(url.getFile())
+        generator.loadPlatformsFile(url.getFile())
         generator.loadYamlString('language: ruby')
         def pipeline = new PipelineGenerator(generator)
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(pipeline)
