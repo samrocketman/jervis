@@ -309,6 +309,7 @@ pipeline_generator.stashMap['html']['includes']
       in this matrix axis for matrix builds.
      */
     Map getStashMap(Map matrix_axis = [:]) {
+        // TODO platformGenerator.getStashMap
         boolean isMatrix = generator.isMatrixBuild()
         Map stash_map = [:]
         stashes.each { s ->
@@ -385,6 +386,8 @@ pipeline_generator.stashMap['html']['includes']
       the Jenkins job.  Used by <tt>withEnvSecretWrapper()</tt> method.
      */
     List getSecretPairsEnv() {
+        // TODO platformGenerator.generator.plainmap secrets can be pulled from
+        // default generator.
         List<Map> secretPairs = []
         List<String> secretEnv = []
         generator.plainmap.each { k, v ->
@@ -401,6 +404,7 @@ pipeline_generator.stashMap['html']['includes']
       <tt>jenkins.collect</tt> items.
      */
     List getPublishableItems() {
+        // TODO refactor for platformGenerator; currently unknown
         Set known_items = collect_items.keySet() as Set
         if(!supported_collections) {
             throw new PipelineGeneratorException('Calling getPublishableItems() without setting supported_collections.  This issue can only be resolved by an admin of the pipeline shared library.')
@@ -461,6 +465,7 @@ pipeline_generator.stashMap['html']['includes']
               YAML key.
      */
     def getPublishable(String item) {
+        // TODO refactor for platformGenerator; currently unknown
         String path = (collect_items[item])?: ''
         if(item in collect_settings_defaults) {
             Map tmp = collect_settings_defaults[item].collect { k, v ->
@@ -494,6 +499,7 @@ pipeline_generator.stashMap['html']['includes']
               <tt>getDefaultEnvironment()</tt> method.
       */
     String getDefaultToolchainsScript() {
+        // TODO platformGenerator.generator.generateToolchainSection()
         generator.generateToolchainSection()
     }
 
