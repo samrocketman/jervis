@@ -3,15 +3,17 @@ package net.gleske.jervis.beta
 import net.gleske.jervis.tools.YamlOperator
 import net.gleske.jervis.lang.PlatformValidator
 
-class MultiPlatformGenerator {
+class MultiPlatformGenerator implements Serializable {
     final MultiPlatformValidator platforms_obj
+
     private MultiPlatformGenerator() {
         throw new IllegalStateException('ERROR: This class must be instantiated with a MultiPlatformValidator.')
     }
 
     MultiPlatformGenerator(MultiPlatformValidator platforms) {
-        this.platforms = platforms.platforms
-        this.operating_systems = platforms.operating_systems
+        platforms.validate()
+        this.platforms = platforms.known_platforms
+        this.operating_systems = platforms.known_operating_systems
         this.platforms_obj = platforms
     }
 
@@ -23,7 +25,6 @@ class MultiPlatformGenerator {
     String defaultOS
     // TODO: figure out how to expose platforms and operating systems object
     // platforms PlatformValidator
-    // operating_systems could be a Map where key is operating system
 
 
     // a map of LifecycleGenerators with top-level keys platform and child keys by operating system
@@ -42,6 +43,9 @@ class MultiPlatformGenerator {
 
     Map getJervisYaml() {
         // TODO return for default OS
+    }
+    String getJervisYamlString() {
+        YamlOperator.writeObjToYaml(getJervisYaml())
     }
 
     /**
@@ -67,9 +71,7 @@ class MultiPlatformGenerator {
             // TODO throw new MultiPlatformException or JervisYamlException
             throw new Exception("Jervis YAML must be a YAML object but is YAML ${parsedJervisYaml.getClass()}")
         }
-        // TODO call validator on raw jervis yaml
         platforms_obj.validateJervisYaml(parsedJervisYaml)
-        // see 'TODO: validation for rawJervisYaml'
         this.rawJervisYaml = parsedJervisYaml
 
         // initialize platforms
@@ -81,6 +83,7 @@ class MultiPlatformGenerator {
         if(!user_platform) {
             user_platform << YamlOperator.getObjectValue(platforms_obj.platform_obj.platforms, 'defaults.platform', '')
         }
+        this.defaultPlatform = user_platform.first()
 
         List user_os = YamlOperator.getObjectValue(rawJervisYaml, 'jenkins.os', [[], '']).with {
             (it in List) ? it : [it]

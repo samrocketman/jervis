@@ -67,7 +67,9 @@ class MultiPlatformValidator {
     }
 
     List<String> getLifecycleFiles() {
-        // TODO if not platform_obj throw MultiPlatformException
+        if(!this.platform_obj) {
+            return
+        }
         this.known_operating_systems.collect { String os ->
             [
                 "lifecycles-${os}-stable",
@@ -77,7 +79,9 @@ class MultiPlatformValidator {
     }
 
     List<String> getToolchainFiles() {
-        // TODO if not platform_obj throw MultiPlatformException
+        if(!this.platform_obj) {
+            return
+        }
         this.known_operating_systems.collect { String os ->
             [
                 "toolchains-${os}-stable",
@@ -164,20 +168,58 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
     }
 
     void validate() {
-        true
-        // TODO validate the platforms has all platforms, lifecycles, and toolchains available
-        // - this.platforms_obj must not be null
-        // - this.lifecycles must not be empty
-        // - this.toolchains must not be empty
-        // - this.lifecycles.keySet() must all be known operating systems
-        // - this.toolchains.keySet() must all be known operating systems
-        // - A platform MUST NOT be in toolchains
-        // - An OS MUST NOT be in toolchains
-        // - Every OS on every platform must have a LifecycleValidator and ToolchainValidator
+        List errors = []
+        // this.platform_obj must not be null
+        if(!this.platform_obj) {
+            errors << 'platform_obj not available.  Did you call loadPlatformsString(String yaml) method?'
+        }
+        // this.lifecycles must not be empty
+        if(!this.lifecycles) {
+            errors << 'lifecycles are empty.  Did you call loadLifecyclesString(String fileName, String yaml) method?'
+        }
+        // this.toolchains must not be empty
+        if(!this.toolchains) {
+            errors << 'toolchains are empty.  Did you call loadToolchainsString(String fileName, String yaml) method?'
+        }
+        // this.lifecycles.keySet() must all be known operating systems
+        List bad_keys = this.lifecycles.keySet().toList() - known_operating_systems
+        if(bad_keys) {
+            errors << "lifecycles contains an OS not known to platforms.yaml.  Bad OSes: ${bad_keys.inspect()}"
+        }
+        // this.toolchains.keySet() must all be known operating systems
+        bad_keys = this.toolchains.keySet().toList() - known_operating_systems
+        if(bad_keys) {
+            errors << "toolchains contains an OS not known to platforms.yaml.  Bad OSes: ${bad_keys.inspect()}"
+        }
+        // A platform MUST NOT be in toolchains
+        bad_keys = this.known_platforms.intersect(this.known_toolchains)
+        if(bad_keys) {
+            errors << "A platform may not be also known as a toolchain.  Bad platforms: ${bad_keys.inspect()}"
+        }
+        // An OS MUST NOT be in toolchains
+        bad_keys = this.known_operating_systems.intersect(this.known_toolchains)
+        if(bad_keys) {
+            errors << "An OS may not be also known as a toolchain.  Bad OSes: ${bad_keys.inspect()}"
+        }
+        // Every OS on every platform must have a LifecycleValidator and ToolchainValidator
+        this.platform_obj.platforms.supported_platforms.each { platform, pv ->
+            // pv or platform value; ov or os value
+            pv.each { os, ov ->
+                if(!(this.lifecycles[os] in LifecycleValidator)) {
+                    errors << "In platforms.yaml, '${platform}'.'${os}' has no lifecycles file."
+                }
+                if(!(this.toolchains[os] in ToolchainValidator)) {
+                    errors << "In platforms.yaml, '${platform}'.'${os}' has no toolchains file."
+                }
+            }
+        }
+        if(errors) {
+            // TODO MultiPlatformException
+            throw new Exception("Multi-platform YAML validation has failed:\n\n  - " + errors.join('\n  - ') + "\n\nSee one or more errors above.")
+        }
     }
 
     void validateJervisYaml(Map jervis_yaml) {
-        // TODO: validation for raw_jervis_yaml
         List errors = []
         [this.known_platforms, this.known_operating_systems].combinations().collect {
             [platform: it[0], os: it[1]]
@@ -230,7 +272,7 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
             YamlOperator.getObjectValue(jervis_yaml, 'jenkins.os', [[], '']).with {
                 (it in List) ? it : [it]
             }.each {
-                if(!(it.toString() in this.known_platforms)) {
+                if(!(it.toString() in this.known_operating_systems)) {
                     errors << "${it} is not a valid operating system."
                 }
             }

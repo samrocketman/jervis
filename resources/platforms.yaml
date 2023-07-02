@@ -1,12 +1,12 @@
 defaults:
-  platform: docker
+  platform: default
   os: ubuntu2204
   stability: stable
   sudo: sudo
 supported_platforms:
-  docker:
+  default:
     ubuntu2204:
-      friendlyName: Ubuntu 16.04
+      friendlyName: Ubuntu 22.04
       language:
         - java
         - python
