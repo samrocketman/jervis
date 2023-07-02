@@ -1,10 +1,11 @@
 package net.gleske.jervis.beta
+
 import net.gleske.jervis.lang.LifecycleGenerator
 import net.gleske.jervis.lang.LifecycleValidator
 import net.gleske.jervis.lang.PipelineGenerator
 import net.gleske.jervis.lang.PlatformValidator
 import net.gleske.jervis.lang.ToolchainValidator
-
+import net.gleske.jervis.tools.YamlOperator
 /**
 
 import net.gleske.jervis.beta.MultiPlatformValidator
@@ -12,24 +13,35 @@ import net.gleske.jervis.beta.MultiPlatformValidator
 MultiPlatformValidator platforms = new MultiPlatformValidator()
 platforms.loadPlatformsString(new File('resources/platforms.yaml').text)
 platforms.getToolchainFiles().each { String fileName ->
+    if(!new File("resources/${fileName}.yaml").exists()) { return }
     platforms.loadToolchainsString(fileName, new File("resources/${fileName}.yaml").text)
 }
 platforms.getLifecycleFiles().each { String fileName ->
+    if(!new File("resources/${fileName}.yaml").exists()) { return }
     platforms.loadLifecyclesString(fileName, new File("resources/${fileName}.yaml").text)
 }
 platforms.getGeneratorFromJervis(yaml: 'language: shell')
-
   */
 class MultiPlatformValidator {
     /**
       An instance of the <tt>{@link net.gleske.jervis.lang.PlatformValidator}</tt> class which as loaded a platforms file.
      */
     PlatformValidator platform_obj
-    List platforms = []
-    List operating_systems = []
 
-    MultiPlatformValidator() {
-    }
+    /**
+      All known platforms.
+      */
+    List known_platforms = []
+
+    /**
+      All known operating systems across all platforms.
+      */
+    List known_operating_systems = []
+
+    /**
+      All known toolchains across all operating systems.
+      */
+    List known_toolchains = []
 
     Map<String, LifecycleValidator> lifecycles = [:]
     Map<String, ToolchainValidator> toolchains = [:]
@@ -47,8 +59,8 @@ class MultiPlatformValidator {
         this.platform_obj = new PlatformValidator()
         this.platform_obj.loadYamlString(yaml)
         this.platform_obj.validate()
-        this.platforms = this.platform_obj.platforms.supported_platforms.keySet().toList()
-        this.operating_systems = this.platform_obj.platforms.supported_platforms.collect { k, v ->
+        this.known_platforms = this.platform_obj.platforms.supported_platforms.keySet().toList()
+        this.known_operating_systems = this.platform_obj.platforms.supported_platforms.collect { k, v ->
             v.keySet().toList()
         }.flatten().sort().unique()
 
@@ -56,7 +68,7 @@ class MultiPlatformValidator {
 
     List<String> getLifecycleFiles() {
         // TODO if not platform_obj throw MultiPlatformException
-        operating_systems.collect { String os ->
+        this.known_operating_systems.collect { String os ->
             [
                 "lifecycles-${os}-stable",
                 "lifecycles-${os}-unstable"
@@ -66,7 +78,7 @@ class MultiPlatformValidator {
 
     List<String> getToolchainFiles() {
         // TODO if not platform_obj throw MultiPlatformException
-        operating_systems.collect { String os ->
+        this.known_operating_systems.collect { String os ->
             [
                 "toolchains-${os}-stable",
                 "toolchains-${os}-unstable"
@@ -118,6 +130,7 @@ class MultiPlatformValidator {
             this.toolchains[key].loadYamlString(yaml)
         }
         this.toolchains[key].validate()
+        this.known_toolchains = (this.known_toolchains + this.toolchains[key].toolchain_list.toList()).sort().unique()
     }
 
     /**
@@ -153,17 +166,79 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
     void validate() {
         true
         // TODO validate the platforms has all platforms, lifecycles, and toolchains available
+        // - this.platforms_obj must not be null
+        // - this.lifecycles must not be empty
+        // - this.toolchains must not be empty
+        // - this.lifecycles.keySet() must all be known operating systems
+        // - this.toolchains.keySet() must all be known operating systems
+        // - A platform MUST NOT be in toolchains
+        // - An OS MUST NOT be in toolchains
+        // - Every OS on every platform must have a LifecycleValidator and ToolchainValidator
     }
 
     void validateJervisYaml(Map jervis_yaml) {
-        true
         // TODO: validation for raw_jervis_yaml
-        //   - A platform MUST NOT contain any platform keys
-        //   - An OS within a platform MUST NOT contain any platform keys
-        //   - An OS as a top-level key MUST NOT contain any platform keys
-        //   - An OS MUST NOT contain a key with a valid OS
-        //   - If jenkins.platform is a List, then each item MUST be a String
-        //   - If jenkins.os is a List, then each item MUST be a String
+        List errors = []
+        [this.known_platforms, this.known_operating_systems].combinations().collect {
+            [platform: it[0], os: it[1]]
+        }.each { Map current ->
+            // A platform MUST NOT contain any platform keys
+            List bad_platforms = YamlOperator.getObjectValue(
+                jervis_yaml,
+                "\"${current.platform}\"",
+                [:]).keySet().toList().intersect(this.known_platforms)
+            if(bad_platforms) {
+                errors << "'${current.platform}' must not contain any platforms: ${bad_platforms.inspect()}"
+            }
+            // An OS within a platform MUST NOT contain any platform keys
+            // An OS within a platform MUST NOT contain a key with a valid OS
+            bad_platforms = YamlOperator.getObjectValue(
+                jervis_yaml,
+                "\"${current.platform}\".\"${current.os}\"",
+                [:]).keySet().toList().intersect(this.known_platforms + this.known_operating_systems)
+            if(bad_platforms) {
+                errors << "'${current.platform}'.'${current.os}' must not contain any platforms or other OSes: ${bad_platforms.inspect()}"
+            }
+            // An OS as a top-level key MUST NOT contain any platform keys
+            // An OS MUST NOT contain a key with a valid OS
+            bad_platforms = YamlOperator.getObjectValue(
+                jervis_yaml,
+                "\"${current.os}\"",
+                [:]).keySet().toList().intersect(this.known_platforms + this.known_operating_systems)
+            if(bad_platforms) {
+                errors << "'${current.os}' must not contain any platforms or other OSes: ${bad_platforms.inspect()}"
+            }
+            // If jenkins.platform is a List, then each item MUST be a String
+            Boolean nonString = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.platform', []).any { !(it in String) }
+            if(nonString) {
+                errors << 'jenkins.platform List contains a value that is not a String.  All platforms must be a String.'
+            }
+            // If jenkins.os is a List, then each item MUST be a String
+            nonString = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.os', []).any { !(it in String) }
+            if(nonString) {
+                errors << 'jenkins.os List contains a value that is not a String.  All operating systems must be a String.'
+            }
+            // jenkins.platform must exist as a platform
+            YamlOperator.getObjectValue(jervis_yaml, 'jenkins.platform', [[], '']).with {
+                (it in List) ? it : [it]
+            }.each {
+                if(!(it.toString() in this.known_platforms)) {
+                    errors << "${it} is not a valid platform."
+                }
+            }
+            // jenkins.os must exist as an OS
+            YamlOperator.getObjectValue(jervis_yaml, 'jenkins.os', [[], '']).with {
+                (it in List) ? it : [it]
+            }.each {
+                if(!(it.toString() in this.known_platforms)) {
+                    errors << "${it} is not a valid operating system."
+                }
+            }
+        }
+        if(errors) {
+            // TODO MultiPlatformException
+            throw new Exception("Multi-platform YAML validation has failed:\n\n  - " + errors.join('\n  - ') + "\n\nSee one or more errors above.")
+        }
         // ELSE this will cause confusion for the user because they won't have an
         // understanding of YAML parsing internals when there's unexpected
         // behavior.

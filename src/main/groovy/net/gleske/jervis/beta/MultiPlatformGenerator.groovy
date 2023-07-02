@@ -61,13 +61,14 @@ class MultiPlatformGenerator {
         copy
     }
 
-    void loadJervisYamlString(String jervisYaml) {
-        def parsedJervisYaml = YamlOperator.loadYamlFrom(jervisYaml)
+    void loadMultiPlatformYaml(Map options) {
+        def parsedJervisYaml = YamlOperator.loadYamlFrom(options.yaml)
         if(!(parsedJervisYaml in Map)) {
             // TODO throw new MultiPlatformException or JervisYamlException
             throw new Exception("Jervis YAML must be a YAML object but is YAML ${parsedJervisYaml.getClass()}")
         }
         // TODO call validator on raw jervis yaml
+        platforms_obj.validateJervisYaml(parsedJervisYaml)
         // see 'TODO: validation for rawJervisYaml'
         this.rawJervisYaml = parsedJervisYaml
 
@@ -86,13 +87,13 @@ class MultiPlatformGenerator {
         }.findAll {
             it.trim()
         }
-        if(!user_platform) {
-            user_platform << YamlOperator.getObjectValue(platforms_obj.platform_obj.platforms, 'defaults.os', '')
+        if(!user_os) {
+            user_os << YamlOperator.getObjectValue(platforms_obj.platform_obj.platforms, 'defaults.os', '')
         }
 
         // get a List of platform / operating system pairs
         [user_platform, user_os].combinations().collect {
-          [platform: it[0], os: it[1]]
+            [platform: it[0], os: it[1]]
         }.each { Map current ->
             // perform a deep copy on original YAML in order to update it
             this.platform_jervis_yaml[current.platform][current.os] = YamlOperator.deepCopy(rawJervisYaml).withDefault {
@@ -121,6 +122,8 @@ class MultiPlatformGenerator {
             }
             // remove user-overridden platforms and OS setings.
             this.platform_jervis_yaml[current.platform][current.os] = removePlatformOsKeys(this.platform_jervis_yaml[current.platform][current.os])
+            this.platform_generators[current.platform][current.os] = platforms_obj.getGeneratorFromJervis(
+                yaml: YamlOperator.writeObjToYaml(this.platform_jervis_yaml[current.platform][current.os]))
         }
     }
     // TODO: implement a ToolchainsValidator
