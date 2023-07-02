@@ -5,7 +5,26 @@ import net.gleske.jervis.lang.PlatformValidator
 
 class MultiPlatformGenerator implements Serializable {
     final MultiPlatformValidator platforms_obj
+    Map rawJervisYaml
+    List platforms = []
+    List operating_systems = []
+    String defaultPlatform
+    String defaultOS
+    // TODO: figure out how to expose platforms and operating systems object
+    // platforms PlatformValidator
+    // a map of LifecycleGenerators with top-level keys platform and child keys by operating system
+    Map platform_generators = [:].withDefault {
+        [:].withDefault { [:] }
+    }
 
+    // 2-level default hashmap
+    Map platform_jervis_yaml = [:].withDefault {
+        [:].withDefault { [:] }
+    }
+
+    /**
+      Do not allow instantiating without arguments.
+      */
     private MultiPlatformGenerator() {
         throw new IllegalStateException('ERROR: This class must be instantiated with a MultiPlatformValidator.')
     }
@@ -17,32 +36,29 @@ class MultiPlatformGenerator implements Serializable {
         this.platforms_obj = platforms
     }
 
-    Map rawJervisYaml
+    /**
+      Get the <tt>{@link net.gleske.jervis.lang.LifecycleGenerator}</tt> for a
+      given default platform and OS.
 
-    List platforms = []
-    List operating_systems = []
-    String defaultPlatform
-    String defaultOS
-    // TODO: figure out how to expose platforms and operating systems object
-    // platforms PlatformValidator
-
-
-    // a map of LifecycleGenerators with top-level keys platform and child keys by operating system
-    Map platform_generators = [:].withDefault {
-        [:].withDefault { [:] }
-    }
-
-    // 2-level default hashmap
-    Map platform_jervis_yaml = [:].withDefault {
-        [:].withDefault { [:] }
-    }
-
+      @see #defaultPlatform
+      @see #defaultOS
+      @return A <tt>LifecycleGenerator</tt> instance.
+      */
     Map getGenerator() {
-        // TODO return generator for default platform and default OS
+        this.platform_generators[defaultPlatform][defaultOS]
     }
 
+    /**
+      Get the Jervis YAML for a given default platform and OS.  If you're
+      looking for the original multi-platform Jervis YAML, then refer to
+      <tt>{@link #rawJervisYaml}</tt>.
+
+      @see #defaultPlatform
+      @see #defaultOS
+      @return A <tt>{@link java
+      */
     Map getJervisYaml() {
-        // TODO return for default OS
+        platform_jervis_yaml[defaultPlatform][defaultOS]
     }
     String getJervisYamlString() {
         YamlOperator.writeObjToYaml(getJervisYaml())
