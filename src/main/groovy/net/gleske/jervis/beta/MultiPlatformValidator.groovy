@@ -223,30 +223,38 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
             [platform: it[0], os: it[1]]
         }.each { Map current ->
             // A platform MUST NOT contain any platform keys
+            // A platform MUST NOT contain any key named 'jenkins', 'platform', or 'os'
             List bad_platforms = YamlOperator.getObjectValue(
                 jervis_yaml,
                 "\"${current.platform}\"",
-                [:]).keySet().toList().intersect(this.known_platforms)
+                [:]).keySet().toList().intersect(this.known_platforms + ['jenkins', 'platform', 'os'])
             if(bad_platforms) {
                 errors << "'${current.platform}' must not contain any platforms: ${bad_platforms.inspect()}"
             }
             // An OS within a platform MUST NOT contain any platform keys
             // An OS within a platform MUST NOT contain a key with a valid OS
+            // An OS within a platform MUST NOT contain any key named 'jenkins', 'platform', or 'os'
             bad_platforms = YamlOperator.getObjectValue(
                 jervis_yaml,
                 "\"${current.platform}\".\"${current.os}\"",
-                [:]).keySet().toList().intersect(this.known_platforms + this.known_operating_systems)
+                [:]).keySet().toList().intersect(this.known_platforms + this.known_operating_systems + ['jenkins', 'platform', 'os'])
             if(bad_platforms) {
                 errors << "'${current.platform}'.'${current.os}' must not contain any platforms or other OSes: ${bad_platforms.inspect()}"
             }
             // An OS as a top-level key MUST NOT contain any platform keys
             // An OS MUST NOT contain a key with a valid OS
+            // An OS MUST NOT contain any key named 'jenkins', 'platform', or 'os'
             bad_platforms = YamlOperator.getObjectValue(
                 jervis_yaml,
                 "\"${current.os}\"",
-                [:]).keySet().toList().intersect(this.known_platforms + this.known_operating_systems)
+                [:]).keySet().toList().intersect(this.known_platforms + this.known_operating_systems + ['jenkins', 'platform', 'os'])
             if(bad_platforms) {
                 errors << "'${current.os}' must not contain any platforms or other OSes: ${bad_platforms.inspect()}"
+            }
+            // Top-level keys MUST NOT contian any key named 'platform' or 'os'
+            bad_platforms = jervis_yaml.keySet().toList.intersect(['platform', 'os'])
+            if(bad_platforms) {
+                errors << "jenkins.platform and jenkins.os is supported but not as top-level keys: ${bad_platforms.inspect()}"
             }
             // If jenkins.platform is a List, then each item MUST be a String
             Boolean nonString = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.platform', []).any { !(it in String) }
@@ -274,6 +282,7 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
                     errors << "${it} is not a valid operating system."
                 }
             }
+            // TODO verify neither os nor platform are named as keys.
         }
         if(errors) {
             // TODO MultiPlatformException
