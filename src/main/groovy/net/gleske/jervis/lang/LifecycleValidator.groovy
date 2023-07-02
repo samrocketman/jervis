@@ -54,10 +54,27 @@ class LifecycleValidator implements Serializable {
      */
     Map lifecycles
 
+    Map getLifecycles(Boolean unstable = false) {
+        Map tempLifecycles = YamlOperator.deepCopy(this.@lifecycles)
+        if(unstable && this.unstable_lifecycles) {
+            tempLifecycles.putAll(YamlOperator.deepCopy(this.unstable_lifecycles))
+        }
+        tempLifecycles
+    }
+
+    /**
+      A <tt>{@link Map}</tt> of the parsed unstable lifecycles file.
+     */
+    Map unstable_lifecycles
+
     /**
       A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of supported languages in the lifecycles file.  This is just a list of the keys in {@link #lifecycles}.
      */
     String[] languages
+    /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of supported languages in the unstable lifecycles file.  This is just a list of the keys in {@link #unstable_lifecycles}.
+     */
+    String[] unstable_languages
 
     /**
       Load the YAML of a lifecycles file and parse it.  This should be the first
@@ -66,8 +83,8 @@ class LifecycleValidator implements Serializable {
       <tt>{@link #lifecycles}</tt> and <tt>{@link #languages}</tt>.
       @param file A <tt>String</tt> which is a path to a lifecycles file.
      */
-    public void loadYamlFile(String file) {
-        loadYamlString(new File(file).text)
+    public void loadYamlFile(String file, Boolean unstable = false) {
+        loadYamlString(new File(file).text, unstable)
     }
 
     /**
@@ -78,9 +95,15 @@ class LifecycleValidator implements Serializable {
       method from the Jenkins Job DSL Plugin.
       @param yaml A <tt>String</tt> containing the contents of a lifecycles file.
      */
-    public void loadYamlString(String yaml) {
-        lifecycles = YamlOperator.loadYamlFrom(yaml) ?: [:]
-        languages = lifecycles.keySet() as String[];
+    public void loadYamlString(String yaml, Boolean unstable = false) {
+        if(unstable) {
+            this.unstable_lifecycles = YamlOperator.loadYamlFrom(yaml) ?: [:]
+            this.unstable_languages = lifecycles.keySet() as String[];
+        }
+        else {
+            this.lifecycles = YamlOperator.loadYamlFrom(yaml) ?: [:]
+            this.languages = lifecycles.keySet() as String[];
+        }
     }
 
     /**
@@ -88,8 +111,13 @@ class LifecycleValidator implements Serializable {
       @param lang A <tt>String</tt> which is a language to look up based on the keys in the lifecycles file.
       @return     <tt>true</tt> if the language is supported or <tt>false</tt> if the language is not supported.
      */
-    public Boolean supportedLanguage(String lang) {
-        lang in languages
+    public Boolean supportedLanguage(String lang, Boolean unstable = false) {
+        if(unstable && this.unstable_lifecycles) {
+            lang in (this.languages + this.unstable_languages)
+        }
+        else {
+            lang in this.languages
+        }
     }
 
     /**
@@ -98,18 +126,30 @@ class LifecycleValidator implements Serializable {
      */
     public Boolean validate_asBool() {
         try {
-            this.validate()
+            this.validate(true)
+            this.validate(false)
             return true
         }
         catch(LifecycleValidationException E) {
             return false
         }
     }
+
     /**
-      Validates the lifecycles file.
+      Validates the lifecycles file.  Covers both unstable and stable.
       @return <tt>true</tt> if the lifecycles file validates.  If the lifecycles file fails validation then it will throw a <tt>{@link net.gleske.jervis.exceptions.LifecycleValidationException}</tt>.
      */
-    public Boolean validate() throws LifecycleMissingKeyException, LifecycleBadValueInKeyException, LifecycleInfiniteLoopException {
+    Boolean validate() {
+        this.validate(false)
+        this.validate(true)
+    }
+    /**
+      Validates the lifecycles file.
+      @param unstable Validate as an unstable lifecycle or stable lifecycle.
+      @return <tt>true</tt> if the lifecycles file validates.  If the lifecycles file fails validation then it will throw a <tt>{@link net.gleske.jervis.exceptions.LifecycleValidationException}</tt>.
+     */
+    public Boolean validate(Boolean unstable) throws LifecycleMissingKeyException, LifecycleBadValueInKeyException, LifecycleInfiniteLoopException {
+        Map lifecycles = this.getLifecycles(unstable)
         lifecycles.each { language, lifecycleMap ->
             if(!(lifecycleMap in Map)) {
                 throw new LifecycleMissingKeyException([language, 'must contain a Map but found:', lifecycleMap.getClass()].join(' '))

@@ -140,4 +140,20 @@ class LifecycleValidatorTest extends GroovyTestCase {
         }
         assert false == lifecycles.validate_asBool()
     }
+    //test supportedLanguage()
+    @Test public void test_LifecycleValidator_supportedLanguage_partial_unstable() {
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        lifecycles.loadYamlFile(url.getFile())
+        lifecycles.validate()
+        assert true == lifecycles.supportedLanguage('groovy')
+        assert false == lifecycles.supportedLanguage('python')
+        url = this.getClass().getResource('/good_lifecycles_python_number.json');
+        // load unstable
+        lifecycles.loadYamlFile(url.getFile(), true)
+        lifecycles.validate()
+        assert true == lifecycles.supportedLanguage('groovy')
+        assert false == lifecycles.supportedLanguage('python')
+        // supported when unstable enabled
+        assert false == lifecycles.supportedLanguage('python', true)
+    }
 }
