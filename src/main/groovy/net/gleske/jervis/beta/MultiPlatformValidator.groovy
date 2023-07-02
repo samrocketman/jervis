@@ -142,6 +142,7 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
       */
     LifecycleGenerator getGeneratorFromJervis(Map options) {
         LifecycleGenerator generator = new LifecycleGenerator()
+        generator.multiPlatform = true
         generator.platform_obj = this.platform_obj
         if(options.yaml) {
             generator.preloadYamlString(options.yaml)

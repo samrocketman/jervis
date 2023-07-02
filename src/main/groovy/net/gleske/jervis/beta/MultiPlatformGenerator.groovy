@@ -126,7 +126,9 @@ class MultiPlatformGenerator implements Serializable {
             // remove user-overridden platforms and OS setings.
             this.platform_jervis_yaml[current.platform][current.os] = removePlatformOsKeys(this.platform_jervis_yaml[current.platform][current.os])
             this.platform_generators[current.platform][current.os] = platforms_obj.getGeneratorFromJervis(
-                yaml: YamlOperator.writeObjToYaml(this.platform_jervis_yaml[current.platform][current.os]))
+                yaml: YamlOperator.writeObjToYaml(this.platform_jervis_yaml[current.platform][current.os]),
+                folder_listing: options.folder_listing,
+                private_key: options.private_key)
         }
     }
     // TODO: implement a ToolchainsValidator
