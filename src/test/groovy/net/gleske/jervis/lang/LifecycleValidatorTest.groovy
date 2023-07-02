@@ -154,6 +154,6 @@ class LifecycleValidatorTest extends GroovyTestCase {
         assert true == lifecycles.supportedLanguage('groovy')
         assert false == lifecycles.supportedLanguage('python')
         // supported when unstable enabled
-        assert false == lifecycles.supportedLanguage('python', true)
+        assert true == lifecycles.supportedLanguage('python', true)
     }
 }

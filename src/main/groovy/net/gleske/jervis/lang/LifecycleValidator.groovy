@@ -48,18 +48,26 @@ println lifecycles.languages.collect {
 </code></pre>
  */
 class LifecycleValidator implements Serializable {
+    /**
+      Check if there is an unstable lifecycles object available.
+      */
+    private Boolean isUnstable(Boolean unstable) {
+        unstable && this.unstable_lifecycles
+    }
 
     /**
       A <tt>{@link Map}</tt> of the parsed lifecycles file.
      */
     Map lifecycles
 
+    /**
+      Get lifecycles or optionally unstable lifecycles.
+      @param unstable Request unstable instead of stable.
+      @return A <tt>{@link Map}</tt> of the parsed lifecycles files (could include unstable).
+      */
     Map getLifecycles(Boolean unstable = false) {
-        Map tempLifecycles = YamlOperator.deepCopy(this.@lifecycles)
-        if(unstable && this.unstable_lifecycles) {
-            tempLifecycles.putAll(YamlOperator.deepCopy(this.unstable_lifecycles))
-        }
-        tempLifecycles
+        this.isUnstable(unstable) ?
+            this.unstable_lifecycles : this.@lifecycles
     }
 
     /**
@@ -68,11 +76,28 @@ class LifecycleValidator implements Serializable {
     Map unstable_lifecycles
 
     /**
-      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of supported languages in the lifecycles file.  This is just a list of the keys in {@link #lifecycles}.
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of
+      supported languages in the lifecycles file.  This is just a list of the
+      keys in {@link #lifecycles}.
      */
     String[] languages
+
     /**
-      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of supported languages in the unstable lifecycles file.  This is just a list of the keys in {@link #unstable_lifecycles}.
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of
+      supported languages in the lifecycles file.  This is just a list of the
+      keys in {@link #lifecycles}.
+      @param unstable Request unstable languages instead of stable.
+      @return Returns a languages list.
+     */
+    String[] getLanguages(Boolean unstable = false) {
+        this.isUnstable(unstable) ?
+            this.unstable_languages : this.@languages
+    }
+
+    /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of
+      supported languages in the unstable lifecycles file.  This is just a list
+      of the keys in {@link #unstable_lifecycles}.
      */
     String[] unstable_languages
 
@@ -97,8 +122,10 @@ class LifecycleValidator implements Serializable {
      */
     public void loadYamlString(String yaml, Boolean unstable = false) {
         if(unstable) {
-            this.unstable_lifecycles = YamlOperator.loadYamlFrom(yaml) ?: [:]
-            this.unstable_languages = lifecycles.keySet() as String[];
+            Map tempLifecycles = YamlOperator.deepCopy(this.@lifecycles)
+            tempLifecycles.putAll(YamlOperator.loadYamlFrom(yaml) ?: [:])
+            this.unstable_lifecycles = tempLifecycles
+            this.unstable_languages = this.unstable_lifecycles.keySet() as String[];
         }
         else {
             this.lifecycles = YamlOperator.loadYamlFrom(yaml) ?: [:]
@@ -112,12 +139,7 @@ class LifecycleValidator implements Serializable {
       @return     <tt>true</tt> if the language is supported or <tt>false</tt> if the language is not supported.
      */
     public Boolean supportedLanguage(String lang, Boolean unstable = false) {
-        if(unstable && this.unstable_lifecycles) {
-            lang in (this.languages + this.unstable_languages)
-        }
-        else {
-            lang in this.languages
-        }
+        lang in this.getLanguages(unstable)
     }
 
     /**
@@ -126,8 +148,8 @@ class LifecycleValidator implements Serializable {
      */
     public Boolean validate_asBool() {
         try {
-            this.validate(true)
             this.validate(false)
+            this.validate(true)
             return true
         }
         catch(LifecycleValidationException E) {
@@ -145,7 +167,7 @@ class LifecycleValidator implements Serializable {
     }
     /**
       Validates the lifecycles file.
-      @param unstable Validate as an unstable lifecycle or stable lifecycle.
+      @param unstable Validate as an unstable instead of stable.
       @return <tt>true</tt> if the lifecycles file validates.  If the lifecycles file fails validation then it will throw a <tt>{@link net.gleske.jervis.exceptions.LifecycleValidationException}</tt>.
      */
     public Boolean validate(Boolean unstable) throws LifecycleMissingKeyException, LifecycleBadValueInKeyException, LifecycleInfiniteLoopException {

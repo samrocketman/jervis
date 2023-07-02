@@ -51,27 +51,108 @@ null
 </code></pre>
  */
 class ToolchainValidator implements Serializable {
+    /**
+      Check if there is an unstable toolchains object available.
+      */
+    private Boolean isUnstable(Boolean unstable) {
+        unstable && this.unstable_toolchains
+    }
 
     /**
       A <tt>{@link Map}</tt> of the parsed toolchains file.
      */
-
     Map toolchains
 
     /**
-      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of toolchains in the toolchains file.  This is just a list of the keys in <tt>{@link #toolchains}</tt>.
-     */
-    String[] toolchain_list
+      Returns a copy of a parsed toolchains file for either stable toolchains
+      or unstable toolchains.
+      @param unstable Request unstable toolchains instead of stable.
+      @return A parsed toolchains file.
+      */
+    Map getToolchains(Boolean unstable = false) {
+        this.isUnstable(unstable) ?
+            this.unstable_toolchains : this.@toolchains
+    }
 
     /**
-      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of toolchains in the toolchains file which are capable of matrix building.  This is just a list of the keys in <tt>{@link #toolchains}</tt>.
+      A <tt>{@link Map}</tt> of the parsed unstable toolchains file.
+     */
+    Map unstable_toolchains
+
+    /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of
+      toolchains in the toolchains file.  This is just a list of the keys in
+      <tt>{@link #toolchains}</tt>.
+     */
+    String[] toolchain_list
+    /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of
+      toolchains in the toolchains file.  This is just a list of the keys in
+      <tt>{@link #toolchains}</tt>.
+      @param unstable Request unstable instead of stable.
+      @return Returns a toolchain list.
+     */
+    String[] getToolchain_list(Boolean unstable = false) {
+        this.isUnstable(unstable) ?
+            this.unstable_toolchain_list : this.@toolchain_list
+    }
+
+    /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of
+      toolchains in the unstable toolchains file.  This is just a list of the
+      keys in <tt>{@link #unstable_toolchains}</tt>.
+     */
+    String[] unstable_toolchain_list
+
+    /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of
+      toolchains in the toolchains file which are capable of matrix building.
+      This is just a list of the keys in <tt>{@link #toolchains}</tt>.
      */
     List matrix_toolchain_list
 
     /**
-      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of supported languages in the lifecycles file.  This is just a list of the keys in {@link #lifecycles}.
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of
+      toolchains in the toolchains file which are capable of matrix building.
+      This is just a list of the keys in <tt>{@link #toolchains}</tt>.
+      @param unstable Request unstable instead of stable.
+      @return Returns a matrix toolchain list.
+     */
+    List getMatrix_toolchain_list(Boolean unstable = false) {
+        this.isUnstable(unstable) ?
+            this.unstable_matrix_toolchain_list : this.@matrix_toolchain_list
+    }
+
+    /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of toolchains in the toolchains file which are capable of matrix building.  This is just a list of the keys in <tt>{@link #toolchains}</tt>.
+     */
+    List unstable_matrix_toolchain_list
+
+    /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of
+      supported languages in the lifecycles file.  This is just a list of the
+      keys in {@link #lifecycles}.
      */
     String[] languages
+
+    /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of
+      supported languages in the lifecycles file.  This is just a list of the
+      keys in {@link #lifecycles}.
+      @param unstable Request unstable instead of stable.
+      @return Returns a languages list.
+     */
+    String[] getLanguages(Boolean unstable = false) {
+        this.isUnstable(unstable) ?
+            this.unstable_languages : this.@languages
+    }
+
+    /**
+      A <tt>String</tt> <tt>{@link Array}</tt> which contains a list of
+      supported languages in the unstable toolchains file.  This is just a list
+      of the keys in {@link #unstable_toolchains}.
+     */
+    String[] unstable_languages
 
     /**
       Load the YAML of a toolchains file and parse it.  This should be the first
@@ -80,8 +161,8 @@ class ToolchainValidator implements Serializable {
       <tt>{@link #languages}</tt>.
       @param file A <tt>String</tt> which is a path to a toolchains file.
      */
-    public void loadYamlFile(String file) {
-        loadYamlString(new File(file).text)
+    public void loadYamlFile(String file, Boolean unstable = false) {
+        loadYamlString(new File(file).text, unstable)
     }
 
     /**
@@ -93,14 +174,34 @@ class ToolchainValidator implements Serializable {
       DSL Plugin.
       @param yaml A <tt>String</tt> the contents of a toolchains file.
      */
-    public void loadYamlString(String yaml) {
-        toolchains = YamlOperator.loadYamlFrom(yaml) ?: [:]
-        toolchain_list = toolchains.keySet() as String[]
-        matrix_toolchain_list = toolchain_list.findAll { String toolchain ->
-            toolchainType(toolchain) != 'disabled'
+    public void loadYamlString(String yaml, Boolean unstable = false) {
+        if(unstable) {
+            // merge toolchains (preserving a merge with child key named
+            // 'toolchains')
+            this.unstable_toolchains = YamlOperator.deepCopy(this.@toolchains)
+            Map tempUnstableToolchains = YamlOperator.loadYamlFrom(yaml) ?: [:]
+            Map toolsByLanguage = YamlOperator.deepCopy(this.@toolchains.toolchains)
+            toolsByLanguage.putAll(tempUnstableToolchains.toolchains ?: [:])
+            this.unstable_toolchains.putAll(tempUnstableToolchains)
+            this.unstable_toolchains.toolchains = toolsByLanguage
+            // end merge toolchains
+            this.unstable_toolchain_list = this.unstable_toolchains.keySet() as String[]
+            this.unstable_matrix_toolchain_list = this.unstable_toolchain_list.findAll { String toolchain ->
+                toolchainType(toolchain) != 'disabled'
+            }
+            if('toolchains' in this.unstable_toolchain_list) {
+                this.unstable_languages = this.unstable_toolchains.toolchains.keySet() as String[]
+            }
         }
-        if('toolchains' in toolchain_list) {
-            languages = toolchains.toolchains.keySet() as String[]
+        else {
+            this.toolchains = YamlOperator.loadYamlFrom(yaml) ?: [:]
+            this.toolchain_list = this.@toolchains.keySet() as String[]
+            this.matrix_toolchain_list = this.toolchain_list.findAll { String toolchain ->
+                toolchainType(toolchain) != 'disabled'
+            }
+            if('toolchains' in this.toolchain_list) {
+                this.languages = this.@toolchains.toolchains.keySet() as String[]
+            }
         }
     }
 
@@ -109,8 +210,8 @@ class ToolchainValidator implements Serializable {
       @param lang A <tt>String</tt> which is a language to look up based on the keys in the toolchains file.
       @return     <tt>true</tt> if the language is supported or <tt>false</tt> if the language is not supported.
      */
-    public Boolean supportedLanguage(String lang) {
-        lang in languages
+    public Boolean supportedLanguage(String lang, Boolean unstable = false) {
+        lang in this.getLanguages(unstable)
     }
 
     /**
@@ -123,8 +224,8 @@ class ToolchainValidator implements Serializable {
                        if the toolchain is not supported.  Note: it can exist as a
                        toolchain but not be supported as a matrix builder.
      */
-    public Boolean supportedToolchain(String toolchain) {
-        toolchain in toolchain_list
+    public Boolean supportedToolchain(String toolchain, Boolean unstable = false) {
+        toolchain in this.getToolchain_list(unstable)
     }
 
     /**
@@ -135,9 +236,9 @@ class ToolchainValidator implements Serializable {
       @return A <tt>String</tt> which has one of three values: <tt>advanced</tt>,
               <tt>simple</tt>, <tt>disabled</tt>.
      */
-    public String toolchainType(String toolchain) {
-        if('matrix' in toolchains[toolchain]) {
-            toolchains[toolchain]['matrix']
+    public String toolchainType(String toolchain, Boolean unstable = false) {
+        if('matrix' in this.getToolchains(unstable)[toolchain]) {
+            this.getToolchains(unstable)[toolchain]['matrix']
         }
         else {
             'simple'
@@ -153,8 +254,8 @@ class ToolchainValidator implements Serializable {
       <tt>toolchain</tt> is actually valid.
       @return <tt>true</tt> if the <tt>tool</tt> is supported or <tt>false</tt> if it is not supported.
      */
-    public Boolean supportedTool(String toolchain, String tool) {
-        def tools = toolchains[toolchain].keySet() as String[]
+    public Boolean supportedTool(String toolchain, String tool, Boolean unstable = false) {
+        def tools = this.getToolchains(unstable)[toolchain].keySet() as String[]
         return (tool in tools) || ('*' in tools)
     }
 
@@ -164,8 +265,9 @@ class ToolchainValidator implements Serializable {
       @param toolchain A <tt>String</tt> which is a toolchain to look up based on the <tt>lang</tt> to see if it is a matrix building attribute.
       @return          <tt>true</tt> if the toolchain is a matrix builder or <tt>false</tt> if the matrix build is not supported for that language.  Note: it can exist as a toolchain but not be supported as a matrix builder.
      */
-    public Boolean supportedMatrix(String lang, String toolchain) {
-        (toolchain in toolchains['toolchains'][lang]) && (toolchain in matrix_toolchain_list)
+    public Boolean supportedMatrix(String lang, String toolchain, Boolean unstable = false) {
+        (toolchain in this.getToolchains(unstable)['toolchains'][lang]) &&
+            (toolchain in this.getMatrix_toolchain_list(unstable))
     }
 
     /**
@@ -174,7 +276,8 @@ class ToolchainValidator implements Serializable {
      */
     public Boolean validate_asBool() {
         try {
-            this.validate()
+            this.validate(true)
+            this.validate(false)
             return true
         }
         catch(ToolchainValidationException E) {
@@ -187,8 +290,17 @@ class ToolchainValidator implements Serializable {
       @return <tt>true</tt> if the toolchains file validates.  If the toolchains file fails validation then it will throw a <tt>{@link net.gleske.jervis.exceptions.ToolchainValidationException}</tt>.
      */
     public Boolean validate() throws ToolchainMissingKeyException {
+        this.validate(false)
+        this.validate(true)
+    }
+    /**
+      Validates the toolchains file.
+      @return <tt>true</tt> if the toolchains file validates.  If the toolchains file fails validation then it will throw a <tt>{@link net.gleske.jervis.exceptions.ToolchainValidationException}</tt>.
+     */
+    public Boolean validate(Boolean unstable) throws ToolchainMissingKeyException {
+        Map toolchains = this.getToolchains(unstable)
         //check for toolchains key
-        if(!this.supportedToolchain('toolchains')) {
+        if(!this.supportedToolchain('toolchains', unstable)) {
             throw new ToolchainMissingKeyException('toolchains')
         }
         //check for "advanced" env missing the matrix key in toolchains.yaml; now a requirement
@@ -198,7 +310,7 @@ class ToolchainValidator implements Serializable {
         //check all of the toolchains inside of the toolchains key
         (toolchains['toolchains'].keySet() as String[]).each{ language ->
             toolchains['toolchains'][language].each{ toolchain ->
-                if(!this.supportedToolchain(toolchain)) {
+                if(!this.supportedToolchain(toolchain, unstable)) {
                     throw new ToolchainMissingKeyException("toolchains.${language}.${toolchain}.  The toolchain for ${toolchain} is missing from the top level of the toolchains file.")
                 }
             }
@@ -246,9 +358,9 @@ class ToolchainValidator implements Serializable {
 
       @return Returns <tt>true</tt> if a friendly label can be used otherwise <tt>false</tt>
      */
-    public boolean isFriendlyLabel(String toolchain) {
-        if('friendlyLabel' in toolchains[toolchain].keySet()) {
-            return toolchains[toolchain]['friendlyLabel'].toString().equals('true')
+    public boolean isFriendlyLabel(String toolchain, Boolean unstable = false) {
+        if('friendlyLabel' in this.getToolchains(unstable)[toolchain].keySet()) {
+            return this.getToolchains(unstable)[toolchain]['friendlyLabel'].toString().equals('true')
         }
         return false
     }
