@@ -15,9 +15,11 @@
    */
 package net.gleske.jervis.lang
 
-import java.util.regex.Pattern
-import net.gleske.jervis.exceptions.PipelineGeneratorException
 import static net.gleske.jervis.tools.YamlOperator.getObjectValue
+import net.gleske.jervis.exceptions.PipelineGeneratorException
+import net.gleske.jervis.lang.interfaces.PipelineGeneratorInterface
+
+import java.util.regex.Pattern
 
 /**
   This class offers helper forunctions for using Jervis in the context of a
@@ -63,7 +65,7 @@ pipeline_generator.getBuildableMatrixAxes().each { axis -&gt;
 println "Buildable matrices: " + pipeline_generator.getBuildableMatrixAxes().size()
 </code></pre>
  */
-class PipelineGenerator implements Serializable {
+class PipelineGenerator implements PipelineGeneratorInterface, Serializable {
 
     /**
       A lifecycle generator which has already been instantiated and processed
