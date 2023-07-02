@@ -130,5 +130,4 @@ class MultiPlatformGenerator implements Serializable {
         }
     }
     // TODO: implement a ToolchainsValidator
-
 }

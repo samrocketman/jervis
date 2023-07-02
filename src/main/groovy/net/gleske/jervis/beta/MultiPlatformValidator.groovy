@@ -98,7 +98,6 @@ class MultiPlatformValidator {
      */
     public void loadLifecyclesString(String fileName, String yaml) {
         Boolean isUnstable = fileName.endsWith('unstable')
-        // TODO verify this key is correct (by OS)
         String key = (fileName -~ '^lifecycles-') -~ '-(un)?stable$'
         if(!this.lifecycles[key]) {
             this.lifecycles[key] = new LifecycleValidator()
@@ -122,7 +121,6 @@ class MultiPlatformValidator {
      */
     public void loadToolchainsString(String fileName, String yaml) {
         Boolean isUnstable = fileName.endsWith('unstable')
-        // TODO verify this key is correct (by OS)
         String key = (fileName -~ '^toolchains-') -~ '-(un)?stable$'
         if(!this.toolchains[key]) {
             this.toolchains[key] = new ToolchainValidator()
