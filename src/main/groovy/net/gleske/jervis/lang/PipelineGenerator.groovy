@@ -69,6 +69,7 @@ class PipelineGenerator implements Serializable {
       A lifecycle generator which has already been instantiated and processed
       lifecycle, toolchains, and platforms YAML as well as Jervis YAML.
      */
+    // TODO replace with getGenerator() { platformGenerator }
     LifecycleGenerator generator
 
     /**
@@ -190,11 +191,12 @@ pipeline_generator.stashMap['html']['includes']
       is used for helper functions when creating a pipeline job designed to
       support Jervis.
      */
-    def PipelineGenerator(LifecycleGenerator generator) {
+    PipelineGenerator(LifecycleGenerator generator) {
+        // TODO replace generator with (MultiPlatformGenerator)platformGenerator
         this.generator = generator
-        def stashes = (getObjectValue(generator.jervis_yaml, 'jenkins.stash', [])) ?: getObjectValue(generator.jervis_yaml, 'jenkins.stash', [:])
-        if(stashes) {
-            this.stashes = (stashes instanceof List)? stashes : [stashes]
+        // TODO replace stashes with platformGenerator.stashes
+        this.stashes = getObjectValue(generator.jervis_yaml, 'jenkins.stash', [[:], []]).with {
+            (!it) ? [] : ((it in List) ? it : [it])
         }
         processCollectItems()
     }
@@ -241,6 +243,7 @@ pipeline_generator.stashMap['html']['includes']
       Processes <tt>jenkins.collect</tt> items from Jervis YAML.
      */
     private void processCollectItems() {
+        // TODO replace with platformGenerator.collectItems
         Map tmp = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
         if(tmp) {
             this.collect_items = tmp.collect { k, v ->
@@ -265,6 +268,10 @@ pipeline_generator.stashMap['html']['includes']
       the YAML configuration.
      */
     List getBuildableMatrixAxes() {
+        // TODO move code to platformGenerator.getBuildableMatrixAxes()
+        // - Should include platformGenerator 'platform' and 'os'.
+        // - Implement platformGenerator.getYamlMatrixAxes from the collection
+        //   of LifecycleGenerator objects.
         List matrix_axis_maps = generator.yaml_matrix_axes.collect { axis ->
             generator.matrixGetAxisValue(axis).split().collect {
                 [(axis): it]
@@ -274,8 +281,10 @@ pipeline_generator.stashMap['html']['includes']
             matrix_axis_maps = matrix_axis_maps[0]
         }
         else {
-            //creates a list of lists which contain maps to be summed into one list of maps with every possible matrix combination
-            //create a groovy cartesian product of the maps and then sum each list of maps together
+            // - Creates a list of lists which contain maps to be summed into
+            //   one list of maps with every possible matrix combination.
+            // - Create a groovy cartesian product of the maps and then sum
+            //   each list of maps together
             matrix_axis_maps = matrix_axis_maps.combinations()*.sum()
         }
         //return all maps (or some maps allowed via filter)
@@ -298,7 +307,6 @@ pipeline_generator.stashMap['html']['includes']
     /**
       Returns a list of stashes from Jervis YAML to be stashed either serially or
       in this matrix axis for matrix builds.
-
      */
     Map getStashMap(Map matrix_axis = [:]) {
         boolean isMatrix = generator.isMatrixBuild()
@@ -410,7 +418,8 @@ pipeline_generator.stashMap['html']['includes']
     }
 
     /**
-      Check to see if user input is valid when a customized collction is defined.
+      Check to see if user input is valid when a customized collection is
+      defined.
 
       @param item The "jenkins &gt; collect" YAML key to check; e.g.
                   <tt>artifact</tt>.

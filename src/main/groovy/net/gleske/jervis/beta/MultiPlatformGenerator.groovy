@@ -147,5 +147,12 @@ class MultiPlatformGenerator implements Serializable {
                 private_key: options.private_key)
         }
     }
+
+    List getStashes() {
+        YamlOperator.getObjectValue(generator.jervis_yaml, 'jenkins.stash', [[:], []]).with {
+            (!it) ? [] : ((it in List) ? it : [it])
+        }
+    }
+
     // TODO: implement a ToolchainsValidator
 }
