@@ -117,6 +117,13 @@ class LifecycleGenerator implements Serializable {
     String filter_type = ''
 
     /**
+      Set if this generator is a part of a multi-platform configuration.  This
+      would support treating platforms and operating systems as matrix-capable
+      fields.
+      */
+    Boolean multiPlatform = false
+
+    /**
       A quick access variable for matrix build axes.
      */
     List yaml_matrix_axes
@@ -494,7 +501,7 @@ env:
       @return <tt>true</tt> if a matrix build will be generated or <tt>false</tt> if it will just be a regular build.
      */
     public Boolean isMatrixBuild() {
-        yaml_matrix_axes as Boolean
+        yaml_matrix_axes
     }
 
     /*
@@ -507,6 +514,7 @@ env:
     private String matrixExcludeFilterBuilder(String filterType, String exprSeparator, Boolean inverse, Boolean group) {
         Map matrix = jervis_yaml['matrix']
         String result = ''
+        List matrix_platforms = (multiPlatform) ? ['platform', 'os'] : []
         if(filterType in matrix) {
             Boolean first_in_group = true
             for(int i=0; i < matrix[filterType].size(); i++) {
@@ -516,7 +524,7 @@ env:
                     temp = "!${temp}"
                 }
                 matrix[filterType][i].each { k, v ->
-                    if(!(k in yaml_matrix_axes)) {
+                    if(!(k in (yaml_matrix_axes + matrix_platforms))) {
                         //discard because something was nil
                         temp = '-1'
                         return
@@ -527,7 +535,14 @@ env:
                     else {
                         temp += " && "
                     }
-                    if(('env' == k) && (jervis_yaml[k] instanceof Map)) {
+
+                    if('platform' == k) {
+                        temp += "${k} == '${this.label_platform}'"
+                    }
+                    else if('os' == k) {
+                        temp += "${k} == '${this.label_os}'"
+                    }
+                    else if(('env' == k) && (jervis_yaml[k] instanceof Map)) {
                         temp += "${k} == '${k}${jervis_yaml[k]['matrix'].indexOf(v)}'"
                     }
                     else {

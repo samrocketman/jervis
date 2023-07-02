@@ -224,6 +224,40 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  include:\n    - rvm: 1.9.3\n      env: world=hello\n  exclude:\n    - rvm: "1.9.3"\n    - rvm: "2.1"')
         assert '!(rvm == \'rvm:1.9.3\') && !(rvm == \'rvm:2.1\') && (rvm == \'rvm:1.9.3\' && env == \'env0\')' == generator.matrixExcludeFilter()
     }
+    @Test public void test_LifecycleGenerator_matrixExcludeFilter_platform_os() {
+        String yaml = '''\
+            language: ruby
+            env: [world=hello, world=goodbye]
+            rvm: ["1.9.3", "2.0.0", "2.1"]
+            matrix:
+              exclude:
+                - env: world=goodbye
+                  rvm: "2.1"
+                  platform: docker
+                  os: ubuntu1404
+            '''.stripIndent()
+        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        generator.loadPlatformsFile(url.getFile())
+        generator.preloadYamlString(yaml)
+        generator.loadYamlString(yaml)
+        assert generator.multiPlatform == false
+        assert '' == generator.matrixExcludeFilter()
+        generator.multiPlatform = true
+        assert '!(env == \'env1\' && rvm == \'rvm2\' && platform == \'docker\' && os == \'ubuntu1404\')' == generator.matrixExcludeFilter()
+        // no platform or os matrix necessary because not matrix build
+        yaml = '''
+            language: ruby
+            env: world=hello
+            rvm: "2.1"
+            matrix:
+              exclude:
+                - platform: docker
+                  os: ubuntu1404
+            '''.stripIndent()
+        generator.preloadYamlString(yaml)
+        generator.loadYamlString(yaml)
+        assert '!(platform == \'docker\' && os == \'ubuntu1404\')' == generator.matrixExcludeFilter()
+    }
     @Test public void test_LifecycleGenerator_matrixGetAxisValue1() {
         generator.loadYamlString('language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar')
         assert 'env0 env1' == generator.matrixGetAxisValue('env')
