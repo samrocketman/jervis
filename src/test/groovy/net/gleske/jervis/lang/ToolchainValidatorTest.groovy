@@ -40,9 +40,6 @@ class ToolchainValidatorTest extends GroovyTestCase {
         assert toolchains.languages == null
         URL url = this.getClass().getResource('/good_toolchains_simple.json');
         toolchains.loadYamlFile(url.getFile())
-        assert toolchains.toolchains instanceof Map
-        assert toolchains.toolchain_list instanceof String[]
-        assert toolchains.languages instanceof String[]
         assert toolchains.toolchains['jdk']['default_ivalue'] == 'openjdk7'
         assert 'toolchains' in toolchains.toolchain_list
         assert 'gemfile' in toolchains.toolchain_list
@@ -58,8 +55,6 @@ class ToolchainValidatorTest extends GroovyTestCase {
         assert toolchains.languages == null
         url = this.getClass().getResource('/bad_toolchains_missing_toolchains.json');
         toolchains.loadYamlFile(url.getFile())
-        assert toolchains.toolchains instanceof Map
-        assert toolchains.toolchain_list instanceof String[]
         assert toolchains.languages == null
     }
     @Test public void test_ToolchainValidator_loadYamlString() {
@@ -70,9 +65,6 @@ class ToolchainValidatorTest extends GroovyTestCase {
         String contents = new File(url.getFile()).getText()
         //pass the string contents
         toolchains.loadYamlString(contents)
-        assert toolchains.toolchains instanceof Map
-        assert toolchains.toolchain_list instanceof String[]
-        assert toolchains.languages instanceof String[]
         assert toolchains.toolchains['jdk']['default_ivalue'] == 'openjdk7'
         assert 'toolchains' in toolchains.toolchain_list
         assert 'gemfile' in toolchains.toolchain_list
@@ -89,8 +81,6 @@ class ToolchainValidatorTest extends GroovyTestCase {
         url = this.getClass().getResource('/bad_toolchains_missing_toolchains.json');
         contents = new File(url.getFile()).getText()
         toolchains.loadYamlString(contents)
-        assert toolchains.toolchains instanceof Map
-        assert toolchains.toolchain_list instanceof String[]
         assert toolchains.languages == null
     }
     //test supportedLanguage()

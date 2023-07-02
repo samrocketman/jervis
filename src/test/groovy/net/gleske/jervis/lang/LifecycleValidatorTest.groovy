@@ -41,8 +41,6 @@ class LifecycleValidatorTest extends GroovyTestCase {
         assert lifecycles.languages == null
         URL url = this.getClass().getResource('/good_lifecycles_simple.json');
         lifecycles.loadYamlFile(url.getFile())
-        assert lifecycles.lifecycles instanceof Map
-        assert lifecycles.languages instanceof String[]
         assert lifecycles.lifecycles['groovy']['friendlyName'] == 'Groovy'
         assert 'groovy' in lifecycles.languages
         assert 'ruby' in lifecycles.languages
@@ -55,8 +53,6 @@ class LifecycleValidatorTest extends GroovyTestCase {
         String contents = new File(url.getFile()).getText()
         //use a string this time
         lifecycles.loadYamlString(contents)
-        assert lifecycles.lifecycles instanceof Map
-        assert lifecycles.languages instanceof String[]
         assert lifecycles.lifecycles['groovy']['friendlyName'] == 'Groovy'
         assert 'groovy' in lifecycles.languages
         assert 'ruby' in lifecycles.languages

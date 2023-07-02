@@ -215,7 +215,7 @@ class LifecycleGenerator implements Serializable {
       A utility for decrypting RSA encrypted strings in YAML files.  This is an
       instance of the <tt>{@link net.gleske.jervis.tools.SecurityIO}</tt>.
      */
-    def secret_util
+    SecurityIO secret_util
 
     /**
       A map of friendly key names for matrix steps which can be reference to

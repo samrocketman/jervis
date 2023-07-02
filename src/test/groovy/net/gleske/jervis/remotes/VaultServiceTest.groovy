@@ -296,7 +296,7 @@ class VaultServiceTest extends GroovyTestCase {
         urls.each { String vault_url ->
             myvault = new VaultService(vault_url, cred)
             assert myvault.baseUrl() == DEFAULT_VAULT_URL
-            assert myvault.credential instanceof TokenCredential
+            assert myvault.credential != null
             assert myvault.header() == ['X-Vault-Token': 'fake-token', 'X-Vault-Request': 'true']
         }
         urls.each { String vault_url ->

@@ -583,7 +583,6 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert generator.secret_util == null
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
         generator.setPrivateKey(url.content.text)
-        assert generator.secret_util instanceof SecurityIO
         assert generator.secret_util.key_pair
     }
     @Test public void test_LifecycleGenerator_decryptSecrets_list() {
