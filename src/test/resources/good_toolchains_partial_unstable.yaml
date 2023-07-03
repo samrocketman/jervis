@@ -1,0 +1,14 @@
+toolchains:
+  java: [env, jdk]
+env:
+  matrix: 'disabled'
+  '*': 'export ${jervis_toolchain_ivalue}'
+python:
+  default_ivalue: '3.6'
+  friendlyLabel: true
+  '2.7': foo
+  '3.6': bar
+  '3.10': baz
+go:
+  default_ivalue: 'world'
+  '*': 'hello ${jervis_toolchain_ivalue}'

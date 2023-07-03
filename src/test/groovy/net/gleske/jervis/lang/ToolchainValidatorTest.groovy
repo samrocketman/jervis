@@ -34,6 +34,67 @@ class ToolchainValidatorTest extends GroovyTestCase {
         toolchains = null
         super.tearDown()
     }
+    @Test public void test_ToolchainValidator_loadYamlFile_partial_unstable() {
+        URL url = this.getClass().getResource('/good_toolchains_matrix_added_toolchain.json');
+        toolchains.loadYamlFile(url.getFile())
+        assert toolchains.validate(true) == true
+        assert toolchains.validate(false) == true
+        assert toolchains.validate() == true
+        assert toolchains.validate_asBool() == true
+        assert toolchains.getToolchain_list(false) == ['toolchains', 'env', 'jdk', 'python']
+        assert toolchains.getToolchain_list(true) == ['toolchains', 'env', 'jdk', 'python']
+        assert toolchains.getLanguages(false) == ['python']
+        assert toolchains.getLanguages(true) == ['python']
+        assert toolchains.getMatrix_toolchain_list(true) == ['toolchains', 'env', 'jdk', 'python']
+        assert toolchains.getMatrix_toolchain_list(false) == ['toolchains', 'env', 'jdk', 'python']
+        assert toolchains.isFriendlyLabel('python', false) == false
+        assert toolchains.isFriendlyLabel('python', true) == false
+        assert toolchains.supportedTool('python', '3.6', false) == true
+        assert toolchains.supportedTool('python', '3.6', true) == true
+        assert toolchains.supportedTool('python', '3.10', false) == false
+        assert toolchains.supportedTool('python', '3.10', true) == false
+        assert toolchains.supportedMatrix('java', 'jdk', false) == false
+        assert toolchains.supportedMatrix('java', 'jdk', true) == false
+        assert toolchains.supportedMatrix('python', 'go', false) == false
+        assert toolchains.supportedMatrix('python', 'go', true) == false
+        assert toolchains.toolchainType('env', false) == 'advanced'
+        assert toolchains.toolchainType('env', true) == 'advanced'
+        assert toolchains.supportedLanguage('java', false) == false
+        assert toolchains.supportedLanguage('java', true) == false
+        assert toolchains.supportedToolchain('go', false) == false
+        assert toolchains.supportedToolchain('go', true) == false
+    }
+    @Test public void test_ToolchainValidator_loadYamlFile_partial_unstable_load() {
+        URL url = this.getClass().getResource('/good_toolchains_matrix_added_toolchain.json');
+        toolchains.loadYamlFile(url.getFile())
+        url = this.getClass().getResource('/good_toolchains_partial_unstable.yaml');
+        // load unstable
+        toolchains.loadYamlFile(url.getFile(), true)
+        assert toolchains.validate(true) == true
+        assert toolchains.validate(false) == true
+        assert toolchains.validate() == true
+        assert toolchains.validate_asBool() == true
+        assert toolchains.getToolchain_list(false) == ['toolchains', 'env', 'jdk', 'python']
+        assert toolchains.getToolchain_list(true) == ['toolchains', 'env', 'jdk', 'python', 'go']
+        assert toolchains.getLanguages(false) == ['python']
+        assert toolchains.getLanguages(true) == ['python', 'java']
+        assert toolchains.getMatrix_toolchain_list(false) == ['toolchains', 'env', 'jdk', 'python']
+        assert toolchains.getMatrix_toolchain_list(true) == ['toolchains', 'jdk', 'python', 'go']
+        assert toolchains.isFriendlyLabel('python', false) == false
+        assert toolchains.isFriendlyLabel('python', true) == true
+        assert toolchains.supportedTool('python', '3.6', false) == true
+        assert toolchains.supportedTool('python', '3.6', true) == true
+        assert toolchains.supportedTool('python', '3.10', false) == false
+        assert toolchains.supportedTool('python', '3.10', true) == true
+        assert toolchains.supportedMatrix('java', 'jdk', false) == false
+        assert toolchains.supportedMatrix('java', 'jdk', true) == true
+        assert toolchains.toolchainType('env', false) == 'advanced'
+        assert toolchains.toolchainType('env', true) == 'disabled'
+        assert toolchains.supportedLanguage('java', false) == false
+        assert toolchains.supportedLanguage('java', true) == true
+        assert toolchains.supportedToolchain('go', false) == false
+        assert toolchains.supportedToolchain('go', true) == true
+    }
     @Test public void test_ToolchainValidator_loadYamlFile() {
         assert toolchains.toolchains == null
         assert toolchains.toolchain_list == null

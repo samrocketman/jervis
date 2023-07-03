@@ -187,7 +187,7 @@ class ToolchainValidator implements Serializable {
             // end merge toolchains
             this.unstable_toolchain_list = this.unstable_toolchains.keySet() as String[]
             this.unstable_matrix_toolchain_list = this.unstable_toolchain_list.findAll { String toolchain ->
-                toolchainType(toolchain) != 'disabled'
+                toolchainType(toolchain, true) != 'disabled'
             }
             if('toolchains' in this.unstable_toolchain_list) {
                 this.unstable_languages = this.unstable_toolchains.toolchains.keySet() as String[]
