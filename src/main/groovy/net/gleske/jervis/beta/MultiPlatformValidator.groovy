@@ -102,12 +102,7 @@ class MultiPlatformValidator {
         if(!this.lifecycles[key]) {
             this.lifecycles[key] = new LifecycleValidator()
         }
-        if(isUnstable) {
-            // TODO support partial unstable
-        }
-        else {
-            this.lifecycles[key].loadYamlString(yaml)
-        }
+        this.lifecycles[key].loadYamlString(yaml, isUnstable)
         this.lifecycles[key].validate()
     }
 
@@ -125,12 +120,7 @@ class MultiPlatformValidator {
         if(!this.toolchains[key]) {
             this.toolchains[key] = new ToolchainValidator()
         }
-        if(isUnstable) {
-            // TODO support partial unstable
-        }
-        else {
-            this.toolchains[key].loadYamlString(yaml)
-        }
+        this.toolchains[key].loadYamlString(yaml, isUnstable)
         this.toolchains[key].validate()
         this.known_toolchains = (this.known_toolchains + this.toolchains[key].toolchain_list.toList()).sort().unique()
     }
