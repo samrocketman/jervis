@@ -243,7 +243,7 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
                 errors << "'${current.os}' must not contain any platforms or other OSes: ${bad_platforms.inspect()}"
             }
             // Top-level keys MUST NOT contian any key named 'platform' or 'os'
-            bad_platforms = jervis_yaml.keySet().toList.intersect(['platform', 'os'])
+            bad_platforms = jervis_yaml.keySet().toList().intersect(['platform', 'os'])
             if(bad_platforms) {
                 errors << "jenkins.platform and jenkins.os is supported but not as top-level keys: ${bad_platforms.inspect()}"
             }
