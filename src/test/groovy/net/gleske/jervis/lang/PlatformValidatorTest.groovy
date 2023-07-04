@@ -255,8 +255,6 @@ class PlatformValidatorTest extends GroovyTestCase {
     @Test public void test_PlatformValidator_partial_unstable() {
         URL url = this.getClass().getResource('/good_platforms_partial.yaml')
         platforms.loadYamlFile(url.getFile())
-        //['defaults':['platform':'default', 'os':'ubuntu2204', 'stability':'stable', 'sudo':'sudo'], 'supported_platforms':['default':['ubuntu2204':['friendlyName':'Ubuntu 22.04', 'language':['python'], 'toolchain':['env', 'python']]]], 'restrictions':[:]]
-        //assert platforms.@platforms == [:]
         assert YamlOperator.getObjectValue(platforms.platforms, 'supported_platforms.default.ubuntu2204.friendlyName', '') == 'Ubuntu 22.04'
         assert YamlOperator.getObjectValue(platforms.platforms, 'supported_platforms.default.ubuntu2204.language', []) == ['python']
         assert YamlOperator.getObjectValue(platforms.platforms, 'supported_platforms.default.ubuntu2204.toolchain', []) == ['env', 'python']
@@ -271,6 +269,21 @@ class PlatformValidatorTest extends GroovyTestCase {
         assert YamlOperator.getObjectValue(platforms.getPlatforms(true), 'supported_platforms.default.ubuntu2204.friendlyName', '') == 'Ubuntu 22.04'
         assert YamlOperator.getObjectValue(platforms.getPlatforms(true), 'supported_platforms.default.ubuntu2204.language', []) == ['java', 'python']
         assert YamlOperator.getObjectValue(platforms.getPlatforms(true), 'supported_platforms.default.ubuntu2204.toolchain', []) == ['env', 'jdk', 'python']
+    }
+    @Test public void test_PlatformValidator_partial_platform_os() {
+        URL url = this.getClass().getResource('/good_platforms_partial.yaml')
+        platforms.loadYamlFile(url.getFile())
+        assert platforms.platforms.defaults.sudo == 'sudo'
+        assert platforms.platforms.supported_platforms.keySet().toList().sort() == ['default']
+        assert platforms.platforms.supported_platforms.default.keySet().toList().sort() == ['ubuntu2204']
+        url = this.getClass().getResource('/good_platforms_partial_add_platform_os.yaml')
+        platforms.loadYamlFile(url.getFile(), true)
+        assert platforms.platforms.defaults.sudo == 'sudo'
+        assert platforms.platforms.supported_platforms.keySet().toList().sort() == ['default']
+        assert platforms.platforms.supported_platforms.default.keySet().toList().sort() == ['ubuntu2204']
+        assert platforms.getPlatforms(true).defaults.sudo == 'nosudo'
+        assert platforms.getPlatforms(true).supported_platforms.keySet().toList().sort() == ['arm64', 'default']
+        assert platforms.getPlatforms(true).supported_platforms.default.keySet().toList().sort() == ['alpine', 'ubuntu2204']
     }
     @Test public void test_PlatformValidator_serialization() {
         URL url = this.getClass().getResource('/good_platforms_simple.json')

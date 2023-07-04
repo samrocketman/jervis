@@ -1,0 +1,15 @@
+defaults:
+  sudo: nosudo
+supported_platforms:
+  default:
+    alpine:
+      language:
+        - go
+      toolchain:
+        - env
+  arm64:
+    alpine:
+      language:
+        - go
+      toolchain:
+        - env
