@@ -891,4 +891,38 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert generator.cipherlist == []
         assert generator.ciphermap == [:]
     }
+    @Test public void test_LifecycleGenerator_partial_unstable() {
+        // TODO load
+        // /good_lifecycles_partial_unstable.yaml
+        // /good_toolchains_partial_unstable.yaml
+        // /good_platforms_partial.yaml
+        // /good_platforms_partial_unstable.yaml
+        generator = new LifecycleGenerator()
+        // load platforms
+        URL url = this.getClass().getResource('/good_platforms_partial.yaml');
+        generator.loadPlatformsFile(url.getFile())
+        assert generator.platform_obj.@platforms != null
+        // load partial unstable platforms
+        url = this.getClass().getResource('/good_platforms_partial_unstable.yaml');
+        generator.loadPlatformsFile(url.getFile(), true)
+        // load lifecycles
+        url = this.getClass().getResource('/good_lifecycles_matrix_added_toolchain.json');
+        generator.loadLifecycles(url.getFile())
+        assert generator.lifecycle_obj.@lifecycles != null
+        // load partial unstable lifecycles
+        url = this.getClass().getResource('/good_lifecycles_partial_unstable.yaml');
+        generator.loadLifecycles(url.getFile(), true)
+        // load toolchains
+        url = this.getClass().getResource('/good_toolchains_matrix_added_toolchain.json');
+        generator.loadToolchains(url.getFile())
+        assert generator.toolchain_obj.@toolchains != null
+        // load partial unstable toolchains
+        url = this.getClass().getResource('/good_toolchains_partial_unstable.yaml');
+        generator.loadToolchains(url.getFile(), true)
+        String yaml = '''\
+            language: java
+            '''.stripIndent()
+        generator.preloadYamlString(yaml)
+        generator.loadYamlString(yaml)
+    }
 }

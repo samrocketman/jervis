@@ -176,6 +176,14 @@ class LifecycleGenerator implements Serializable {
     String label_stability
 
     /**
+      This is a shortcut for <tt>label_stability</tt> being <tt>unstable</tt>.
+      If <tt>isUnstable</tt> is <tt>true</tt>, then the requested toolchains or
+      lifecycles will be considered unstable.  Default is <tt>false</tt>.
+      @see #label_stability
+     */
+    Boolean isUnstable = false
+
+    /**
       An optional label which is used by the <tt>{@link #getLabels()}</tt> function
       to generate advanced job labels for agents with sudo or nosudo access.  This is
       populated by <tt>{@link #preloadYamlString(java.lang.String)}</tt>.
@@ -246,17 +254,17 @@ class LifecycleGenerator implements Serializable {
             throw new JervisException('Must call loadYamlString() first.')
         }
         folder_listing = listing
-        String current_key = lifecycle_obj.lifecycles[yaml_language].defaultKey
+        String current_key = this.lifecycle_obj.getLifecycles(this.isUnstable)[yaml_language].defaultKey
         while(current_key != null) {
-            def cycles = lifecycle_obj.lifecycles[yaml_language][current_key].keySet() as String[]
+            def cycles = this.lifecycle_obj.getLifecycles(this.isUnstable)[yaml_language][current_key].keySet() as String[]
             if('fileExistsCondition' in cycles) {
-                if(lifecycle_obj.lifecycles[yaml_language][current_key]['fileExistsCondition'] in listing) {
+                if(this.lifecycle_obj.getLifecycles(this.isUnstable)[yaml_language][current_key]['fileExistsCondition'] in listing) {
                     lifecycle_key = current_key
                     current_key = null
                 }
                 else {
                     if('fallbackKey' in cycles) {
-                        current_key = lifecycle_obj.lifecycles[yaml_language][current_key]['fallbackKey']
+                        current_key = this.lifecycle_obj.getLifecycles(this.isUnstable)[yaml_language][current_key]['fallbackKey']
                     }
                     else {
                         lifecycle_key = current_key
@@ -282,11 +290,12 @@ class LifecycleGenerator implements Serializable {
      */
     public void setLabel_stability(String stability) {
         if(stability == 'unstable' || stability == 'true') {
-            label_stability = 'unstable'
+            this.label_stability = 'unstable'
         }
         else {
-            label_stability = 'stable'
+            this.label_stability = 'stable'
         }
+        this.isUnstable = (this.label_stability == 'unstable')
     }
 
     /**
@@ -314,10 +323,13 @@ class LifecycleGenerator implements Serializable {
       <tt>/src/main/resources/lifecycles.yaml</tt>.
 
       @param file A path to a lifecycles file.
+      @param unstable Load unstable, instead of stable.
      */
-    public void loadLifecycles(String file) {
-        this.lifecycle_obj = new LifecycleValidator()
-        this.lifecycle_obj.loadYamlFile(file)
+    public void loadLifecycles(String file, Boolean unstable = false) {
+        if(!this.lifecycle_obj) {
+            this.lifecycle_obj = new LifecycleValidator()
+        }
+        this.lifecycle_obj.loadYamlFile(file, unstable)
         this.lifecycle_obj.validate()
     }
 
@@ -328,10 +340,13 @@ class LifecycleGenerator implements Serializable {
       repository root is <tt>/src/main/resources/lifecycles.yaml</tt>.
 
       @param yaml A <tt>String</tt> containing YAML which is from a lifecycles file.
+      @param unstable Load unstable, instead of stable.
      */
-    public void loadLifecyclesString(String yaml) {
-        this.lifecycle_obj = new LifecycleValidator()
-        this.lifecycle_obj.loadYamlString(yaml)
+    public void loadLifecyclesString(String yaml, Boolean unstable = false) {
+        if(!this.lifecycle_obj) {
+            this.lifecycle_obj = new LifecycleValidator()
+        }
+        this.lifecycle_obj.loadYamlString(yaml, unstable)
         this.lifecycle_obj.validate()
     }
 
@@ -343,10 +358,13 @@ class LifecycleGenerator implements Serializable {
       <tt>/src/main/resources/toolchains.yaml</tt>.
 
       @param file A path to a toolchains file.
+      @param unstable Load unstable, instead of stable.
      */
-    public void loadToolchains(String file) {
-        this.toolchain_obj = new ToolchainValidator()
-        this.toolchain_obj.loadYamlFile(file)
+    public void loadToolchains(String file, Boolean unstable = false) {
+        if(!this.toolchain_obj) {
+            this.toolchain_obj = new ToolchainValidator()
+        }
+        this.toolchain_obj.loadYamlFile(file, unstable)
         this.toolchain_obj.validate()
     }
 
@@ -358,10 +376,13 @@ class LifecycleGenerator implements Serializable {
       <tt>/src/main/resources/toolchains.yaml</tt>.
 
       @param yaml A <tt>String</tt> containing YAML which is from a toolchains file.
+      @param unstable Load unstable, instead of stable.
      */
-    public void loadToolchainsString(String yaml) {
-        this.toolchain_obj = new ToolchainValidator()
-        this.toolchain_obj.loadYamlString(yaml)
+    public void loadToolchainsString(String yaml, Boolean unstable = false) {
+        if(!this.toolchain_obj) {
+            this.toolchain_obj = new ToolchainValidator()
+        }
+        this.toolchain_obj.loadYamlString(yaml, unstable)
         this.toolchain_obj.validate()
     }
 
@@ -385,13 +406,13 @@ class LifecycleGenerator implements Serializable {
         if(jervis_yaml['language']) {
             yaml_language = jervis_yaml['language']
         }
-        if(!lifecycle_obj) {
+        if(!this.lifecycle_obj) {
             throw new JervisException('ERROR: Must call LifecycleGenerator.loadLifecycles() or LifecycleGenerator.loadLifecyclesString() first.')
         }
-        if(!toolchain_obj) {
+        if(!this.toolchain_obj) {
             throw new JervisException('ERROR: Must call LifecycleGenerator.loadToolchains() or LifecycleGenerator.loadToolchainsString() first.')
         }
-        if(!lifecycle_obj.supportedLanguage(this.yaml_language) || !toolchain_obj.supportedLanguage(this.yaml_language)) {
+        if(!this.lifecycle_obj.supportedLanguage(this.yaml_language, this.isUnstable) || !this.toolchain_obj.supportedLanguage(this.yaml_language, this.isUnstable)) {
             throw new UnsupportedLanguageException(this.yaml_language)
         }
         def cipherobj = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.secrets', new Object())
@@ -416,32 +437,32 @@ class LifecycleGenerator implements Serializable {
 
         //allow ordered loading additional toolchains into a language key
         List additional_toolchains = []
-        toolchain_obj.toolchains["toolchains"][yaml_language].with { List toolchainList ->
+        this.toolchain_obj.getToolchains(this.isUnstable)["toolchains"][yaml_language].with { List toolchainList ->
             List yaml_additional_toolchains = YamlOperator.getObjectValue(jervis_yaml, 'additional_toolchains', [])
             if(YamlOperator.getObjectValue(jervis_yaml, 'additional_toolchains', '')) {
                 yaml_additional_toolchains = [YamlOperator.getObjectValue(jervis_yaml, 'additional_toolchains', '')]
             }
             additional_toolchains += (yaml_additional_toolchains - toolchainList).findAll {
-                it in toolchain_obj.matrix_toolchain_list
+                it in this.toolchain_obj.getMatrix_toolchain_list(this.isUnstable)
             }
         }
-        toolchain_obj.toolchains["toolchains"][yaml_language] += additional_toolchains
+        this.toolchain_obj.getToolchains(this.isUnstable)["toolchains"][yaml_language] += additional_toolchains
 
         // go through any toolchains that may be left; order is not guaranteed
         // but will likely remain the order in which they're in the YAML file.
         yaml_keys.each { key ->
-            if((key in toolchain_obj.toolchains) && !(key in toolchain_obj.toolchains["toolchains"][yaml_language])) {
-                toolchain_obj.toolchains["toolchains"][yaml_language] << key
+            if((key in this.toolchain_obj.getToolchains(this.isUnstable)) && !(key in this.toolchain_obj.getToolchains(this.isUnstable)["toolchains"][yaml_language])) {
+                this.toolchain_obj.getToolchains(this.isUnstable)["toolchains"][yaml_language] << key
             }
         }
 
         // determine which toolchains need to be built as a matrix build
-        yaml_matrix_axes = toolchain_obj.toolchains["toolchains"][yaml_language].findAll { String toolchain ->
-            toolchain_obj.supportedMatrix(yaml_language, toolchain) &&
+        yaml_matrix_axes = this.toolchain_obj.getToolchains(this.isUnstable)["toolchains"][yaml_language].findAll { String toolchain ->
+            this.toolchain_obj.supportedMatrix(yaml_language, toolchain, this.isUnstable) &&
             (
                 (YamlOperator.getObjectValue(jervis_yaml, toolchain, []).size() > 1) ||
                 (
-                    toolchain_obj.toolchainType(toolchain) == 'advanced' &&
+                    this.toolchain_obj.toolchainType(toolchain, this.isUnstable) == 'advanced' &&
                     (YamlOperator.getObjectValue(jervis_yaml, "${toolchain}.matrix", []).size() > 1)
                 )
             )
@@ -546,7 +567,7 @@ env:
                         temp += "${k} == '${k}${jervis_yaml[k]['matrix'].indexOf(v)}'"
                     }
                     else {
-                        if(toolchain_obj.isFriendlyLabel(k)) {
+                        if(this.toolchain_obj.isFriendlyLabel(k, this.isUnstable)) {
                             temp += "${k} == '${k}:${v}'"
                         }
                         else {
@@ -614,7 +635,7 @@ env:
                 }
             }
             else {
-                boolean friendly = toolchain_obj.isFriendlyLabel(axis)
+                boolean friendly = this.toolchain_obj.isFriendlyLabel(axis, this.isUnstable)
                 jervis_yaml[axis].each {
                     if(friendly) {
                         result += " ${axis}:${it}"
@@ -668,10 +689,10 @@ env:
             output += "case \${${toolchain}} in\n"
             for(int i=0; i < chain.size(); i++) {
                 String tempchain = chain[i].toString()
-                if(!toolchain_obj.supportedTool(toolchain, tempchain)) {
+                if(!this.toolchain_obj.supportedTool(toolchain, tempchain, this.isUnstable)) {
                     throw new UnsupportedToolException("${toolchain}: ${tempchain}")
                 }
-                if(toolchain_obj.isFriendlyLabel(toolchain)) {
+                if(this.toolchain_obj.isFriendlyLabel(toolchain, this.isUnstable)) {
                     output += "  ${toolchain}:${tempchain})\n"
                 }
                 else {
@@ -680,12 +701,12 @@ env:
                     output += "  ${toolchain}${i})\n"
                 }
                 if(tempchain in toolchain_keys) {
-                    toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(toolchain_obj.toolchains, "\"${toolchain}\".\"${tempchain}\"", [[], '']))
+                    toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(this.toolchain_obj.getToolchains(this.isUnstable), "\"${toolchain}\".\"${tempchain}\"", [[], '']))
                     output += '    ' + toolchainScriptList.join('\n    ') + '\n    ;;\n'
                 }
                 else {
                     //assume using "*" key
-                    toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(toolchain_obj.toolchains, "\"${toolchain}\".\\*", [[], '']))
+                    toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(this.toolchain_obj.getToolchains(this.isUnstable), "\"${toolchain}\".\\*", [[], '']))
                     output += '    ' + this.interpolate_ivalue(toolchainScriptList, tempchain).join('\n    ') + '\n    ;;\n'
                 }
             }
@@ -693,16 +714,16 @@ env:
         }
         else {
             chain.each {
-                if(!toolchain_obj.supportedTool(toolchain, it)) {
+                if(!this.toolchain_obj.supportedTool(toolchain, it, this.isUnstable)) {
                     throw new UnsupportedToolException("${toolchain}: ${it}")
                 }
                 if(it in toolchain_keys) {
-                    toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(toolchain_obj.toolchains, "\"${toolchain}\".\"${it}\"", [[], '']))
+                    toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(this.toolchain_obj.getToolchains(this.isUnstable), "\"${toolchain}\".\"${it}\"", [[], '']))
                     output += toolchainScriptList.join('\n') + '\n'
                 }
                 else {
                     //assume using "*" key
-                    toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(toolchain_obj.toolchains, "\"${toolchain}\".\\*", [[], '']))
+                    toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(this.toolchain_obj.getToolchains(this.isUnstable), "\"${toolchain}\".\\*", [[], '']))
                     output += this.interpolate_ivalue(toolchainScriptList, it).join('\n') + '\n'
                 }
             }
@@ -717,14 +738,14 @@ env:
      */
     public String generateToolchainSection() throws UnsupportedToolException {
         //get toolchain order for this language
-        def toolchains_order = toolchain_obj.toolchains['toolchains'][yaml_language]
+        def toolchains_order = this.toolchain_obj.getToolchains(this.isUnstable)['toolchains'][yaml_language]
         HashMap cleanup = [:]
         String output = '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n'
         List toolchainScriptList
         toolchains_order.each { toolchain ->
-            String[] toolchain_keys = toolchain_obj.toolchains[toolchain].keySet() as String[]
-            if('cleanup' in toolchain_obj.toolchains[toolchain]) {
-                cleanup[toolchain] = toolchain_obj.toolchains[toolchain]['cleanup']
+            String[] toolchain_keys = this.toolchain_obj.getToolchains(this.isUnstable)[toolchain].keySet() as String[]
+            if('cleanup' in this.toolchain_obj.getToolchains(this.isUnstable)[toolchain]) {
+                cleanup[toolchain] = this.toolchain_obj.getToolchains(this.isUnstable)[toolchain]['cleanup']
             }
             output += "#${toolchain} toolchain section\n"
             if(toolchain in yaml_keys) {
@@ -735,7 +756,11 @@ env:
                     jervis_yaml[toolchain] = jervis_yaml[toolchain].toString()
                 }
                 //toolchain must be an instance of String, List, or (in the case of only advanced toolchains) Map.
-                if(!isInstanceFromList(jervis_yaml[toolchain], [String, List]) && !((toolchain_obj.toolchainType(toolchain) == 'advanced') && (jervis_yaml[toolchain] instanceof Map))) {
+                if(!isInstanceFromList(jervis_yaml[toolchain], [String, List]) &&
+                        !(
+                            (this.toolchain_obj.toolchainType(toolchain, this.isUnstable) == 'advanced') &&
+                            (jervis_yaml[toolchain] instanceof Map)
+                        )) {
                     throw new UnsupportedToolException("${toolchain}: ${jervis_yaml[toolchain]}")
                 }
                 if(jervis_yaml[toolchain] instanceof String) {
@@ -779,15 +804,19 @@ env:
             }
             else {
                 //falling back to default behavior in toolchains.yaml because user has not defined it in their YAML.
-                String default_ivalue = toolchain_obj.toolchains[toolchain].default_ivalue
+                String default_ivalue = this.toolchain_obj.getToolchains(this.isUnstable)[toolchain].default_ivalue
                 if(default_ivalue) {
                     if(default_ivalue in toolchain_keys) {
-                        toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(toolchain_obj.toolchains, "\"${toolchain}\".\"${default_ivalue}\"", [[], '']))
+                        toolchainScriptList = toolchainScript(
+                                YamlOperator.getObjectValue(
+                                    this.toolchain_obj.getToolchains(this.isUnstable),
+                                    "\"${toolchain}\".\"${default_ivalue}\"",
+                                    [[], '']))
                         output += toolchainScriptList.join('\n') + '\n'
                     }
                     else {
                         //assume using "*" key
-                        toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(toolchain_obj.toolchains, "\"${toolchain}\".\\*", [[], '']))
+                        toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(this.toolchain_obj.getToolchains(this.isUnstable), "\"${toolchain}\".\\*", [[], '']))
                         output += this.interpolate_ivalue(toolchainScriptList, default_ivalue).join('\n') + '\n'
                     }
                 }
@@ -810,7 +839,7 @@ env:
      */
     public String generateSection(String section) {
         String output = "#\n# ${section.toUpperCase()} SECTION\n#\nset +x\necho '# ${section.toUpperCase()} SECTION'\nset -x\n"
-        def my_lifecycle = lifecycle_obj.lifecycles[yaml_language][lifecycle_key]
+        def my_lifecycle = this.lifecycle_obj.getLifecycles(this.isUnstable)[yaml_language][lifecycle_key]
         String[] my_lifecycle_keys = my_lifecycle.keySet() as String[]
         if(!(section in yaml_keys)) {
             //take the default
@@ -972,10 +1001,11 @@ env:
       <tt>/src/main/resources/platforms.yaml</tt>.
 
       @param file A path to a platforms file.
+      @param unstable Load unstable, instead of stable.
      */
-    public void loadPlatformsFile(String file) {
+    public void loadPlatformsFile(String file, Boolean unstable = false) {
         this.platform_obj = new PlatformValidator()
-        this.platform_obj.loadYamlFile(file)
+        this.platform_obj.loadYamlFile(file, unstable)
         this.platform_obj.validate()
     }
 
@@ -989,10 +1019,11 @@ env:
       repository root is <tt>/src/main/resources/platforms.yaml</tt>.
 
       @param yaml A <tt>String</tt> containing YAML which is from a platforms file.
+      @param unstable Load unstable, instead of stable.
      */
-    public void loadPlatformsString(String yaml) {
+    public void loadPlatformsString(String yaml, Boolean unstable = false) {
         this.platform_obj = new PlatformValidator()
-        this.platform_obj.loadYamlString(yaml)
+        this.platform_obj.loadYamlString(yaml, unstable)
         this.platform_obj.validate()
     }
 
@@ -1005,14 +1036,16 @@ env:
       @param raw_yaml A <tt>String</tt> which contains Jervis YAML to be parsed.
      */
     public void preloadYamlString(String raw_yaml) throws JervisException {
-        if(!platform_obj) {
+        if(!this.platform_obj) {
             throw new PlatformValidationException('Must load the platforms file first.')
         }
         jervis_yaml = YamlOperator.loadYamlFrom(raw_yaml) ?: [:]
-        this.label_platform = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.platform', platform_obj.platforms['defaults']['platform'])
-        this.label_os = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.os', platform_obj.platforms['defaults']['os'])
-        setLabel_stability(YamlOperator.getObjectValue(jervis_yaml, 'jenkins.unstable', platform_obj.platforms['defaults']['stability']))
-        setLabel_sudo(YamlOperator.getObjectValue(jervis_yaml, 'jenkins.sudo', platform_obj.platforms['defaults']['sudo']))
+        // stability should always load first; load it twice to account for unstable defaults
+        setLabel_stability(YamlOperator.getObjectValue(jervis_yaml, 'jenkins.unstable', this.platform_obj.platforms['defaults']['stability']))
+        setLabel_stability(YamlOperator.getObjectValue(jervis_yaml, 'jenkins.unstable', this.platform_obj.getPlatforms(this.isUnstable)['defaults']['stability']))
+        this.label_platform = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.platform', this.platform_obj.getPlatforms(this.isUnstable)['defaults']['platform'])
+        this.label_os = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.os', this.platform_obj.getPlatforms(this.isUnstable)['defaults']['os'])
+        setLabel_sudo(YamlOperator.getObjectValue(jervis_yaml, 'jenkins.sudo', this.platform_obj.getPlatforms(this.isUnstable)['defaults']['sudo']))
     }
 
     /**
@@ -1022,8 +1055,8 @@ env:
       @return A <tt>String</tt> which is a groovy expression of Jenkins node labels.
      */
     public String getLabels() {
-        String labels = ["language:${yaml_language}", toolchain_obj.toolchains['toolchains'][yaml_language].join(' && ')].join(' && ')
-        if(platform_obj) {
+        String labels = ["language:${yaml_language}", this.toolchain_obj.getToolchains(this.isUnstable)['toolchains'][yaml_language].join(' && ')].join(' && ')
+        if(this.platform_obj) {
             labels = [this.label_stability, this.label_platform, this.label_os, this.label_sudo, labels].join(' && ')
         }
         //build on additional labels
@@ -1048,7 +1081,7 @@ env:
               That is, it is not restricted.
      */
     public boolean isRestricted(String project) {
-        Map restrictions = platform_obj.platforms['restrictions']
+        Map restrictions = this.platform_obj.getPlatforms(this.isUnstable)['restrictions']
         String org = project.split('/')[0]
         boolean restricted = false
         if(restrictions.containsKey(label_platform)) {
@@ -1071,19 +1104,19 @@ env:
                platform.
      */
     public boolean isSupportedPlatform() {
-        if(platform_obj) {
-            String [] supported_platforms = platform_obj.platforms['supported_platforms'].keySet() as String[]
+        if(this.platform_obj) {
+            String [] supported_platforms = this.platform_obj.getPlatforms(this.isUnstable)['supported_platforms'].keySet() as String[]
             if(label_platform in supported_platforms) {
-                String[] supported_os = platform_obj.platforms['supported_platforms'][label_platform].keySet() as String[]
+                String[] supported_os = this.platform_obj.getPlatforms(this.isUnstable)['supported_platforms'][label_platform].keySet() as String[]
                 if(label_os in supported_os) {
                     //check the support of toolchains
                     LinkedHashSet toolchains_set = [] as Set
                     //start with the requested toolchains
-                    toolchains_set = toolchains_set.plus(toolchain_obj.toolchains['toolchains'][yaml_language])
+                    toolchains_set = toolchains_set.plus(this.toolchain_obj.getToolchains(this.isUnstable)['toolchains'][yaml_language])
                     //subtract from the list of supported tool chains
-                    toolchains_set = toolchains_set.minus(platform_obj.platforms['supported_platforms'][label_platform][label_os]['toolchain'])
+                    toolchains_set = toolchains_set.minus(this.platform_obj.getPlatforms(this.isUnstable)['supported_platforms'][label_platform][label_os]['toolchain'])
                     //toolchains_set should be empty if the platform supports all toolchains
-                    List supported_languages = platform_obj.platforms['supported_platforms'][label_platform][label_os]['language']
+                    List supported_languages = this.platform_obj.getPlatforms(this.isUnstable)['supported_platforms'][label_platform][label_os]['language']
                     if(!(yaml_language in supported_languages) || toolchains_set.size() > 0) {
                         return false
                     }

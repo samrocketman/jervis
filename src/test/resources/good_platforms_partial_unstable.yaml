@@ -1,0 +1,7 @@
+supported_platforms:
+  default:
+    ubuntu2204:
+      language:
+        - java
+      toolchain:
+        - jdk

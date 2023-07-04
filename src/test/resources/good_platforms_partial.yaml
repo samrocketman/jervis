@@ -1,0 +1,16 @@
+defaults:
+  platform: default
+  os: ubuntu2204
+  stability: stable
+  sudo: sudo
+supported_platforms:
+  default:
+    ubuntu2204:
+      friendlyName: Ubuntu 22.04
+      language:
+        - python
+      toolchain:
+        - env
+        - python
+restrictions: {
+  }

@@ -51,11 +51,27 @@ null
 </code></pre>
  */
 class PlatformValidator implements Serializable {
+    /**
+      Check if there is an unstable platforms object available.
+      */
+    private Boolean isUnstable(Boolean unstable) {
+        unstable && this.unstable_platforms
+    }
 
     /**
       A <tt>{@link Map}</tt> of the parsed platforms file.
      */
     Map platforms
+
+    Map getPlatforms(Boolean unstable = false) {
+        this.isUnstable(unstable) ?
+            this.unstable_platforms : this.@platforms
+    }
+
+    /**
+      A <tt>{@link Map}</tt> of the parsed unstable platforms file.
+     */
+    Map unstable_platforms
 
     /**
       Load the YAML of a platforms file and parse it.  This should be the first
@@ -63,9 +79,10 @@ class PlatformValidator implements Serializable {
       <tt>{@link #loadYamlString()}</tt> can be called instead.  It populates
       <tt>{@link #platforms}</tt>.
       @param file A <tt>String</tt> which is a path to a platforms file.
+      @param unstable Load unstable platforms instead of stable.
      */
-    public void loadYamlFile(String file) {
-        loadYamlString(new File(file).text)
+    public void loadYamlFile(String file, Boolean unstable = false) {
+        loadYamlString(new File(file).text, unstable)
     }
 
     /**
@@ -74,9 +91,50 @@ class PlatformValidator implements Serializable {
       <a href="https://github.com/samrocketman/jervis/issues/43#issuecomment-73638215" target="_blank"><tt>readFileFromWorkspace</tt></a>
       method from the Jenkins Job DSL Plugin.
       @param yaml A <tt>String</tt> containing the contents of a platforms file.
+      @param unstable Load unstable platforms instead of stable.
      */
-    public void loadYamlString(String yaml) {
-        platforms = YamlOperator.loadYamlFrom(yaml) ?: [:]
+    public void loadYamlString(String yaml, Boolean unstable = false) {
+        if(unstable) {
+            // perform a deep merge of unstable YAML with stable YAML
+            Map tempPlatforms = YamlOperator.deepCopy(this.@platforms)
+            Map tempYaml = YamlOperator.loadYamlFrom(yaml) ?: [:]
+            ['defaults', 'supported_platforms', 'restrictions'].each { String topKey ->
+                if(topKey in tempYaml.keySet()) {
+                    if(topKey == 'supported_platforms') {
+                        // pv is platform value
+                        tempYaml[topKey].each { platform, pv ->
+                            if(!(platform in tempPlatforms[topKey].keySet())) {
+                                tempPlatforms[topKey][platform] = pv
+                                // skip to next platform
+                                return
+                            }
+                            // ov is OS value
+                            pv.each { os, ov ->
+                                if(!(os in tempPlatforms[topKey][platform].keySet())) {
+                                    tempPlatforms[topKey][platform][os] = ov
+                                    // skip to next OS
+                                    return
+                                }
+                                // OS exists in both places so merge language and toolchain lists
+                                List addLanguage = YamlOperator.getObjectValue(ov, 'language', [])
+                                List addToolchain = YamlOperator.getObjectValue(ov, 'toolchain', [])
+                                List currentLanguage = YamlOperator.getObjectValue(tempPlatforms, "supported_platforms.\"${platform}\".\"${os}\".language", [])
+                                List currentToolchain = YamlOperator.getObjectValue(tempPlatforms, "supported_platforms.\"${platform}\".\"${os}\".toolchain", [])
+                                tempPlatforms['supported_platforms'][platform][os].language = (currentLanguage + addLanguage).sort().unique()
+                                tempPlatforms['supported_platforms'][platform][os].toolchain = (currentToolchain + addToolchain).sort().unique()
+                            }
+                        }
+                    }
+                    else {
+                        tempPlatforms[topKey].putAll(tempYaml[topKey])
+                    }
+                }
+            }
+            this.unstable_platforms = tempPlatforms
+        }
+        else {
+            this.platforms = YamlOperator.loadYamlFrom(yaml) ?: [:]
+        }
     }
 
     /**
@@ -85,7 +143,8 @@ class PlatformValidator implements Serializable {
      */
     public Boolean validate_asBool() {
         try {
-            this.validate()
+            this.validate(false)
+            this.validate(true)
             return true
         }
         catch(PlatformValidationException E) {
@@ -97,6 +156,17 @@ class PlatformValidator implements Serializable {
       @return <tt>true</tt> if the platforms file validates.  If the platforms file fails validation then it will throw a <tt>{@link net.gleske.jervis.exceptions.PlatformValidationException}</tt>.
      */
     public Boolean validate() throws PlatformMissingKeyException, PlatformBadValueInKeyException, PlatformValidationException {
+        validate(false)
+        validate(true)
+    }
+
+    /**
+      Validates the platforms file.
+      @param
+      @return <tt>true</tt> if the platforms file validates.  If the platforms file fails validation then it will throw a <tt>{@link net.gleske.jervis.exceptions.PlatformValidationException}</tt>.
+     */
+    public Boolean validate(Boolean unstable) throws PlatformMissingKeyException, PlatformBadValueInKeyException, PlatformValidationException {
+        Map platforms = getPlatforms(unstable)
         //check for required root keys and types
         ['defaults', 'supported_platforms', 'restrictions'].each {
             if(!platforms.containsKey(it)) {
