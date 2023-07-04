@@ -918,6 +918,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
             language: java
             '''.stripIndent()
         generator.preloadYamlString(yaml)
+        assert generator.isSupportedPlatform() == false
         shouldFail(UnsupportedLanguageException) {
             generator.loadYamlString(yaml)
         }
@@ -927,8 +928,42 @@ class LifecycleGeneratorTest extends GroovyTestCase {
               unstable: true
             '''.stripIndent()
         generator.preloadYamlString(yaml)
+        assert generator.isSupportedPlatform() == true
         generator.loadYamlString(yaml)
         assert generator.generateSection('script') == '#\n# SCRIPT SECTION\n#\nset +x\necho \'# SCRIPT SECTION\'\nset -x\nant test\n'
         assert generator.generateSection('install') == ''
+        yaml = '''\
+            language: python
+            go: foo
+            jenkins:
+              unstable: true
+            '''.stripIndent()
+        generator.preloadYamlString(yaml)
+        generator.loadYamlString(yaml)
+        assert generator.generateToolchainSection() == '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#env toolchain section\n#python toolchain section\nbar\n#go toolchain section\nhello foo\n'
+        yaml = '''\
+            language: python
+            go:
+              - foo
+              - bar
+            jenkins:
+              unstable: false
+            '''.stripIndent()
+        generator.preloadYamlString(yaml)
+        generator.loadYamlString(yaml)
+        assert generator.yaml_matrix_axes == []
+        assert generator.getLabels() == 'stable && default && ubuntu2204 && sudo && language:python && env && python'
+        yaml = '''\
+            language: python
+            go:
+              - foo
+              - bar
+            jenkins:
+              unstable: true
+            '''.stripIndent()
+        generator.preloadYamlString(yaml)
+        generator.loadYamlString(yaml)
+        assert generator.yaml_matrix_axes == ['go']
+        assert generator.getLabels() == 'unstable && default && ubuntu2204 && sudo && language:python && env && python && go'
     }
 }
