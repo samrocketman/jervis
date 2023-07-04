@@ -1004,7 +1004,9 @@ env:
       @param unstable Load unstable, instead of stable.
      */
     public void loadPlatformsFile(String file, Boolean unstable = false) {
-        this.platform_obj = new PlatformValidator()
+        if(!this.platform_obj) {
+            this.platform_obj = new PlatformValidator()
+        }
         this.platform_obj.loadYamlFile(file, unstable)
         this.platform_obj.validate()
     }
@@ -1022,7 +1024,9 @@ env:
       @param unstable Load unstable, instead of stable.
      */
     public void loadPlatformsString(String yaml, Boolean unstable = false) {
-        this.platform_obj = new PlatformValidator()
+        if(!this.platform_obj) {
+            this.platform_obj = new PlatformValidator()
+        }
         this.platform_obj.loadYamlString(yaml, unstable)
         this.platform_obj.validate()
     }

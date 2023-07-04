@@ -120,6 +120,7 @@ class PlatformValidator implements Serializable {
                                 List addToolchain = YamlOperator.getObjectValue(ov, 'toolchain', [])
                                 List currentLanguage = YamlOperator.getObjectValue(tempPlatforms, "supported_platforms.\"${platform}\".\"${os}\".language", [])
                                 List currentToolchain = YamlOperator.getObjectValue(tempPlatforms, "supported_platforms.\"${platform}\".\"${os}\".toolchain", [])
+                                tempPlatforms['supported_platforms'][platform][os].putAll(ov)
                                 tempPlatforms['supported_platforms'][platform][os].language = (currentLanguage + addLanguage).sort().unique()
                                 tempPlatforms['supported_platforms'][platform][os].toolchain = (currentToolchain + addToolchain).sort().unique()
                             }

@@ -18,6 +18,7 @@ package net.gleske.jervis.lang
 import net.gleske.jervis.exceptions.PlatformBadValueInKeyException
 import net.gleske.jervis.exceptions.PlatformMissingKeyException
 import net.gleske.jervis.exceptions.PlatformValidationException
+import net.gleske.jervis.tools.YamlOperator
 
 import org.junit.After
 import org.junit.Before
@@ -246,10 +247,30 @@ class PlatformValidatorTest extends GroovyTestCase {
         }
     }
     @Test public void test_PlatformValidator_good_platforms_optional() {
-        URL url = this.getClass().getResource('/good_platforms_optional.json');
+        URL url = this.getClass().getResource('/good_platforms_optional.json')
         platforms.loadYamlFile(url.getFile())
         assert true == platforms.validate()
         assert true == platforms.validate_asBool()
+    }
+    @Test public void test_PlatformValidator_partial_unstable() {
+        URL url = this.getClass().getResource('/good_platforms_partial.yaml')
+        platforms.loadYamlFile(url.getFile())
+        //['defaults':['platform':'default', 'os':'ubuntu2204', 'stability':'stable', 'sudo':'sudo'], 'supported_platforms':['default':['ubuntu2204':['friendlyName':'Ubuntu 22.04', 'language':['python'], 'toolchain':['env', 'python']]]], 'restrictions':[:]]
+        //assert platforms.@platforms == [:]
+        assert YamlOperator.getObjectValue(platforms.platforms, 'supported_platforms.default.ubuntu2204.friendlyName', '') == 'Ubuntu 22.04'
+        assert YamlOperator.getObjectValue(platforms.platforms, 'supported_platforms.default.ubuntu2204.language', []) == ['python']
+        assert YamlOperator.getObjectValue(platforms.platforms, 'supported_platforms.default.ubuntu2204.toolchain', []) == ['env', 'python']
+        assert YamlOperator.getObjectValue(platforms.getPlatforms(true), 'supported_platforms.default.ubuntu2204.friendlyName', '') == 'Ubuntu 22.04'
+        assert YamlOperator.getObjectValue(platforms.getPlatforms(true), 'supported_platforms.default.ubuntu2204.language', []) == ['python']
+        assert YamlOperator.getObjectValue(platforms.getPlatforms(true), 'supported_platforms.default.ubuntu2204.toolchain', []) == ['env', 'python']
+        url = this.getClass().getResource('/good_platforms_partial_unstable.yaml')
+        platforms.loadYamlFile(url.getFile(), true)
+        assert YamlOperator.getObjectValue(platforms.platforms, 'supported_platforms.default.ubuntu2204.friendlyName', '') == 'Ubuntu 22.04'
+        assert YamlOperator.getObjectValue(platforms.platforms, 'supported_platforms.default.ubuntu2204.language', []) == ['python']
+        assert YamlOperator.getObjectValue(platforms.platforms, 'supported_platforms.default.ubuntu2204.toolchain', []) == ['env', 'python']
+        assert YamlOperator.getObjectValue(platforms.getPlatforms(true), 'supported_platforms.default.ubuntu2204.friendlyName', '') == 'Ubuntu 22.04'
+        assert YamlOperator.getObjectValue(platforms.getPlatforms(true), 'supported_platforms.default.ubuntu2204.language', []) == ['java', 'python']
+        assert YamlOperator.getObjectValue(platforms.getPlatforms(true), 'supported_platforms.default.ubuntu2204.toolchain', []) == ['env', 'jdk', 'python']
     }
     @Test public void test_PlatformValidator_serialization() {
         URL url = this.getClass().getResource('/good_platforms_simple.json')

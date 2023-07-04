@@ -892,11 +892,6 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert generator.ciphermap == [:]
     }
     @Test public void test_LifecycleGenerator_partial_unstable() {
-        // TODO load
-        // /good_lifecycles_partial_unstable.yaml
-        // /good_toolchains_partial_unstable.yaml
-        // /good_platforms_partial.yaml
-        // /good_platforms_partial_unstable.yaml
         generator = new LifecycleGenerator()
         // load platforms
         URL url = this.getClass().getResource('/good_platforms_partial.yaml');
@@ -923,6 +918,17 @@ class LifecycleGeneratorTest extends GroovyTestCase {
             language: java
             '''.stripIndent()
         generator.preloadYamlString(yaml)
+        shouldFail(UnsupportedLanguageException) {
+            generator.loadYamlString(yaml)
+        }
+        yaml = '''\
+            language: java
+            jenkins:
+              unstable: true
+            '''.stripIndent()
+        generator.preloadYamlString(yaml)
         generator.loadYamlString(yaml)
+        assert generator.generateSection('script') == '#\n# SCRIPT SECTION\n#\nset +x\necho \'# SCRIPT SECTION\'\nset -x\nant test\n'
+        assert generator.generateSection('install') == ''
     }
 }
