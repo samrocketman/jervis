@@ -55,7 +55,8 @@ class MultiPlatformGenerator implements Serializable {
 
       @see #defaultPlatform
       @see #defaultOS
-      @return A <tt>{@link java
+      @return A <tt>{@link java.util.HashMap}</tt> of the original parsed
+              Jervis YAML.
       */
     Map getJervisYaml() {
         platform_jervis_yaml[defaultPlatform][defaultOS]
