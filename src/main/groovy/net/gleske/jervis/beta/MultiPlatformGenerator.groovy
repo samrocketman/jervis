@@ -155,4 +155,5 @@ class MultiPlatformGenerator implements Serializable {
     }
 
     // TODO: implement a ToolchainsValidator
+    // TODO: validate() for loaded YAML (should throw errors for bad toolchains values)
 }
