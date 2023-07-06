@@ -5,6 +5,16 @@ defaults:
   sudo: sudo
 supported_platforms:
   default:
+    alpine3:
+      friendlyName: Alpine 3.x
+      language:
+        - java
+        - python
+        - shell
+      toolchain:
+        - env
+        - jdk
+        - python
     ubuntu2204:
       friendlyName: Ubuntu 22.04
       language:

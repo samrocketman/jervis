@@ -58,44 +58,21 @@ env:
   matrix: advanced
   '*': export ${jervis_toolchain_ivalue}
 jdk:
-  default_ivalue: openjdk8
+  default_ivalue: openjdk11
   friendlyLabel: true
-  openjdk8: |-
-    export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
-    export PATH="${JAVA_HOME}/bin:${PATH}"
-    java -Xmx32m -version
-    javac -J-Xmx32m -version
   openjdk11: |-
-    export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
+    export JAVA_HOME="/usr/lib/jvm/java-11-openjdk"
     export PATH="${JAVA_HOME}/bin:${PATH}"
     java -Xmx32m -version
     javac -J-Xmx32m -version
   openjdk17: |-
-    export JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
-    export PATH="${JAVA_HOME}/bin:${PATH}"
-    java -Xmx32m -version
-    javac -J-Xmx32m -version
-  openjdk18: |-
-    export JAVA_HOME="/usr/lib/jvm/java-18-openjdk-amd64"
-    export PATH="${JAVA_HOME}/bin:${PATH}"
-    java -Xmx32m -version
-    javac -J-Xmx32m -version
-  openjdk19: |-
-    export JAVA_HOME="/usr/lib/jvm/java-19-openjdk-amd64"
+    export JAVA_HOME="/usr/lib/jvm/java-17-openjdk"
     export PATH="${JAVA_HOME}/bin:${PATH}"
     java -Xmx32m -version
     javac -J-Xmx32m -version
 python:
-  default_ivalue: '3.10'
+  default_ivalue: '3.11'
   friendlyLabel: true
-  '3.10': |-
-    set +x
-    python3.10 -m venv /tmp/venv3.10
-    echo "$ source \"/tmp/venv3.10/bin/activate\""
-    source "/tmp/venv3.10/bin/activate"
-    set -x
-    python --version
-    pip --version
   '3.11': |-
     set +x
     python3.11 -m venv /tmp/venv3.10
