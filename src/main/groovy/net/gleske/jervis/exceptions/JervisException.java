@@ -24,7 +24,15 @@ package net.gleske.jervis.exceptions;
   with the classpath set up.</p>
 <pre><code>
 import net.gleske.jervis.exceptions.JervisException
-throw new JervisException('some text')</code></pre><br>
+throw new JervisException('some text')
+
+// or alternately catch and re-throw with documentation
+try {
+    // some code which throws an exception
+} catch(JervisException ex) {
+    throw new JervisException('See docs at https://example.com/', ex)
+}
+</code></pre><br>
  */
 public class JervisException extends Exception {
 
@@ -35,5 +43,16 @@ public class JervisException extends Exception {
      */
     public JervisException(String message) {
         super(message);
+    }
+
+    /**
+      Throw a reduced <tt>JervisException</tt> attaching an additional message
+      to the exception.  This is typically for providing additional
+      supplementary documentation.
+
+      @param message A simple message.
+     */
+    public JervisException(String message, Throwable t) {
+        super("\n\n" + message + "\n", t, true, false);
     }
 }

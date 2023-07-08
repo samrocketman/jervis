@@ -3,22 +3,34 @@
 This file contains all of the notable changes from Jervis releases.  For the
 full change log see the commit log.
 
-# jervis 2.1 - Jun 27th, 2023
+# jervis 2.1
 
 :boom: Publishing bugfix - the published pom.xml for v2.0 did not have any
 dependencies listed.  This patch-release fixes the published pom.
 
 See Jervis 2.0 release notes for breaking changes.
 
-Jervis API changes (breaking)
+## Breaking changes
+
+In `src/` folder:
 
 - `LifecycleGenerator.loadPlatforms` is renamed to
   `LifecycleGenerator.loadPlatformsFile`
 
-Pipeline changes:
+In `vars/` folder:
 
 - `loadCustomResource` var no longer throws an exception.  If a file does not
   exist it will return `null` instead of String contents.
+
+## New features
+
+#### Jervis API changes in `src/` folder
+
+- `JervisException` now supports throwing with a supplemental message.
+
+#### Pipeline DSL scripts changes in the `vars/` folder
+
+TBD
 
 # jervis 2.0 - Jun 27th, 2023
 
