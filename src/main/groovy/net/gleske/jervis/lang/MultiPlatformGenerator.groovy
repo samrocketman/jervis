@@ -24,14 +24,11 @@ class MultiPlatformGenerator implements Serializable {
     List operating_systems = []
     String defaultPlatform
     String defaultOS
-    // TODO: figure out how to expose platforms and operating systems object
-    // platforms PlatformValidator
-    // a map of LifecycleGenerators with top-level keys platform and child keys by operating system
+
     Map platform_generators = [:].withDefault {
         [:].withDefault { [:] }
     }
 
-    // 2-level default hashmap
     Map platform_jervis_yaml = [:].withDefault {
         [:].withDefault { [:] }
     }
