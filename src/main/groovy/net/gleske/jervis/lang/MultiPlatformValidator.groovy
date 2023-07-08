@@ -15,6 +15,7 @@
    */
 package net.gleske.jervis.lang
 
+import net.gleske.jervis.exceptions.MultiPlatformValidatorException
 import net.gleske.jervis.tools.YamlOperator
 
 /**
@@ -214,8 +215,7 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
             }
         }
         if(errors) {
-            // TODO MultiPlatformException
-            throw new Exception("Multi-platform YAML validation has failed:\n\n  - " + errors.join('\n  - ') + "\n\nSee one or more errors above.")
+            throw new MultiPlatformValidatorException("* " + errors.join('\n* '))
         }
     }
 

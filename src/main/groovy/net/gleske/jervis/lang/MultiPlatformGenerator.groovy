@@ -15,6 +15,7 @@
    */
 package net.gleske.jervis.lang
 
+import net.gleske.jervis.exceptions.MultiPlatformJervisYamlException
 import net.gleske.jervis.tools.YamlOperator
 
 class MultiPlatformGenerator implements Serializable {
@@ -96,8 +97,7 @@ class MultiPlatformGenerator implements Serializable {
     void loadMultiPlatformYaml(Map options) {
         def parsedJervisYaml = YamlOperator.loadYamlFrom(options.yaml)
         if(!(parsedJervisYaml in Map)) {
-            // TODO throw new MultiPlatformException or JervisYamlException
-            throw new Exception("Jervis YAML must be a YAML object but is YAML ${parsedJervisYaml.getClass()}")
+            throw new MultiPlatformJervisYamlException("* Jervis YAML must be a YAML object but is YAML ${parsedJervisYaml.getClass()}")
         }
         // validate against the platform
         platforms_obj.validateJervisYaml(parsedJervisYaml)
@@ -175,12 +175,7 @@ class MultiPlatformGenerator implements Serializable {
             this.platform_generators = [:].withDefault {
                 [:].withDefault { [:] }
             }
-            // TODO multi-platform exception
-            throw new Exception([
-                    '',
-                    'Found one or more Jervis YAML errors:',
-                    '* ' + errors.sort().unique().reverse().join('\n* '),
-                    ''].join('\n\n'))
+            throw new MultiPlatformJervisYamlException('* ' + errors.sort().unique().reverse().join('\n* '))
         }
         this.rawJervisYaml = parsedJervisYaml
     }
