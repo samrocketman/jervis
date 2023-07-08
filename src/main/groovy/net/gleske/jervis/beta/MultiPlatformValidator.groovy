@@ -257,27 +257,11 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
             if(nonString) {
                 errors << 'jenkins.os List contains a value that is not a String.  All operating systems must be a String.'
             }
-            // jenkins.platform must exist as a platform
-            YamlOperator.getObjectValue(jervis_yaml, 'jenkins.platform', [[], '']).with {
-                (it in List) ? it : [it]
-            }.each {
-                if(!(it.toString() in this.known_platforms)) {
-                    errors << "${it} is not a valid platform."
-                }
-            }
-            // jenkins.os must exist as an OS
-            YamlOperator.getObjectValue(jervis_yaml, 'jenkins.os', [[], '']).with {
-                (it in List) ? it : [it]
-            }.each {
-                if(!(it.toString() in this.known_operating_systems)) {
-                    errors << "${it} is not a valid operating system."
-                }
-            }
             // TODO verify neither os nor platform are named as keys.
         }
         if(errors) {
             // TODO MultiPlatformException
-            throw new Exception("Multi-platform YAML validation has failed:\n\n  - " + errors.join('\n  - ') + "\n\nSee one or more errors above.")
+            throw new Exception("Multi-platform YAML validation has failed:\n\n  - " + errors.sort().unique().join('\n  - ') + "\n\nSee one or more errors above.")
         }
         // ELSE this will cause confusion for the user because they won't have an
         // understanding of YAML parsing internals when there's unexpected
