@@ -71,8 +71,15 @@ class PipelineGenerator implements PipelineGeneratorInterface, Serializable {
       A lifecycle generator which has already been instantiated and processed
       lifecycle, toolchains, and platforms YAML as well as Jervis YAML.
      */
-    // TODO replace with getGenerator() { platformGenerator }
-    LifecycleGenerator generator
+    MultiPlatformGenerator platformGenerator
+
+    /**
+      A lifecycle generator which has already been instantiated and processed
+      lifecycle, toolchains, and platforms YAML as well as Jervis YAML.
+     */
+    LifecycleGenerator getGenerator() {
+        this.platformGenerator.getGenerator()
+    }
 
     /**
       A set of collections which a global pipeline library might support.
@@ -193,14 +200,20 @@ pipeline_generator.stashMap['html']['includes']
       is used for helper functions when creating a pipeline job designed to
       support Jervis.
      */
+    @Deprecated
     PipelineGenerator(LifecycleGenerator generator) {
+        MultiPlatformValidator platformValidator = new MultiPlatformValidator()
         // TODO replace generator with (MultiPlatformGenerator)platformGenerator
         this.generator = generator
         // TODO replace stashes with platformGenerator.stashes
-        this.stashes = getObjectValue(generator.jervis_yaml, 'jenkins.stash', [[:], []]).with {
+        this.stashes = getObjectValue(this.platformGenerator.getRawJervisYaml(), 'jenkins.stash', [[:], []]).with {
             (!it) ? [] : ((it in List) ? it : [it])
         }
         processCollectItems()
+    }
+
+    PipelineGenerator(MultiPlatformGenerator platformGenerator) {
+        this.platformGenerator = platformGenerator
     }
 
     /**

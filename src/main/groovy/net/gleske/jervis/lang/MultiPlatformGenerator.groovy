@@ -56,7 +56,7 @@ class MultiPlatformGenerator implements Serializable {
       @see #defaultOS
       @return A <tt>LifecycleGenerator</tt> instance.
       */
-    Map getGenerator() {
+    LifecycleGenerator getGenerator() {
         this.platform_generators[defaultPlatform][defaultOS]
     }
 
@@ -73,6 +73,7 @@ class MultiPlatformGenerator implements Serializable {
     Map getJervisYaml() {
         platform_jervis_yaml[defaultPlatform][defaultOS]
     }
+
     String getJervisYamlString() {
         YamlOperator.writeObjToYaml(getJervisYaml())
     }
