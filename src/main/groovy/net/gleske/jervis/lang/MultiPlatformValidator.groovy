@@ -19,20 +19,31 @@ import net.gleske.jervis.exceptions.MultiPlatformValidatorException
 import net.gleske.jervis.tools.YamlOperator
 
 /**
+  Validates platforms, lifecycles, and toolchains for multiple operating
+  systems; and their unstable counterparts; as a whole collection.  This helps
+  guarantee, for a given platforms file, lifecycles and toolchains are loaded
+  for mult-platform matrix support.
 
+  <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
+
+<pre><code class="language-groovy">
 import net.gleske.jervis.beta.MultiPlatformValidator
 
 MultiPlatformValidator platforms = new MultiPlatformValidator()
 platforms.loadPlatformsString(new File('resources/platforms.yaml').text)
-platforms.getToolchainFiles().each { String fileName ->
+platforms.getToolchainFiles().each { String fileName -&gt;
     if(!new File("resources/${fileName}.yaml").exists()) { return }
     platforms.loadToolchainsString(fileName, new File("resources/${fileName}.yaml").text)
 }
-platforms.getLifecycleFiles().each { String fileName ->
+platforms.getLifecycleFiles().each { String fileName -&gt;
     if(!new File("resources/${fileName}.yaml").exists()) { return }
     platforms.loadLifecyclesString(fileName, new File("resources/${fileName}.yaml").text)
 }
 platforms.getGeneratorFromJervis(yaml: 'language: shell')
+</code></pre>
   */
 class MultiPlatformValidator implements Serializable {
     /**
