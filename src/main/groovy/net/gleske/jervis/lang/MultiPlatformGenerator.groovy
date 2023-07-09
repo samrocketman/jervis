@@ -306,7 +306,7 @@ class MultiPlatformGenerator implements Serializable {
                         errors << (message + "Unsupported tool in yaml -> '${toolchain}': ${key}.${tool[key]}")
                     }
                     toolValue.each {
-                        if(!toolchain_obj.supportedTool(toolchain, it, isUnstable)) {
+                        if(!toolchain_obj.supportedTool(toolchain, it.toString(), isUnstable)) {
                             errors << (message + "Unsupported tool in yaml -> '${toolchain}': ${key}.${it}")
                         }
                     }
@@ -323,7 +323,7 @@ class MultiPlatformGenerator implements Serializable {
                 return
             }
             toolValue.each {
-                if(!toolchain_obj.supportedTool(toolchain, it, isUnstable)) {
+                if(!toolchain_obj.supportedTool(toolchain, it.toString(), isUnstable)) {
                     errors << (message + "Unsupported tool in yaml -> '${toolchain}': ${it}")
                 }
             }
