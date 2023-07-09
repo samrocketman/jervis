@@ -15,9 +15,9 @@
    */
 package net.gleske.jervis.lang
 
-import static net.gleske.jervis.tools.YamlOperator.getObjectValue
 import net.gleske.jervis.exceptions.PipelineGeneratorException
 import net.gleske.jervis.lang.interfaces.PipelineGeneratorInterface
+import net.gleske.jervis.tools.YamlOperator
 
 import java.util.regex.Pattern
 
@@ -202,11 +202,9 @@ pipeline_generator.stashMap['html']['includes']
      */
     @Deprecated
     PipelineGenerator(LifecycleGenerator generator) {
-        MultiPlatformValidator platformValidator = new MultiPlatformValidator()
-        // TODO replace generator with (MultiPlatformGenerator)platformGenerator
-        this.generator = generator
+        this.platformGenerator = new MultiPlatformGenerator(generator)
         // TODO replace stashes with platformGenerator.stashes
-        this.stashes = getObjectValue(this.platformGenerator.getRawJervisYaml(), 'jenkins.stash', [[:], []]).with {
+        this.stashes = YamlOperator.getObjectValue(this.platformGenerator.getRawJervisYaml(), 'jenkins.stash', [[:], []]).with {
             (!it) ? [] : ((it in List) ? it : [it])
         }
         processCollectItems()
@@ -214,6 +212,10 @@ pipeline_generator.stashMap['html']['includes']
 
     PipelineGenerator(MultiPlatformGenerator platformGenerator) {
         this.platformGenerator = platformGenerator
+        this.stashes = YamlOperator.getObjectValue(this.platformGenerator.getRawJervisYaml(), 'jenkins.stash', [[:], []]).with {
+            (!it) ? [] : ((it in List) ? it : [it])
+        }
+        processCollectItems()
     }
 
     /**
@@ -259,7 +261,7 @@ pipeline_generator.stashMap['html']['includes']
      */
     private void processCollectItems() {
         // TODO replace with platformGenerator.collectItems
-        Map tmp = getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
+        Map tmp = YamlOperator.getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
         if(tmp) {
             this.collect_items = tmp.collect { k, v ->
                 if(v in Map) {
@@ -330,18 +332,18 @@ pipeline_generator.stashMap['html']['includes']
         stashes.each { s ->
             if((s instanceof Map) &&
                     ('name' in s) &&
-                    getObjectValue(collect_items, s['name'], '')) {
-                s['includes'] = getObjectValue(collect_items, s['name'], '')
+                    YamlOperator.getObjectValue(collect_items, s['name'], '')) {
+                s['includes'] = YamlOperator.getObjectValue(collect_items, s['name'], '')
             }
             if((s instanceof Map) &&
                     ('name' in s) &&
-                    getObjectValue(s, 'name', '') &&
+                    YamlOperator.getObjectValue(s, 'name', '') &&
                     ('includes' in s) &&
-                    getObjectValue(s, 'includes', '') &&
-                    (!isMatrix || getObjectValue(s, 'matrix_axis', [:])) &&
-                    (!isMatrix || (getObjectValue(s, 'matrix_axis', [:]) == convertMatrixAxis(matrix_axis)))) {
-                String name = getObjectValue(s, 'name', '')
-                String includes = getObjectValue(s, 'includes', '')
+                    YamlOperator.getObjectValue(s, 'includes', '') &&
+                    (!isMatrix || YamlOperator.getObjectValue(s, 'matrix_axis', [:])) &&
+                    (!isMatrix || (YamlOperator.getObjectValue(s, 'matrix_axis', [:]) == convertMatrixAxis(matrix_axis)))) {
+                String name = YamlOperator.getObjectValue(s, 'name', '')
+                String includes = YamlOperator.getObjectValue(s, 'includes', '')
                 Boolean validUserInput = isCollectUserInputValid(name, 'path', includes)
                 if((name in stashmap_preprocessor) && (getPublishable(name) in Map)) {
                     def result
@@ -359,10 +361,10 @@ pipeline_generator.stashMap['html']['includes']
                 if(validUserInput) {
                     stash_map[name] = [
                         'includes': includes,
-                        'excludes': getObjectValue(s, 'excludes', ''),
-                        'use_default_excludes': getObjectValue(s, 'use_default_excludes', true),
-                        'allow_empty': getObjectValue(s, 'allow_empty', false),
-                        'matrix_axis': getObjectValue(s, 'matrix_axis', [:])
+                        'excludes': YamlOperator.getObjectValue(s, 'excludes', ''),
+                        'use_default_excludes': YamlOperator.getObjectValue(s, 'use_default_excludes', true),
+                        'allow_empty': YamlOperator.getObjectValue(s, 'allow_empty', false),
+                        'matrix_axis': YamlOperator.getObjectValue(s, 'matrix_axis', [:])
                     ]
                 }
             }
@@ -484,10 +486,10 @@ pipeline_generator.stashMap['html']['includes']
         String path = (collect_items[item])?: ''
         if(item in collect_settings_defaults) {
             Map tmp = collect_settings_defaults[item].collect { k, v ->
-                def setting = getObjectValue((user_defined_collect_settings[item])?: [:], k, v)
+                def setting = YamlOperator.getObjectValue((user_defined_collect_settings[item])?: [:], k, v)
                 if(item in collect_settings_filesets && k in collect_settings_filesets[item]) {
                     if(k in (user_defined_collect_settings[item]?: [:])) {
-                        setting = processCollectValue(getObjectValue((user_defined_collect_settings[item])?: [:], k, new Object()), k)
+                        setting = processCollectValue(YamlOperator.getObjectValue((user_defined_collect_settings[item])?: [:], k, new Object()), k)
                     }
                 }
                 //check if user input matches admin required format (if any)

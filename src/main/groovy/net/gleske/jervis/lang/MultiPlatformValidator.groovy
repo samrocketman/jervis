@@ -75,7 +75,6 @@ class MultiPlatformValidator {
         this.known_operating_systems = this.platform_obj.platforms.supported_platforms.collect { k, v ->
             v.keySet().toList()
         }.flatten().sort().unique()
-
     }
 
     List<String> getLifecycleFiles() {

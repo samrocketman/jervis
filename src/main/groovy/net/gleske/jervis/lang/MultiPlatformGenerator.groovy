@@ -48,6 +48,30 @@ class MultiPlatformGenerator implements Serializable {
         this.platforms_obj = platforms
     }
 
+    MultiPlatformGenerator(LifecycleGenerator lifecycleGenerator) {
+        this.platforms_obj = new MultiPlatformValidator()
+        if(lifecycleGenerator.platform_obj) {
+            this.platforms_obj.loadPlatformString(YamlOperator.writeObjToYaml(lifecycleGenerator.platform_obj.platforms))
+        }
+        this.platforms_obj.loadToolchainsString(
+            lifecycleGenerator.label_os,
+            YamlOperator.writeObjToYaml(lifecycleGenerator.toolchain_obj.toolchains))
+        this.platforms_obj.loadLifecyclesString(
+            lifecycleGenerator.label_os,
+            YamlOperator.writeObjToYaml(lifecycleGenerator.lifecycle_obj.lifecycles))
+        loadMultiPlatformYaml(
+            yaml: YamlOperator.writeObjToYaml(lifecycleGenerator.jervis_yaml),
+            folder_listing: lifecycleGenerator.folder_listing)
+        if(generator.@secret_util) {
+            getGenerator().@secret_util = lifecycleGenerator.@secret_util
+        }
+        if(getGenerator().ciphermap) {
+            getGenerator().decryptSecrets()
+        }
+        this.platforms = this.platforms_obj.known_platforms
+        this.operating_systems = this.platforms_obj.known_operating_systems
+    }
+
     /**
       Get the <tt>{@link net.gleske.jervis.lang.LifecycleGenerator}</tt> for a
       given default platform and OS.
@@ -122,6 +146,7 @@ class MultiPlatformGenerator implements Serializable {
         if(!user_os) {
             user_os << YamlOperator.getObjectValue(platforms_obj.platform_obj.platforms, 'defaults.os', '')
         }
+        this.defaultOS = user_os.first()
 
         // get a List of platform / operating system pairs
         List errors = []

@@ -296,6 +296,7 @@ if(security.verifyGitHubJWTPayload(jwt)) {
             throw new KeyPairDecodeException("Could not decode KeyPair from pem String.  Unable to handle ${obj.class}")
         }
     }
+
     /**
       Converts from PKCS8 private to PKCS1 pair.
       */
