@@ -85,8 +85,8 @@ class MultiPlatformGenerator implements Serializable {
         loadMultiPlatformYaml(
             yaml: YamlOperator.writeObjToYaml(lifecycleGenerator.jervis_yaml),
             folder_listing: lifecycleGenerator.folder_listing)
-        if(generator.@secret_util) {
-            getGenerator().@secret_util = lifecycleGenerator.@secret_util
+        if(lifecycleGenerator.secret_util) {
+            getGenerator().secret_util = lifecycleGenerator.secret_util
         }
         if(getGenerator().ciphermap) {
             getGenerator().decryptSecrets()
