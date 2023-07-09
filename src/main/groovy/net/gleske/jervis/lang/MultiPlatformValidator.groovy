@@ -34,7 +34,7 @@ platforms.getLifecycleFiles().each { String fileName ->
 }
 platforms.getGeneratorFromJervis(yaml: 'language: shell')
   */
-class MultiPlatformValidator {
+class MultiPlatformValidator implements Serializable {
     /**
       An instance of the <tt>{@link net.gleske.jervis.lang.PlatformValidator}</tt> class which as loaded a platforms file.
      */

@@ -174,13 +174,17 @@ class MultiPlatformGenerator implements Serializable {
             [platform: it[0], os: it[1]]
         }.each { Map current ->
             // perform a deep copy on original YAML in order to update it
-            this.platform_jervis_yaml[current.platform][current.os] = YamlOperator.deepCopy(parsedJervisYaml).withDefault {
-                [:].withDefault { [:] }
+            if(!this.platform_jervis_yaml[current.platform]) {
+                this.platform_jervis_yaml[current.platform] = [:]
             }
+            this.platform_jervis_yaml[current.platform][current.os] = YamlOperator.deepCopy(parsedJervisYaml)
             // For each platform and OS; flatten the YAML into a simpler text
             // for LifecycleGenerator; without matrix jenkins.platform or
             // jenkins.os
             this.platform_jervis_yaml[current.platform][current.os].with { Map jervis_yaml ->
+                if(!jervis_yaml.jenkins) {
+                    jervis_yaml.jenkins = [:]
+                }
                 jervis_yaml.jenkins.platform = current.platform
                 jervis_yaml.jenkins.os = current.os
                 // ORDER of merging platform and operating system keys
@@ -207,6 +211,9 @@ class MultiPlatformGenerator implements Serializable {
             if(errors) {
                 return
             }
+            if(!this.platform_generators[current.platform]) {
+                this.platform_generators[current.platform] = [:]
+            }
             this.platform_generators[current.platform][current.os] = platforms_obj.getGeneratorFromJervis(
                 yaml: YamlOperator.writeObjToYaml(this.platform_jervis_yaml[current.platform][current.os]),
                 folder_listing: options.folder_listing,
@@ -214,13 +221,9 @@ class MultiPlatformGenerator implements Serializable {
         }
         if(errors) {
             // reset parsed yaml
-            this.platform_jervis_yaml = [:].withDefault {
-                [:].withDefault { [:] }
-            }
+            this.platform_jervis_yaml = [:]
             // reset generators
-            this.platform_generators = [:].withDefault {
-                [:].withDefault { [:] }
-            }
+            this.platform_generators = [:]
             throw new MultiPlatformJervisYamlException('* ' + errors.sort().unique().reverse().join('\n* '))
         }
         this.rawJervisYaml = parsedJervisYaml
