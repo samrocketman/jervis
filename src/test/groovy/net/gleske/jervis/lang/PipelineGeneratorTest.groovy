@@ -1298,7 +1298,7 @@ class PipelineGeneratorTest extends GroovyTestCase {
         ]
 
         assert pipeline_generator.publishableItems == ['bar', 'foo']
-        generator.is_pr = true
+        pipeline_generator.generator.is_pr = true
         assert pipeline_generator.publishableItems == ['bar']
     }
     @Test public void test_PipelineGenerator_publish_skip_on_pr_by_admin_default() {
@@ -1320,7 +1320,7 @@ class PipelineGeneratorTest extends GroovyTestCase {
             ]
         ]
 
-        generator.is_pr = true
+        pipeline_generator.generator.is_pr = true
         assert pipeline_generator.publishableItems == ['bar']
     }
     @Test public void test_PipelineGenerator_publish_skip_on_pr_by_admin_default_user_override() {
@@ -1343,7 +1343,7 @@ class PipelineGeneratorTest extends GroovyTestCase {
             ]
         ]
 
-        generator.is_pr = true
+        pipeline_generator.generator.is_pr = true
         assert pipeline_generator.publishableItems == ['bar', 'foo']
     }
     @Test public void test_PipelineGenerator_publish_skip_on_tag() {
@@ -1364,7 +1364,7 @@ class PipelineGeneratorTest extends GroovyTestCase {
         ]
 
         assert pipeline_generator.publishableItems == ['bar', 'foo']
-        generator.is_tag = true
+        pipeline_generator.generator.is_tag = true
         assert pipeline_generator.publishableItems == ['bar']
     }
     @Test public void test_PipelineGenerator_publish_skip_on_tag_by_admin_default() {
@@ -1386,7 +1386,7 @@ class PipelineGeneratorTest extends GroovyTestCase {
             ]
         ]
 
-        generator.is_tag = true
+        pipeline_generator.generator.is_tag = true
         assert pipeline_generator.publishableItems == ['bar']
     }
     @Test public void test_PipelineGenerator_publish_skip_on_tag_by_admin_default_user_override() {
@@ -1409,7 +1409,7 @@ class PipelineGeneratorTest extends GroovyTestCase {
             ]
         ]
 
-        generator.is_tag = true
+        pipeline_generator.generator.is_tag = true
         assert pipeline_generator.publishableItems == ['bar', 'foo']
     }
     @Test public void test_PipelineGenerator_getDefaultToolchainsScript_nonmatrix() {

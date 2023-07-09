@@ -12,10 +12,16 @@ See Jervis 2.0 release notes for breaking changes.
 
 ## Breaking changes
 
+And other critical notes.
+
 In `src/` folder:
 
 - `LifecycleGenerator.loadPlatforms` is renamed to
   `LifecycleGenerator.loadPlatformsFile`
+- If you instantiate a `PipelineGenerator` with a `LifecycleGenerator`, the
+  `LifecycleGenerator` gets recreated from scratch.  This means you can't modify
+  your original `LifecycleGenerator` object with the expectation that
+  `PipelineGenerator.getGenerator()` is updated.  They're separate objects.
 
 In `vars/` folder:
 
