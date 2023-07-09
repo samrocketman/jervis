@@ -84,8 +84,6 @@ class MultiPlatformGenerator implements Serializable {
             folder_listing: lifecycleGenerator.folder_listing)
         if(lifecycleGenerator.secret_util) {
             getGenerator().secret_util = lifecycleGenerator.secret_util
-        }
-        if(getGenerator().ciphermap) {
             getGenerator().decryptSecrets()
         }
         this.platforms = this.platforms_obj.known_platforms
