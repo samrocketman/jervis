@@ -23,8 +23,8 @@ class MultiPlatformGenerator implements Serializable {
     Map rawJervisYaml
     List platforms = []
     List operating_systems = []
-    String defaultPlatform
-    String defaultOS
+    String defaultPlatform = 'none'
+    String defaultOS = 'none'
 
     Map platform_generators = [:].withDefault {
         [:].withDefault { [:] }
@@ -48,16 +48,39 @@ class MultiPlatformGenerator implements Serializable {
         this.platforms_obj = platforms
     }
 
+    @Deprecated
     MultiPlatformGenerator(LifecycleGenerator lifecycleGenerator) {
         this.platforms_obj = new MultiPlatformValidator()
         if(lifecycleGenerator.platform_obj) {
-            this.platforms_obj.loadPlatformString(YamlOperator.writeObjToYaml(lifecycleGenerator.platform_obj.platforms))
+            this.platforms_obj.loadPlatformsString(YamlOperator.writeObjToYaml(lifecycleGenerator.platform_obj.platforms))
         }
+        else {
+            Map fakePlatform = [
+                defaults: [
+                    platform: this.defaultPlatform,
+                    os: defaultOS,
+                    stability: 'stable',
+                    sudo: 'sudo'
+                ],
+                supported_platforms: [
+                    (this.defaultPlatform): [
+                        (this.defaultOS): [
+                            language: lifecycleGenerator.lifecycle_obj.languages.toList().intersect(lifecycleGenerator.toolchain_obj.languages.toList()),
+                            toolchain: lifecycleGenerator.toolchain_obj.toolchain_list.toList()
+                        ]
+                    ]
+                ],
+                restrictions: [:]
+            ]
+            this.platforms_obj.loadPlatformsString(YamlOperator.writeObjToYaml(fakePlatform))
+        }
+        this.defaultPlatform = lifecycleGenerator.label_os ?: this.defaultPlatform
+        this.defaultOS = lifecycleGenerator.label_os ?: this.defaultOS
         this.platforms_obj.loadToolchainsString(
-            lifecycleGenerator.label_os,
+            this.defaultOS,
             YamlOperator.writeObjToYaml(lifecycleGenerator.toolchain_obj.toolchains))
         this.platforms_obj.loadLifecyclesString(
-            lifecycleGenerator.label_os,
+            this.defaultOS,
             YamlOperator.writeObjToYaml(lifecycleGenerator.lifecycle_obj.lifecycles))
         loadMultiPlatformYaml(
             yaml: YamlOperator.writeObjToYaml(lifecycleGenerator.jervis_yaml),
@@ -134,7 +157,7 @@ class MultiPlatformGenerator implements Serializable {
             it.trim()
         }
         if(!user_platform) {
-            user_platform << YamlOperator.getObjectValue(this.platforms_obj.platform_obj.platforms, 'defaults.platform', '')
+            user_platform << YamlOperator.getObjectValue(this.platforms_obj.platform_obj.platforms, 'defaults.platform', this.defaultPlatform)
         }
         this.defaultPlatform = user_platform.first()
 
@@ -144,7 +167,7 @@ class MultiPlatformGenerator implements Serializable {
             it.trim()
         }
         if(!user_os) {
-            user_os << YamlOperator.getObjectValue(platforms_obj.platform_obj.platforms, 'defaults.os', '')
+            user_os << YamlOperator.getObjectValue(platforms_obj.platform_obj?.platforms, 'defaults.os', this.defaultOS)
         }
         this.defaultOS = user_os.first()
 
