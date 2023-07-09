@@ -26,13 +26,8 @@ class MultiPlatformGenerator implements Serializable {
     String defaultPlatform = 'none'
     String defaultOS = 'none'
 
-    Map platform_generators = [:].withDefault {
-        [:].withDefault { [:] }
-    }
-
-    Map platform_jervis_yaml = [:].withDefault {
-        [:].withDefault { [:] }
-    }
+    Map platform_generators = [:]
+    Map platform_jervis_yaml = [:]
 
     /**
       Do not allow instantiating without arguments.
@@ -53,6 +48,8 @@ class MultiPlatformGenerator implements Serializable {
         this.platforms_obj = new MultiPlatformValidator()
         if(lifecycleGenerator.platform_obj) {
             this.platforms_obj.loadPlatformsString(YamlOperator.writeObjToYaml(lifecycleGenerator.platform_obj.platforms))
+            this.defaultPlatform = YamlOperator.getObjectValue(this.platforms_obj.platform_obj.platforms, 'defaults.platform', '')
+            this.defaultOS = YamlOperator.getObjectValue(this.platforms_obj.platform_obj.platforms, 'defaults.os', '')
         }
         else {
             Map fakePlatform = [
