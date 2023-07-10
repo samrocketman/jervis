@@ -324,4 +324,11 @@ class ToolchainValidatorTest extends GroovyTestCase {
         toolchains.loadYamlFile(url.getFile())
         assert false == toolchains.supportedMatrix('ruby','derpy')
     }
+    @Test public void test_ToolchainValidator_toolValues() {
+        URL url = this.getClass().getResource('/good_toolchains_simple.yaml');
+        toolchains.loadYamlFile(url.getFile())
+        assert toolchains.toolValues('jdk') == ['openjdk6', 'openjdk7']
+        assert toolchains.toolValues('python') == ['2.6', '2.7']
+        assert toolchains.toolValues('rvm') == []
+    }
 }

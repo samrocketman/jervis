@@ -255,14 +255,14 @@ class MultiPlatformGenerator implements Serializable {
         String message = (isUnstable) ? 'Unstable; ' : 'Stable; '
         List known_platforms = platform_obj.getPlatforms(isUnstable)['supported_platforms'].keySet().toList()
         if(!(platform in known_platforms)) {
-            return [message + "Unknown jenkins.platform: '${platform}'.  Remove it or choose: '${known_platforms.join('\', \'')}'"]
+            return [message + "Unknown jenkins.platform: '${platform}';\n  Remove it or choose: '${known_platforms.join('\', \'')}'"]
         }
         message += "platform '${platform}'; "
         List known_os = platform_obj.getPlatforms(isUnstable)['supported_platforms'][platform].keySet().toList()
         if(!(os in known_os)) {
-            return [message + "Unknown jenkins.os: '${os}'.  Remove it or choose: '${known_os.join('\', \'')}'"]
+            return [message + "Unknown jenkins.os: '${os}';\n  Remove it or choose: '${known_os.join('\', \'')}'"]
         }
-        message += "os: '${os}'; "
+        message += "os: '${os}';\n  "
         LifecycleValidator lifecycle_obj = this.platforms_obj.lifecycles[os]
         ToolchainValidator toolchain_obj = this.platforms_obj.toolchains[os]
         String language = YamlOperator.getObjectValue(jervisYaml, 'language', '')
@@ -274,7 +274,7 @@ class MultiPlatformGenerator implements Serializable {
         }
         else {
             if(!(language in platform_obj.getPlatforms(isUnstable)['supported_platforms'][platform][os].language)) {
-                return ["Admin setup error: Unsupported language in platforms.yaml -> language: ${language}; however lifecycles and toolchains support it"]
+                return ["Admin setup error: Unsupported language in platforms.yaml -> language: ${language};\n  However, lifecycles and toolchains support it"]
             }
         }
         jervisYaml.each { toolchain, tool ->
@@ -285,9 +285,9 @@ class MultiPlatformGenerator implements Serializable {
             if(tool in Map) {
                 if(!(this.toolchain_obj.toolchainType(toolchain, isUnstable) == 'advanced')) {
                     errors << ( message + [
-                        "toolchain '${toolchain}' does not support advanced matrices.",
-                        'Its value must be a String or List.'
-                        ].join('  '))
+                        "toolchain '${toolchain}' does not support advanced matrices;",
+                        'Its value must be a String or List;'
+                        ].join(';\n  '))
                     return
                 }
                 // check advanced matrix
@@ -322,7 +322,15 @@ class MultiPlatformGenerator implements Serializable {
             }
             toolValue.each {
                 if(!toolchain_obj.supportedTool(toolchain, it.toString(), isUnstable)) {
-                    errors << (message + "Unsupported tool in yaml -> '${toolchain}': ${it}")
+                    if(toolchain_obj.toolValues(toolchain, isUnstable)) {
+                        errors << (message + [
+                            "Unsupported tool in yaml -> '${toolchain}': ${it}",
+                            "choose one of: ${toolchain_obj.toolValues(toolchain, isUnstable).join(', ')}"
+                        ].join(';\n  '))
+                    }
+                    else {
+                        errors << (message + "Unsupported tool in yaml -> '${toolchain}': ${it}")
+                    }
                 }
             }
         }

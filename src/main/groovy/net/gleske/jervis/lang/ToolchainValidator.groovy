@@ -52,6 +52,16 @@ null
  */
 class ToolchainValidator implements Serializable {
     /**
+      A list of fields to exclude when getting available tool versions.
+      */
+    private static List nonToolValueFields = [
+        '*',
+        'comment',
+        'default_ivalue',
+        'friendlyLabel',
+        'matrix'
+    ]
+    /**
       Check if there is an unstable toolchains object available.
       */
     private Boolean isUnstable(Boolean unstable) {
@@ -244,6 +254,15 @@ class ToolchainValidator implements Serializable {
             'simple'
         }
     }
+    /**
+      Get a list of values for a given toolchain.  If the returns List is
+      empty, then it is likely allows any value due to wildcard <tt>*</tt>.
+      @param toolchain A <tt>String</tt> which is a toolchain to look up based on the
+                       keys in the toolchains file.
+      */
+    List toolValues(String toolchain, Boolean unstable = false) {
+        this.getToolchains(unstable)[toolchain].keySet().toList() - this.nonToolValueFields
+    }
 
     /**
       Check to see if a given <tt>tool</tt> is supported in the <tt>toolchain</tt>.  A
@@ -252,11 +271,14 @@ class ToolchainValidator implements Serializable {
       If there is no key for it and no <tt>*</tt> key for that toolchain then the
       <tt>tool</tt> is not supported.  There is no checking to see if a
       <tt>toolchain</tt> is actually valid.
+      @param toolchain A <tt>String</tt> which is a toolchain to look up based on the
+                       keys in the toolchains file.
+      @param tool A value intended for the existing toolchain to check against
+                  allowed values for support.
       @return <tt>true</tt> if the <tt>tool</tt> is supported or <tt>false</tt> if it is not supported.
      */
     public Boolean supportedTool(String toolchain, String tool, Boolean unstable = false) {
-        def tools = this.getToolchains(unstable)[toolchain].keySet() as String[]
-        return (tool in tools) || ('*' in tools)
+        return (tool in toolValues(toolchain, unstable)) || ('*' in this.getToolchains(unstable)[toolchain].keySet().toList())
     }
 
     /**
