@@ -329,4 +329,132 @@ class MultiPlatformGenerator implements Serializable {
         // return
         errors
     }
+
+    private Boolean isPlatformMatrix() {
+        this.platform_generators.keySet().size() > 1
+    }
+
+    private Boolean isOSMatrix() {
+        Boolean isMatrix = false
+        this.platform_generators.find { platform, pv ->
+            if(pv.keySet().size() > 1) {
+                isMatrix = true
+            }
+            isMatrix
+        }
+        isMatrix
+    }
+
+    Boolean isMatrixBuild() {
+        if(isPlatformMatrix() || isOSMatrix()) {
+            return true
+        }
+        // Non-matrix platform and OS, there's only the default check for
+        // toolchains matrix.
+        getGenerator().isMatrixBuild()
+    }
+
+    Map getDefaultToolchainsEnvironment() {
+        getBuildableMatrixAxes().take(1) ?: [:]
+    }
+
+    List getBuildableMatrixAxes() {
+        if(!isMatrixBuild()) {
+            return []
+        }
+        List platform_matrix_axis_maps = []
+        // TODO finish this for platform and OS
+        List platform_os_matrix_axis_maps = []
+        if(isPlatformMatrix()) {
+            platform_os_matrix_axis_maps << YamlOperator.getObjectValue(rawJervisYaml, 'jenkins.platform', []).collect {
+                [platform: it]
+            }
+        }
+        if(isOSMatrix()) {
+            platform_os_matrix_axis_maps << YamlOperator.getObjectValue(rawJervisYaml, 'jenkins.os', []).collect {
+                [os: it]
+            }
+        }
+        if(!platform_os_matrix_axis_maps) {
+            // platform and OS have no matrix build so let's use the current
+            // identified platform and OS from rawJervisYaml
+            platform_os_matrix_axis_maps << [[platform: this.defaultPlatform, os: this.defaultOS]]
+        }
+        if(platform_os_matrix_axis_maps.size() == 1) {
+            platform_os_matrix_axis_maps = platform_os_matrix_axis_maps[0]
+        }
+        else {
+            platform_os_matrix_axis_maps = platform_os_matrix_axis_maps.combinations()*.sum()
+        }
+        // platform_os_matrix_axis_maps now has platform/os combinations with
+        // the first item being the default.  Next is for each platform and OS
+        // get the matrix from the generator, if any, and combine them.
+        List matrix_axis_maps = platform_os_matrix_axis_maps.collect { Map current ->
+            String currentPlatform = current.platform ?: this.defaultPlatform
+            String currentOS = current.os ?: this.defaultOS
+            List generator_axis_maps = [[[platform: currentPlatform, os: currentOS]]]
+            this.platform_generators[currentPlatform][currentOS].with { generator ->
+                if(!generator.yaml_matrix_axes) {
+                    return
+                }
+                generator_axis_maps += generator.yaml_matrix_axes.collect { axis ->
+                    generator.matrixGetAxisValue(axis).split().collect {
+                        [(axis): it]
+                    }
+                }
+            }
+            if(generator_axis_maps.size() < 2) {
+                generator_axis_maps = generator_axis_maps[0]
+            }
+            else {
+                generator_axis_maps = generator_axis_maps.combinations()*.sum()
+            }
+            generator_axis_maps
+        }
+        // currently a List of lists so sum them to create a List of Maps
+        matrix_axis_maps = matrix_axis_maps.flatten()
+        //return all maps (or some maps allowed via filter)
+        matrix_axis_maps.findAll { Map current ->
+            this.platform_generators[current.platform][current.os].with { generator ->
+                if(generator.matrixExcludeFilter()) {
+                    Binding binding = new Binding()
+                    current.each { k, v ->
+                        binding.setVariable(k, v)
+                    }
+                    //filter out the combinations (returns a boolean true or false)
+                    new GroovyShell(binding).evaluate(generator.matrixExcludeFilter())
+                }
+                else {
+                    //if there's no matrix exclude filter then include everything
+                    true
+                }
+            }
+        }
+    }
+    String generateToolchainSection() {
+        if(!(isPlatformMatrix() || isOSMatrix())) {
+            return getGenerator().generateToolchainSection()
+        }
+        List scripts = []
+        // TODO finish this for platform and/or OS using if/else if conditions
+        this.platform_generators.each { platform, pmap ->
+            List conditionals = []
+            if(isPlatformMatrix()) {
+                conditionals << "[ \"\${platform}\" = '${platform}' ]"
+            }
+            pmap.each { os, generator ->
+                if(isOSMatrix()) {
+                    conditionals << "[ \"\${os}\" = '${os}' ]"
+                }
+                scripts << (
+                    """\
+                    ${scripts.size() ? 'if' : 'elif'} ${conditionals.join(' && ')}; then
+                      ${generator.generateToolchainSection().tokenize('\n').join('\n  ')}
+                    """.stripIndent().trim()
+                )
+            }
+        }
+        scripts << 'fi'
+
+    }
 }

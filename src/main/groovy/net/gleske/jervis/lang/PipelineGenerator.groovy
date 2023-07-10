@@ -261,7 +261,7 @@ pipeline_generator.stashMap['html']['includes']
      */
     private void processCollectItems() {
         // TODO replace with platformGenerator.collectItems
-        Map tmp = YamlOperator.getObjectValue(generator.jervis_yaml, 'jenkins.collect', [:])
+        Map tmp = YamlOperator.getObjectValue(this.platformGenerator.getRawJervisYaml(), 'jenkins.collect', [:])
         if(tmp) {
             this.collect_items = tmp.collect { k, v ->
                 if(v in Map) {
@@ -271,7 +271,7 @@ pipeline_generator.stashMap['html']['includes']
             }.sum().findAll { k, v -> k && v }
         }
 
-        if(!generator.isMatrixBuild()) {
+        if(!this.platformGenerator.isMatrixBuild()) {
             //append the items to collect to the end of the list of stashes (overrides prior entries)
             this.stashes += this.collect_items.collect { k, v ->
                 [name: k, includes: v]
@@ -516,8 +516,7 @@ pipeline_generator.stashMap['html']['includes']
               <tt>getDefaultEnvironment()</tt> method.
       */
     String getDefaultToolchainsScript() {
-        // TODO platformGenerator.generator.generateToolchainSection()
-        generator.generateToolchainSection()
+        this.platformGenerator.generateToolchainSection()
     }
 
     /**
@@ -528,20 +527,15 @@ pipeline_generator.stashMap['html']['includes']
               matrix to be part of the environment.
       */
     Map getDefaultToolchainsEnvironment() {
-        if(generator.isMatrixBuild()) {
-            getBuildableMatrixAxes().first()
-        }
-        else {
-            [:]
-        }
+        this.platformGenerator.getDefaultToolchainsEnvironment()
     }
 
     /**
       Get Jervis YAML from the pipeline generator.
 
-      @return An instance of <tt>{@link net.gleske.jervis.lang.LifecycleGenerator}</tt>.
+      @return The original multi-platform Jervis YAML Map.
       */
     Map getYaml() {
-        generator.jervis_yaml
+        this.platformGenerator.rawJervisYaml
     }
 }
