@@ -1491,7 +1491,7 @@ class PipelineGeneratorTest extends GroovyTestCase {
         '''.stripMargin().trim()
         generator.loadYamlString(yaml)
         def pipeline_generator = new PipelineGenerator(generator)
-        assert pipeline_generator.getDefaultToolchainsEnvironment() == [env: 'env0', jdk: 'jdk0']
+        assert pipeline_generator.getDefaultToolchainsEnvironment() == [platform: 'none', os: 'none', env: 'env0', jdk: 'jdk0']
     }
     @Test public void test_PipelineGenerator_matrix_additional_toolchain() {
         generator = new LifecycleGenerator()

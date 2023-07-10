@@ -355,7 +355,7 @@ class MultiPlatformGenerator implements Serializable {
     }
 
     Map getDefaultToolchainsEnvironment() {
-        getBuildableMatrixAxes().take(1) ?: [:]
+        (getBuildableMatrixAxes()) ? getBuildableMatrixAxes()[0] : [:]
     }
 
     List getBuildableMatrixAxes() {
@@ -415,6 +415,7 @@ class MultiPlatformGenerator implements Serializable {
         matrix_axis_maps = matrix_axis_maps.flatten()
         //return all maps (or some maps allowed via filter)
         matrix_axis_maps.findAll { Map current ->
+            Boolean result = false
             this.platform_generators[current.platform][current.os].with { generator ->
                 if(generator.matrixExcludeFilter()) {
                     Binding binding = new Binding()
@@ -422,13 +423,15 @@ class MultiPlatformGenerator implements Serializable {
                         binding.setVariable(k, v)
                     }
                     //filter out the combinations (returns a boolean true or false)
-                    new GroovyShell(binding).evaluate(generator.matrixExcludeFilter())
+                    result = new GroovyShell(binding).evaluate(generator.matrixExcludeFilter())
+                    //println("platform: ${current.platform}; os: ${current.os}; filter: ${generator.matrixExcludeFilter()}; result: ${result}")
                 }
                 else {
                     //if there's no matrix exclude filter then include everything
-                    true
+                    result = true
                 }
             }
+            result
         }
     }
     String generateToolchainSection() {

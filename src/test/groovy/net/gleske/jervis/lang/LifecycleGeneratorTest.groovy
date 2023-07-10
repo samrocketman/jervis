@@ -243,7 +243,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert generator.multiPlatform == false
         assert '' == generator.matrixExcludeFilter()
         generator.multiPlatform = true
-        assert '!(env == \'env1\' && rvm == \'rvm2\' && platform == \'docker\' && os == \'ubuntu1404\')' == generator.matrixExcludeFilter()
+        assert '!(env == \'env1\' && rvm == \'rvm2\' && \'docker\' == \'docker\' && \'ubuntu1404\' == \'ubuntu1404\')' == generator.matrixExcludeFilter()
         // no platform or os matrix necessary because not matrix build
         yaml = '''
             language: ruby
@@ -251,12 +251,12 @@ class LifecycleGeneratorTest extends GroovyTestCase {
             rvm: "2.1"
             matrix:
               exclude:
-                - platform: docker
-                  os: ubuntu1404
+                - platform: amd64
+                  os: alpine3
             '''.stripIndent()
         generator.preloadYamlString(yaml)
         generator.loadYamlString(yaml)
-        assert '!(platform == \'docker\' && os == \'ubuntu1404\')' == generator.matrixExcludeFilter()
+        assert '!(\'amd64\' == \'docker\' && \'alpine3\' == \'ubuntu1404\')' == generator.matrixExcludeFilter()
     }
     @Test public void test_LifecycleGenerator_matrixGetAxisValue1() {
         generator.loadYamlString('language: ruby\nenv:\n  - foobar=foo\n  - foobar=bar')

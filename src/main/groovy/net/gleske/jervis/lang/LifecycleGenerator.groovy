@@ -558,10 +558,10 @@ env:
                     }
 
                     if('platform' == k) {
-                        temp += "${k} == '${this.label_platform}'"
+                        temp += "'${v}' == '${this.label_platform}'"
                     }
                     else if('os' == k) {
-                        temp += "${k} == '${this.label_os}'"
+                        temp += "'${v}' == '${this.label_os}'"
                     }
                     else if(('env' == k) && (jervis_yaml[k] instanceof Map)) {
                         temp += "${k} == '${k}${jervis_yaml[k]['matrix'].indexOf(v)}'"

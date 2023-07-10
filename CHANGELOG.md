@@ -22,6 +22,8 @@ In `src/` folder:
   `LifecycleGenerator` gets recreated from scratch.  This means you can't modify
   your original `LifecycleGenerator` object with the expectation that
   `PipelineGenerator.getGenerator()` is updated.  They're separate objects.
+- `PipelineGenerator.getDefaultToolchainsEnvironment()` will now always include
+  the platform and OS even if they're not used in matrix building.
 
 In `vars/` folder:
 
