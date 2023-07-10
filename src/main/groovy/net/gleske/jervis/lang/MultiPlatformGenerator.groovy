@@ -441,23 +441,20 @@ class MultiPlatformGenerator implements Serializable {
         List scripts = []
         // TODO finish this for platform and/or OS using if/else if conditions
         this.platform_generators.each { platform, pmap ->
-            List conditionals = []
-            if(isPlatformMatrix()) {
-                conditionals << "[ \"\${platform}\" = '${platform}' ]"
-            }
             pmap.each { os, generator ->
+                List conditionals = []
+                if(isPlatformMatrix()) {
+                    conditionals << "[ \"\${platform}\" = '${platform}' ]"
+                }
                 if(isOSMatrix()) {
                     conditionals << "[ \"\${os}\" = '${os}' ]"
                 }
                 scripts << (
-                    """\
-                    ${scripts.size() ? 'if' : 'elif'} ${conditionals.join(' && ')}; then
-                      ${generator.generateToolchainSection().tokenize('\n').join('\n  ')}
-                    """.stripIndent().trim()
+                    "${scripts.size() ? 'elif' : 'if'} ${conditionals.join(' && ')}; then\n  ${generator.generateToolchainSection().tokenize('\n').join('\n  ')}"
                 )
             }
         }
         scripts << 'fi'
-
+        scripts.join('\n')
     }
 }
