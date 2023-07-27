@@ -401,4 +401,20 @@ class FilterByContext {
     Boolean getAllowBuild() {
         checkFilter(this.filters)
     }
+
+    /**
+      Evaluate the full list of filters provided as an argument instead of
+      relying on the <tt>{@link #filters}</tt> property.
+
+      @param filters A list of user-provided filters where a filter can be a
+                     String, Map, or a List (containing a list of objects of
+                     type List, String, or Map therein).
+      @return True if the current environment <tt>{@link #context}</tt>
+              evaluates against the provided filters.
+      */
+    Boolean allowBuild(def filters) {
+        List providedFilters = (filters in List) ? filters : [filters]
+        validateFilters(providedFilters)
+        checkFilter(providedFilters)
+    }
 }

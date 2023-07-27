@@ -1153,4 +1153,35 @@ class FilterByContextTest extends GroovyTestCase {
             shouldFilter.filters = [pr: 3]
         }
     }
+    @Test public void test_FilterByContext_allowBuild_with_filters_arg() {
+        Map context = [
+            trigger: 'pr_comment',
+            context: 'pr',
+            metadata: [
+                pr: true,
+                branch: 'main',
+                tag: '',
+                push: false,
+                cron: false,
+                manually: '',
+                pr_comment: 'retest this please'
+            ]
+        ]
+
+        // Build on push, tag, or manually triggered build.  OR if in a PR and
+        // the user commented a specific comment.
+        List filter = ['push', 'tag', 'manually', [pr_comment: '/.*test this please.*/']]
+        shouldFilter = new FilterByContext(context, filter)
+        assert shouldFilter.allowBuild == true
+        assert shouldFilter.allowBuild(filter) == true
+        assert shouldFilter.allowBuild('tag') == false
+        assert shouldFilter.allowBuild('manually') == false
+        assert shouldFilter.allowBuild('push') == false
+        assert shouldFilter.allowBuild('pr_comment') == true
+        assert shouldFilter.allowBuild('pr') == true
+        assert shouldFilter.allowBuild(pr_comment: '/some other comment/') == false
+        shouldFail(FilterByContextException) {
+            shouldFilter.allowBuild('invalid')
+        }
+    }
 }
