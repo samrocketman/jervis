@@ -50,6 +50,9 @@ void setupJervisEnvironment() {
   call() is the main method of buildViaJervis()
  */
 def call() {
+    if(hasGlobalVar('adminInitialSetup')) {
+        adminInitialSetup()
+    }
     def global_scm = scm
     setupJervisEnvironment()
 
@@ -65,6 +68,9 @@ def call() {
         pipeline_generator = it
         script_header = loadCustomResource "header.sh"
         script_footer = loadCustomResource "footer.sh"
+    }
+    if(hasGlobalVar('adminCustomizePipelineGenerator')) {
+        pipeline_generator = adminCustomizePipelineGenerator(pipeline_generator)
     }
     if(generator.isMatrixBuild()) {
         // this occurs in parallel across multiple build nodes (1 node per axis)
