@@ -18,6 +18,48 @@ package net.gleske.jervis.lang
 import net.gleske.jervis.exceptions.MultiPlatformJervisYamlException
 import net.gleske.jervis.tools.YamlOperator
 
+
+/**
+  Creates a multi-platform generator similar to a LifecycleGenerator but
+  multi-plaform and multi-os capable when building matrix combinations.
+
+  <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
+
+<pre><code class="language-groovy">
+import net.gleske.jervis.lang.MultiPlatformGenerator
+import net.gleske.jervis.lang.MultiPlatformValidator
+
+MultiPlatformValidator platforms = new MultiPlatformValidator()
+platforms.loadPlatformsString(new File('resources/platforms.yaml').text)
+platforms.getToolchainFiles().each { String fileName -&gt;
+    if(!new File("resources/${fileName}.yaml").exists()) { return }
+    platforms.loadToolchainsString(fileName, new File("resources/${fileName}.yaml").text)
+}
+platforms.getLifecycleFiles().each { String fileName -&gt;
+    if(!new File("resources/${fileName}.yaml").exists()) { return }
+    platforms.loadLifecyclesString(fileName, new File("resources/${fileName}.yaml").text)
+}
+platforms.getGeneratorFromJervis(yaml: 'language: shell')
+
+MultiPlatformGenerator platformGenerator = new MultiPlatformGenerator(platforms)
+
+platformGenerator.loadMultiPlatformYaml(yaml: '''
+language: shell
+jenkins:
+  platform:
+    - amd64
+    - arm64
+  os:
+    - alpine3
+    - ubuntu2204
+''')
+
+platformGenerator.generateToolchainSection()
+</code></pre>
+  */
 class MultiPlatformGenerator implements Serializable {
     final MultiPlatformValidator platforms_obj
     Map rawJervisYaml

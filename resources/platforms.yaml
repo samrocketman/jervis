@@ -4,7 +4,7 @@ defaults:
   stability: stable
   sudo: sudo
 supported_platforms:
-  default:
+  default: &default-platform
     alpine3:
       friendlyName: Alpine 3.x
       language:
@@ -25,5 +25,7 @@ supported_platforms:
         - env
         - jdk
         - python
+  amd64: *default-platform
+  arm64: *default-platform
 restrictions: {
   }
