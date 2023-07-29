@@ -44,7 +44,7 @@ ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.21'
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
 ext.snakeYamlVersion = '1.33'
-ext.bouncyCastleVersion = '1.73'
+ext.bouncyCastleVersion = '1.75'
 ext.codeNarcVersion = '3.2.0'
 
 if(JavaVersion.current() == JavaVersion.VERSION_17 && Integer.parseInt(ext.groovyVersion.tokenize('.').first()) < 3) {
