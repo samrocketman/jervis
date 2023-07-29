@@ -118,15 +118,15 @@ class PipelineGeneratorTest extends GroovyTestCase {
     @Test public void test_PipelineGenerator_getBuildableMatrixAxes_matrix() {
         generator.loadYamlString('language: java\nenv: ["world=hello", "world=goodby"]\njdk:\n  - openjdk6\n  - openjdk7')
         def pipeline_generator = new PipelineGenerator(generator)
-        assert pipeline_generator.getBuildableMatrixAxes() == [[env:'env0', jdk:'jdk0'], [env:'env1', jdk:'jdk0'], [env:'env0', jdk:'jdk1'], [env:'env1', jdk:'jdk1']]
+        assert pipeline_generator.getBuildableMatrixAxes() == [[platform: 'none', os: 'none', env:'env0', jdk:'jdk0'], [platform: 'none', os: 'none', env:'env1', jdk:'jdk0'], [platform: 'none', os: 'none', env:'env0', jdk:'jdk1'], [platform: 'none', os: 'none', env:'env1', jdk:'jdk1']]
         //account for matrix include axes
         generator.loadYamlString('language: java\nenv: ["world=hello", "world=goodbye"]\njdk:\n  - openjdk6\n  - openjdk7\nmatrix:\n  include:\n    - {env: "world=hello", jdk: openjdk6}\n    - {env: "world=goodbye", jdk: openjdk7}')
         pipeline_generator = new PipelineGenerator(generator)
-        assert pipeline_generator.getBuildableMatrixAxes() == [[env:'env0', jdk:'jdk0'], [env:'env1', jdk:'jdk1']]
+        assert pipeline_generator.getBuildableMatrixAxes() == [[platform: 'none', os: 'none', env:'env0', jdk:'jdk0'], [platform: 'none', os: 'none', env:'env1', jdk:'jdk1']]
         //account for inverse matrix exclude axes
         generator.loadYamlString('language: java\nenv: ["world=hello", "world=goodbye"]\njdk:\n  - openjdk6\n  - openjdk7\nmatrix:\n  exclude:\n    - {env: "world=hello", jdk: openjdk6}\n    - {env: "world=goodbye", jdk: openjdk7}')
         pipeline_generator = new PipelineGenerator(generator)
-        assert pipeline_generator.getBuildableMatrixAxes() ==  [[env:'env1', jdk:'jdk0'], [env:'env0', jdk:'jdk1']]
+        assert pipeline_generator.getBuildableMatrixAxes() ==  [[platform: 'none', os: 'none', env:'env1', jdk:'jdk0'], [platform: 'none', os: 'none', env:'env0', jdk:'jdk1']]
     }
     @Test public void test_PipelineGenerator_getBuildableMatrixAxes_nonmatrix() {
         generator.loadYamlString('language: java\nenv: "world=hello"\njdk:\n  - openjdk6')
@@ -1510,7 +1510,7 @@ class PipelineGeneratorTest extends GroovyTestCase {
             """.stripMargin().trim()
         generator.loadYamlString(yaml)
         def pipeline_generator = new PipelineGenerator(generator)
-        List result = [['python':'python0', 'jdk':'jdk0'], ['python':'python1', 'jdk':'jdk0'], ['python':'python0', 'jdk':'jdk1'], ['python':'python1', 'jdk':'jdk1']]
+        List result = [[platform: 'none', os: 'none', 'python':'python0', 'jdk':'jdk0'], [platform: 'none', os: 'none', 'python':'python1', 'jdk':'jdk0'], [platform: 'none', os: 'none', 'python':'python0', 'jdk':'jdk1'], [platform: 'none', os: 'none', 'python':'python1', 'jdk':'jdk1']]
         assert pipeline_generator.getBuildableMatrixAxes() == result
     }
     @Test public void test_PipelineGenerator_getYaml() {

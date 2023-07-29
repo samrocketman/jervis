@@ -303,40 +303,7 @@ pipeline_generator.stashMap['html']['includes']
       the YAML configuration.
      */
     List getBuildableMatrixAxes() {
-        // TODO move code to platformGenerator.getBuildableMatrixAxes()
-        // - Should include platformGenerator 'platform' and 'os'.
-        // - Implement platformGenerator.getYamlMatrixAxes from the collection
-        //   of LifecycleGenerator objects.
-        List matrix_axis_maps = generator.yaml_matrix_axes.collect { axis ->
-            generator.matrixGetAxisValue(axis).split().collect {
-                [(axis): it]
-            }
-        }
-        if(generator.yaml_matrix_axes.size() < 2) {
-            matrix_axis_maps = matrix_axis_maps[0]
-        }
-        else {
-            // - Creates a list of lists which contain maps to be summed into
-            //   one list of maps with every possible matrix combination.
-            // - Create a groovy cartesian product of the maps and then sum
-            //   each list of maps together
-            matrix_axis_maps = matrix_axis_maps.combinations()*.sum()
-        }
-        //return all maps (or some maps allowed via filter)
-        matrix_axis_maps.findAll {
-            if(generator.matrixExcludeFilter()) {
-                Binding binding = new Binding()
-                it.each { k, v ->
-                    binding.setVariable(k, v)
-                }
-                //filter out the combinations (returns a boolean true or false)
-                new GroovyShell(binding).evaluate(generator.matrixExcludeFilter())
-            }
-            else {
-                //if there's no matrix exclude filter then include everything
-                true
-            }
-        }
+        this.platformGenerator.getBuildableMatrixAxes()
     }
 
     /**
@@ -403,9 +370,15 @@ pipeline_generator.stashMap['html']['includes']
       Convert a matrix axis to use unfriendly names for stash comparison.
      */
     private Map convertMatrixAxis(Map matrix_axis) {
+        String platform = matrix_axis.platform ?: this.platformGenerator.defaultPlatform
+        String os = matrix_axis.os ?: this.platformGenerator.defaultOS
         Map new_axis = [:]
         matrix_axis.each { k, v ->
-            new_axis[k] = (generator.matrix_fullName_by_friendly[v]?:v) - ~/^${k}:/
+            if(k in ['os', 'platform']) {
+                new_axis[k] = v
+                return
+            }
+            new_axis[k] = (this.platformGenerator.platform_generators[platform][os].matrix_fullName_by_friendly[v]?:v) - ~/^${k}:/
         }
         new_axis
     }
@@ -421,11 +394,9 @@ pipeline_generator.stashMap['html']['includes']
       the Jenkins job.  Used by <tt>withEnvSecretWrapper()</tt> method.
      */
     List getSecretPairsEnv() {
-        // TODO platformGenerator.generator.plainmap secrets can be pulled from
-        // default generator.
         List<Map> secretPairs = []
         List<String> secretEnv = []
-        generator.plainmap.each { k, v ->
+        getGenerator().plainmap.each { k, v ->
             secretPairs << [var: k, password: v]
             secretEnv << "${k}=${v}"
         }
