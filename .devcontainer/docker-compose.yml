@@ -50,7 +50,7 @@ services:
     networks:
       - internal
   vault:
-    image: vault
+    image: hashicorp/vault
     init: true
     command:
       - "sh"

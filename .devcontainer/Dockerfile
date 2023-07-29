@@ -4,7 +4,8 @@ FROM ubuntu:20.04
 # JDK 11 or JDK 17
 ARG JDK=11
 
-RUN set -ex; \
+SHELL ["/bin/bash", "-exc"]
+RUN \
   export DEBIAN_FRONTEND=noninteractive; \
   apt-get update; \
   apt-get install -y openjdk-"${JDK}"-jdk git firefox curl unzip zip gpg; \
