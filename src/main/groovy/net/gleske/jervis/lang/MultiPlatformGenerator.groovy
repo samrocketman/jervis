@@ -85,7 +85,6 @@ class MultiPlatformGenerator implements Serializable {
         this.platforms_obj = platforms
     }
 
-    @Deprecated
     MultiPlatformGenerator(LifecycleGenerator lifecycleGenerator) {
         this.platforms_obj = new MultiPlatformValidator()
         if(lifecycleGenerator.platform_obj) {

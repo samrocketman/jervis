@@ -196,11 +196,21 @@ pipeline_generator.stashMap['html']['includes']
     private Map user_defined_collect_settings = [:]
 
     /**
-      Instantiates this class with a <tt>{@link LifecycleGenerator}</tt> which
-      is used for helper functions when creating a pipeline job designed to
-      support Jervis.
+      <b>Deprecated:</b> Instantiates this class with a
+      <tt>{@link LifecycleGenerator}</tt> which is used for helper functions
+      when creating a pipeline job designed to support Jervis.
+
+
+      @Deprecated
+      This method is kept to help ease 3rd party legacy code migrations.  It
+      will be removed in a future version of Jervis.  Use
+      <tt>{@link #PipelineGenerator(net.gleske.jervis.lang.MultiPlatformGenerator)}</tt>,
+      instead.
+
+      @param generator A <tt>LifecycleGenerator</tt> used as a backend to
+                       generate Jenkins pipeline friendly code.
      */
-    @Deprecated
+    @Deprecated(forRemoval=true, since="jervis-2.1")
     PipelineGenerator(LifecycleGenerator generator) {
         this.platformGenerator = new MultiPlatformGenerator(generator)
         // TODO replace stashes with platformGenerator.stashes
@@ -210,6 +220,14 @@ pipeline_generator.stashMap['html']['includes']
         processCollectItems()
     }
 
+    /**
+      Instantiates this class with a <tt>{@link MultiPlatformGenerator}</tt> which
+      is used for helper functions when creating a pipeline job designed to
+      support Jervis.
+
+      @param platformGenerator A <tt>MultiPlatformGenerator</tt> used as a
+                               backend to generate Jenkins pipeline friendly code.
+     */
     PipelineGenerator(MultiPlatformGenerator platformGenerator) {
         this.platformGenerator = platformGenerator
         this.stashes = YamlOperator.getObjectValue(this.platformGenerator.getRawJervisYaml(), 'jenkins.stash', [[:], []]).with {
