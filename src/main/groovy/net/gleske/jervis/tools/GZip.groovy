@@ -82,11 +82,14 @@ assert response.responseCode == 201
     encoded compressed data.
   </p>
 <pre><code>
+import net.gleske.jervis.tools.GZip
+import net.gleske.jervis.tools.SecurityIO
+
 ByteArrayOutputStream compressed = new ByteArrayOutputStream()
 // best speed compression
 new GZip(compressed, 1).withCloseable {
-    it << 'hello'
-    it << ' world'
+    it &lt;&lt; 'hello'
+    it &lt;&lt; ' world'
 }
 
 // compressed data encoded as base64
