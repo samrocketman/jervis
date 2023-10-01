@@ -41,7 +41,7 @@ println github.getFile('samrocketman/jervis','.travis.yml','main')
 
   <h4>Using a GitHub App to upload security code analysis</h4>
   <p>
-    GitHub supports SARIF format for
+    GitHub supports <a href="https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=sarif" target=_blank>SARIF format</a> for
     <a href="https://docs.github.com/en/free-pro-team@latest/rest/code-scanning/code-scanning?apiVersion=2022-11-28#upload-an-analysis-as-sarif-data" target=_blank>uploading code analysis results</a>.
     This is a code example of uploading the report to a reference.  The GitHub
     App requires read and write for
