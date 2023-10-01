@@ -73,13 +73,34 @@ HttpURLConnection response = api_url.openConnection().with { conn -&gt;
 // getting the response code completes the setup and makes the network connection
 assert response.responseCode == 201
 </code></pre>
+  <h4>Base64 encoded GZip compressed data</h4>
+  <p>
+    Some APIs, such as
+    <a href="https://docs.github.com/en/free-pro-team@latest/rest/code-scanning/code-scanning?apiVersion=2022-11-28#upload-an-analysis-as-sarif-data" target=_blank>uploading to GitHub analysis as SARIF data</a>,
+    may require compressing data and including the compressed payload as part
+    of a plain text JSON request.  This example highlights getting base64
+    encoded compressed data.
+  </p>
+<pre><code>
+ByteArrayOutputStream compressed = new ByteArrayOutputStream()
+// best speed compression
+new GZip(compressed, 1).withCloseable {
+    it << 'hello'
+    it << ' world'
+}
+
+// compressed data encoded as base64
+// to decompress you'll want to use SecurityIO.decodeBase64Bytes
+String data = SecurityIO.encodeBase64(compressed.toByteArray())
+</code></pre>
  */
 
  class GZip extends GZIPOutputStream {
 
     /**
       Creates a <tt>{@link java.util.zip.GZIPOutputStream}</tt> with maximum compression enabled.
-      @param os An <tt>{@link java.io.OutputStream</tt> to wrap which will write out compressed data.
+      @see java.util.zip.Deflater
+      @param os An <tt>{@link java.io.OutputStream}</tt> to wrap which will write out compressed data.
       @param level A compression level between fastest (<tt>1</tt>) and best compression (<tt>9</tt>).
       */
     GZip(OutputStream os, Integer level = Deflater.BEST_COMPRESSION) {
