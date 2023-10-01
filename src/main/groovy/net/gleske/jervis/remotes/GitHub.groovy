@@ -27,14 +27,67 @@ import net.gleske.jervis.tools.SecurityIO
    to bring up a <a href="http://groovy-lang.org/groovyconsole.html"
    target="_blank">Groovy Console</a> with the classpath set up.</p>
 
+   <h4>Basic usage</h4>
+
 <pre><code>
 import net.gleske.jervis.remotes.GitHub
 
-def x = new GitHub()
+GitHub github = new GitHub()
 println 'Print each branch.'
-x.branches('samrocketman/jervis').each{ println it }
+github.branches('samrocketman/jervis').each{ println it }
 println 'Print the contents of .travis.yml from the main branch.'
-println x.getFile('samrocketman/jervis','.travis.yml','main')</code></pre><br>
+println github.getFile('samrocketman/jervis','.travis.yml','main')
+</code></pre>
+
+  <h4>Using a GitHub App to upload security code analysis</h4>
+  <p>
+    GitHub supports SARIF format for
+    <a href="https://docs.github.com/en/free-pro-team@latest/rest/code-scanning/code-scanning?apiVersion=2022-11-28#upload-an-analysis-as-sarif-data" target=_blank>uploading code analysis results</a>.
+    This is a code example of uploading the report to a reference.  The GitHub
+    App requires read and write for
+    <a href="https://docs.github.com/en/rest/overview/permissions-required-for-github-apps?apiVersion=2022-11-28#repository-permissions-for-code-scanning-alerts">Code scanning alerts</a>.
+    This example illustrates a more advanced example of utilizing this library
+    with GitHub REST APIs.
+  </p>
+<pre><code>
+import net.gleske.jervis.remotes.GitHub
+import net.gleske.jervis.remotes.creds.EphemeralTokenCache
+import net.gleske.jervis.remotes.creds.GitHubAppCredential
+import net.gleske.jervis.remotes.creds.GitHubAppRsaCredentialImpl
+import net.gleske.jervis.tools.GZip
+import net.gleske.jervis.tools.SecurityIO
+
+GitHubAppRsaCredentialImpl rsaCred = new GitHubAppRsaCredentialImpl('123456', new File('app-private-key.pem').text)
+rsaCred.owner = 'gh-organization'
+EphemeralTokenCache tokenCache = new EphemeralTokenCache('src/test/resources/rsa_keys/good_id_rsa_4096')
+
+GitHubAppCredential apiCredential = new GitHubAppCredential(rsaCred, tokenCache)
+// uncomment this if rsaCred.owner is a user (as opposed to organization)
+// apiCredential.ownerIsUser = true
+
+// instantiate API client with GitHub App credential
+GitHub github = new GitHub()
+github.credential = apiCredential
+
+// create sarif data; for example
+// gitleaks detect -f sarif -r sarif.json
+
+ByteArrayOutputStream compressed = new ByteArrayOutputStream()
+// best speed (1) compression
+new GZip(compressed, 1).withCloseable {
+    it &lt;&lt; new FileInputStream('sarif.json')
+}
+
+Map data = [
+    commit_sha: '6de5066d241a0a30576c8685874b90aa12441a87',
+    ref: 'refs/heads/main',
+    sarif: SecurityIO.encodeBase64(compressed.toByteArray())
+]
+
+// make API call to GitHub code-scanning
+github.apiFetch('repos/samrocketman/jervis/code-scanning/sarifs', [:], 'POST', data)
+</code></pre>
+
  */
 class GitHub implements JervisRemote, SimpleRestServiceSupport {
 

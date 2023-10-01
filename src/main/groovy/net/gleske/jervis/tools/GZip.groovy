@@ -79,7 +79,7 @@ assert response.responseCode == 201
     <a href="https://docs.github.com/en/free-pro-team@latest/rest/code-scanning/code-scanning?apiVersion=2022-11-28#upload-an-analysis-as-sarif-data" target=_blank>uploading to GitHub analysis as SARIF data</a>,
     may require compressing data and including the compressed payload as part
     of a plain text JSON request.  This example highlights getting base64
-    encoded compressed data.
+    encoded compressed data.  You can find a more advanced example in <tt>{@link net.gleske.jervis.remotes.GitHub}</tt> class documentation.
   </p>
 <pre><code>
 import net.gleske.jervis.tools.GZip
