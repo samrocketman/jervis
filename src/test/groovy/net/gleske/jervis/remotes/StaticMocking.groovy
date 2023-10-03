@@ -101,6 +101,7 @@ class StaticMocking {
         }
         mc.openConnection = { ->
             request_meta['data'] = new StringWriter()
+            request_meta['data_binary'] = new ByteArrayOutputStream()
             [
                 setDoOutput: { Boolean val ->
                     request_meta['doOutput'] = val
@@ -283,6 +284,7 @@ request_history
         mc.openConnection = { ->
             request_meta['conn'] = savedOpenConnection.invoke(delegate)
             request_meta['data'] = new StringWriter()
+            request_meta['data_binary'] = new ByteArrayOutputStream()
             request_meta['id'] = request_history.size() + 1
             // return URLConnection Class-like object
             [
@@ -293,11 +295,16 @@ request_history
                     request_meta.conn.getDoOutput()
                 },
                 getHeaderFields: { ->
-                    request_meta.data = request_meta.data.toString() ?: ''
+                    request_meta.data = request_meta.data?.toString() ?: ''
                     // write output to connection request
                     if(request_meta.conn.getDoOutput()) {
-                        request_meta.conn.getOutputStream().withWriter { writer ->
-                            writer << request_meta.data
+                        if(request_meta.binary_data) {
+                            request_meta.conn.getOutputStream() << new ByteArrayInputStream(request_meta.data_binary.toByteArray())
+                        }
+                        else {
+                            request_meta.conn.getOutputStream().withWriter { writer ->
+                                writer << request_meta.data
+                            }
                         }
                     }
                     // Complete the request by getting header fields
@@ -328,6 +335,10 @@ request_history
                     null
                 },
                 setRequestProperty: { String key, def value ->
+                    if(key == 'X-HTTP-Binary-Data') {
+                        request_meta['binary_data'] = true
+                        return
+                    }
                     if(key == 'X-HTTP-Method-Override') {
                         if(value) {
                             request_meta.conn.@method = value
@@ -343,7 +354,11 @@ request_history
                     null
                 },
                 getOutputStream: {->
-                    request_meta.data
+                    if(request_meta.binary_data) {
+                        request_meta.data_binary
+                    } else {
+                        request_meta.data
+                    }
                 },
                 getContentLengthLong: {->
                     request_meta.conn.getContentLengthLong()

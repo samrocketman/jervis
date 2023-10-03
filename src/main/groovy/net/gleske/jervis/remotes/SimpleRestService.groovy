@@ -258,7 +258,7 @@ class SimpleRestService {
             }
             http_headers.each { k, v ->
                 // ignored headers are skipped
-                if(k in ['Binary-Data', 'Parse-JSON', 'Response-Code', 'Response-Headers', 'X-HTTP-Method-Override']) {
+                if(k in ['Binary-Data', 'Parse-JSON', 'Response-Code', 'Response-Headers', 'X-HTTP-Binary-Data', 'X-HTTP-Method-Override']) {
                     return
                 }
                 conn.setRequestProperty(k, v)
@@ -270,9 +270,13 @@ class SimpleRestService {
             // Vault has custom HTTP verbs such as LIST.
             // source: https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/net/HttpURLConnection.java
             conn.@method = http_method.toUpperCase()
-            // Necessary for mock interception
+            // START: Necessary for mock interception
             conn.setRequestProperty('X-HTTP-Method-Override', http_method)
             conn.setRequestProperty('X-HTTP-Method-Override', null)
+            if(binary_data) {
+                conn.setRequestProperty('X-HTTP-Binary-Data', null)
+            }
+            // END: Necessary for mock interception
 
             if(conn.getDoOutput()) {
                 if(binary_data && httpOutputStream) {
