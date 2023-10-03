@@ -1,0 +1,21 @@
+null:
+  - HTTP/1.1 200 OK
+Server:
+  - Nexus/3.60.0-02 (OSS)
+X-Content-Type-Options:
+  - nosniff
+Content-Disposition:
+  - attachment
+Content-Security-Policy:
+  - sandbox allow-forms allow-modals allow-popups allow-presentation allow-scripts
+    allow-top-navigation
+Last-Modified:
+  - Tue, 03 Oct 2023 04:25:45 GMT
+Content-Length:
+  - '43'
+X-XSS-Protection:
+  - 1; mode=block
+Date:
+  - Tue, 03 Oct 2023 05:06:19 GMT
+Content-Type:
+  - application/x-gzip

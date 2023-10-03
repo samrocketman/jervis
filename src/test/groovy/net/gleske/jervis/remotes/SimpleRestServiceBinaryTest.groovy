@@ -16,13 +16,13 @@
 package net.gleske.jervis.remotes
 //the SimpleRestServiceBinaryTest() class automatically sees the SimpleRestService() class because they're in the same package
 
-import static net.gleske.jervis.remotes.SimpleRestService.addTrailingSlash
-import static net.gleske.jervis.remotes.SimpleRestService.apiFetch
 import static net.gleske.jervis.remotes.StaticMocking.mockStaticUrl
 import net.gleske.jervis.exceptions.JervisException
 import net.gleske.jervis.tools.GZip
 import net.gleske.jervis.tools.SecurityIO
 
+
+import java.util.zip.GZIPInputStream
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -43,7 +43,7 @@ class SimpleRestServiceBinaryTest extends GroovyTestCase {
         request_meta = null
         super.tearDown()
     }
-    @Test public void test_SimpleRestService_apiFetch_upload_binary() {
+    @Test public void test_SimpleRestService_apiFetch_binary_upload() {
         String username = 'admin'
         String password = 'admin123'
 
@@ -73,5 +73,19 @@ class SimpleRestServiceBinaryTest extends GroovyTestCase {
 
         // get response message from Nexus
         assert request_history*.response_code == [201]
+    }
+    @Test public void test_SimpleRestService_apiFetch_binary_download() {
+        URL api_url = new URL('http://localhost:8081/repository/hosted-raw-repo/file.gz')
+        def response = SimpleRestService.apiFetch(api_url, ['Binary-Data': true])
+        ByteArrayOutputStream plain = new ByteArrayOutputStream()
+
+        response.getInputStream().withCloseable { is ->
+            new GZIPInputStream(is).withCloseable { gunzip ->
+            // decompress the downloaded text
+            plain << gunzip
+            }
+        }
+        assert plain.toString() == 'hello world\n\nMy friend\n'
+        assert request_history*.response_code == [200]
     }
 }

@@ -173,6 +173,12 @@ class StaticMocking {
                         request_meta.data
                     }
                 },
+                getInputStream: { ->
+                    String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
+                    File responseFile = new File("src/test/resources/mocks/${file}")
+                    byte[] responseBytes = net.gleske.jervis.tools.SecurityIO.decodeBase64Bytes(responseFile.text)
+                    new ByteArrayInputStream(responseBytes)
+                },
                 getContentLengthLong: {->
                     request_meta.data = request_meta.data.toString() ?: ''
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
@@ -367,6 +373,16 @@ request_history
                     } else {
                         request_meta.data
                     }
+                },
+                getInputStream: { ->
+                    ByteArrayOutputStream capture = new ByteArrayOutputStream()
+                    capture << request_meta.conn.inputStream
+                    String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
+                    File responseFile = new File("src/test/resources/mocks/${file}")
+                    responseFile.withWriter { writer ->
+                        writer << net.gleske.jervis.tools.SecurityIO.encodeBase64(capture.toByteArray())
+                    }
+                    new ByteArrayInputStream(capture.toByteArray())
                 },
                 getContentLengthLong: {->
                     request_meta.conn.getContentLengthLong()
