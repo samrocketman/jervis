@@ -110,7 +110,7 @@ class StaticMocking {
                     request_meta['doOutput']
                 },
                 getHeaderFields: { ->
-                    request_meta.data = request_meta.data.toString() ?: ''
+                    request_meta.data = request_meta.data?.toString() ?: ''
                     Map header_fields = [(null): Collections.unmodifiableList(['HTTP/1.1 200 OK'])]
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
                     if(file in custom_responses.keySet()) {
@@ -150,6 +150,10 @@ class StaticMocking {
                     if(key == 'X-Mock-Throw-Exception') {
                         throw value
                     }
+                    if(key == 'X-HTTP-Binary-Data') {
+                        request_meta['binary_data'] = true
+                        return
+                    }
                     if(key == 'X-HTTP-Method-Override') {
                         if(value) {
                             request_meta['method'] = value
@@ -163,7 +167,11 @@ class StaticMocking {
                     null
                 },
                 getOutputStream: {->
-                    request_meta.data
+                    if(request_meta.binary_data) {
+                        request_meta.data_binary
+                    } else {
+                        request_meta.data
+                    }
                 },
                 getContentLengthLong: {->
                     request_meta.data = request_meta.data.toString() ?: ''
