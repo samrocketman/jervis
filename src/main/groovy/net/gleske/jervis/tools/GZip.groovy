@@ -84,6 +84,7 @@ assert response.responseCode == 201
 <pre><code>
 import net.gleske.jervis.tools.GZip
 import net.gleske.jervis.tools.SecurityIO
+import java.util.zip.GZIPInputStream
 
 ByteArrayOutputStream compressed = new ByteArrayOutputStream()
 // best speed compression
@@ -92,9 +93,17 @@ new GZip(compressed, 1).withCloseable {
     it &lt;&lt; ' world'
 }
 
-// compressed data encoded as base64
-// to decompress you'll want to use SecurityIO.decodeBase64Bytes
+// COMPRESSED data encoded as base64
 String data = SecurityIO.encodeBase64(compressed.toByteArray())
+
+// DECOMPRESS example
+ByteArrayOutputStream plain = new ByteArrayOutputStream()
+new ByteArrayInputStream(SecurityIO.decodeBase64Bytes(data)).withCloseable { is -&gt;
+    new GZIPInputStream(is).withCloseable { gunzip -&gt;
+        plain &lt;&lt; gunzip
+    }
+}
+assert plain.toString() == 'hello world'
 </code></pre>
  */
 
