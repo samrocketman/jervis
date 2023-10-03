@@ -109,4 +109,14 @@ class SimpleRestServiceBinaryTest extends GroovyTestCase {
         // get response message from Nexus
         assert request_history*.response_code == [201]
     }
+    @Test public void test_SimpleRestService_apiFetch_binary_download_without_closure() {
+        URL api_url = new URL('http://localhost:8081/repository/hosted-raw-repo/plain.txt')
+        def response = SimpleRestService.apiFetch(api_url, ['Binary-Data': true])
+        ByteArrayOutputStream plain = new ByteArrayOutputStream()
+
+        response.getInputStream().withCloseable { is ->
+            plain << is
+        }
+        assert plain.toString() == 'this is a simple file'
+    }
 }
