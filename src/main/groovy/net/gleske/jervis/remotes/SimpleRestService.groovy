@@ -23,6 +23,107 @@ import groovy.json.JsonBuilder
   A simple class which makes using REST services like the GitHub API really
   easy.  This utilizes helpful features of Groovy while not relying on any
   heavier external libraries for HTTP communication.
+
+  <h2>Sample usage</h2>
+  <p>To run this example, clone Jervis and execute <tt>./gradlew console</tt>
+  to bring up a
+  <a href="http://groovy-lang.org/groovyconsole.html" target="_blank">Groovy Console</a>
+  with the classpath set up.</p>
+
+  <h4>A basic get request</h4>
+  <p>By default, JSON-based REST APIs are assumed.  The response will
+  automatically be parsed into a plain Java Object.  In this example, a HashMap
+  is returned.</p>
+
+<pre><code>
+import net.gleske.jervis.remotes.SimpleRestService
+
+SimpleRestService.apiFetch(new URL('https://api.github.com/meta'))
+</code></pre>
+
+  <h4>A basic get request with no response processing</h4>
+  <p>  So if you do not set the
+  content type, then an <tt>application/json</tt> response will be assumed.  If
+  you do not want any response processing you can force no content type by
+  passing a <tt>null</tt> HTTP request header value for
+  <tt>Content-Type</tt>.</p>
+
+<pre><code>
+import net.gleske.jervis.remotes.SimpleRestService
+
+SimpleRestService.apiFetch(new URL('http://www.example.com/'), ['Content-Type': null])
+</code></pre>
+
+  <h4>Handling binary data</h4>
+  <p>This client can send or receive binary data by using a special header
+  <tt>Binary-Data</tt>.  Compare this example with
+  <tt>{@link net.gleske.jervis.tools.GZip}</tt></p>
+
+<pre><code>
+import java.net.HttpURLConnection
+import net.gleske.jervis.remotes.SimpleRestService
+import net.gleske.jervis.tools.GZip
+import net.gleske.jervis.tools.SecurityIO
+
+String username = 'some user'
+String password = 'some pass'
+
+// this example data will be compressed and uploaded to Nexus
+String upload_data = 'hello world\n\nMy friend\n'
+
+URL api_url = new URL('http://localhost:8081/repository/hosted-raw-repo/file.gz')
+Map http_headers = [
+    Authorization: "Basic ${SecurityIO.encodeBase64("${username}:${password}")}",
+    Accept: '*&sol;*',
+    Expect: '100-continue',
+    'Binary-Data': true
+]
+
+// make network call uploading or receiving binary data
+HttpURLConnection response = SimpleRestService.apiFetch(
+        api_url,
+        http_headers,
+        'PUT',
+        'binary-data') { httpOutputStream -&gt;
+
+    // wrap the output stream with compression
+    new GZip(httpOutputStream).withCloseable { gzip -&gt;
+        gzip &lt;&lt; upload_data
+    }
+}
+
+// get response message from Nexus
+response.getHeaderFields()[null][0]
+</code></pre>
+
+  <p>You can also use the <tt>Binary-Data</tt> special header to get back the raw HTTP request response so you can do your own custom processing.</p>
+
+<pre><code>
+import net.gleske.jervis.remotes.SimpleRestService
+
+SimpleRestService.apiFetch(new URL('http://www.example.com/'), ['Binary-Data': true])
+</code></pre>
+
+  <p>You would also do a similar request to download compressed data you uploaded to Nexus.</p>
+
+<pre><code>
+import java.net.HttpURLConnection
+import java.util.zip.GZIPInputStream
+import net.gleske.jervis.remotes.SimpleRestService
+
+URL api_url = new URL('http://localhost:8081/repository/hosted-raw-repo/file.gz')
+HttpURLConnection response = SimpleRestService.apiFetch(api_url, ['Binary-Data': true])
+ByteArrayOutputStream plain = new ByteArrayOutputStream()
+
+response.inputStream.withCloseable { is -&gt;
+    new GZIPInputStream(is).withCloseable { gunzip -&gt;
+        // decompress the downloaded text
+        plain &lt;&lt; gunzip
+    }
+}
+assert plain.toString() == 'hello world\n\nMy friend\n'
+</code></pre>
+
   */
 class SimpleRestService {
 
@@ -85,6 +186,13 @@ class SimpleRestService {
       <dl>
       <dt><b>Special HTTP Headers:</b></dt>
       <dd>
+        <tt>Binary-Data</tt> - Enable send and receive of binary data.  No
+        <tt>Content-Type</tt> is set and no automatic response processing is
+        performed.  An
+        <tt>{@link java.net.HttpURLConnection}</tt> will
+        always be returned.  All other special HTTP headers will be ignored.
+      </dd>
+      <dd>
         <tt>Parse-JSON</tt> - For JSON-based APIs responses are automatically
         parsed.  This setting can disable automatic parsing if set to
         <tt>false</tt>.
@@ -102,21 +210,37 @@ class SimpleRestService {
 
       @param api_url A URL of a REST endpoint in which to make an HTTP call.
       @param http_headers HTTP headers to pass as part of the HTTP request.  By
-                          default only <tt>Content-Type: application/json</tt>
-                          HTTP header will be set.
+                  default only <tt>Content-Type: application/json</tt> HTTP
+                  header will be set.
       @param http_method The HTTP method or action to request from the server.
-                         Currently supported methods include: GET, POST, PUT,
-                         DELETE, and PATCH.
+                  Currently supported methods include: GET, POST, PUT, DELETE,
+                  and PATCH.
+      @param data Send <tt>String</tt> data to the remote connection via
+                  <tt>{@link java.io.OutputStream}</tt>
+                  <tt>{@link java.io.Writer}</tt>.
+      @param httpOutputStream A <tt>Closure</tt> in which an
+                  <tt>{@link java.io.OutputStream}</tt> is passed as an
+                  argument.  This allows caller to write binary data to the
+                  remote as part of the HTTP connection.  The
+                  <tt>httpOutputStream</tt> will only be called if
+                  <tt>data</tt> is a non-zero length String.
 
       @return If <tt>Content-Type</tt> HTTP header is
               <tt>application/json</tt>, then one of two types will be
               returned: <tt>HashMap</tt> or <tt>ArrayList</tt> (for JSON Object
               and JSON Array respectively).  If any other <tt>Content-Type</tt>
               HTTP header used then a <tt>String</tt> will be returned and it
-              will be left up to the caller to parse the result.
+              will be left up to the caller to parse the result.  If
+              <tt>Binary-Data</tt> request header was passed, then an
+              <tt>{@link java.net.HttpURLConnection}</tt> will
+              be returned and all response processing will be left to the
+              caller.
       */
-    static def apiFetch(URL api_url, Map http_headers = [:], String http_method = 'GET', String data = '') {
-        http_headers['Content-Type'] = http_headers['Content-Type'] ?: 'application/json'
+    static def apiFetch(URL api_url, Map http_headers = [:], String http_method = 'GET', def data = '', Closure httpOutputStream = null) {
+        Boolean binary_data = net.gleske.jervis.tools.YamlOperator.getObjectValue(http_headers, 'Binary-Data', false)
+        if(!('Content-Type' in http_headers.keySet()) && !binary_data) {
+            http_headers['Content-Type'] = 'application/json'
+        }
         Boolean parse_json = http_headers['Content-Type'] == 'application/json'
         parse_json = net.gleske.jervis.tools.YamlOperator.getObjectValue(http_headers, 'Parse-JSON', parse_json)
         Boolean response_code = (http_method == 'DELETE')
@@ -128,13 +252,13 @@ class SimpleRestService {
 
         Map response_headers = [:]
         //data_response could be either a List or Map depending on the JSON
-        String response = api_url.openConnection().with { conn ->
+        def response = api_url.openConnection().with { conn ->
             if(http_method.toUpperCase() != 'GET' && data.size()) {
                 conn.setDoOutput(true)
             }
             http_headers.each { k, v ->
                 // ignored headers are skipped
-                if(k in ['Parse-JSON', 'Response-Code', 'Response-Headers', 'X-HTTP-Method-Override']) {
+                if(k in ['Binary-Data', 'Parse-JSON', 'Response-Code', 'Response-Headers', 'X-HTTP-Method-Override']) {
                     return
                 }
                 conn.setRequestProperty(k, v)
@@ -151,23 +275,32 @@ class SimpleRestService {
             conn.setRequestProperty('X-HTTP-Method-Override', null)
 
             if(conn.getDoOutput()) {
-                conn.getOutputStream().withWriter { writer ->
-                    writer << data
+                if(binary_data && httpOutputStream) {
+                    conn.getOutputStream().withCloseable { os ->
+                        httpOutputStream(os)
+                    }
+                } else {
+                    conn.getOutputStream().withWriter { writer ->
+                        writer << data
+                    }
                 }
             }
+            //getHeaderFields will make a network request
             response_headers = conn.getHeaderFields()
+            // user requested Binary-Data processing so return binary data
+            if(binary_data) {
+                return conn
+            }
             if(only_response_headers) {
                 return
             }
-            if(response_headers[null].toList().first().toLowerCase().contains('no content')) {
+            if(response_headers[null].toList().first().toLowerCase().contains('no content') || (conn.getContentLengthLong() == 0)) {
                 return
             }
-            conn.getContent().with {
-                if(conn.getContentLengthLong()) {
-                    return it.getText()
-                }
-                ''
-            }
+            conn.getContent().getText()
+        }
+        if(binary_data) {
+            return response
         }
         if(only_response_headers) {
             return response_headers

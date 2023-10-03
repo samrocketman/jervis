@@ -48,7 +48,7 @@ new File('test.gz').withOutputStream { OutputStream os -&gt;
 </code></pre>
 
   <h4>Upload a compressed file</h4>
-  <p>This example uploads compressed data directly to <a href="https://help.sonatype.com/repomanager3" target=_blank>Sonatype Nexus</a>.</p>
+  <p>This example uploads compressed data directly to <a href="https://help.sonatype.com/repomanager3" target=_blank>Sonatype Nexus</a>.  Compare this example with <tt>{@link net.gleske.jervis.remotes.SimpleRestService}</tt></p>
 <pre><code>
 import net.gleske.jervis.tools.GZip
 import net.gleske.jervis.tools.SecurityIO
