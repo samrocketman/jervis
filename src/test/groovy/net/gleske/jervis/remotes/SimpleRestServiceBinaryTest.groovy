@@ -88,4 +88,25 @@ class SimpleRestServiceBinaryTest extends GroovyTestCase {
         assert plain.toString() == 'hello world\n\nMy friend\n'
         assert request_history*.response_code == [200]
     }
+    @Test public void test_SimpleRestService_apiFetch_binary_upload_without_closure() {
+        String username = 'admin'
+        String password = 'admin123'
+
+        // this example data will be compressed and uploaded to Nexus
+        String upload_data = 'hello world\n\nMy friend\n'
+        url = 'http://localhost:8081/repository/hosted-raw-repo/plain.txt'
+        URL api_url = new URL(url)
+        Map http_headers = [
+            Authorization: "Basic ${SecurityIO.encodeBase64("${username}:${password}")}",
+            Accept: '*/*',
+            Expect: '100-continue',
+            'Binary-Data': true
+        ]
+
+        // make network call uploading or receiving binary data
+        def response = SimpleRestService.apiFetch(api_url, http_headers, 'PUT', 'this is a simple file')
+
+        // get response message from Nexus
+        assert request_history*.response_code == [201]
+    }
 }
