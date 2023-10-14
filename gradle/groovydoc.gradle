@@ -36,6 +36,7 @@ groovydoc {
         }
         copy {
             from 'src/groovydoc/resources/highlightjs' into 'build/docs/groovydoc'
+            from 'src/groovydoc/resources/copycode' into 'build/docs/groovydoc'
         }
     }
 

@@ -744,5 +744,77 @@ if (classDoc.isInterface()) {
     </div>
 </div>
 <!-- ======== END OF BOTTOM NAVBAR ======= -->
+<!-- START of code copy button
+Source: https://remarkablemark.org/blog/2021/06/01/add-copy-code-to-clipboard-button-to-jeyll-site/
+-->
+<script src="${classDoc.relativeRootPath}copybutton.js"></script>
+<style type="text/css">
+
+/*
+pre.highlight .copy {
+}
+.button, button {
+  margin-bottom: 1rem;
+}
+.button, button, input[type="button"], input[type="reset"], input[type="submit"] {
+  display: inline-block;
+  height: 38px;
+  padding: 0 30px;
+  color: #555;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 38px;
+  letter-spacing: .1rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+*/
+pre {
+  position: relative;
+}
+pre > button {
+  font-family: open sans,HelveticaNeue,helvetica neue,Helvetica,Arial,sans-serif;
+  color: #fff;
+  position: absolute;
+  right: 1em;
+  top: 0.5em;
+  opacity: 0;
+
+  display: inline-block;
+  height: 38px;
+  padding: 0 30px;
+  /*color: #555;*/
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 38px;
+  letter-spacing: .1rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+pre:hover > button {
+  opacity: 1;
+}
+
+pre > button:active,
+pre > button:focus {
+  opacity: 1;
+}
+</style>
+<!-- END of code copy button -->
 </body>
 </html>
