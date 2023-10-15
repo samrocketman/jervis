@@ -66,7 +66,14 @@ class MultiPlatformValidator implements Serializable {
       */
     List known_toolchains = []
 
+    /**
+      A mapping of known operating systems and their associated lifecycles of supported languages.
+      */
     Map<String, LifecycleValidator> lifecycles = [:]
+
+    /**
+      A mapping of known operating systems and their associated toolchains of supported languages.
+      */
     Map<String, ToolchainValidator> toolchains = [:]
 
     /**
@@ -88,6 +95,15 @@ class MultiPlatformValidator implements Serializable {
         }.flatten().sort().unique()
     }
 
+    /**
+      Returns a list of file names without the extension in which to search for
+      lifecycle files.
+
+      @return A list of stable and unstable lifecycle file names for each
+              operating systing in the platforms.yaml file.  This list is to be
+              used for loading all known lifecycles including associated
+              unstable lifecycles for each operating system.
+      */
     List<String> getLifecycleFiles() {
         if(!this.platform_obj) {
             return
@@ -100,6 +116,15 @@ class MultiPlatformValidator implements Serializable {
         }.flatten()*.toString()
     }
 
+    /**
+      Returns a list of file names without the extension in which to search for
+      toolchain files.
+
+      @return A list of stable and unstable toolchain file names for each
+              operating systing in the platforms.yaml file.  This list is to be
+              used for loading all known toolchains including associated
+              unstable toolchains for each operating system.
+      */
     List<String> getToolchainFiles() {
         if(!this.platform_obj) {
             return
@@ -178,6 +203,11 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
         MultiPlatformGenerator platforms = new MultiPlatformGenerator(this)
     }
 
+    /**
+      validate checks all supported operating systems and platforms to ensure
+      that there's none missing.  It will also check for some invalid
+      configurations.
+      */
     void validate() {
         List errors = []
         // this.platform_obj must not be null
@@ -229,6 +259,15 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
         }
     }
 
+    /**
+      If given a <tt>.jervis.yml</tt> file, validate it against the known
+      platforms and operating systems.  This will check the configuration
+      against the loaded platforms, lifecycles, and toolchains for supported
+      languages.  It will throw errors for misconfiguration provided in the
+      <tt>.jervis.yml</tt> file.
+      @param jervis_yaml A POJO created from a parsed <tt>.jervis.yml</tt>
+                         file.
+      */
     void validateJervisYaml(Map jervis_yaml) {
         List errors = []
         [this.known_platforms, this.known_operating_systems].combinations().collect {
