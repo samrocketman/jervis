@@ -61,15 +61,66 @@ platformGenerator.generateToolchainSection()
 </code></pre>
   */
 class MultiPlatformGenerator implements Serializable {
+    /**
+      Platforms, operating systems, lifecycles, and toolchains for all suported
+      languages.  This includes all known support even if a
+      <tt>.jervis.ymlM</tt> doesn't request it.
+      */
     final MultiPlatformValidator platforms_obj
+
+    /**
+      A POJO parsed from the original user provided <tt>.jervis.yml</tt>.
+      */
     Map rawJervisYaml
+
+    /**
+      A list of platforms requested by user <tt>.jervis.yml</tt>.
+      */
     List platforms = []
+
+    /**
+      A list of operating systems requested by user <tt>.jervis.yml</tt>.
+      */
     List operating_systems = []
+
+    /**
+      If matrix building of platforms is requested, the first in the List
+      provided by the user will be known as the default platform.
+      */
     String defaultPlatform = 'none'
+
+    /**
+      If matrix building of operating systems is requested, the first in the
+      List provided by the user will be known as the default operating system.
+      */
     String defaultOS = 'none'
 
-    Map platform_generators = [:]
-    Map platform_jervis_yaml = [:]
+    /**
+      When user-provided <tt>.jervis.yml</tt> is split up into platforms and
+      operating systems, the result will be a series of
+      <tt>LifecycleGenerator</tt> objects; one for each platform/OS
+      combination.  The object is organized by platforms as a top-level key,
+      with operating system as the child key; where the operating system
+      contains the <tt>LifecycleGenerator</tt> object for that platform/OS
+      combination.
+
+      @see #platform_jervis_yaml
+      */
+    Map<String, Map<String, LifecycleGenerator>> platform_generators = [:]
+
+    /**
+      When user-provided <tt>.jervis.yml</tt> is split up into platforms and
+      operating systems, the result will a new <tt>.jervis.yml</tt> file unique
+      to each platform/OS combination.  This object contains the generated
+      <tt>.jervis.yml</tt> objects associated with the
+      <tt>LifecycleGenerator</tt> created for the platofmr/OS combination.  The
+      object is organized by platforms as a top-level key, with operating
+      system as the child key; where the operating system contains the
+      <tt>.jervis.yml</tt> object for that platform/OS combination.
+
+      @see #platform_generators
+      */
+    Map<String, Map<String, Map>> platform_jervis_yaml = [:]
 
     /**
       Do not allow instantiating without arguments.
