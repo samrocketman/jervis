@@ -237,8 +237,21 @@ class SimpleRestService {
               caller.
       */
     static def apiFetch(URL api_url, Map http_headers = [:], String http_method = 'GET', def data = '', Closure httpOutputStream = null) {
+        // case insensitive HashMap with default value fallback to looking up case insensitive values
+        http_headers = YamlOperator.deepCopy(http_headers).withDefault { key ->
+            if(!(key in String)) {
+                return null
+            }
+            for(Map.Entry entry : http_headers.entrySet()) {
+                if(key.equalsIgnoreCase(entry.key)) {
+                    return entry.value;
+                }
+            }
+            null
+        }
         Boolean binary_data = net.gleske.jervis.tools.YamlOperator.getObjectValue(http_headers, 'Binary-Data', false)
-        if(!('Content-Type' in http_headers.keySet()) && !binary_data) {
+        Boolean user_specified_content_type = http_headers.keySet().toList()*.equalsIgnoreCase('Content-Type').any { it }
+        if(!user_specified_content_type && !binary_data) {
             http_headers['Content-Type'] = 'application/json'
         }
         Boolean parse_json = http_headers['Content-Type'] == 'application/json'
@@ -269,7 +282,14 @@ class SimpleRestService {
             // Error checking the verb is not necessary.  For example, HashiCorp
             // Vault has custom HTTP verbs such as LIST.
             // source: https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/net/HttpURLConnection.java
-            conn.@method = http_method.toUpperCase()
+            List java_supported_methods = ['GET', 'POST', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']
+            if(http_method.toUpperCase() in java_supported_methods) {
+                conn.setRequestMethod(http_method.toUpperCase())
+            }
+            else {
+                // else a non-standard HTTP verb is desirable
+                conn.@method = http_method.toUpperCase()
+            }
             // START: Necessary for mock interception
             conn.setRequestProperty('X-HTTP-Method-Override', http_method)
             conn.setRequestProperty('X-HTTP-Method-Override', null)
