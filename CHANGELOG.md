@@ -3,6 +3,11 @@
 This file contains all of the notable changes from Jervis releases.  For the
 full change log see the commit log.
 
+# jervis 2.0.1 - Oct 19th, 2023
+
+- Critical bugfix: PUT requests would not properly send to servers.  Exact root
+  cause is unknown but the fix was validated as working.
+
 # jervis 2.0 - Jun 27th, 2023
 
 This is a new major release.  From an end user perspective, all behavior for 1.x
