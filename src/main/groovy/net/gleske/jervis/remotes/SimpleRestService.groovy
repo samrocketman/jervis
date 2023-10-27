@@ -238,7 +238,7 @@ class SimpleRestService {
       */
     static def apiFetch(URL api_url, Map http_headers = [:], String http_method = 'GET', def data = '', Closure httpOutputStream = null) {
         // case insensitive HashMap with default value fallback to looking up case insensitive values
-        http_headers = YamlOperator.deepCopy(http_headers).withDefault { key ->
+        Map tmp_http_headers = [:].withDefault { key ->
             if(!(key in String)) {
                 return null
             }
@@ -248,6 +248,18 @@ class SimpleRestService {
                 }
             }
             null
+        }
+        // copy valid fields only
+        http_headers.each { k, v ->
+            if(!(v in [String, Boolean])) {
+                return
+            }
+            if(v in String) {
+                tmp_http_headers[k] = v.toString()
+            }
+            else {
+                tmp_http_headers[k] = v
+            }
         }
         Boolean binary_data = net.gleske.jervis.tools.YamlOperator.getObjectValue(http_headers, 'Binary-Data', false)
         Boolean user_specified_content_type = http_headers.keySet().toList()*.equalsIgnoreCase('Content-Type').any { it }
