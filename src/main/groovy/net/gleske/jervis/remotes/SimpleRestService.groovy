@@ -258,14 +258,11 @@ class SimpleRestService {
         }
         // copy valid fields only
         http_headers.each { k, v ->
-            if(!(v in [String, Boolean])) {
-                return
-            }
-            if(v in String) {
-                tmp_http_headers[k] = v.toString()
+            if(v in Boolean) {
+                tmp_http_headers[k] = v
             }
             else {
-                tmp_http_headers[k] = v
+                tmp_http_headers[k] = v.toString()
             }
         }
         Boolean binary_data = YamlOperator.getObjectValue(tmp_http_headers, 'Binary-Data', false)
