@@ -261,16 +261,16 @@ class SimpleRestService {
                 tmp_http_headers[k] = v
             }
         }
-        Boolean binary_data = net.gleske.jervis.tools.YamlOperator.getObjectValue(http_headers, 'Binary-Data', false)
+        Boolean binary_data = YamlOperator.getObjectValue(http_headers, 'Binary-Data', false)
         Boolean user_specified_content_type = http_headers.keySet().toList()*.equalsIgnoreCase('Content-Type').any { it }
         if(!user_specified_content_type && !binary_data) {
             http_headers['Content-Type'] = 'application/json'
         }
         Boolean parse_json = http_headers['Content-Type'] == 'application/json'
-        parse_json = net.gleske.jervis.tools.YamlOperator.getObjectValue(http_headers, 'Parse-JSON', parse_json)
+        parse_json = YamlOperator.getObjectValue(http_headers, 'Parse-JSON', parse_json)
         Boolean response_code = (http_method == 'DELETE')
-        response_code = net.gleske.jervis.tools.YamlOperator.getObjectValue(http_headers, 'Response-Code', response_code)
-        Boolean only_response_headers = net.gleske.jervis.tools.YamlOperator.getObjectValue(http_headers, 'Response-Headers', false)
+        response_code = YamlOperator.getObjectValue(http_headers, 'Response-Code', response_code)
+        Boolean only_response_headers = YamlOperator.getObjectValue(http_headers, 'Response-Headers', false)
         if(!response_code && http_method == 'HEAD') {
             only_response_headers = true
         }
