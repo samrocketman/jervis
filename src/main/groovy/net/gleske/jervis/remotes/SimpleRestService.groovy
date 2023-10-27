@@ -206,6 +206,13 @@ class SimpleRestService {
         <tt>Response-Code</tt> to <tt>false</tt>.  The <tt>HEAD</tt> HTTP
         method implies returning response headers.
       </dd>
+      <dd>
+        <tt>Response-Map</tt> - Return a HashMap containing
+        <tt>response_code</tt>, <tt>response_headers</tt>,
+        <tt>response_content</tt>, and <tt>error</tt> keys.  <tt>error</tt>
+        will return <tt>true</tt> if <tt>response_code</tt> is a 4XX or 5XX
+        HTTP code.
+      </dd>
       </dl>
 
       @param api_url A URL of a REST endpoint in which to make an HTTP call.
