@@ -261,29 +261,33 @@ class SimpleRestService {
                 tmp_http_headers[k] = v
             }
         }
-        Boolean binary_data = YamlOperator.getObjectValue(http_headers, 'Binary-Data', false)
-        Boolean user_specified_content_type = http_headers.keySet().toList()*.equalsIgnoreCase('Content-Type').any { it }
+        Boolean binary_data = YamlOperator.getObjectValue(tmp_http_headers, 'Binary-Data', false)
+        Boolean user_specified_content_type = tmp_http_headers.keySet().toList()*.equalsIgnoreCase('Content-Type').any { it }
         if(!user_specified_content_type && !binary_data) {
-            http_headers['Content-Type'] = 'application/json'
+            tmp_http_headers['Content-Type'] = 'application/json'
         }
-        Boolean parse_json = http_headers['Content-Type'] == 'application/json'
-        parse_json = YamlOperator.getObjectValue(http_headers, 'Parse-JSON', parse_json)
-        Boolean response_code = (http_method == 'DELETE')
-        response_code = YamlOperator.getObjectValue(http_headers, 'Response-Code', response_code)
-        Boolean only_response_headers = YamlOperator.getObjectValue(http_headers, 'Response-Headers', false)
-        if(!response_code && http_method == 'HEAD') {
+        Boolean parse_json = tmp_http_headers['Content-Type'] == 'application/json'
+        parse_json = YamlOperator.getObjectValue(tmp_http_headers, 'Parse-JSON', parse_json)
+        Boolean return_response_code = (http_method == 'DELETE')
+        return_response_code = YamlOperator.getObjectValue(tmp_http_headers, 'Response-Code', return_response_code)
+        Boolean only_response_headers = YamlOperator.getObjectValue(tmp_http_headers, 'Response-Headers', false)
+        Boolean get_response_map = YamlOperator.getObjectValue(tmp_http_headers, 'Response-Map', false)
+        if(!return_response_code && http_method == 'HEAD') {
             only_response_headers = true
         }
 
         Map response_headers = [:]
+        Integer response_code = 0
+        Boolean response_failure = false
+        String response_content = ''
         //data_response could be either a List or Map depending on the JSON
         def response = api_url.openConnection().with { conn ->
             if(http_method.toUpperCase() != 'GET' && data.size()) {
                 conn.setDoOutput(true)
             }
-            http_headers.each { k, v ->
+            tmp_http_headers.each { k, v ->
                 // ignored headers are skipped
-                if(k in ['Binary-Data', 'Parse-JSON', 'Response-Code', 'Response-Headers', 'X-HTTP-Binary-Data', 'X-HTTP-Method-Override']) {
+                if(k.toLowerCase() in ['binary-data', 'parse-json', 'response-code', 'response-headers', 'response-map', 'x-http-binary-data', 'x-http-method-override']) {
                     return
                 }
                 conn.setRequestProperty(k, v)
@@ -323,6 +327,9 @@ class SimpleRestService {
             }
             //getHeaderFields will make a network request
             response_headers = conn.getHeaderFields()
+            response_code = Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
+            // 4xx and 5xx are errors
+            response_failure = response_code.toString()[0] in ['4', '5']
             // user requested Binary-Data processing so return binary data
             if(binary_data) {
                 return conn
@@ -330,10 +337,17 @@ class SimpleRestService {
             if(only_response_headers) {
                 return
             }
-            if(response_headers[null].toList().first().toLowerCase().contains('no content') || (conn.getContentLengthLong() == 0)) {
+            if(conn.getContentLengthLong() == 0) {
                 return
             }
-            conn.getContent().getText()
+            if(response_failure) {
+                ByteArrayOutputStream errorResponse = new ByteArrayOutputStream()
+                errorResponse << conn.getErrorStream()
+                response_content = errorResponse.toString()
+            } else {
+                response_content = conn.getContent().getText()
+            }
+            response_content
         }
         if(binary_data) {
             return response
@@ -341,8 +355,18 @@ class SimpleRestService {
         if(only_response_headers) {
             return response_headers
         }
-        if(response_code) {
-            return Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
+        if(return_response_code) {
+            return response_code
+        }
+        Map response_map = [response_code: response_code]
+        response_map.content = (parse_json) ? YamlOperator.loadYamlFrom(response_content) : response_content
+        response_map.response_headers = response_headers
+        if(get_response_map) {
+            response_map.error = response_failure
+            return response_map
+        }
+        if(response_failure) {
+            throw new FileNotFoundException('\n\n' + YamlOperator.writeObjToYaml(response_map) + '\n\n')
         }
         if(!response) {
             return ''
