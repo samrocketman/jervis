@@ -139,6 +139,7 @@ class StaticMocking {
                     temp_request_meta['response_code'] = Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
                     temp_request_meta['mock_file'] = "src/test/resources/mocks/${file}".toString()
                     temp_request_meta['mock_header_file'] = "src/test/resources/mocks/${file}_headers".toString()
+                    temp_request_meta['mock_error_file'] = "src/test/resources/mocks/${file}_err".toString()
                     request_history << temp_request_meta
                     response_headers
                 },
@@ -173,6 +174,15 @@ class StaticMocking {
                         request_meta.data
                     }
                 },
+                getErrorStream: { ->
+                    String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
+                    File responseFile = new File("src/test/resources/mocks/${file}_err")
+                    byte[] responseBytes = ''.bytes
+                    if(responseFile.exists()) {
+                        responseBytes = net.gleske.jervis.tools.SecurityIO.decodeBase64Bytes(responseFile.text)
+                    }
+                    new ByteArrayInputStream(responseBytes)
+                },
                 getInputStream: { ->
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
                     File responseFile = new File("src/test/resources/mocks/${file}")
@@ -180,6 +190,9 @@ class StaticMocking {
                     new ByteArrayInputStream(responseBytes)
                 },
                 getContentLengthLong: {->
+                    Integer responseCode = request_history[-1]['response_code']
+                    String fileName = request_history[-1]['mock_file']
+                    // TODO set fileName based on response code
                     request_meta.data = request_meta.data.toString() ?: ''
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
                     if(file in custom_responses.keySet()) {
@@ -379,6 +392,16 @@ request_history
                     capture << request_meta.conn.inputStream
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
                     File responseFile = new File("src/test/resources/mocks/${file}")
+                    responseFile.withWriter { writer ->
+                        writer << net.gleske.jervis.tools.SecurityIO.encodeBase64(capture.toByteArray())
+                    }
+                    new ByteArrayInputStream(capture.toByteArray())
+                },
+                getErrorStream: { ->
+                    ByteArrayOutputStream capture = new ByteArrayOutputStream()
+                    capture << request_meta.conn.errorStream
+                    String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
+                    File responseFile = new File("src/test/resources/mocks/${file}_err")
                     responseFile.withWriter { writer ->
                         writer << net.gleske.jervis.tools.SecurityIO.encodeBase64(capture.toByteArray())
                     }
