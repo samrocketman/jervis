@@ -898,4 +898,20 @@ println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
         Integer iterations = (hash_iterations > 0) ? hash_iterations : 1
         decryptWithAES256(b_secret, b_iv, b_data, iterations)
     }
+
+    /*
+       Check if String is valid base64 according to <a href="https://datatracker.ietf.org/doc/html/rfc4648">RFC 4648</a>.
+
+       @param s Check if String is similar to valid base64 encoding.
+       @return <tt>true</tt> if it looks like valid base64 or <tt>false</tt> if not.
+     */
+    static Boolean isBase64(String s) {
+        if(s.trim().size() == 0) {
+            return true
+        }
+        if(s.size() < 4) {
+            return false
+        }
+        s.tokenize('\n').join('') =~ /^[=0-9a-zA-Z+\/]+$/
+    }
 }

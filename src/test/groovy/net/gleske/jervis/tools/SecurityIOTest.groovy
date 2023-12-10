@@ -531,4 +531,11 @@ class SecurityIOTest extends GroovyTestCase {
         assert ciphertext != SecurityIO.encryptWithAES256(passphrase, plaintext, 2)
         assert plaintext == SecurityIO.decryptWithAES256(passphrase, ciphertext, 1)
     }
+    @Test public void test_SecurityIO_isBase64() {
+        assert SecurityIO.isBase64('') == true
+        assert SecurityIO.isBase64('YQ==') == true
+        assert SecurityIO.isBase64('YQ=') == false
+        assert SecurityIO.isBase64('YQ\n==\n') == true
+        assert SecurityIO.isBase64('hello world') == false
+    }
 }
