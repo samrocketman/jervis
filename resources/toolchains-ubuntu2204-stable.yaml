@@ -98,9 +98,9 @@ python:
     pip --version
   '3.11': |-
     set +x
-    python3.11 -m venv /tmp/venv3.10
-    echo "$ source \"/tmp/venv3.10/bin/activate\""
-    source "/tmp/venv3.10/bin/activate"
+    python3.11 -m venv /tmp/venv3.11
+    echo "$ source \"/tmp/venv3.11/bin/activate\""
+    source "/tmp/venv3.11/bin/activate"
     set -x
     python --version
     pip --version
