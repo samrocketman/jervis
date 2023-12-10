@@ -434,7 +434,25 @@ fi
 
     /**
         Matches a string against an expression.  This is typically used to
-        match branch names.
+        match branch names.  It takes one of two forms: literal string and
+        regex pattern.  Regex patterns require that the value start and end
+        with a forward slash.
+
+        For example,
+<pre><code>
+import static net.gleske.jervis.tools.AutoRelease.isMatched
+
+// basic literal evaluation
+assert isMatched('foo', 'bar') == false
+assert isMatched('foo', 'foo') == true
+
+// pattern matching because surrounded by /
+assert isMatched('/.*string$/', 'somestring') == true
+assert isMatched('/.*string$/', 'anotherstring') == true
+assert isMatched('/.*string$/', 'somestringvalue') == false
+</code></pre>
+
+        @see java.util.regex.Pattern
 
         @param expression If the String starts and ends with a <tt>/</tt>, then
                           it is treated as an expression for regex matching.
