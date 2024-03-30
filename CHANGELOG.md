@@ -5,8 +5,10 @@ full change log see the commit log.
 
 # jervis 2.1
 
-:boom: Publishing bugfix - the published pom.xml for v2.0 did not have any
-dependencies listed.  This patch-release fixes the published pom.
+## Bug fixes
+
+- :boom: Publishing bugfix - the published pom.xml for v2.0 did not have any
+  dependencies listed.  This patch-release fixes the published pom.
 
 See Jervis 2.0 release notes for breaking changes if migrating from Jervis 1.x.
 
@@ -30,17 +32,25 @@ In `vars/` folder:
 - `loadCustomResource` var no longer throws an exception.  If a file does not
   exist it will return `null` instead of String contents.
 
-## New features
+## Changes by DSL area
 
 #### Jervis API changes in `src/` folder
 
 - `JervisException` now supports throwing with a supplemental message.
+- `SecurityIO.isBase64` method available.  It returns a boolean if the String
+  has valid base64 characters.
 
 #### Pipeline DSL scripts changes in the `vars/` folder
 
+- Bugfix: `readGlobalResource` couldn't read library resources due to incorrect
+  filesystem path.
 - `doNotRunCodeAfter` step available which enables admins to warn users about
   pipeline step deprecations, migration paths, and eventually automatically stop
   running undesirable logic.
+
+#### Job DSL changes in the `jobs/` folder
+
+- Slack notifications via `notify_slack()` available for Job DSL scripts.
 
 # jervis 2.0.1 - Oct 19th, 2023
 
