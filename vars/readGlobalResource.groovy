@@ -29,7 +29,7 @@ String lookForGlobalLibraryResource(Run run, String resourceFile) {
     def action = run.getAction(LibrariesAction)
     String contents = ''
     action.libraries.any { LibraryRecord library ->
-        File file = new File(run.getRootDir(), "libs/${library.name}/resources/${resourceFile}")
+        File file = new File(run.getRootDir(), "libs/${library.directoryName}/resources/${resourceFile}")
         if(file.exists()) {
             contents = file.text
         }
