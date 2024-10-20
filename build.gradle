@@ -14,8 +14,8 @@ plugins {
     id 'signing'
 }
 
-if(JavaVersion.current() != JavaVersion.VERSION_11 && JavaVersion.current() != JavaVersion.VERSION_17) {
-    throw new GradleException("This project requires Java 11 or Java 17, but it's running on "+JavaVersion.current())
+if(JavaVersion.current() != JavaVersion.VERSION_17 && JavaVersion.current() != JavaVersion.VERSION_21) {
+    throw new GradleException("This project requires Java 17 or Java 21, but it's running on "+JavaVersion.current())
 }
 
 /*
@@ -47,9 +47,9 @@ ext.snakeYamlVersion = '2.2'
 ext.bouncyCastleVersion = '1.75'
 ext.codeNarcVersion = '3.2.0'
 
-if(JavaVersion.current() == JavaVersion.VERSION_17 && Integer.parseInt(ext.groovyVersion.tokenize('.').first()) < 3) {
-    throw new GradleException("When using Java 17 you must use Groovy 3 or higher.  Found Groovy " + ext.groovyVersion)
-}
+//if(JavaVersion.current() == JavaVersion.VERSION_17 && Integer.parseInt(ext.groovyVersion.tokenize('.').first()) < 3) {
+//    throw new GradleException("When using Java 17 you must use Groovy 3 or higher.  Found Groovy " + ext.groovyVersion)
+//}
 
 if(Integer.parseInt(ext.groovyVersion.tokenize('.').first()) > 3) {
     // Groovy 4 and higher
@@ -71,7 +71,7 @@ repositories {
 
 // Address security vulnerability identified by DependencyTrack located as a
 // transitive dependency within groovy-ant.
-configurations.all {
+/*configurations.all {
     resolutionStrategy {
         dependencySubstitution {
             substitute module('org.apache.ant:ant:1.9.15') with module('org.apache.ant:ant:1.9.16')
@@ -79,7 +79,7 @@ configurations.all {
             substitute module('org.apache.ant:ant-junit:1.9.15') with module('org.apache.ant:ant-junit:1.9.16')
         }
     }
-}
+}*/
 
 dependencies {
     //implementation "${groovyPackage}:groovy-all:${groovyVersion}"
