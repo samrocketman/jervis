@@ -33,6 +33,27 @@ class StaticMocking {
     }
 
     /**
+      Location for mocks saved to disk.  This can be configured via
+      build.gradle or via environment variable.
+
+      <h5>build.gradle example</h5>
+<pre><code class="language-groovy">
+test {
+    systemProperty 'StaticMocking.mocksPath', '/tmp/mocks'
+}
+</code></pre>
+
+      <h5>Environment variable example</h5>
+<pre><code class="language-bash">
+JERVIS_MOCKS_PATH=/tmp/mocks ./gradlew clean check
+</code></pre>
+      */
+    static String resolveMockPath() {
+        String mockPath = System.getProperty('StaticMocking.mocksPath', (System.getenv().JERVIS_MOCKS_PATH ?: 'src/test/resources/mocks'))
+        mockPath -~ '/$'
+    }
+
+    /**
       Checksum String data for use in static mocking of GraphQL payloads.
       Valid checksum algorithms:
         MD2
@@ -117,10 +138,10 @@ class StaticMocking {
                         //throw new Exception( custom_responses.get(file) )
                         file = custom_responses.get(file)
                     }
-                    File headersFile = new File("src/test/resources/mocks/${file}_headers")
+                    File headersFile = new File("${resolveMockPath()}/${file}_headers")
                     if(!headersFile.exists()) {
                         file = urlToMockFileName(mockedUrl, request_meta.data, checksumMocks, checksumAlgorithm)
-                        headersFile = new File("src/test/resources/mocks/${file}_headers")
+                        headersFile = new File("${resolveMockPath()}/${file}_headers")
                     }
                     if(headersFile.exists() && !request_meta.response_headers) {
                         request_meta.response_headers = net.gleske.jervis.tools.YamlOperator.loadYamlFrom(headersFile)
@@ -137,9 +158,9 @@ class StaticMocking {
                     temp_request_meta['url'] = mockedUrl
                     temp_request_meta['response_headers'] = response_headers
                     temp_request_meta['response_code'] = Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
-                    temp_request_meta['mock_file'] = "src/test/resources/mocks/${file}".toString()
-                    temp_request_meta['mock_header_file'] = "src/test/resources/mocks/${file}_headers".toString()
-                    temp_request_meta['mock_error_file'] = "src/test/resources/mocks/${file}_err".toString()
+                    temp_request_meta['mock_file'] = "${resolveMockPath()}/${file}".toString()
+                    temp_request_meta['mock_header_file'] = "${resolveMockPath()}/${file}_headers".toString()
+                    temp_request_meta['mock_error_file'] = "${resolveMockPath()}/${file}_err".toString()
                     request_history << temp_request_meta
                     response_headers
                 },
@@ -176,7 +197,7 @@ class StaticMocking {
                 },
                 getErrorStream: { ->
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
-                    File responseFile = new File("src/test/resources/mocks/${file}_err")
+                    File responseFile = new File("${resolveMockPath()}/${file}_err")
                     byte[] responseBytes = ''.bytes
                     if(responseFile.exists()) {
                         responseBytes = net.gleske.jervis.tools.SecurityIO.decodeBase64Bytes(responseFile.text)
@@ -185,7 +206,7 @@ class StaticMocking {
                 },
                 getInputStream: { ->
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
-                    File responseFile = new File("src/test/resources/mocks/${file}")
+                    File responseFile = new File("${resolveMockPath()}/${file}")
                     byte[] responseBytes = net.gleske.jervis.tools.SecurityIO.decodeBase64Bytes(responseFile.text)
                     new ByteArrayInputStream(responseBytes)
                 },
@@ -198,10 +219,10 @@ class StaticMocking {
                     if(file in custom_responses.keySet()) {
                         file = custom_responses.get(file)
                     }
-                    File responseFile = new File("src/test/resources/mocks/${file}")
+                    File responseFile = new File("${resolveMockPath()}/${file}")
                     if(!responseFile.exists()) {
                         file = urlToMockFileName(mockedUrl, request_meta.data, checksumMocks, checksumAlgorithm)
-                        responseFile = new File("src/test/resources/mocks/${file}")
+                        responseFile = new File("${resolveMockPath()}/${file}")
                     }
                     responseFile.text.trim().size()
                 },
@@ -212,13 +233,13 @@ class StaticMocking {
                     if(file in custom_responses.keySet()) {
                         file = custom_responses.get(file)
                     }
-                    File responseFile = new File("src/test/resources/mocks/${file}")
+                    File responseFile = new File("${resolveMockPath()}/${file}")
                     if(!responseFile.exists()) {
                         file = urlToMockFileName(mockedUrl, request_meta.data, checksumMocks, checksumAlgorithm)
-                        responseFile = new File("src/test/resources/mocks/${file}")
+                        responseFile = new File("${resolveMockPath()}/${file}")
                     }
                     if(!responseFile.exists()) {
-                        throw new IOException("[404] Not Found - src/test/resources/mocks/${file}")
+                        throw new IOException("[404] Not Found - ${resolveMockPath()}/${file}")
                     }
                     // return content like object
                     [
@@ -337,7 +358,7 @@ request_history
                     // Complete the request by getting header fields
                     Map response_headers = request_meta.conn.getHeaderFields()
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
-                    File headersFile = new File("src/test/resources/mocks/${file}_headers")
+                    File headersFile = new File("${resolveMockPath()}/${file}_headers")
                     net.gleske.jervis.tools.YamlOperator.writeObjToYaml(headersFile, response_headers)
                     Integer response_code = Integer.parseInt(response_headers[null].toList().first().tokenize(' ')[1])
                     Map temp_request_meta = request_meta.clone()
@@ -346,11 +367,11 @@ request_history
                     temp_request_meta['url'] = mockedUrl
                     temp_request_meta['response_headers'] = response_headers
                     temp_request_meta['response_code'] = response_code
-                    temp_request_meta['mock_file'] = "src/test/resources/mocks/${file}".toString()
-                    temp_request_meta['mock_header_file'] = "src/test/resources/mocks/${file}_headers".toString()
+                    temp_request_meta['mock_file'] = "${resolveMockPath()}/${file}".toString()
+                    temp_request_meta['mock_header_file'] = "${resolveMockPath()}/${file}_headers".toString()
                     request_history << temp_request_meta
                     // create an empty file for any API query
-                    File responseFile = new File("src/test/resources/mocks/${file}")
+                    File responseFile = new File("${resolveMockPath()}/${file}")
                     if(!responseFile.exists()) {
                         responseFile.createNewFile()
                     }
@@ -391,7 +412,7 @@ request_history
                     ByteArrayOutputStream capture = new ByteArrayOutputStream()
                     capture << request_meta.conn.inputStream
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
-                    File responseFile = new File("src/test/resources/mocks/${file}")
+                    File responseFile = new File("${resolveMockPath()}/${file}")
                     responseFile.withWriter { writer ->
                         writer << net.gleske.jervis.tools.SecurityIO.encodeBase64(capture.toByteArray())
                     }
@@ -401,7 +422,7 @@ request_history
                     ByteArrayOutputStream capture = new ByteArrayOutputStream()
                     capture << request_meta.conn.errorStream
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
-                    File responseFile = new File("src/test/resources/mocks/${file}_err")
+                    File responseFile = new File("${resolveMockPath()}/${file}_err")
                     responseFile.withWriter { writer ->
                         writer << net.gleske.jervis.tools.SecurityIO.encodeBase64(capture.toByteArray())
                     }
@@ -420,7 +441,7 @@ request_history
                         getText: { ->
                             //create a file from the URL including the domain and path with all special characters and path separators replaced with an underscore
                             String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
-                            File responseFile = new File("src/test/resources/mocks/${file}")
+                            File responseFile = new File("${resolveMockPath()}/${file}")
                             StringWriter responseBuffer = new StringWriter()
                             responseBuffer << request_meta.conn.content.text
                             // serialize the response to disk as YAML for a readable version of the response
