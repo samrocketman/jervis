@@ -312,5 +312,16 @@ project.tasks["jacocoTestReport"].dependsOn "check"
 project.tasks["sonarqube"].dependsOn "jacocoTestReport"
 project.tasks["coveralls"].dependsOn "jacocoTestReport"
 
+/**
+  Jervis API Mock Recording tasks.
+  **/
+task mockVault(dependsOn: "classes", type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
+    mainClass = 'groovy.ui.GroovyMain'
+    args = ['gradle/mocks/VaultServiceMocks.groovy']
+}
+task mockAll
+mockAll.dependsOn mockVault
+
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 //generate gradlew with: ./gradlew wrapper --gradle-version 7.6
