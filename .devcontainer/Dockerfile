@@ -1,8 +1,8 @@
 # [Choice] Java version (use -bullseye variants on local arm64/Apple Silicon): 11, 17, 11-bullseye, 17-bullseye, 11-buster, 17-buster
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
-# JDK 11 or JDK 17
-ARG JDK=11
+# JDK 17 or 21
+ARG JDK=17
 
 SHELL ["/bin/bash", "-exc"]
 RUN \
