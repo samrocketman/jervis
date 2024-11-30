@@ -25,3 +25,4 @@ id_rsa*
 /*.groovy
 
 *.pem
+/.credentials

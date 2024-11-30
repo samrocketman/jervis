@@ -8,7 +8,9 @@ SHELL ["/bin/bash", "-exc"]
 RUN \
   export DEBIAN_FRONTEND=noninteractive; \
   apt-get update; \
-  apt-get install -y openjdk-"${JDK}"-jdk git firefox curl unzip zip gpg; \
+  apt-get install -y openjdk-"${JDK}"-jdk git curl unzip zip gpg software-properties-common; \
+  add-apt-repository -y ppa:mozillateam/ppa; \
+  apt install firefox-esr; \
   yes | adduser vscode
 
 USER vscode
