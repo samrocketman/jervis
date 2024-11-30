@@ -1,5 +1,7 @@
 null:
-  - HTTP/1.1 200 Ok
+  - HTTP/1.1 404 Not Found
+X-Cache:
+  - 404-HIT
 Server:
   - ECS (oxr/830D)
 Last-Modified:

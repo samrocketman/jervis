@@ -136,8 +136,8 @@ class SimpleRestServiceTest extends GroovyTestCase {
     }
     @Test public void test_SimpleRestService_apiFetch_response_code() {
         // get HTTP response code
-        assert 404 == apiFetch(new URL('https://www.example.com/doesnotexist'), ['Content-Type': 'text/html', 'Response-Code': true], 'HEAD')
-        assert 404 == apiFetch(new URL('https://www.example.com/doesnotexist'), ['Content-Type': 'text/html', 'Response-Code': 'true'], 'HEAD')
+        assert 404 == apiFetch(new URL('https://www.example.com/doesnotexist2'), ['Content-Type': 'text/html', 'Response-Code': true], 'HEAD')
+        assert 404 == apiFetch(new URL('https://www.example.com/doesnotexist2'), ['Content-Type': 'text/html', 'Response-Code': 'true'], 'HEAD')
     }
     @Test public void test_SimpleRestService_apiFetch_parsed_content() {
         Map response = apiFetch(new URL('https://www.example.com/doesnotexist'), [:], 'POST')
@@ -151,19 +151,19 @@ class SimpleRestServiceTest extends GroovyTestCase {
     }
     @Test public void test_SimpleRestService_apiFetch_no_content() {
         request_meta.response_headers = Collections.unmodifiableMap([(null): Collections.unmodifiableList(['HTTP/1.1 204 No Content'])])
-        def response = apiFetch(new URL('https://www.example.com/doesnotexist'), [:], 'POST')
+        def response = apiFetch(new URL('https://www.example.com/doesnotexist2'), [:], 'POST')
         assert response == ''
         // get HTTP response code
         assert 204 == apiFetch(new URL('https://www.example.com/doesnotexist'), ['Response-Code': true], 'POST')
     }
     @Test public void test_SimpleRestService_apiFetch_delete_example() {
         request_meta.response_headers = Collections.unmodifiableMap([(null): Collections.unmodifiableList(['HTTP/1.1 204 No Content'])])
-        def response = apiFetch(new URL('https://www.example.com/doesnotexist'), [:], 'DELETE')
+        def response = apiFetch(new URL('https://www.example.com/doesnotexist2'), [:], 'DELETE')
         assert response == 204
-        assert request_history*.url == ['https://www.example.com/doesnotexist']
+        assert request_history*.url == ['https://www.example.com/doesnotexist2']
         assert request_history*.method == ['DELETE']
         // get HTTP response code
-        assert '' == apiFetch(new URL('https://www.example.com/doesnotexist'), ['Response-Code': false], 'DELETE')
+        assert '' == apiFetch(new URL('https://www.example.com/doesnotexist2'), ['Response-Code': false], 'DELETE')
     }
     @Test public void test_SimpleRestService_addTrailingSlash() {
         String result = 'https://example.com/'
