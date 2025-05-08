@@ -14,9 +14,11 @@ plugins {
     id 'signing'
 }
 
+/*
 if(JavaVersion.current() != JavaVersion.VERSION_17 && JavaVersion.current() != JavaVersion.VERSION_21) {
     throw new GradleException("This project requires Java 17 or Java 21, but it's running on "+JavaVersion.current())
 }
+*/
 
 /*
    Groovy 2.4.21 supports bytecode Java 1.8 and lower.  Do not use higher
@@ -105,6 +107,7 @@ dependencies {
 }
 
 test {
+    systemProperty('net.gleske.jervis.SimpleRestService.AddMockHeader', 'true')
     // show standard out and standard error of the test JVM(s) on the console
     testLogging.showStandardStreams = true
 

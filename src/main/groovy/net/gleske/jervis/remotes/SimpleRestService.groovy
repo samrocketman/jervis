@@ -311,10 +311,12 @@ class SimpleRestService {
                 conn.@method = http_method.toUpperCase()
             }
             // START: Necessary for mock interception
-            conn.setRequestProperty('X-HTTP-Method-Override', http_method)
-            conn.setRequestProperty('X-HTTP-Method-Override', null)
-            if(binary_data) {
-                conn.setRequestProperty('X-HTTP-Binary-Data', null)
+            if(System.getProperty('net.gleske.jervis.SimpleRestService.AddMockHeader') == 'true') {
+                conn.setRequestProperty('X-HTTP-Method-Override', http_method)
+                conn.setRequestProperty('X-HTTP-Method-Override', null)
+                if(binary_data) {
+                    conn.setRequestProperty('X-HTTP-Binary-Data', null)
+                }
             }
             // END: Necessary for mock interception
 
