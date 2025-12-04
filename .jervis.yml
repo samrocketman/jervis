@@ -4,7 +4,8 @@
 # User guide for this file: https://github.com/samrocketman/jervis/wiki/User-Guide
 
 language: groovy
-jdk: openjdk8
+jdk:
+ - openjdk8
 
 #build library
 #gradle doesn't have a retry for assembling dependencies so here's one in bash
@@ -17,17 +18,12 @@ script: |
   ./gradlew clean check jacocoTestReport Jar groovydoc
 
 env:
-  # Jenkins weekly uses Groovy 2.4.12 as of this writing
-  - GROOVY_VERSION="2.4.12"
-  - GROOVY_VERSION="2.4.20"
-  - GROOVY_VERSION="2.5.13"
-  # Groovy 3.0 current stable
-  - GROOVY_VERSION="3.0.5"
-
-matrix:
-  allow_failures:
-    - env: GROOVY_VERSION="2.5.13"
-    - env: GROOVY_VERSION="3.0.5"
+  # Jenkins uses Groovy 2.4.21 as of this writing
+  - GROOVY_VERSION="2.4.21"
+  - GROOVY_VERSION="2.5.23"
+  - GROOVY_VERSION="3.0.25"
+  - GROOVY_VERSION="4.0.29"
+  - GROOVY_VERSION="5.0.3"
 
 branches:
   only:
@@ -39,7 +35,7 @@ jenkins:
   # see YAML anchors and aliases for how this works
   default_stash_axis: &stash_axis
     matrix_axis:
-      env: GROOVY_VERSION="2.4.15"
+      env: GROOVY_VERSION="2.4.21"
   stash:
     - name: artifacts
       <<: *stash_axis
@@ -59,6 +55,11 @@ jenkins:
 ########################
 #Travis CI also uses some options in the Jenkins section above.
 #None of the following options are interpreted by Jenkins.
+
+matrix:
+  allow_failures:
+    - env: GROOVY_VERSION="2.5.13"
+    - env: GROOVY_VERSION="3.0.5"
 
 after_success:
   - ./gradlew jacocoTestReport coveralls
