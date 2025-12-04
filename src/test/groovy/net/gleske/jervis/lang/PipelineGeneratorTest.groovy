@@ -52,9 +52,7 @@ class PipelineGeneratorTest extends GroovyTestCase {
         generator.decryptSecrets()
         def pipeline_generator = new PipelineGenerator(generator)
         List<List> results = pipeline_generator.getSecretPairsEnv()
-        assert results[0] instanceof List<Map>
-        assert results[1] instanceof List<String>
-        assert results[0]  == [[var: 'JERVIS_SECRETS_TEST', password: 'plaintext']]
+        assert results[0] == [[var: 'JERVIS_SECRETS_TEST', password: 'plaintext']]
         assert results[1] == ['JERVIS_SECRETS_TEST=plaintext']
     }
     @Test public void test_PipelineGenerator_supported_collections() {
