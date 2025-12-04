@@ -966,4 +966,210 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert generator.yaml_matrix_axes == ['go']
         assert generator.getLabels() == 'unstable && default && ubuntu2204 && sudo && language:python && env && python && go'
     }
+    @Test public void test_LifecycleGenerator_nonwildcard_jervis_toolchain_ivalue_default() {
+        String desired_value = '''\
+            |#
+            |# TOOLCHAINS SECTION
+            |#
+            |set +x
+            |echo '# TOOLCHAINS SECTION'
+            |set -x
+            |#some_toolchain toolchain section
+            |echo option2
+            |#wildcard_toolchain toolchain section
+            |echo wildcard
+            |'''.stripMargin('|')
+
+        String yaml = '''\
+            |language: some_language
+            |'''.stripMargin('|')
+
+        String platform = '''\
+            |defaults:
+            |  platform: some_platform
+            |  os: some_os
+            |  stability: stable
+            |  sudo: sudo
+            |supported_platforms:
+            |  some_platform:
+            |    some_os:
+            |      friendlyName: Some OS
+            |      language:
+            |        - some_language
+            |      toolchain:
+            |        - some_toolchain
+            |        - wildcard_toolchain
+            |restrictions: {}
+            |'''.stripMargin('|')
+
+        String lifecycles = '''\
+            |some_language:
+            |  friendlyName: Some Language
+            |  defaultKey: empty_default
+            |  empty_default: {}
+            |'''.stripMargin('|')
+
+        String toolchains = '''
+        toolchains:
+          some_language: [ some_toolchain, wildcard_toolchain ]
+        some_toolchain:
+          default_ivalue: option2
+          option1: &copy
+            - echo ${jervis_toolchain_ivalue}
+          option2: *copy
+        wildcard_toolchain:
+          default_ivalue: wildcard
+          '*': 'echo ${jervis_toolchain_ivalue}'
+        '''
+
+        def generator = new LifecycleGenerator()
+        generator.loadPlatformsString(platform)
+        generator.preloadYamlString(yaml)
+        generator.loadLifecyclesString(lifecycles)
+        generator.loadToolchainsString(toolchains)
+        generator.loadYamlString(yaml)
+
+        assert desired_value == generator.generateAll()
+    }
+    @Test public void test_LifecycleGenerator_nonwildcard_jervis_toolchain_ivalue_single_value() {
+        String desired_value = '''\
+            |#
+            |# TOOLCHAINS SECTION
+            |#
+            |set +x
+            |echo '# TOOLCHAINS SECTION'
+            |set -x
+            |#some_toolchain toolchain section
+            |echo option1
+            |#wildcard_toolchain toolchain section
+            |echo wildcard
+            |'''.stripMargin('|')
+
+        String yaml = '''\
+            |language: some_language
+            |some_toolchain: option1
+            |'''.stripMargin('|')
+
+        String platform = '''\
+            |defaults:
+            |  platform: some_platform
+            |  os: some_os
+            |  stability: stable
+            |  sudo: sudo
+            |supported_platforms:
+            |  some_platform:
+            |    some_os:
+            |      friendlyName: Some OS
+            |      language:
+            |        - some_language
+            |      toolchain:
+            |        - some_toolchain
+            |        - wildcard_toolchain
+            |restrictions: {}
+            |'''.stripMargin('|')
+
+        String lifecycles = '''\
+            |some_language:
+            |  friendlyName: Some Language
+            |  defaultKey: empty_default
+            |  empty_default: {}
+            |'''.stripMargin('|')
+
+        String toolchains = '''
+        toolchains:
+          some_language: [ some_toolchain, wildcard_toolchain ]
+        some_toolchain:
+          default_ivalue: option2
+          option1: &copy
+            - echo ${jervis_toolchain_ivalue}
+          option2: *copy
+        wildcard_toolchain:
+          default_ivalue: wildcard
+          '*': 'echo ${jervis_toolchain_ivalue}'
+        '''
+
+        def generator = new LifecycleGenerator()
+        generator.loadPlatformsString(platform)
+        generator.preloadYamlString(yaml)
+        generator.loadLifecyclesString(lifecycles)
+        generator.loadToolchainsString(toolchains)
+        generator.loadYamlString(yaml)
+
+        assert desired_value == generator.generateAll()
+    }
+    @Test public void test_LifecycleGenerator_nonwildcard_jervis_toolchain_ivalue_matrix() {
+        String desired_value = '''\
+            |#
+            |# TOOLCHAINS SECTION
+            |#
+            |set +x
+            |echo '# TOOLCHAINS SECTION'
+            |set -x
+            |#some_toolchain toolchain section
+            |case ${some_toolchain} in
+            |  some_toolchain0)
+            |    echo option1
+            |    ;;
+            |  some_toolchain1)
+            |    echo option2
+            |    ;;
+            |esac
+            |#wildcard_toolchain toolchain section
+            |echo wildcard
+            |'''.stripMargin('|')
+
+        String yaml = '''\
+            |language: some_language
+            |some_toolchain:
+            |  - option1
+            |  - option2
+            |'''.stripMargin('|')
+
+        String platform = '''\
+            |defaults:
+            |  platform: some_platform
+            |  os: some_os
+            |  stability: stable
+            |  sudo: sudo
+            |supported_platforms:
+            |  some_platform:
+            |    some_os:
+            |      friendlyName: Some OS
+            |      language:
+            |        - some_language
+            |      toolchain:
+            |        - some_toolchain
+            |        - wildcard_toolchain
+            |restrictions: {}
+            |'''.stripMargin('|')
+
+        String lifecycles = '''\
+            |some_language:
+            |  friendlyName: Some Language
+            |  defaultKey: empty_default
+            |  empty_default: {}
+            |'''.stripMargin('|')
+
+        String toolchains = '''
+        toolchains:
+          some_language: [ some_toolchain, wildcard_toolchain ]
+        some_toolchain:
+          default_ivalue: option2
+          option1: &copy
+            - echo ${jervis_toolchain_ivalue}
+          option2: *copy
+        wildcard_toolchain:
+          default_ivalue: wildcard
+          '*': 'echo ${jervis_toolchain_ivalue}'
+        '''
+
+        def generator = new LifecycleGenerator()
+        generator.loadPlatformsString(platform)
+        generator.preloadYamlString(yaml)
+        generator.loadLifecyclesString(lifecycles)
+        generator.loadToolchainsString(toolchains)
+        generator.loadYamlString(yaml)
+
+        assert desired_value == generator.generateAll()
+    }
 }

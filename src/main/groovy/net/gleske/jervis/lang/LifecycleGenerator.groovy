@@ -702,13 +702,12 @@ env:
                 }
                 if(tempchain in toolchain_keys) {
                     toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(this.toolchain_obj.getToolchains(this.isUnstable), "\"${toolchain}\".\"${tempchain}\"", [[], '']))
-                    output += '    ' + toolchainScriptList.join('\n    ') + '\n    ;;\n'
                 }
                 else {
                     //assume using "*" key
                     toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(this.toolchain_obj.getToolchains(this.isUnstable), "\"${toolchain}\".\\*", [[], '']))
-                    output += '    ' + this.interpolate_ivalue(toolchainScriptList, tempchain).join('\n    ') + '\n    ;;\n'
                 }
+                output += '    ' + this.interpolate_ivalue(toolchainScriptList, tempchain).join('\n    ') + '\n    ;;\n'
             }
             output += 'esac\n'
         }
@@ -719,13 +718,12 @@ env:
                 }
                 if(it in toolchain_keys) {
                     toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(this.toolchain_obj.getToolchains(this.isUnstable), "\"${toolchain}\".\"${it}\"", [[], '']))
-                    output += toolchainScriptList.join('\n') + '\n'
                 }
                 else {
                     //assume using "*" key
                     toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(this.toolchain_obj.getToolchains(this.isUnstable), "\"${toolchain}\".\\*", [[], '']))
-                    output += this.interpolate_ivalue(toolchainScriptList, it).join('\n') + '\n'
                 }
+                output += this.interpolate_ivalue(toolchainScriptList, it).join('\n') + '\n'
             }
         }
         return output
@@ -812,13 +810,12 @@ env:
                                     this.toolchain_obj.getToolchains(this.isUnstable),
                                     "\"${toolchain}\".\"${default_ivalue}\"",
                                     [[], '']))
-                        output += toolchainScriptList.join('\n') + '\n'
                     }
                     else {
                         //assume using "*" key
                         toolchainScriptList = toolchainScript(YamlOperator.getObjectValue(this.toolchain_obj.getToolchains(this.isUnstable), "\"${toolchain}\".\\*", [[], '']))
-                        output += this.interpolate_ivalue(toolchainScriptList, default_ivalue).join('\n') + '\n'
                     }
+                    output += this.interpolate_ivalue(toolchainScriptList, default_ivalue).join('\n') + '\n'
                 }
             }
         }

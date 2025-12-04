@@ -9,6 +9,7 @@ full change log see the commit log.
 
 - :boom: Publishing bugfix - the published pom.xml for v2.0 did not have any
   dependencies listed.  This patch-release fixes the published pom.
+- `${jervis_toolchain_ivalue}` is now always interpolated in toolchains.
 
 See Jervis 2.0 release notes for breaking changes if migrating from Jervis 1.x.
 
