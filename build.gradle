@@ -102,7 +102,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation "${groovyPackage}:groovy-test:${groovyVersion}"
     testImplementation "${groovyPackage}:groovy-console:${groovyVersion}"
-
     if(groovy_4_or_higher) {
         testImplementation "org.codenarc:CodeNarc:${codeNarcVersion}-groovy-4.0"
     } else {
