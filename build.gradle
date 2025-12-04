@@ -25,6 +25,8 @@ archivesBaseName = 'jervis'
 version = "${version}"
 
 ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.21'
+ext.groovy_4_or_higher = (Integer.parseInt(groovyVersion.tokenize('.').first()) > 3)
+ext.groovy_5_or_higher = (Integer.parseInt(groovyVersion.tokenize('.').first()) > 4)
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
 ext.snakeYamlVersion = '2.2'
@@ -35,8 +37,7 @@ ext.codeNarcVersion = '3.2.0'
 //    throw new GradleException("When using Java 17 you must use Groovy 3 or higher.  Found Groovy " + groovyVersion)
 //}
 
-if(Integer.parseInt(groovyVersion.tokenize('.').first()) > 3) {
-    // Groovy 4 and higher
+if(groovy_4_or_higher) {
     ext.groovyPackage = 'org.apache.groovy'
 } else {
     ext.groovyPackage = 'org.codehaus.groovy'
@@ -50,8 +51,7 @@ if(Integer.parseInt(groovyVersion.tokenize('.').first()) > 3) {
 
    https://github.com/groovy/GMavenPlus/issues/256
 */
-if(Integer.parseInt(groovyVersion.tokenize('.').first()) > 4) {
-    // Groovy 5 and higher
+if(groovy_5_or_higher) {
     ext.javaVersion = JavaVersion.VERSION_11
 } else {
     ext.javaVersion = JavaVersion.VERSION_1_8
@@ -103,8 +103,7 @@ dependencies {
     testImplementation "${groovyPackage}:groovy-test:${groovyVersion}"
     testImplementation "${groovyPackage}:groovy-console:${groovyVersion}"
 
-    if(Integer.parseInt(groovyVersion.tokenize('.').first()) > 3) {
-        // Groovy 4 and higher
+    if(groovy_4_or_higher) {
         testImplementation "org.codenarc:CodeNarc:${codeNarcVersion}-groovy-4.0"
     } else {
         testImplementation "org.codenarc:CodeNarc:${codeNarcVersion}"
