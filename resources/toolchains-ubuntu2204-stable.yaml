@@ -75,12 +75,12 @@ jdk:
     export PATH="${JAVA_HOME}/bin:${PATH}"
     java -Xmx32m -version
     javac -J-Xmx32m -version
-  openjdk18: |-
-    export JAVA_HOME="/usr/lib/jvm/java-18-openjdk-amd64"
+  openjdk21: |-
+    export JAVA_HOME="/usr/lib/jvm/java-21-openjdk-amd64"
     export PATH="${JAVA_HOME}/bin:${PATH}"
     java -Xmx32m -version
     javac -J-Xmx32m -version
-  openjdk19: |-
+  openjdk25: |-
     export JAVA_HOME="/usr/lib/jvm/java-19-openjdk-amd64"
     export PATH="${JAVA_HOME}/bin:${PATH}"
     java -Xmx32m -version
