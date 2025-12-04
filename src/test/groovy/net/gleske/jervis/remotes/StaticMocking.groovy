@@ -135,6 +135,9 @@ JERVIS_MOCKS_PATH=/tmp/mocks ./gradlew clean check
                 getDoOutput: { ->
                     request_meta['doOutput']
                 },
+                setConnectTimeout: { Integer millis ->
+                    request_meta['connectTimeout'] = millis
+                },
                 getHeaderFields: { ->
                     request_meta.data = request_meta.data?.toString() ?: ''
                     Map header_fields = [(null): Collections.unmodifiableList(['HTTP/1.1 200 OK'])]

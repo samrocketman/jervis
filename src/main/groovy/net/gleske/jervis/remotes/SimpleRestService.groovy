@@ -289,9 +289,19 @@ class SimpleRestService {
             if(http_method.toUpperCase() != 'GET' && data.size()) {
                 conn.setDoOutput(true)
             }
+            // Set connection timeout - JVM property takes priority over header
+            Integer timeout = 30000 // default 30 seconds
+            String timeoutProperty = System.getProperty('net.gleske.jervis.remotes.SimpleRestService.timeoutMillis')
+            if(timeoutProperty) {
+                timeout = Integer.parseInt(timeoutProperty)
+            } else if(tmp_http_headers.find { it.key.toLowerCase() == 'x-http-timeout-millis' }) {
+                timeout = Integer.parseInt(tmp_http_headers.find { it.key.toLowerCase() == 'x-http-timeout-millis' }.value.toString())
+            }
+            conn.setConnectTimeout(timeout)
+
             tmp_http_headers.each { k, v ->
                 // ignored headers are skipped
-                if(k.toLowerCase() in ['binary-data', 'parse-json', 'response-code', 'response-headers', 'response-map', 'x-http-binary-data', 'x-http-method-override']) {
+                if(k.toLowerCase() in ['binary-data', 'parse-json', 'response-code', 'response-headers', 'response-map', 'x-http-binary-data', 'x-http-method-override', 'x-http-timeout-millis']) {
                     return
                 }
                 conn.setRequestProperty(k, v)

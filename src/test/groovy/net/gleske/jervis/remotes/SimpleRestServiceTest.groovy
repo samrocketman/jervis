@@ -177,4 +177,41 @@ class SimpleRestServiceTest extends GroovyTestCase {
         assert result == addTrailingSlash('https://example.com/', 'v1')
         assert result == addTrailingSlash('https://example.com/', 'v1/')
     }
+    @Test public void test_SimpleRestService_apiFetch_default_timeout() {
+        apiFetch(new URL('https://api.github.com/users/samrocketman'))
+        assert request_meta['connectTimeout'] == 30000
+    }
+    @Test public void test_SimpleRestService_apiFetch_timeout_via_header() {
+        apiFetch(new URL('https://api.github.com/users/samrocketman'), ['X-HTTP-Timeout-Millis': '5000'])
+        assert request_meta['connectTimeout'] == 5000
+    }
+    @Test public void test_SimpleRestService_apiFetch_timeout_via_property() {
+        String originalValue = System.getProperty('net.gleske.jervis.remotes.SimpleRestService.timeoutMillis')
+        try {
+            System.setProperty('net.gleske.jervis.remotes.SimpleRestService.timeoutMillis', '10000')
+            apiFetch(new URL('https://api.github.com/users/samrocketman'))
+            assert request_meta['connectTimeout'] == 10000
+        } finally {
+            if(originalValue) {
+                System.setProperty('net.gleske.jervis.remotes.SimpleRestService.timeoutMillis', originalValue)
+            } else {
+                System.clearProperty('net.gleske.jervis.remotes.SimpleRestService.timeoutMillis')
+            }
+        }
+    }
+    @Test public void test_SimpleRestService_apiFetch_timeout_property_overrides_header() {
+        String originalValue = System.getProperty('net.gleske.jervis.remotes.SimpleRestService.timeoutMillis')
+        try {
+            System.setProperty('net.gleske.jervis.remotes.SimpleRestService.timeoutMillis', '15000')
+            // Header should be ignored because property is set
+            apiFetch(new URL('https://api.github.com/users/samrocketman'), ['X-HTTP-Timeout-Millis': '5000'])
+            assert request_meta['connectTimeout'] == 15000
+        } finally {
+            if(originalValue) {
+                System.setProperty('net.gleske.jervis.remotes.SimpleRestService.timeoutMillis', originalValue)
+            } else {
+                System.clearProperty('net.gleske.jervis.remotes.SimpleRestService.timeoutMillis')
+            }
+        }
+    }
 }
