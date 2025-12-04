@@ -123,6 +123,11 @@ JERVIS_MOCKS_PATH=/tmp/mocks ./gradlew clean check
         mc.openConnection = { ->
             request_meta['data'] = new StringWriter()
             request_meta['data_binary'] = new ByteArrayOutputStream()
+            // Reset method for each new connection to prevent stale values from previous requests
+            request_meta['method'] = null
+            // Track whether response_headers was loaded from a file (vs pre-set by test)
+            // File-loaded headers should be cleared after use; test pre-sets should persist
+            request_meta['_response_headers_from_file'] = false
             [
                 setDoOutput: { Boolean val ->
                     request_meta['doOutput'] = val
@@ -145,6 +150,7 @@ JERVIS_MOCKS_PATH=/tmp/mocks ./gradlew clean check
                     }
                     if(headersFile.exists() && !request_meta.response_headers) {
                         request_meta.response_headers = net.gleske.jervis.tools.YamlOperator.loadYamlFrom(headersFile)
+                        request_meta._response_headers_from_file = true
                     }
                     if(request_meta.response_headers in Map) {
                         header_fields = [:]
@@ -162,6 +168,10 @@ JERVIS_MOCKS_PATH=/tmp/mocks ./gradlew clean check
                     temp_request_meta['mock_header_file'] = "${resolveMockPath()}/${file}_headers".toString()
                     temp_request_meta['mock_error_file'] = "${resolveMockPath()}/${file}_err".toString()
                     request_history << temp_request_meta
+                    // Clear response_headers only if it was loaded from file (not pre-set by test)
+                    if(request_meta._response_headers_from_file) {
+                        request_meta.response_headers = null
+                    }
                     response_headers
                 },
                 setRequestMethod: { String method ->
@@ -170,7 +180,13 @@ JERVIS_MOCKS_PATH=/tmp/mocks ./gradlew clean check
                 },
                 setRequestProperty: { String key, def value ->
                     if(key == 'X-Mock-Throw-Exception') {
-                        throw value
+                        // Handle case where value may have been coerced to String
+                        // (e.g., when headers Map is typed as Map<String, String>)
+                        if(value instanceof Throwable) {
+                            throw value
+                        } else {
+                            throw new IOException(value?.toString() ?: 'Mocked exception')
+                        }
                     }
                     if(key == 'X-HTTP-Binary-Data') {
                         request_meta['binary_data'] = true

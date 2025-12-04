@@ -16,7 +16,8 @@
 package net.gleske.jervis.remotes
 /**
   A Mock URLConnection whose only purpose is to add a private field to the
-  <tt>{@link java.util.LinkedHashMap}</tt> class.
+  <tt>{@link java.util.LinkedHashMap}</tt> class and to enable method calls
+  to be dispatched to closures stored as map entries.
   */
 class MockURLConnection extends LinkedHashMap {
     /**
@@ -24,4 +25,18 @@ class MockURLConnection extends LinkedHashMap {
       exist.
       */
     private def method
+
+    /**
+      Enables method calls on this Map-based mock object to be dispatched to
+      closures stored as map entries. This is necessary for Groovy 2.4.x
+      compatibility where method calls on LinkedHashMap subclasses don't
+      automatically invoke closures stored as values.
+      */
+    def methodMissing(String name, args) {
+        def closure = this.get(name)
+        if(closure instanceof Closure) {
+            return closure.call(*args)
+        }
+        throw new MissingMethodException(name, this.getClass(), args)
+    }
 }
