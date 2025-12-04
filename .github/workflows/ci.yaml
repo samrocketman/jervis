@@ -33,6 +33,7 @@ jobs:
           - ${{ vars.GROOVY_2_5 }}
           - ${{ vars.GROOVY_3_0 }}
           - ${{ vars.GROOVY_4_0 }}
+          - ${{ vars.GROOVY_5_0 }}
         #exclude:
         #  - groovy: ${{ vars.GROOVY_2_4 }}
         #    java: '21'
