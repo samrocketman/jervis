@@ -170,8 +170,14 @@ task testSourcesJar(type: Jar) {
     from sourceSets.test.allSource
 }
 
+task mainSourcesJar(type: Jar) {
+    archiveClassifier = 'sources'
+    includes = ['**/*']
+    from sourceSets.main.allSource
+}
+
 artifacts {
-    archives javadocJar, testJar, testSourcesJar
+    archives  mainSourcesJar, javadocJar, testJar, testSourcesJar
 }
 
 jar {
@@ -186,8 +192,9 @@ jar {
 publishing {
     repositories {
         maven {
-            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            // https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
+            def releasesRepoUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://central.sonatype.com/repository/maven-snapshots/"
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
                 username = ossrhUsername
@@ -201,6 +208,7 @@ publishing {
         }
         binaryAndSources(MavenPublication) {
             from components.java
+            artifact mainSourcesJar
             artifact javadocJar
             artifact testJar
             artifact testSourcesJar
@@ -331,6 +339,28 @@ task mockVault(dependsOn: "classes", type: JavaExec) {
 }
 task mockAll
 mockAll.dependsOn mockVault
+
+/**
+  Maven Central publishing notification.
+  */
+task postToNotifyMavenCentral {
+    doLast {
+        // https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/#documentation-of-manual-api-endpoints
+        // https://ossrh-staging-api.central.sonatype.com/swagger-ui/#/default/manual_upload_default_repository
+        new URL('https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/net.gleske').openConnection().with { conn ->
+            conn.setConnectTimeout(10000)
+            conn.setRequestProperty('Authorization', 'Bearer ' + "${ossrhUsername}:${ossrhPassword}".toString().bytes.encodeBase64().toString())
+            conn.setRequestMethod('POST')
+            // make network request
+            conn.getHeaderFields()
+        }
+    }
+}
+afterEvaluate {
+    tasks.named('publishBinaryAndSourcesPublicationToMavenRepository') {
+        finalizedBy 'postToNotifyMavenCentral'
+    }
+}
 
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 //generate gradlew with: ./gradlew wrapper --gradle-version 7.6
