@@ -10,6 +10,15 @@ full change log see the commit log.
 - :boom: Publishing bugfix - the published pom.xml for v2.0 did not have any
   dependencies listed.  This patch-release fixes the published pom.
 - `${jervis_toolchain_ivalue}` is now always interpolated in toolchains.
+- Fix `SimpleRestService` mishandling PUT requests copied from jervis-2.0.1
+  release.
+- Fix `SimpleRestService` header duplication.  HTTP headers are now case
+  insensitive.
+- Fix `SimpleRestService` indefinitely hanging if server drops connection
+  without closing the connection.  There's now a configurable 30 second timeout.
+  If using the Java API, timeout can be customized via HTTP header
+  `x-http-timeout-millis`.  If using a service the timeout can be customized via
+  Java property `net.gleske.jervis.remotes.SimpleRestService.timeoutMillis`.
 
 See Jervis 2.0 release notes for breaking changes if migrating from Jervis 1.x.
 
@@ -27,11 +36,18 @@ In `src/` folder:
   `PipelineGenerator.getGenerator()` is updated.  They're separate objects.
 - `PipelineGenerator.getDefaultToolchainsEnvironment()` will now always include
   the platform and OS even if they're not used in matrix building.
+- `StaticMocking` hashing for mocks has changed.  So mocking paths may be
+  different depending on mock configuration.
 
 In `vars/` folder:
 
 - `loadCustomResource` var no longer throws an exception.  If a file does not
   exist it will return `null` instead of String contents.
+
+Building:
+
+- Java 17 or Java 21 is recommended but still generates Java 8 bytecode.
+- Support for Groovy 5 added.
 
 ## Changes by DSL area
 
@@ -40,6 +56,33 @@ In `vars/` folder:
 - `JervisException` now supports throwing with a supplemental message.
 - `SecurityIO.isBase64` method available.  It returns a boolean if the String
   has valid base64 characters.
+- `YamlOperator.deepCopy` API provides a full map copy via serialization.
+- `SimpleRestService` supports a response Map so that response code, headers,
+  and content, can all be returned from the same call.
+- AutoRelease.isMatched has better documentation.
+- `StaticMocking` can load mocks from a non-hardcoded path.  Customized via
+  environment variable `JERVIS_MOCKS_PATH` or system property
+  `StaticMocking.mocksPath`.
+
+New unused APIs available:
+
+- New classes for supporting multi-platform and multi-os matrix building.
+  `MultiPlatformGenerator` and `MultiPlatformValidator`.  This will enable
+  more matrix building in the next release.  See [#140] for this unfinished
+  feature.  PipelineGenerator uses `MultiPlatformGenerator`.
+- Support for partial unstable lifecycles and toolchains.  See [#150].
+- Support for unstable platforms file.  See [#163].
+- Support for GZip compression.
+- `SimpleRestService` has binary data support.  StaticMocking also supports
+  binary data.
+
+Deprecated APIs
+
+- `PipelineGenerator(LifecycleGenerator generator)` now deprecated for removal.
+
+[#150]: https://github.com/samrocketman/jervis/issues/150
+[#163]: https://github.com/samrocketman/jervis/issues/163
+[#140]: https://github.com/samrocketman/jervis/issues/140
 
 #### Pipeline DSL scripts changes in the `vars/` folder
 
@@ -52,6 +95,7 @@ In `vars/` folder:
 #### Job DSL changes in the `jobs/` folder
 
 - Slack notifications via `notify_slack()` available for Job DSL scripts.
+- alpine3 and ubuntu22 operating systems added in resources folder.
 
 # jervis 2.0.1 - Oct 19th, 2023
 
