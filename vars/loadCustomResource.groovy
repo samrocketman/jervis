@@ -22,6 +22,7 @@
 
 import jenkins.model.Jenkins
 import org.jenkinsci.plugins.configfiles.GlobalConfigFiles
+import net.gleske.jervis.tools.YamlOperator
 
 /**
   Gets a library resource.  A resource can be loaded from an external library
@@ -41,6 +42,14 @@ String loadConfigFileResource(String resource) {
 
 @NonCPS
 String call(String resource, Boolean skipAdmin = false) {
+    call(resource: resource, skipAdmin: skipAdmin)
+}
+
+@NonCPS
+String call(Map options) {
+    String resource = YamlOperator.getObjectValue(options, 'resource', '')
+    Boolean skipAdmin = YamlOperator.getObjectValue(options, 'skipAdmin', false)
+    Boolean silent = YamlOperator.getObjectValue(options, 'silent', false)
     if(!skipAdmin && hasGlobalVar('adminLibraryResource')) {
         adminLibraryResource(resource)
     }
@@ -48,7 +57,12 @@ String call(String resource, Boolean skipAdmin = false) {
         loadConfigFileResource(resource)
     }
     else if(hasGlobalResource(resource)) {
-        libraryResource(resource)
+        if(silent) {
+            readGlobalResource(resource)
+        }
+        else {
+            libraryResource(resource)
+        }
     }
     else {
         null
