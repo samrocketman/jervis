@@ -199,16 +199,26 @@ class SecurityIOTest extends GroovyTestCase {
     @Test public void test_SecurityIO_signRS256Base64Url_and_verifyJsonWebToken() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         security = new SecurityIO(url.content.text)
-        String signature = security.signRS256Base64Url('data.data')
-        String jwt_like = "data.data.${signature}"
+        // Create a valid JWT header and payload for signature verification
+        String header = security.encodeBase64Url('{"alg":"RS256","typ":"JWT"}')
+        String payload = security.encodeBase64Url('{"sub":"test","iat":1234567890}')
+        String data = "${header}.${payload}"
+        String signature = security.signRS256Base64Url(data)
+        String jwt_like = "${data}.${signature}"
         assert true == security.verifyJsonWebToken(jwt_like)
     }
 
     @Test public void test_SecurityIO_verifyJsonWebToken_fail_to_verify() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         security = new SecurityIO(url.content.text)
-        String signature = security.signRS256Base64Url('data.data')
-        String jwt_like = "junk.junk.${signature}"
+        // Create a valid JWT header but sign different data to fail signature verification
+        String header = security.encodeBase64Url('{"alg":"RS256","typ":"JWT"}')
+        String payload = security.encodeBase64Url('{"sub":"test","iat":1234567890}')
+        String data = "${header}.${payload}"
+        String signature = security.signRS256Base64Url(data)
+        // Tamper with the payload to cause signature verification failure
+        String tamperedPayload = security.encodeBase64Url('{"sub":"tampered","iat":1234567890}')
+        String jwt_like = "${header}.${tamperedPayload}.${signature}"
         assert false == security.verifyJsonWebToken(jwt_like)
     }
 
@@ -317,8 +327,14 @@ class SecurityIOTest extends GroovyTestCase {
     @Test public void test_SecurityIO_verifyGitHubJWTPayload_bad_signature() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         security = new SecurityIO(url.content.text)
-        String signature = security.signRS256Base64Url('data.data')
-        String jwt_like = "junk.junk.${signature}"
+        // Create a valid JWT header but sign different data to fail signature verification
+        String header = security.encodeBase64Url('{"alg":"RS256","typ":"JWT"}')
+        String payload = security.encodeBase64Url('{"sub":"test","iat":1234567890}')
+        String data = "${header}.${payload}"
+        String signature = security.signRS256Base64Url(data)
+        // Tamper with the payload to cause signature verification failure
+        String tamperedPayload = security.encodeBase64Url('{"sub":"tampered","iat":1234567890}')
+        String jwt_like = "${header}.${tamperedPayload}.${signature}"
         assert false == security.verifyGitHubJWTPayload(jwt_like)
     }
 
@@ -537,5 +553,319 @@ class SecurityIOTest extends GroovyTestCase {
         assert SecurityIO.isBase64('YQ=') == false
         assert SecurityIO.isBase64('YQ\n==\n') == true
         assert SecurityIO.isBase64('hello world') == false
+    }
+
+    @Test public void test_SecurityIO_isBase64_invalid_characters() {
+        // Test invalid base64 characters (triggers regex failure)
+        assert SecurityIO.isBase64('!@#$') == false
+        assert SecurityIO.isBase64('YQ==!') == false
+        assert SecurityIO.isBase64('data with spaces') == false
+        assert SecurityIO.isBase64('====') == false
+    }
+
+    // ==========================================================================
+    // Tests for new RSA OAEP encryption methods
+    // ==========================================================================
+
+    @Test public void test_SecurityIO_rsaEncryptOaep_rsaDecryptOaep() {
+        String plaintext = 'secret message with OAEP'
+        String ciphertext
+        String decodedtext
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security.key_pair = url.content.text
+        ciphertext = security.rsaEncryptOaep(plaintext)
+        assert ciphertext.length() > 0
+        decodedtext = security.rsaDecryptOaep(ciphertext)
+        assert plaintext == decodedtext
+    }
+
+    @Test public void test_SecurityIO_rsaEncryptBytesOaep_rsaDecryptBytesOaep() {
+        byte[] plainbytes = 'secret bytes with OAEP'.bytes
+        byte[] cipherbytes
+        byte[] decodedbytes
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security.key_pair = url.content.text
+        cipherbytes = security.rsaEncryptBytesOaep(plainbytes)
+        assert cipherbytes.length > 0
+        decodedbytes = security.rsaDecryptBytesOaep(cipherbytes)
+        assert plainbytes == decodedbytes
+    }
+
+    @Test public void test_SecurityIO_rsaEncryptOaep_with_4096_key() {
+        String plaintext = 'secret message with 4096-bit key'
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
+        security.key_pair = url.content.text
+        String ciphertext = security.rsaEncryptOaep(plaintext)
+        assert ciphertext.length() > 0
+        assert plaintext == security.rsaDecryptOaep(ciphertext)
+    }
+
+    @Test public void test_SecurityIO_fail_rsaEncryptOaep_no_keypair() {
+        shouldFail(EncryptException) {
+            security.rsaEncryptOaep('some text')
+        }
+    }
+
+    @Test public void test_SecurityIO_fail_rsaDecryptOaep_no_keypair() {
+        shouldFail(DecryptException) {
+            security.rsaDecryptOaep('some text')
+        }
+    }
+
+    @Test public void test_SecurityIO_fail_rsaEncryptBytesOaep_no_keypair() {
+        shouldFail(EncryptException) {
+            security.rsaEncryptBytesOaep('some text'.bytes)
+        }
+    }
+
+    @Test public void test_SecurityIO_fail_rsaDecryptBytesOaep_no_keypair() {
+        shouldFail(DecryptException) {
+            security.rsaDecryptBytesOaep('some text'.bytes)
+        }
+    }
+
+    @Test public void test_SecurityIO_rsaOaep_different_from_pkcs1() {
+        // Verify OAEP and PKCS1 produce different ciphertext
+        String plaintext = 'test message'
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security.key_pair = url.content.text
+        String oaepCiphertext = security.rsaEncryptOaep(plaintext)
+        String pkcs1Ciphertext = security.rsaEncrypt(plaintext)
+        // Ciphertexts should be different (different padding schemes)
+        assert oaepCiphertext != pkcs1Ciphertext
+        // Both should decrypt to the same plaintext
+        assert plaintext == security.rsaDecryptOaep(oaepCiphertext)
+        assert plaintext == security.rsaDecrypt(pkcs1Ciphertext)
+    }
+
+    // ==========================================================================
+    // Tests for new AES-256-GCM encryption methods
+    // ==========================================================================
+
+    @Test public void test_SecurityIO_AES256GCM_encrypt_decrypt() {
+        byte[] secret = SecurityIO.randomBytes(32)
+        String plaintext = 'secret message for GCM'
+        byte[] ciphertext = SecurityIO.encryptWithAES256GCM(secret, plaintext)
+        assert ciphertext.length > 0
+        // GCM ciphertext should be: 12 bytes nonce + plaintext + 16 bytes auth tag
+        assert ciphertext.length >= 12 + plaintext.bytes.length + 16
+        String decrypted = SecurityIO.decryptWithAES256GCM(secret, ciphertext)
+        assert plaintext == decrypted
+    }
+
+    @Test public void test_SecurityIO_AES256GCM_random_nonce() {
+        // Verify each encryption produces different ciphertext (random nonce)
+        byte[] secret = SecurityIO.randomBytes(32)
+        String plaintext = 'same message'
+        byte[] ciphertext1 = SecurityIO.encryptWithAES256GCM(secret, plaintext)
+        byte[] ciphertext2 = SecurityIO.encryptWithAES256GCM(secret, plaintext)
+        // Ciphertexts should be different due to random nonce
+        assert ciphertext1 != ciphertext2
+        // But both should decrypt to the same plaintext
+        assert plaintext == SecurityIO.decryptWithAES256GCM(secret, ciphertext1)
+        assert plaintext == SecurityIO.decryptWithAES256GCM(secret, ciphertext2)
+    }
+
+    @Test public void test_SecurityIO_AES256GCM_short_secret() {
+        // Test with shortened input bytes (should be padded)
+        byte[] secret = 'short'.bytes
+        String plaintext = 'some secret message'
+        byte[] ciphertext = SecurityIO.encryptWithAES256GCM(secret, plaintext)
+        assert plaintext == SecurityIO.decryptWithAES256GCM(secret, ciphertext)
+    }
+
+    @Test public void test_SecurityIO_AES256GCM_authentication_failure() {
+        byte[] secret = SecurityIO.randomBytes(32)
+        String plaintext = 'secret message'
+        byte[] ciphertext = SecurityIO.encryptWithAES256GCM(secret, plaintext)
+        // Tamper with the ciphertext (modify a byte after the nonce)
+        ciphertext[15] = (byte)(ciphertext[15] ^ 0xFF)
+        // Decryption should fail due to authentication tag mismatch
+        shouldFail(javax.crypto.AEADBadTagException) {
+            SecurityIO.decryptWithAES256GCM(secret, ciphertext)
+        }
+    }
+
+    @Test public void test_SecurityIO_AES256GCM_ciphertext_too_short() {
+        byte[] secret = SecurityIO.randomBytes(32)
+        // Ciphertext too short (less than nonce + auth tag = 28 bytes minimum)
+        byte[] shortCiphertext = new byte[27]
+        shouldFail(DecryptException) {
+            SecurityIO.decryptWithAES256GCM(secret, shortCiphertext)
+        }
+    }
+
+    @Test public void test_SecurityIO_AES256GCM_empty_plaintext() {
+        byte[] secret = SecurityIO.randomBytes(32)
+        String plaintext = ''
+        byte[] ciphertext = SecurityIO.encryptWithAES256GCM(secret, plaintext)
+        // Ciphertext should be exactly: 12 bytes nonce + 16 bytes auth tag
+        assert ciphertext.length == 28
+        assert plaintext == SecurityIO.decryptWithAES256GCM(secret, ciphertext)
+    }
+
+    @Test public void test_SecurityIO_AES256GCMBase64_encrypt_decrypt() {
+        String secretB64 = SecurityIO.randomBytesBase64(32)
+        String plaintext = 'secret message for GCM Base64'
+        String ciphertextB64 = SecurityIO.encryptWithAES256GCMBase64(secretB64, plaintext)
+        assert ciphertextB64.length() > 0
+        String decrypted = SecurityIO.decryptWithAES256GCMBase64(secretB64, ciphertextB64)
+        assert plaintext == decrypted
+    }
+
+    @Test public void test_SecurityIO_AES256GCMBase64_random_nonce() {
+        String secretB64 = SecurityIO.randomBytesBase64(32)
+        String plaintext = 'same message'
+        String ciphertext1 = SecurityIO.encryptWithAES256GCMBase64(secretB64, plaintext)
+        String ciphertext2 = SecurityIO.encryptWithAES256GCMBase64(secretB64, plaintext)
+        // Ciphertexts should be different due to random nonce
+        assert ciphertext1 != ciphertext2
+        // But both should decrypt to the same plaintext
+        assert plaintext == SecurityIO.decryptWithAES256GCMBase64(secretB64, ciphertext1)
+        assert plaintext == SecurityIO.decryptWithAES256GCMBase64(secretB64, ciphertext2)
+    }
+
+    // ==========================================================================
+    // Tests for new passphrase-based AES-256-GCM encryption methods
+    // ==========================================================================
+
+    @Test public void test_SecurityIO_encryptWithPassphraseGCM_decryptWithPassphraseGCM() {
+        String passphrase = 'correct horse battery staple'
+        String plaintext = 'https://xkcd.com/936/'
+        String ciphertext = SecurityIO.encryptWithPassphraseGCM(passphrase, plaintext)
+        assert ciphertext.length() > 0
+        String decrypted = SecurityIO.decryptWithPassphraseGCM(passphrase, ciphertext)
+        assert plaintext == decrypted
+    }
+
+    @Test public void test_SecurityIO_PassphraseGCM_random_salt_and_nonce() {
+        // Verify each encryption produces different ciphertext (random salt and nonce)
+        String passphrase = 'my secret passphrase'
+        String plaintext = 'same message'
+        String ciphertext1 = SecurityIO.encryptWithPassphraseGCM(passphrase, plaintext)
+        String ciphertext2 = SecurityIO.encryptWithPassphraseGCM(passphrase, plaintext)
+        // Ciphertexts should be different due to random salt and nonce
+        assert ciphertext1 != ciphertext2
+        // But both should decrypt to the same plaintext
+        assert plaintext == SecurityIO.decryptWithPassphraseGCM(passphrase, ciphertext1)
+        assert plaintext == SecurityIO.decryptWithPassphraseGCM(passphrase, ciphertext2)
+    }
+
+    @Test public void test_SecurityIO_PassphraseGCM_wrong_passphrase() {
+        String passphrase = 'correct passphrase'
+        String wrongPassphrase = 'wrong passphrase'
+        String plaintext = 'secret data'
+        String ciphertext = SecurityIO.encryptWithPassphraseGCM(passphrase, plaintext)
+        // Decryption with wrong passphrase should fail
+        shouldFail(javax.crypto.AEADBadTagException) {
+            SecurityIO.decryptWithPassphraseGCM(wrongPassphrase, ciphertext)
+        }
+    }
+
+    @Test public void test_SecurityIO_PassphraseGCM_ciphertext_too_short() {
+        String passphrase = 'some passphrase'
+        // Ciphertext too short (less than salt + nonce + auth tag = 60 bytes minimum)
+        String shortCiphertext = SecurityIO.encodeBase64(new byte[59])
+        shouldFail(DecryptException) {
+            SecurityIO.decryptWithPassphraseGCM(passphrase, shortCiphertext)
+        }
+    }
+
+    @Test public void test_SecurityIO_PassphraseGCM_authentication_failure() {
+        String passphrase = 'my passphrase'
+        String plaintext = 'secret message'
+        String ciphertextB64 = SecurityIO.encryptWithPassphraseGCM(passphrase, plaintext)
+        byte[] ciphertext = SecurityIO.decodeBase64Bytes(ciphertextB64)
+        // Tamper with the ciphertext (modify a byte after salt and nonce)
+        ciphertext[50] = (byte)(ciphertext[50] ^ 0xFF)
+        String tamperedB64 = SecurityIO.encodeBase64(ciphertext)
+        // Decryption should fail due to authentication tag mismatch
+        shouldFail(javax.crypto.AEADBadTagException) {
+            SecurityIO.decryptWithPassphraseGCM(passphrase, tamperedB64)
+        }
+    }
+
+    @Test public void test_SecurityIO_PassphraseGCM_different_from_CBC() {
+        // Verify GCM and CBC passphrase encryption produce different results
+        String passphrase = 'test passphrase'
+        String plaintext = 'test message'
+        String gcmCiphertext = SecurityIO.encryptWithPassphraseGCM(passphrase, plaintext)
+        String cbcCiphertext = SecurityIO.encryptWithAES256(passphrase, plaintext)
+        // Ciphertexts should be different (different modes and formats)
+        assert gcmCiphertext != cbcCiphertext
+        // Both should decrypt to the same plaintext with their respective methods
+        assert plaintext == SecurityIO.decryptWithPassphraseGCM(passphrase, gcmCiphertext)
+        assert plaintext == SecurityIO.decryptWithAES256(passphrase, cbcCiphertext)
+    }
+
+    @Test public void test_SecurityIO_PassphraseGCM_empty_plaintext() {
+        String passphrase = 'some passphrase'
+        String plaintext = ''
+        String ciphertext = SecurityIO.encryptWithPassphraseGCM(passphrase, plaintext)
+        assert ciphertext.length() > 0
+        assert plaintext == SecurityIO.decryptWithPassphraseGCM(passphrase, ciphertext)
+    }
+
+    @Test public void test_SecurityIO_PassphraseGCM_long_plaintext() {
+        String passphrase = 'some passphrase'
+        // Create a long plaintext (1000 characters)
+        String plaintext = 'A' * 1000
+        String ciphertext = SecurityIO.encryptWithPassphraseGCM(passphrase, plaintext)
+        assert plaintext == SecurityIO.decryptWithPassphraseGCM(passphrase, ciphertext)
+    }
+
+    @Test public void test_SecurityIO_PassphraseGCM_special_characters() {
+        String passphrase = 'pässwörd with spëcial çhàracters!'
+        String plaintext = 'Message with émojis 🔐 and ünïcödé: 日本語'
+        String ciphertext = SecurityIO.encryptWithPassphraseGCM(passphrase, plaintext)
+        assert plaintext == SecurityIO.decryptWithPassphraseGCM(passphrase, ciphertext)
+    }
+
+    // ==========================================================================
+    // Tests for verifyJsonWebToken edge cases (new validation)
+    // ==========================================================================
+
+    @Test public void test_SecurityIO_verifyJsonWebToken_invalid_structure_too_few_parts() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new SecurityIO(url.content.text)
+        // JWT with only 2 parts should fail
+        assert false == security.verifyJsonWebToken('header.payload')
+    }
+
+    @Test public void test_SecurityIO_verifyJsonWebToken_invalid_structure_too_many_parts() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new SecurityIO(url.content.text)
+        // JWT with 4 parts should fail
+        assert false == security.verifyJsonWebToken('a.b.c.d')
+    }
+
+    @Test public void test_SecurityIO_verifyJsonWebToken_wrong_algorithm() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new SecurityIO(url.content.text)
+        // JWT with HS256 algorithm should fail (we only accept RS256)
+        String header = security.encodeBase64Url('{"alg":"HS256","typ":"JWT"}')
+        String payload = security.encodeBase64Url('{"sub":"test"}')
+        String data = "${header}.${payload}"
+        String signature = security.signRS256Base64Url(data)
+        assert false == security.verifyJsonWebToken("${data}.${signature}")
+    }
+
+    @Test public void test_SecurityIO_verifyJsonWebToken_none_algorithm() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new SecurityIO(url.content.text)
+        // JWT with "none" algorithm should fail (algorithm confusion attack)
+        String header = security.encodeBase64Url('{"alg":"none","typ":"JWT"}')
+        String payload = security.encodeBase64Url('{"sub":"test"}')
+        assert false == security.verifyJsonWebToken("${header}.${payload}.")
+    }
+
+    @Test public void test_SecurityIO_verifyJsonWebToken_malformed_header() {
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
+        security = new SecurityIO(url.content.text)
+        // JWT with malformed header (not valid JSON) should fail
+        String header = security.encodeBase64Url('not valid json')
+        String payload = security.encodeBase64Url('{"sub":"test"}')
+        String signature = 'fakesignature'
+        assert false == security.verifyJsonWebToken("${header}.${payload}.${signature}")
     }
 }

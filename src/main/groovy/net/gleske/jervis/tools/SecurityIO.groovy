@@ -20,6 +20,7 @@ import net.gleske.jervis.exceptions.EncryptException
 import net.gleske.jervis.exceptions.KeyPairDecodeException
 
 import groovy.json.JsonBuilder
+import java.io.ByteArrayOutputStream
 import java.security.KeyFactory
 import java.security.KeyPair
 import java.security.MessageDigest
@@ -30,9 +31,11 @@ import java.security.spec.KeySpec
 import java.security.spec.PKCS8EncodedKeySpec
 import java.time.Duration
 import java.time.Instant
+import java.util.Arrays
 import javax.crypto.Cipher
 import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
@@ -40,6 +43,7 @@ import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1Primitive
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
 import org.bouncycastle.crypto.AsymmetricBlockCipher
+import org.bouncycastle.crypto.encodings.OAEPEncoding
 import org.bouncycastle.crypto.encodings.PKCS1Encoding
 import org.bouncycastle.crypto.engines.RSAEngine
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter
@@ -243,8 +247,21 @@ if(security.verifyGitHubJWTPayload(jwt)) {
       */
     Boolean verifyJsonWebToken(String github_jwt) {
         List jwt = github_jwt.tokenize('.')
+        // Validate JWT structure: must have exactly 3 parts (header.payload.signature)
+        if(jwt.size() != 3) {
+            return false
+        }
+        // Validate algorithm to prevent algorithm confusion attacks
+        try {
+            Map header = YamlOperator.loadYamlFrom(decodeBase64UrlBytes(jwt[0]))
+            if(header.alg != 'RS256') {
+                return false
+            }
+        } catch(Exception e) {
+            return false
+        }
         String data = jwt[0..1].join('.')
-        String signature = jwt[-1]
+        String signature = jwt[2]
         verifyRS256Base64Url(signature, data)
     }
 
@@ -435,6 +452,65 @@ println "Key size: ${security.rsa_keysize}"
     }
 
     /**
+      Uses RSA asymmetric encryption with OAEP padding to encrypt a plain text <tt>String</tt>.
+      OAEP padding is recommended over PKCS1 padding to prevent Bleichenbacher attacks.
+
+      @param  plaintext A plain text <tt>String</tt> to be encrypted.
+      @return A Base64 encoded ciphertext.
+     */
+    String rsaEncryptOaep(String plaintext) throws EncryptException {
+        byte[] ciphertext = rsaEncryptBytesOaep(plaintext.bytes)
+        encodeBase64(ciphertext)
+    }
+
+    /**
+      Uses RSA asymmetric encryption with OAEP padding to encrypt plain bytes.
+      OAEP padding is recommended over PKCS1 padding to prevent Bleichenbacher attacks.
+
+      @param plainbytes Plain bytes to be encrypted.
+      @return Enciphered bytes are returned.
+      */
+    byte[] rsaEncryptBytesOaep(byte[] plainbytes) throws EncryptException {
+        if(!key_pair) {
+            throw new EncryptException('key_pair is not set.')
+        }
+        // Use OAEP padding instead of PKCS1 to prevent Bleichenbacher padding oracle attacks
+        AsymmetricBlockCipher encrypt = new OAEPEncoding(new RSAEngine())
+        encrypt.init(true, PublicKeyFactory.createKey(key_pair.public.encoded) as AsymmetricKeyParameter)
+        byte[] enciphered = encrypt.processBlock(plainbytes, 0, plainbytes.length)
+        enciphered
+    }
+
+    /**
+      Uses RSA asymmetric encryption with OAEP padding to decrypt a ciphertext <tt>String</tt>.
+      OAEP padding is recommended over PKCS1 padding to prevent Bleichenbacher attacks.
+
+      @param  ciphertext A Base64 encoded ciphertext <tt>String</tt> to be decrypted.
+      @return A plain text <tt>String</tt>.
+     */
+    String rsaDecryptOaep(String ciphertext) throws DecryptException {
+        byte[] messageBytes = decodeBase64Bytes(ciphertext)
+        (new String(rsaDecryptBytesOaep(messageBytes)))
+    }
+
+    /**
+      Uses RSA asymmetric encryption with OAEP padding to decrypt enciphered bytes.
+      OAEP padding is recommended over PKCS1 padding to prevent Bleichenbacher attacks.
+
+      @param cipherbytes Encrypted bytes.
+      @return Returns decrypted bytes.
+      */
+    byte[] rsaDecryptBytesOaep(byte[] cipherbytes) throws DecryptException {
+        if(!key_pair) {
+            throw new DecryptException('key_pair is not set.')
+        }
+        // Use OAEP padding instead of PKCS1 to prevent Bleichenbacher padding oracle attacks
+        AsymmetricBlockCipher decrypt = new OAEPEncoding(new RSAEngine())
+        decrypt.init(false, PrivateKeyFactory.createKey(key_pair.private.encoded) as AsymmetricKeyParameter)
+        decrypt.processBlock(cipherbytes, 0, cipherbytes.length)
+    }
+
+    /**
       Uses RSA asymmetric encryption to encrypt a plain text <tt>String</tt> and outputs ciphertext.
 
       For third party reference, this is essentially executing the following commands in a terminal.
@@ -443,9 +519,12 @@ println "Key size: ${security.rsa_keysize}"
 echo -n 'plaintext' | openssl rsautl -encrypt -inkey ./id_rsa.pub -pubin | openssl enc -base64 -A
 </code></pre>
 
+      @deprecated Use {@link #rsaEncryptOaep(java.lang.String)} instead. PKCS1 padding is
+                  vulnerable to Bleichenbacher padding oracle attacks.
       @param  plaintext A plain text <tt>String</tt> to be encrypted.
       @return A Base64 encoded ciphertext or more generically: <tt>ciphertext = base64encode(RSAPublicKeyEncrypt(plaintext))</tt>
      */
+    @Deprecated
     String rsaEncrypt(String plaintext) throws EncryptException {
         byte[] ciphertext = rsaEncryptBytes(plaintext.bytes)
         encodeBase64(ciphertext)
@@ -453,9 +532,13 @@ echo -n 'plaintext' | openssl rsautl -encrypt -inkey ./id_rsa.pub -pubin | opens
 
     /**
       Uses RSA asymmetric encryption to encrypt a plain bytes and outputs enciphered bytes.
+
+      @deprecated Use {@link #rsaEncryptBytesOaep(byte[])} instead. PKCS1 padding is
+                  vulnerable to Bleichenbacher padding oracle attacks.
       @param plainbytes Plain bytes to be encrypted.
       @return Enciphered bytes are returned.
       */
+    @Deprecated
     byte[] rsaEncryptBytes(byte[] plainbytes) throws EncryptException {
         if(!key_pair) {
             throw new EncryptException('key_pair is not set.')
@@ -475,9 +558,12 @@ echo -n 'plaintext' | openssl rsautl -encrypt -inkey ./id_rsa.pub -pubin | opens
 echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey /tmp/id_rsa
 </code></pre>
 
+      @deprecated Use {@link #rsaDecryptOaep(java.lang.String)} instead. PKCS1 padding is
+                  vulnerable to Bleichenbacher padding oracle attacks.
       @param  ciphertext A Base64 encoded ciphertext <tt>String</tt> to be decrypted.
       @return A plain text <tt>String</tt> or more generically: <tt>plaintext = RSAPrivateKeyDecrypt(base64decode(ciphertext))</tt>
      */
+    @Deprecated
     String rsaDecrypt(String ciphertext) throws DecryptException {
         byte[] messageBytes = decodeBase64Bytes(ciphertext)
         (new String(rsaDecryptBytes(messageBytes)))
@@ -485,9 +571,13 @@ echo 'ciphertext' | openssl enc -base64 -A -d | openssl rsautl -decrypt -inkey /
 
     /**
       Uses RSA asymmetric encryption to decrypt enciphered bytes and returns plain bytes.
+
+      @deprecated Use {@link #rsaDecryptBytesOaep(byte[])} instead. PKCS1 padding is
+                  vulnerable to Bleichenbacher padding oracle attacks.
       @param cipherbytes Encrypted bytes.
       @return Returns decrypted bytes.
       */
+    @Deprecated
     byte[] rsaDecryptBytes(byte[] cipherbytes) throws DecryptException {
         if(!key_pair) {
             throw new DecryptException('key_pair is not set.')
@@ -591,7 +681,8 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       @return Returns the result from the executed closure.
       */
     static def avoidTimingAttack(Integer milliseconds, Closure body) {
-        Long desiredTime = (milliseconds < 0) ? (new Random().nextInt(milliseconds * -1)) : milliseconds
+        // Use SecureRandom instead of Random for cryptographically secure randomness
+        Long desiredTime = (milliseconds < 0) ? (SecureRandom.getInstance('NativePRNGNonBlocking').nextInt(milliseconds * -1)) : milliseconds
         Long before = Instant.now().toEpochMilli()
         // execute code
         def result = body()
@@ -622,7 +713,7 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
     static String sha256Sum(byte[] input) {
         MessageDigest digest = MessageDigest.getInstance('SHA-256')
         digest.update(input)
-        new BigInteger(1,digest.digest()).toString(16).padLeft(32, '0')
+        new BigInteger(1,digest.digest()).toString(16).padLeft(64, '0')
     }
 
     /**
@@ -648,9 +739,100 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
     }
 
     /**
+      Encrypt plaintext using AES-256 GCM mode with authenticated encryption.
+      Uses a random 12-byte nonce which is prepended to the ciphertext.
+      GCM mode provides both confidentiality and authenticity.
+
+      @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture (JCA) Reference Guide for <tt>Cipher</tt> class</a>
+      @see <a href="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html" target=_blank>Java Security Standard Algorithm Names</a>.
+      @param secret Secret key for encrypting. If byte-count is less than 32
+                    (256-bits), then bytes are repeated until 256 bits are available.
+      @param data Data to be encrypted with AES-256-GCM.
+      @return Ciphertext with 12-byte nonce prepended (nonce || ciphertext || auth-tag).
+      */
+    static byte[] encryptWithAES256GCM(byte[] secret, String data) {
+        // Generate a random 12-byte nonce for GCM (recommended size)
+        byte[] nonce = randomBytes(12)
+
+        // 32 comes from 256 / 8 in AES-256
+        SecretKey key = new SecretKeySpec(padForAES256(secret), 0, 32, 'AES')
+        // Use AES-GCM for authenticated encryption (prevents padding oracle attacks)
+        Cipher cipher = Cipher.getInstance('AES/GCM/NoPadding')
+        GCMParameterSpec gcmSpec = new GCMParameterSpec(128, nonce) // 128-bit auth tag
+        cipher.init(Cipher.ENCRYPT_MODE, key, gcmSpec)
+        byte[] ciphertext = cipher.doFinal(data.getBytes('UTF-8'))
+
+        // Prepend nonce to ciphertext (nonce || ciphertext)
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+        outputStream.write(nonce)
+        outputStream.write(ciphertext)
+        outputStream.toByteArray()
+    }
+
+    /**
+      Decrypt ciphertext using AES-256 GCM mode with authenticated decryption.
+      Expects the nonce (12 bytes) to be prepended to the ciphertext.
+      GCM mode provides both confidentiality and authenticity verification.
+
+      @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture (JCA) Reference Guide for <tt>Cipher</tt> class</a>
+      @see <a href="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html" target=_blank>Java Security Standard Algorithm Names</a>.
+      @param secret Secret key for decrypting. If byte-count is less than 32
+                    (256-bits), then bytes are repeated until 256 bits are available.
+      @param data Data to be decrypted with AES-256-GCM. Must have 12-byte nonce prepended.
+      @return Decrypted plaintext String.
+      */
+    static String decryptWithAES256GCM(byte[] secret, byte[] data) {
+        // Extract 12-byte nonce from beginning of ciphertext
+        if(data.length < 28) { // 12 bytes nonce + 16 bytes auth tag (min for empty plaintext)
+            throw new DecryptException('Ciphertext too short - missing nonce or auth tag')
+        }
+        byte[] nonce = Arrays.copyOfRange(data, 0, 12)
+        byte[] ciphertext = Arrays.copyOfRange(data, 12, data.length)
+
+        // 32 comes from 256 / 8 in AES-256
+        SecretKey key = new SecretKeySpec(padForAES256(secret), 0, 32, 'AES')
+        // Use AES-GCM for authenticated decryption
+        Cipher cipher = Cipher.getInstance('AES/GCM/NoPadding')
+        GCMParameterSpec gcmSpec = new GCMParameterSpec(128, nonce) // 128-bit auth tag
+        cipher.init(Cipher.DECRYPT_MODE, key, gcmSpec)
+        new String(cipher.doFinal(ciphertext), 'UTF-8')
+    }
+
+    /**
+      Takes Base64 encoded secret and encrypts the provided <tt>String</tt> data
+      using AES-256-GCM authenticated encryption.
+
+      @see #encryptWithAES256GCM(byte[], java.lang.String)
+      @param secret Base64 encoded binary secret.
+      @param data A plain <tt>String</tt> to be encrypted (not Base64 encoded).
+      @return Base64 encoded ciphertext with nonce prepended.
+      */
+    static String encryptWithAES256GCMBase64(String secret, String data) {
+        byte[] b_secret = decodeBase64Bytes(secret)
+        encodeBase64(encryptWithAES256GCM(b_secret, data))
+    }
+
+    /**
+      Takes Base64 encoded secret and decrypts the provided Base64 encoded
+      ciphertext using AES-256-GCM authenticated decryption.
+
+      @see #decryptWithAES256GCM(byte[], byte[])
+      @param secret Base64 encoded binary secret.
+      @param data Base64 encoded encrypted bytes to decrypt (with nonce prepended).
+      @return A <tt>String</tt> which is plaintext.
+      */
+    static String decryptWithAES256GCMBase64(String secret, String data) {
+        byte[] b_secret = decodeBase64Bytes(secret)
+        byte[] b_data = decodeBase64Bytes(data)
+        decryptWithAES256GCM(b_secret, b_data)
+    }
+
+    /**
       Encrypt plaintext using AES-256 CBC mode with PKCS5 padding.  The IV is
       hashed with multiple iterations of SHA-256.
 
+      @deprecated Use {@link #encryptWithAES256GCM(byte[], java.lang.String)} instead.
+                  AES-CBC is vulnerable to padding oracle attacks and lacks authentication.
       @see #DEFAULT_AES_ITERATIONS
       @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture (JCA) Reference Guide for <tt>Cipher</tt> class</a>
       @see <a href="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html" target=_blank>Java Security Standard Algorithm Names</a>.
@@ -667,6 +849,7 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
                              original <tt>iv</tt> is used for AES cipher
                              initialization.
       */
+    @Deprecated
     static byte[] encryptWithAES256(byte[] secret, byte[] iv, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         // Calculate IV with 5k iterations of SHA-256 sum
         String checksum
@@ -689,6 +872,8 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       Decrypt ciphertext using AES-256 CBC mode with PKCS5 padding.  The IV is
       hashed with multiple iterations of SHA-256.
 
+      @deprecated Use {@link #decryptWithAES256GCM(byte[], byte[])} instead.
+                  AES-CBC is vulnerable to padding oracle attacks and lacks authentication.
       @see #DEFAULT_AES_ITERATIONS
       @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-94225C88-F2F1-44D1-A781-1DD9D5094566" target=_blank>Java Cryptography Architecture (JCA) Reference Guide for <tt>Cipher</tt> class</a>
       @see <a href="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html" target=_blank>Java Security Standard Algorithm Names</a>.
@@ -705,6 +890,7 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
                              original <tt>iv</tt> is used for AES cipher
                              initialization.
       */
+    @Deprecated
     static String decryptWithAES256(byte[] secret, byte[] iv, byte[] data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         // Calculate IV with 5k iterations of SHA-256 sum
         String checksum
@@ -727,11 +913,14 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       Takes Base64 encoded secret and IV and encrypts the provided
       <tt>String</tt> data.
 
+      @deprecated Use {@link #encryptWithAES256GCMBase64(java.lang.String, java.lang.String)} instead.
+                  AES-CBC is vulnerable to padding oracle attacks and lacks authentication.
       @see #encryptWithAES256(byte[], byte[], java.lang.String, java.lang.Integer)
       @param secret Base64 encoded binary secret.
       @param iv Base64 encoded binary initialization vector (IV).
       @param data A plain <tt>String</tt> to be encrypted (not Base64 encoded).
       */
+    @Deprecated
     static String encryptWithAES256Base64(String secret, String iv, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         byte[] b_secret = decodeBase64Bytes(secret)
         byte[] b_iv = decodeBase64Bytes(iv)
@@ -742,12 +931,15 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
       Takes Base64 encoded secret and IV and decrypts the provided Base64
       encoded <tt>String</tt> data.
 
+      @deprecated Use {@link #decryptWithAES256GCMBase64(java.lang.String, java.lang.String)} instead.
+                  AES-CBC is vulnerable to padding oracle attacks and lacks authentication.
       @see #encryptWithAES256(byte[], byte[], java.lang.String, java.lang.Integer)
       @param secret Base64 encoded binary secret.
       @param iv Base64 encoded binary initialization vector (IV).
       @param data Base64 encoded encrypted bytes to decrypt.
       @return A <tt>String</tt> which is plaintext.
       */
+    @Deprecated
     static String decryptWithAES256Base64(String secret, String iv, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         byte[] b_secret = decodeBase64Bytes(secret)
         byte[] b_iv = decodeBase64Bytes(iv)
@@ -815,6 +1007,98 @@ println("Time taken (milliseconds): ${Instant.now().toEpochMilli() - before}ms")
     }
 
     /**
+      Encrypts String data with AES-256-GCM using a passphrase.
+      Uses a random 32-byte salt which is prepended to the ciphertext.
+      Provides authenticated encryption for both confidentiality and integrity.
+
+      <h2>Sample usage</h2>
+<pre><code>
+import net.gleske.jervis.tools.SecurityIO
+import java.time.Instant
+
+Long time(Closure c) {
+    Long before = Instant.now().epochSecond
+    c()
+    Long after = Instant.now().epochSecond
+    after - before
+}
+
+String encrypted
+Long timing1 = time {
+    encrypted = SecurityIO.encryptWithPassphraseGCM('correct horse battery staple', 'My secret data')
+}
+
+println("Encrypted text: ${encrypted}")
+Long timing2 = time {
+    println("Decrypted text: ${SecurityIO.decryptWithPassphraseGCM('correct horse battery staple', encrypted)}")
+}
+
+println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
+</code></pre>
+
+      @see #encryptWithAES256GCM(byte[], java.lang.String) encryptWithAES256GCM AES-GCM enciphering details
+      @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-5E8F4099-779F-4484-9A95-F1CEA167601A" target=_blank>Java Cryptography Architecture (JCA) Reference Guide for <tt>SecretKeyFactory</tt> class</a>
+      @see <a href="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html#secretkeyfactory-algorithms" target=_blank><tt>SecretKeyFactory</tt> algorithm names</a>
+      @see <a href="https://www.nist.gov/publications/recommendation-password-based-key-derivation-part-1-storage-applications" target=_blank>Recommendation for Password-Based Key Derivation Part 1: Storage Applications</a>;
+           Published: December 22, 2010; Citation: Special Publication (NIST SP) - 800-132
+
+      @param passphrase A passphrase used to generate AES keys for encryption.
+                        The passphrase creates an AES key using
+                        <tt>PBKDF2WithHmacSHA256</tt>, a random 32-byte salt,
+                        and variable PBKDF2 iterations based on passphrase checksum.
+                        The PBKDF2 iterations are between <tt>100100</tt> and <tt>960000</tt>.
+                        The random salt is prepended to the ciphertext.
+      @param data Data to be encrypted.
+      @return Base64 encoded ciphertext with format: salt (32 bytes) || nonce (12 bytes) || ciphertext || auth-tag
+      */
+    static String encryptWithPassphraseGCM(String passphrase, String data) {
+        // Generate a random 32-byte salt (prevents rainbow table attacks)
+        byte[] randomSalt = randomBytes(32)
+        String saltHex = encodeBase64(randomSalt)
+
+        // Derive key using random salt
+        byte[] b_secret = passwordKeyDerivation(passphrase, saltHex)
+
+        // Encrypt with AES-256-GCM
+        byte[] ciphertext = encryptWithAES256GCM(b_secret, data)
+
+        // Prepend salt to ciphertext: salt (32 bytes) || nonce || ciphertext
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+        outputStream.write(randomSalt)
+        outputStream.write(ciphertext)
+        encodeBase64(outputStream.toByteArray())
+    }
+
+    /**
+      Decrypts ciphertext with AES-256-GCM using a passphrase.
+      Expects the format: salt (32 bytes) || nonce (12 bytes) || ciphertext || auth-tag
+      Provides authenticated decryption that verifies integrity.
+
+      @see #encryptWithPassphraseGCM(java.lang.String, java.lang.String) encryptWithPassphraseGCM using passphrase method
+      @see #decryptWithAES256GCM(byte[], byte[]) decryptWithAES256GCM AES-GCM deciphering details
+      @param passphrase A passphrase used to decrypt AES-256-GCM ciphertext.
+      @param data Base64 encoded ciphertext to be decrypted (with prepended salt and nonce).
+      @return Decrypted plaintext String.
+      */
+    static String decryptWithPassphraseGCM(String passphrase, String data) {
+        byte[] fullData = decodeBase64Bytes(data)
+
+        // Extract 32-byte salt from beginning
+        if(fullData.length < 60) { // 32 bytes salt + 12 bytes nonce + 16 bytes auth tag (min for empty plaintext)
+            throw new DecryptException('Ciphertext too short - missing salt, nonce, or auth tag')
+        }
+        byte[] randomSalt = Arrays.copyOfRange(fullData, 0, 32)
+        byte[] ciphertextWithNonce = Arrays.copyOfRange(fullData, 32, fullData.length)
+
+        // Derive key using extracted salt
+        String saltHex = encodeBase64(randomSalt)
+        byte[] b_secret = passwordKeyDerivation(passphrase, saltHex)
+
+        // Decrypt with AES-256-GCM
+        decryptWithAES256GCM(b_secret, ciphertextWithNonce)
+    }
+
+    /**
       Encrypts String data with AES-256 using a passphrase.
 
       <h2>Sample usage</h2>
@@ -843,6 +1127,9 @@ Long timing2 = time {
 println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
 </code></pre>
 
+      @deprecated Use {@link #encryptWithPassphraseGCM(java.lang.String, java.lang.String)} instead.
+                  AES-CBC is vulnerable to padding oracle attacks, lacks authentication, and uses
+                  deterministic IV/salt derived from passphrase.
       @see #DEFAULT_AES_ITERATIONS
       @see #encryptWithAES256(byte[], byte[], java.lang.String, java.lang.Integer) encryptWithAES256 AES enciphering details
       @see <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-5E8F4099-779F-4484-9A95-F1CEA167601A" target=_blank>Java Cryptography Architecture (JCA) Reference Guide for <tt>SecretKeyFactory</tt> class</a>
@@ -863,6 +1150,7 @@ println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
                              iterations allowed is 1 for password-based
                              encryption.
       */
+    @Deprecated
     static String encryptWithAES256(String passphrase, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         // sha256Sum should always return lower case but forcing toLowerCase
         // since this is used as an input for encryption and decryption.
@@ -877,6 +1165,9 @@ println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
       Decrypts ciphertext with AES-256 using a passphrase.  See the encrypt
       method for more details on both algorithms and usage.
 
+      @deprecated Use {@link #decryptWithPassphraseGCM(java.lang.String, java.lang.String)} instead.
+                  AES-CBC is vulnerable to padding oracle attacks, lacks authentication, and uses
+                  deterministic IV/salt derived from passphrase.
       @see #DEFAULT_AES_ITERATIONS
       @see #encryptWithAES256(java.lang.String, java.lang.String, java.lang.Integer) encryptWithAES256 using passphrase method
       @see #decryptWithAES256(byte[], byte[], byte[], java.lang.Integer) decryptWithAES256 AES deciphering details
@@ -888,6 +1179,7 @@ println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
                              iterations allowed is 1 for password-based
                              encryption.
       */
+    @Deprecated
     static String decryptWithAES256(String passphrase, String data, Integer hash_iterations = DEFAULT_AES_ITERATIONS) {
         // sha256Sum should always return lower case but forcing toLowerCase
         // since this is used as an input for encryption and decryption.
@@ -899,7 +1191,7 @@ println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
         decryptWithAES256(b_secret, b_iv, b_data, iterations)
     }
 
-    /*
+    /**
        Check if String is valid base64 according to <a href="https://datatracker.ietf.org/doc/html/rfc4648">RFC 4648</a>.
 
        @param s Check if String is similar to valid base64 encoding.
@@ -909,9 +1201,18 @@ println "Encrypt time: ${timing1} second(s)\nDecrypt time: ${timing2} second(s)"
         if(s.trim().size() == 0) {
             return true
         }
-        if(s.size() < 4) {
+        String normalized = s.tokenize('\n').join('').trim()
+        if(normalized.size() < 4) {
             return false
         }
-        s.tokenize('\n').join('') =~ /^[=0-9a-zA-Z+\/]+$/
+        // Validate proper base64 format:
+        // - Must be multiple of 4 characters
+        // - Only valid base64 characters
+        // - Padding '=' can only appear at end (max 2)
+        if(normalized.size() % 4 != 0) {
+            return false
+        }
+        // Check for valid characters and proper padding placement
+        normalized =~ /^[0-9a-zA-Z+\/]*={0,2}$/
     }
 }

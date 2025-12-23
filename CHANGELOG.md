@@ -3,6 +3,28 @@
 This file contains all of the notable changes from Jervis releases.  For the
 full change log see the commit log.
 
+# jervis 2.2
+
+## Bug fixes
+
+- SecurityIO.sha256sum padding bug fixed.
+- SecurityIO switching to `AES/GCM/NoPadding` and old AES functions marked as
+  deprecated to be removed in Jervis 2.3.
+- SecurityIO.avoidTimingAttack uses cryptographically secure PRNG.
+- SecurityIO.verifyJsonWebToken does additional JWT structure validation.
+- SecurityIO.isBase64 now checks for base64 padding.  Previously, it was
+  possible for a String to pass as base64 characters but not be actually valid
+  base64.
+- SecurityIO.sha256Sum hex string padding fixed so resulting checksum is always
+  valid for 3rd party checksum functions.
+
+## Breaking changes
+
+- `CipherMap` encrypted data will be discarded when upgrading to Jervis 2.2.
+  Currently, this only affects GitHub app authentication in Jervis and new
+  tokens will be issued instead of reusing old tokens within their previous
+  expiration.  In general, GitHub app issued tokens expire after one hour.
+
 # jervis 2.1
 
 ## Bug fixes
