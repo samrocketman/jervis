@@ -3,7 +3,7 @@
 This file contains all of the notable changes from Jervis releases.  For the
 full change log see the commit log.
 
-# jervis 2.2
+# jervis 2.2 - Jan 11th, 2026
 
 ## Bug fixes
 
@@ -27,7 +27,7 @@ full change log see the commit log.
   tokens will be issued instead of reusing old tokens within their previous
   expiration.  In general, GitHub app issued tokens expire after one hour.
 
-# jervis 2.1
+# jervis 2.1 - Dec 9th, 2025
 
 ## Bug fixes
 

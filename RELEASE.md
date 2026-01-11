@@ -1,19 +1,17 @@
 # How to release to Maven Central
 
-* Follow Central recommendations for [setting up gradle][ossrh-gradle].
-  Additionally, there's decent documentation on code signing in the [gradle
-  documentation][gradle-signing]
-
+* Use Java 21.
 * Ensure GPG is set up for signing jars.
+* Create an [ephemeral publishing token at Maven Central](https://central.sonatype.com/usertoken).
 * Ensure `~/.gradle/gradle.properties` has the following contents for signing
-  and uploading jars to Maven Central.
+  and uploading jars to Maven Central.  Set the token to expire within 1 month.
 
 ```
-ossrhUsername=samrocketman
-ossrhPassword=secret
+ossrhUsername=<random token username>
+ossrhPassword=<random token password>
 ```
 
-Next we need to prepare the environment according to the [signing plugin
+Next prepare the environment according to the [signing plugin
 documentation][sign-plugin] for Gradle.
 
     ORG_GRADLE_PROJECT_signingKey="$(gpg -a --export-secret-keys "Sam Gleske")"

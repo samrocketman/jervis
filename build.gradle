@@ -29,8 +29,8 @@ ext.groovy_4_or_higher = (Integer.parseInt(groovyVersion.tokenize('.').first()) 
 ext.groovy_5_or_higher = (Integer.parseInt(groovyVersion.tokenize('.').first()) > 4)
 ext.ossrhUsername = hasProperty('ossrhUsername')?project['ossrhUsername']:''
 ext.ossrhPassword = hasProperty('ossrhPassword')?project['ossrhPassword']:''
-ext.snakeYamlVersion = '2.2'
-ext.bouncyCastleVersion = '1.75'
+ext.snakeYamlVersion = '2.5'
+ext.bouncyCastleVersion = '1.83'
 ext.codeNarcVersion = '3.2.0'
 
 //if(JavaVersion.current() == JavaVersion.VERSION_17 && Integer.parseInt(groovyVersion.tokenize('.').first()) < 3) {
