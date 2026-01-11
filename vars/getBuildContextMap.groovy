@@ -37,7 +37,7 @@ String getPullRequestComment(Run build) {
 }
 
 @NonCPS
-Boolean getBranchName(Job build_parent) {
+String getBranchName(Job build_parent) {
     SCMHead head = build_parent?.getProperty(BranchJobProperty)?.branch?.head
     if(!(head instanceof BranchSCMHead)) {
         return ''
