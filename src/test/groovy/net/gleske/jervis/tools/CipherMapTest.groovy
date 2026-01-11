@@ -52,19 +52,15 @@ class CipherMapTest extends GroovyTestCase {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
         ciphermap = new CipherMap(new File(url.file))
         assert ciphermap.plainMap == [:]
-        assert ciphermap.hash_iterations == 5000
-        ciphermap = new CipherMap(new File(url.file), 3)
-        assert ciphermap.plainMap == [:]
-        assert ciphermap.hash_iterations == 3
+        // hash_iterations is deprecated and not set by non-deprecated constructor
+        assert ciphermap.hash_iterations == null
     }
     @Test public void test_CipherMap_constructor_string() {
         URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_4096')
         ciphermap = new CipherMap(url.content.text)
         assert ciphermap.plainMap == [:]
-        assert ciphermap.hash_iterations == 5000
-        ciphermap = new CipherMap(url.content.text, 4)
-        assert ciphermap.plainMap == [:]
-        assert ciphermap.hash_iterations == 4
+        // hash_iterations is deprecated and not set by non-deprecated constructor
+        assert ciphermap.hash_iterations == null
     }
     @Test public void test_CipherMap_leftShift_CipherMap() {
         ciphermap.plainMap = [hello: 'friend']
@@ -87,6 +83,7 @@ class CipherMapTest extends GroovyTestCase {
         ciphermap << 'a: b'
         assert ciphermap.plainMap == [:]
 
+        // cipher is now a single string (RSA-OAEP encrypted AES secret)
         ciphermap.plainMap = [some: 'data']
         ciphermap << '''\
             age: ''
@@ -96,6 +93,7 @@ class CipherMapTest extends GroovyTestCase {
             '''.stripIndent()
         assert ciphermap.plainMap == [:]
 
+        // cipher as list is now invalid (old format)
         ciphermap.plainMap = [some: 'data']
         ciphermap << '''\
             age: 23
@@ -129,8 +127,8 @@ class CipherMapTest extends GroovyTestCase {
         ciphermap.plainMap = [change: 'data']
         Map yaml2 = YamlOperator.loadYamlFrom(ciphermap.toString())
         assert yaml1.age == yaml2.age
-        assert yaml1.cipher[0] == yaml2.cipher[0]
-        assert yaml1.cipher[1] == yaml2.cipher[1]
+        // cipher is now a single RSA-OAEP encrypted AES secret
+        assert yaml1.cipher == yaml2.cipher
         assert yaml1.data != yaml2.data
         assert yaml1.signature != yaml2.signature
     }
@@ -141,7 +139,7 @@ class CipherMapTest extends GroovyTestCase {
         ciphermap.hidden = [data: '']
         assert ciphermap.plainMap == [:]
     }
-    @Test public void test_CipherMap_rotating_expired_secret_and_iv() {
+    @Test public void test_CipherMap_rotating_expired_secret() {
         ciphermap.plainMap = [leeroy: 'jenkins']
 
         // manipulate the encrypted payload to be "older than 30 days"
@@ -154,23 +152,21 @@ class CipherMapTest extends GroovyTestCase {
         assert ciphermap.plainMap == [leeroy: 'jenkins']
         Map intermediate = YamlOperator.loadYamlFrom(ciphermap.toString())
         assert old.age == intermediate.age
-        assert old.cipher[0] == intermediate.cipher[0]
-        assert old.cipher[1] == intermediate.cipher[1]
+        // cipher is now a single RSA-OAEP encrypted AES secret
+        assert old.cipher == intermediate.cipher
 
         // Encrypt data which should force secrets rotation
         ciphermap.plainMap = ciphermap.plainMap
         assert ciphermap.plainMap == [leeroy: 'jenkins']
         Map rotated = YamlOperator.loadYamlFrom(ciphermap.toString())
         assert old.age != rotated.age
-        assert old.cipher[0] != rotated.cipher[0]
-        assert old.cipher[1] != rotated.cipher[1]
+        assert old.cipher != rotated.cipher
 
         // Update encrypted data which should not rotate secrets
         ciphermap.plainMap = ciphermap.plainMap + [bert: 'ernie']
         assert ciphermap.plainMap == [leeroy: 'jenkins', bert: 'ernie']
         Map updated = YamlOperator.loadYamlFrom(ciphermap.toString())
         assert rotated.age == updated.age
-        assert rotated.cipher[0] == updated.cipher[0]
-        assert rotated.cipher[1] == updated.cipher[1]
+        assert rotated.cipher == updated.cipher
     }
 }
