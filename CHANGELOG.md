@@ -17,6 +17,8 @@ full change log see the commit log.
   base64.
 - SecurityIO.sha256Sum hex string padding fixed so resulting checksum is always
   valid for 3rd party checksum functions.
+- Fix getBuildContextMap var properly setting a branch name instead of a
+  Boolean.
 
 ## Breaking changes
 
