@@ -21,7 +21,7 @@ if(JavaVersion.current() != JavaVersion.VERSION_17 && JavaVersion.current() != J
 */
 
 group = 'net.gleske'
-archivesBaseName = 'jervis'
+base.archivesName = 'jervis'
 version = "${version}"
 
 ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.21'
@@ -66,12 +66,12 @@ compileGroovy {
     targetCompatibility = javaVersion
 }
 
-apply from: 'file:gradle/groovydoc.gradle'
-apply from: 'file:gradle/jervis.gradle'
+apply from: 'gradle/groovydoc.gradle'
+apply from: 'gradle/jervis.gradle'
 
 println "Using Groovy ${groovyVersion}"
 println "Using Java ${org.gradle.internal.jvm.Jvm.current()}"
-println "Building ${archivesBaseName}-${version}"
+println "Building ${base.archivesName}-${version}"
 
 repositories {
     mavenCentral()
