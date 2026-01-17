@@ -3,6 +3,13 @@
 This file contains all of the notable changes from Jervis releases.  For the
 full change log see the commit log.
 
+# jervis 2.3 - Jan 16th, 2026
+
+- Fixes a core but in MultiePlatformGenerator preventing its use as a
+  replacement for PipelineGenerator.  Expanded test coverage of
+  MultiPlatformGenerator to account for gaps.
+- Added spotless autoformat for YAML and Groovy code.
+
 # jervis 2.2 - Jan 11th, 2026
 
 ## Bug fixes

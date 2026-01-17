@@ -114,7 +114,7 @@ include it in your build tool.
 <dependency>
   <groupId>net.gleske</groupId>
   <artifactId>jervis</artifactId>
-  <version>2.2</version>
+  <version>2.3</version>
   <type>pom</type>
 </dependency>
 ```
@@ -137,7 +137,7 @@ configurations {
 }
 
 dependencies {
-    libs 'net.gleske:jervis:2.2'
+    libs 'net.gleske:jervis:2.3'
 }
 
 task cleanLibs(type: Delete) {
@@ -200,7 +200,7 @@ See [SonarQube README](sonarqube/README.md).
     limitations under the License.
 
 [commits-since]: https://img.shields.io/github/commits-since/samrocketman/jervis/latest/main
-[commits-since-diff]: https://github.com/samrocketman/jervis/compare/jervis-2.2...HEAD
+[commits-since-diff]: https://github.com/samrocketman/jervis/compare/jervis-2.3...HEAD
 [jenkins-plugin-docker]: https://wiki.jenkins-ci.org/display/JENKINS/Docker+Plugin
 [jenkins-plugin-job-dsl]: https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin
 [jenkins]: https://jenkins-ci.org/
