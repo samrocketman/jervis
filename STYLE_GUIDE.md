@@ -3,6 +3,8 @@ should adhere to it in order to be accepted.
 
 # Style Guide
 
+You can run `./gradlew spotlessApply`.
+
 1.  Use consistent indenting.  Indent using four spaces.
 2.  `print` and `println` statements should never use parenthesis.
 3.  Use single quotes `'` when quoting string literals.  Use double quotes `"`

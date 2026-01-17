@@ -1,0 +1,391 @@
+/**
+  Spotless code formatting configuration.
+  Enforces STYLE_GUIDE.md rules for consistent code style.
+
+  Usage:
+    ./gradlew spotlessCheck     - Check formatting (fails if code needs
+                                  formatting)
+    ./gradlew spotlessApply     - Auto-fix formatting issues
+    ./gradlew spotlessYamlApply - Auto-fix YAML formatting issues.
+    ./gradlew spotlessYamlCheck - Check YAML formatting (fails if code needs
+                                  formatting)
+  */
+
+/**
+  Custom formatter to remove trailing semicolons from Groovy code.
+  Preserves semicolons in:
+  - Multi-line strings (triple quotes: ''' or """)
+  - Multi-line comments (block comments)
+  - Single-line comments (starting with //)
+  */
+def removeTrailingSemicolons = { String content ->
+    def lines = content.split(/\n/, -1)
+    def result = []
+
+    // State tracking for multi-line constructs
+    boolean inTripleDoubleQuote = false
+    boolean inTripleSingleQuote = false
+    boolean inBlockComment = false
+
+    for (String line : lines) {
+        String processedLine = line
+
+        // Save initial state for this line
+        boolean lineStartedInMultiline = inTripleDoubleQuote || inTripleSingleQuote || inBlockComment
+
+        // Process the line character by character to update state
+        int i = 0
+        int len = line.length()
+        int codeEndIndex = len  // Index where code ends (before any single-line comment)
+        boolean inSingleLineComment = false
+        boolean inRegularDoubleString = false
+        boolean inRegularSingleString = false
+
+        while (i < len) {
+            int remaining = len - i
+
+            // Skip content if inside triple-quoted strings
+            if (inTripleDoubleQuote) {
+                if (remaining >= 3 && line.substring(i, i + 3) == '"""') {
+                    inTripleDoubleQuote = false
+                    i += 3
+                    continue
+                }
+                i++
+                continue
+            }
+            if (inTripleSingleQuote) {
+                if (remaining >= 3 && line.substring(i, i + 3) == "'''") {
+                    inTripleSingleQuote = false
+                    i += 3
+                    continue
+                }
+                i++
+                continue
+            }
+
+            // Skip content if inside block comment
+            if (inBlockComment) {
+                if (remaining >= 2 && line.substring(i, i + 2) == '*/') {
+                    inBlockComment = false
+                    i += 2
+                    continue
+                }
+                i++
+                continue
+            }
+
+            // Skip content if inside single-line comment
+            if (inSingleLineComment) {
+                i++
+                continue
+            }
+
+            // Handle escape sequences in strings
+            if ((inRegularDoubleString || inRegularSingleString) && line.charAt(i) == '\\' && i + 1 < len) {
+                i += 2
+                continue
+            }
+
+            // Check for triple-quoted string start
+            if (remaining >= 3 && !inRegularDoubleString && !inRegularSingleString) {
+                if (line.substring(i, i + 3) == '"""') {
+                    inTripleDoubleQuote = true
+                    i += 3
+                    continue
+                }
+                if (line.substring(i, i + 3) == "'''") {
+                    inTripleSingleQuote = true
+                    i += 3
+                    continue
+                }
+            }
+
+            // Check for block comment start
+            if (remaining >= 2 && !inRegularDoubleString && !inRegularSingleString) {
+                if (line.substring(i, i + 2) == '/*') {
+                    inBlockComment = true
+                    i += 2
+                    continue
+                }
+            }
+
+            // Check for single-line comment start
+            if (remaining >= 2 && !inRegularDoubleString && !inRegularSingleString) {
+                if (line.substring(i, i + 2) == '//') {
+                    inSingleLineComment = true
+                    codeEndIndex = i
+                    i += 2
+                    continue
+                }
+            }
+
+            // Track regular single-line strings
+            if (!inRegularSingleString && line.charAt(i) == '"') {
+                inRegularDoubleString = !inRegularDoubleString
+            } else if (!inRegularDoubleString && line.charAt(i) == "'") {
+                inRegularSingleString = !inRegularSingleString
+            }
+
+            i++
+        }
+
+        // Only remove trailing semicolon if:
+        // - Line didn't start in any multi-line construct
+        // - Line doesn't end inside a multi-line construct
+        boolean lineEndsInMultiline = inTripleDoubleQuote || inTripleSingleQuote || inBlockComment
+        if (!lineStartedInMultiline && !lineEndsInMultiline) {
+            // Split into code portion and comment portion
+            String codePart = line.substring(0, codeEndIndex)
+            String commentPart = line.substring(codeEndIndex)
+
+            // Remove trailing semicolon from code part (preserve trailing whitespace pattern)
+            codePart = codePart.replaceFirst(/;(\s*)$/, '$1')
+
+            processedLine = codePart + commentPart
+        }
+
+        result << processedLine
+    }
+
+    result.join('\n')
+}
+
+/**
+  Custom formatter to enforce 2-space indentation in YAML files.
+
+  Handles three cases:
+  1. Over-indentation - normalizes 4-space (or other) indentation to 2-space
+  2. List items under keys - ensures lists are indented 2 spaces from parent key
+  3. Multi-line string blocks (| and >) - ensures content is indented 2 spaces from key
+
+  Bad over-indentation (will be fixed):
+    key:
+        nested: value    (4-space indent, should be 2-space)
+
+  Bad list indentation (will be fixed):
+    key:
+    - item1
+    - item2
+
+  Good indentation:
+    key:
+      nested: value
+      - item1
+      - item2
+
+  Bad multi-line string (will be fixed):
+    key: |
+    content line 1
+
+  Good multi-line string:
+    key: |
+      content line 1
+  */
+def enforceYaml2SpaceIndent = { String content ->
+    def lines = content.split(/\n/, -1)
+    def result = []
+
+    // Track indent levels that need adjustment (list items at same level as key)
+    Set<Integer> indentLevelsToAdjust = [] as Set
+    int lastKeyIndent = -1
+
+    // Track multi-line string block state
+    int blockScalarKeyIndent = -1
+    int blockScalarContentIndent = -1
+    // For block scalars, track original indent to normalized indent mapping
+    int blockScalarOriginalContentIndent = -1
+
+    // Track indent normalization: maps original indent levels to correct 2-space indents
+    // indentStack: list of [originalIndent, normalizedIndent] pairs representing the structure
+    def indentStack = [[0, 0]]  // Start with root level
+
+    for (String line : lines) {
+        String processedLine = line
+        String trimmed = line.trim()
+        int originalIndent = line.length() - line.stripLeading().length()
+
+        // Handle block scalar content
+        if (blockScalarKeyIndent >= 0) {
+            // Empty lines within block scalars are preserved as-is
+            if (trimmed.isEmpty()) {
+                result << processedLine
+                continue
+            }
+
+            // Check if we've exited the block scalar
+            boolean exitBlock = false
+            if (originalIndent <= blockScalarKeyIndent) {
+                // Check if it's a new YAML structure element at or before key level
+                if (trimmed.matches("^([\\w\\-_]+|'[^']*'|\"[^\"]*\"):.*") || trimmed.startsWith('- ') || trimmed == '-') {
+                    exitBlock = true
+                }
+            }
+
+            if (exitBlock) {
+                // Exit block scalar mode
+                blockScalarKeyIndent = -1
+                blockScalarContentIndent = -1
+                blockScalarOriginalContentIndent = -1
+                // Fall through to normal processing
+            } else {
+                // Still in block scalar
+                // First content line establishes the original indent for the block
+                if (blockScalarOriginalContentIndent < 0) {
+                    blockScalarOriginalContentIndent = originalIndent
+                }
+
+                // Calculate normalized indent for block content
+                int indentDiff = originalIndent - blockScalarOriginalContentIndent
+                int normalizedIndent = blockScalarContentIndent + Math.max(0, indentDiff)
+
+                if (normalizedIndent != originalIndent) {
+                    processedLine = ' '.repeat(normalizedIndent) + trimmed
+                }
+                result << processedLine
+                continue
+            }
+        }
+
+        // Empty line - preserve as-is
+        if (trimmed.isEmpty()) {
+            result << processedLine
+            continue
+        }
+
+        // Determine the normalized indent for this line
+        int normalizedIndent = originalIndent
+
+        // Pop stack levels that are deeper than current indent (we've moved back out)
+        while (indentStack.size() > 1 && indentStack[-1][0] > originalIndent) {
+            indentStack.removeLast()
+        }
+
+        // Get the current parent's normalized indent
+        int parentNormalizedIndent = indentStack[-1][1]
+        int parentOriginalIndent = indentStack[-1][0]
+
+        if (originalIndent > parentOriginalIndent) {
+            // This line is nested under the parent - should be exactly parent + 2
+            normalizedIndent = parentNormalizedIndent + 2
+            // Push this level onto the stack
+            indentStack << [originalIndent, normalizedIndent]
+        } else {
+            // Same level as parent (originalIndent == parentOriginalIndent after popping)
+            normalizedIndent = parentNormalizedIndent
+        }
+
+        // Apply indent normalization if needed
+        if (normalizedIndent != originalIndent) {
+            processedLine = ' '.repeat(normalizedIndent) + trimmed
+        }
+
+        // Update currentIndent to normalized value for subsequent logic
+        int currentIndent = normalizedIndent
+
+        // Comment line - apply list adjustment if at an adjusted indent level
+        if (trimmed.startsWith('#')) {
+            if (indentLevelsToAdjust.contains(currentIndent)) {
+                processedLine = '  ' + processedLine
+            }
+            result << processedLine
+            continue
+        }
+
+        // Check if this is a list item (starts with "- ")
+        boolean isListItem = trimmed.startsWith('- ') || trimmed == '-'
+
+        // Check if this line has a block scalar indicator (| or >)
+        boolean hasBlockScalar = false
+        boolean isKeyOnly = false
+
+        if (!isListItem) {
+            if (trimmed.matches('^.+:\\s*[|>][+\\-]?\\d*\\s*(#.*)?$')) {
+                hasBlockScalar = true
+                isKeyOnly = false
+            } else {
+                int commentIdx = trimmed.indexOf(' #')
+                String withoutComment = (commentIdx >= 0) ? trimmed.substring(0, commentIdx).trim() : trimmed
+                isKeyOnly = withoutComment.endsWith(':') && !withoutComment.contains(': ')
+                if (!isKeyOnly && withoutComment.contains(':')) {
+                    int colonIdx = withoutComment.lastIndexOf(':')
+                    String afterColon = withoutComment.substring(colonIdx + 1).trim()
+                    isKeyOnly = afterColon.isEmpty()
+                }
+            }
+        }
+
+        // Non-list-item at same or lower indent resets tracking for that level
+        if (!isListItem) {
+            indentLevelsToAdjust.removeAll { it >= currentIndent }
+        }
+
+        if (isListItem) {
+            // Check if list item is at same level as last key (needs indent)
+            if (lastKeyIndent == currentIndent) {
+                indentLevelsToAdjust << currentIndent
+            }
+
+            // Apply adjustment if needed
+            if (indentLevelsToAdjust.contains(currentIndent)) {
+                processedLine = '  ' + processedLine
+            }
+
+            // If list item is also a key, track it
+            if (isKeyOnly || (trimmed.contains(':') && !trimmed.contains(': '))) {
+                lastKeyIndent = indentLevelsToAdjust.contains(currentIndent) ? currentIndent + 2 : currentIndent
+            } else {
+                lastKeyIndent = -1
+            }
+        } else if (hasBlockScalar) {
+            // Start tracking block scalar content
+            blockScalarKeyIndent = currentIndent
+            blockScalarContentIndent = currentIndent + 2
+            blockScalarOriginalContentIndent = -1  // Will be set on first content line
+            lastKeyIndent = -1
+        } else if (isKeyOnly) {
+            lastKeyIndent = currentIndent
+        } else {
+            lastKeyIndent = -1
+        }
+
+        result << processedLine
+    }
+
+    result.join('\n')
+}
+
+spotless {
+    // Groovy source files - STYLE_GUIDE.md compliance
+    groovy {
+        target 'src/**/*.groovy', 'jobs/**/*.groovy', 'vars/**/*.groovy'
+        // Remove trailing whitespace
+        trimTrailingWhitespace()
+        // Ensure files end with newline
+        endWithNewline()
+        // Rule 1: 4-space indentation
+        indentWithSpaces(4)
+        // Remove trailing semicolons (Groovy doesn't require them)
+        custom 'removeTrailingSemicolons', removeTrailingSemicolons
+    }
+    // YAML config files in project folders
+    format 'yaml', {
+        target fileTree(projectDir) {
+            include 'resources/**/*.yml', 'resources/**/*.yaml'
+        }
+        trimTrailingWhitespace()
+        endWithNewline()
+        indentWithSpaces(2)
+        // Enforce 2-space indentation for lists under keys and multi-line strings
+        custom 'enforceYaml2SpaceIndent', enforceYaml2SpaceIndent
+    }
+    // Gradle build files
+    groovyGradle {
+        target '*.gradle', 'gradle/**/*.gradle'
+        trimTrailingWhitespace()
+        endWithNewline()
+        indentWithSpaces(4)
+        // Remove trailing semicolons (Groovy doesn't require them)
+        custom 'removeTrailingSemicolons', removeTrailingSemicolons
+    }
+}

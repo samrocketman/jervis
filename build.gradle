@@ -8,6 +8,7 @@ buildscript {
 plugins {
     id "org.sonarqube" version "3.4.0.2513"
     id 'com.github.kt3k.coveralls' version '2.12.0'
+    id 'com.diffplug.spotless' version '6.25.0'
     id 'groovy'
     id 'jacoco'
     id 'maven-publish'
@@ -68,6 +69,7 @@ compileGroovy {
 
 apply from: 'file:gradle/groovydoc.gradle'
 apply from: 'file:gradle/jervis.gradle'
+apply from: 'file:gradle/spotless.gradle'
 
 println "Using Groovy ${groovyVersion}"
 println "Using Java ${org.gradle.internal.jvm.Jvm.current()}"
