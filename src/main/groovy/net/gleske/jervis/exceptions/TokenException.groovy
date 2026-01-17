@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    */
-package net.gleske.jervis.exceptions;
+package net.gleske.jervis.exceptions
 
 /**
   A group of exceptions that are thrown when there are incompatible
@@ -34,6 +34,6 @@ public class TokenException extends JervisException {
       @param message A simple message that will be prepended with <tt>'ERROR: Token failure.  ' + message</tt>.
      */
     public TokenException(String message) {
-        super("\nERROR: Token failure.  " + message + "\n\n");
+        super("\nERROR: Token failure.  " + message + "\n\n")
     }
 }

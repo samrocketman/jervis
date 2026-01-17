@@ -167,7 +167,7 @@ class SecurityIOTest extends GroovyTestCase {
     }
     @Test public void test_SecurityIO_unsupported_key_pair() {
         shouldFail(KeyPairDecodeException) {
-            URL url = this.getClass().getResource('/rsa_keys/unsupported_crt_pair');
+            URL url = this.getClass().getResource('/rsa_keys/unsupported_crt_pair')
             security.key_pair = url.content.text
         }
     }

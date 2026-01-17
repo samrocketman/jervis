@@ -35,9 +35,9 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     @Before protected void setUp() {
         super.setUp()
         generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json')
         generator.loadLifecycles(url.getFile())
-        url = this.getClass().getResource('/good_toolchains_simple.json');
+        url = this.getClass().getResource('/good_toolchains_simple.json')
         generator.loadToolchains(url.getFile())
     }
     //tear down after every test
@@ -59,7 +59,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleGenerator_loadLifecycles_throws_exception() {
         generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
+        URL url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json')
         shouldFail(JervisException) {
             generator.loadLifecycles(url.getFile())
         }
@@ -67,7 +67,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     //loadLifecyclesString() tests
     @Test public void test_LifecycleGenerator_loadLifecyclesString_type_checking() {
         generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json')
         String contents = new File(url.getFile()).getText()
         generator.loadLifecyclesString(contents)
         assert generator.lifecycle_obj != null
@@ -75,14 +75,14 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleGenerator_loadLifecyclesString_simple_query() {
         generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json')
         String contents = new File(url.getFile()).getText()
         generator.loadLifecyclesString(contents)
         assert generator.lifecycle_obj.lifecycles['groovy']['friendlyName'] == 'Groovy'
     }
     @Test public void test_LifecycleGenerator_loadLifecyclesString_throws_exception() {
         generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json');
+        URL url = this.getClass().getResource('/bad_lifecycles_missing_defaultKey.json')
         String contents = new File(url.getFile()).getText()
         shouldFail(JervisException) {
             generator.loadLifecyclesString(contents)
@@ -102,7 +102,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleGenerator_loadToolchains_throws_exception() {
         generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json');
+        URL url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json')
         shouldFail(JervisException) {
             generator.loadToolchains(url.getFile())
         }
@@ -110,7 +110,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     //loadToolchainsString() tests
     @Test public void test_LifecycleGenerator_loadToolchainsString_type_checking() {
         generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/good_toolchains_simple.json');
+        URL url = this.getClass().getResource('/good_toolchains_simple.json')
         String contents = new File(url.getFile()).getText()
         generator.loadToolchainsString(contents)
         assert generator.toolchain_obj != null
@@ -118,14 +118,14 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleGenerator_loadToolchainsString_simple_query() {
         generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/good_toolchains_simple.json');
+        URL url = this.getClass().getResource('/good_toolchains_simple.json')
         String contents = new File(url.getFile()).getText()
         generator.loadToolchainsString(contents)
         assert generator.toolchain_obj.toolchains['jdk']['default_ivalue'] == 'openjdk7'
     }
     @Test public void test_LifecycleGenerator_loadToolchainsString_throws_exception() {
         generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json');
+        URL url = this.getClass().getResource('/bad_toolchains_missing_default_ivalue.json')
         String contents = new File(url.getFile()).getText()
         shouldFail(JervisException) {
             generator.loadToolchainsString(contents)
@@ -140,7 +140,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleGenerator_loadYaml_exception_no_toolchains_loaded() {
         generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json')
         generator.loadLifecycles(url.getFile())
         shouldFail(JervisException) {
             generator.loadYamlString('language: ruby')
@@ -219,7 +219,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  include:\n    - rvm: 1.9.3\n      env: world=hello\n  exclude:\n    - rvm: "1.9.3"\n    - rvm: "2.1"')
         assert '!(rvm == \'rvm0\') && !(rvm == \'rvm2\') && (rvm == \'rvm0\' && env == \'env0\')' == generator.matrixExcludeFilter()
         //test friendly labels
-        URL url = this.getClass().getResource('/good_toolchains_friendly.json');
+        URL url = this.getClass().getResource('/good_toolchains_friendly.json')
         generator.loadToolchains(url.getFile())
         generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]\nmatrix:\n  include:\n    - rvm: 1.9.3\n      env: world=hello\n  exclude:\n    - rvm: "1.9.3"\n    - rvm: "2.1"')
         assert '!(rvm == \'rvm:1.9.3\') && !(rvm == \'rvm:2.1\') && (rvm == \'rvm:1.9.3\' && env == \'env0\')' == generator.matrixExcludeFilter()
@@ -236,7 +236,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
                   platform: docker
                   os: ubuntu1404
             '''.stripIndent()
-        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        URL url = this.getClass().getResource('/good_platforms_simple.json')
         generator.loadPlatformsFile(url.getFile())
         generator.preloadYamlString(yaml)
         generator.loadYamlString(yaml)
@@ -271,7 +271,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert 'env0 env1' == generator.matrixGetAxisValue('env')
     }
     @Test public void test_LifecycleGenerator_matrixGetAxisValue_friendly() {
-        URL url = this.getClass().getResource('/good_toolchains_friendly.json');
+        URL url = this.getClass().getResource('/good_toolchains_friendly.json')
         generator.loadToolchains(url.getFile())
         generator.loadYamlString('language: ruby\nenv:\n  matrix: [world=hello, world=goodbye]\nrvm: ["1.9.3", "2.0.0", "2.1"]')
         assert 'env0 env1' == generator.matrixGetAxisValue('env')
@@ -306,7 +306,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
             generator.generateToolchainSection()
         }
         //test for friendly labels
-        URL url = this.getClass().getResource('/good_toolchains_friendly.json');
+        URL url = this.getClass().getResource('/good_toolchains_friendly.json')
         generator.loadToolchains(url.getFile())
         generator.loadYamlString('language: ruby\njdk: [openjdk6, openjdk7]')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\ncase ${jdk} in\n  jdk:openjdk6)\n    more commands\n    ;;\n  jdk:openjdk7)\n    some commands\n    ;;\nesac\n' == generator.generateToolchainSection()
@@ -501,14 +501,14 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleGenerator_loadPlatformsFile() {
         assert null.equals(generator.platform_obj)
-        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        URL url = this.getClass().getResource('/good_platforms_simple.json')
         generator.loadPlatformsFile(url.getFile())
         assert !null.equals(generator.platform_obj)
         assert generator.platform_obj.class == PlatformValidator
     }
     @Test public void test_LifecycleGenerator_loadPlatformsString() {
         assert null.equals(generator.platform_obj)
-        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        URL url = this.getClass().getResource('/good_platforms_simple.json')
         String contents = new File(url.getFile()).getText()
         generator.loadPlatformsString(contents)
         assert !null.equals(generator.platform_obj)
@@ -519,7 +519,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         shouldFail(PlatformValidationException) {
             generator.preloadYamlString(yaml)
         }
-        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        URL url = this.getClass().getResource('/good_platforms_simple.json')
         generator.loadPlatformsFile(url.getFile())
         generator.preloadYamlString(yaml)
         assert 'docker'.equals(generator.label_platform)
@@ -531,7 +531,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         String yaml = 'language: ruby'
         generator.loadYamlString(yaml)
         assert 'language:ruby && gemfile && env && rvm && jdk'.equals(generator.getLabels())
-        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        URL url = this.getClass().getResource('/good_platforms_simple.json')
         generator.loadPlatformsFile(url.getFile())
         generator.preloadYamlString(yaml)
         generator.loadYamlString(yaml)
@@ -547,7 +547,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     }
     @Test public void test_LifecycleGenerator_isRestricted() {
         String yaml = 'language: ruby'
-        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        URL url = this.getClass().getResource('/good_platforms_simple.json')
         generator.loadPlatformsFile(url.getFile())
         generator.preloadYamlString(yaml)
         assert !generator.isRestricted('samrocketman/derp')
@@ -557,7 +557,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     @Test public void test_LifecycleGenerator_isSupportedPlatform() {
         assert true == generator.isSupportedPlatform()
         String yaml = 'language: ruby'
-        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        URL url = this.getClass().getResource('/good_platforms_simple.json')
         generator.loadPlatformsFile(url.getFile())
         generator.preloadYamlString(yaml)
         generator.loadYamlString(yaml)
@@ -574,19 +574,19 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         generator.yaml_language = 'invalid'
         assert false == generator.isSupportedPlatform()
         generator.yaml_language = tmp
-        url = this.getClass().getResource('/good_platforms_optional.json');
+        url = this.getClass().getResource('/good_platforms_optional.json')
         generator.loadPlatformsFile(url.getFile())
         generator.preloadYamlString(yaml)
         assert false == generator.isSupportedPlatform()
     }
     @Test public void test_LifecycleGenerator_setPrivateKey() {
         assert generator.secret_util == null
-        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         generator.setPrivateKey(url.content.text)
         assert generator.secret_util.key_pair
     }
     @Test public void test_LifecycleGenerator_decryptSecrets_list() {
-        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_test.yml')
         generator.loadYamlString(file_url.content.text)
         shouldFail(SecurityException) {
@@ -602,7 +602,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert generator.plainlist[0]['secret'] == 'plaintext'
     }
     @Test public void test_LifecycleGenerator_decryptSecrets_map() {
-        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_map_test.yml')
         generator.loadYamlString(file_url.content.text)
         shouldFail(SecurityException) {
@@ -618,7 +618,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert generator.plainmap['JERVIS_SECRETS_TEST'] == 'plaintext'
     }
     @Test public void test_LifecycleGenerator_decryptSecrets_list_to_map() {
-        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_test.yml')
         generator.loadYamlString(file_url.content.text)
         shouldFail(SecurityException) {
@@ -634,7 +634,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert generator.plainmap['JERVIS_SECRETS_TEST'] == 'plaintext'
     }
     @Test public void test_LifecycleGenerator_decryptSecrets_map_to_list() {
-        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_map_test.yml')
         generator.loadYamlString(file_url.content.text)
         shouldFail(SecurityException) {
@@ -664,14 +664,14 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert true == generator.isInstanceFromList([:], [Number, String, Map])
     }
     @Test public void test_LifecycleGenerator_good_toolchains_disabled_env() {
-        URL url = this.getClass().getResource('/good_toolchains_disabled_env.json');
+        URL url = this.getClass().getResource('/good_toolchains_disabled_env.json')
         generator.loadToolchains(url.getFile())
         generator.loadYamlString('language: ruby\nenv:\n  - foo=bar\n  - hello=world')
         assert 'disabled' == generator.toolchain_obj.toolchainType('env')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\nexport foo=bar\nexport hello=world\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n' == generator.generateToolchainSection()
     }
     @Test public void test_LifecycleGenerator_good_lifecycles_python_number() {
-        URL url = this.getClass().getResource('/good_lifecycles_python_number.json');
+        URL url = this.getClass().getResource('/good_lifecycles_python_number.json')
         generator.loadLifecycles(url.getFile())
         String compare_string = '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#env toolchain section\n#python toolchain section\nsome commands\n'
         generator.loadYamlString('language: python\npython: 2.7')
@@ -692,7 +692,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert compare_string == generator.generateToolchainSection()
     }
     @Test public void test_LifecycleGenerator_bad_advanced_toolchain_when_not_supported() {
-        URL url = this.getClass().getResource('/good_toolchains_disabled_env.json');
+        URL url = this.getClass().getResource('/good_toolchains_disabled_env.json')
         generator.loadToolchains(url.getFile())
         generator.loadYamlString('language: ruby\nenv:\n  global:\n    - foo=bar\n    - hello=world')
         assert 'disabled' == generator.toolchain_obj.toolchainType('env')
@@ -736,7 +736,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\nadditional_toolchains:\n  - python\n  - compiler')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#python toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
         //reset toolchains for reverse order
-        URL url = this.getClass().getResource('/good_toolchains_simple.json');
+        URL url = this.getClass().getResource('/good_toolchains_simple.json')
         generator.loadToolchains(url.getFile())
         //test reverse order
         generator.loadYamlString('language: ruby\nadditional_toolchains:\n  - compiler\n  - python')
@@ -746,7 +746,7 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         generator.loadYamlString('language: ruby\npython: "2.7"\ncompiler: gcc')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#python toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
         //reset toolchains for reverse order
-        URL url = this.getClass().getResource('/good_toolchains_simple.json');
+        URL url = this.getClass().getResource('/good_toolchains_simple.json')
         generator.loadToolchains(url.getFile())
         //test reverse order
         generator.loadYamlString('language: ruby\ncompiler: gcc\npython: "2.7"')
@@ -757,13 +757,13 @@ class LifecycleGeneratorTest extends GroovyTestCase {
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#compiler toolchain section\nexport CXX="g++"\nexport CC="gcc"\n' == generator.generateToolchainSection()
     }
     @Test public void test_LifecycleGenerator_good_toolchains_cleanup() {
-        URL url = this.getClass().getResource('/good_toolchains_cleanup.json');
+        URL url = this.getClass().getResource('/good_toolchains_cleanup.json')
         generator.loadToolchains(url.getFile())
         generator.loadYamlString('language: ruby')
         assert '#\n# TOOLCHAINS SECTION\n#\nset +x\necho \'# TOOLCHAINS SECTION\'\nset -x\n#gemfile toolchain section\nexport BUNDLE_GEMFILE="${PWD}/Gemfile"\n#env toolchain section\n#rvm toolchain section\nsome commands\n#jdk toolchain section\nsome commands\n#cleanup toolchain section\nfunction rvm_cleanup_on() {\n  set +x\n  some cleanup command\n}\ntrap rvm_cleanup_on EXIT\n' == generator.generateToolchainSection()
     }
     @Test public void test_LifecycleGenerator_serialization() {
-        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        URL url = this.getClass().getResource('/good_platforms_simple.json')
         generator.loadPlatformsFile(url.getFile())
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(generator)
     }
@@ -894,25 +894,25 @@ class LifecycleGeneratorTest extends GroovyTestCase {
     @Test public void test_LifecycleGenerator_partial_unstable() {
         generator = new LifecycleGenerator()
         // load platforms
-        URL url = this.getClass().getResource('/good_platforms_partial.yaml');
+        URL url = this.getClass().getResource('/good_platforms_partial.yaml')
         generator.loadPlatformsFile(url.getFile())
         assert generator.platform_obj.@platforms != null
         // load partial unstable platforms
-        url = this.getClass().getResource('/good_platforms_partial_unstable.yaml');
+        url = this.getClass().getResource('/good_platforms_partial_unstable.yaml')
         generator.loadPlatformsFile(url.getFile(), true)
         // load lifecycles
-        url = this.getClass().getResource('/good_lifecycles_matrix_added_toolchain.json');
+        url = this.getClass().getResource('/good_lifecycles_matrix_added_toolchain.json')
         generator.loadLifecycles(url.getFile())
         assert generator.lifecycle_obj.@lifecycles != null
         // load partial unstable lifecycles
-        url = this.getClass().getResource('/good_lifecycles_partial_unstable.yaml');
+        url = this.getClass().getResource('/good_lifecycles_partial_unstable.yaml')
         generator.loadLifecycles(url.getFile(), true)
         // load toolchains
-        url = this.getClass().getResource('/good_toolchains_matrix_added_toolchain.json');
+        url = this.getClass().getResource('/good_toolchains_matrix_added_toolchain.json')
         generator.loadToolchains(url.getFile())
         assert generator.toolchain_obj.@toolchains != null
         // load partial unstable toolchains
-        url = this.getClass().getResource('/good_toolchains_partial_unstable.yaml');
+        url = this.getClass().getResource('/good_toolchains_partial_unstable.yaml')
         generator.loadToolchains(url.getFile(), true)
         String yaml = '''\
             language: java

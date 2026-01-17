@@ -251,7 +251,7 @@ class SimpleRestService {
             }
             for(Map.Entry entry : http_headers.entrySet()) {
                 if(key.equalsIgnoreCase(entry.key)) {
-                    return entry.value;
+                    return entry.value
                 }
             }
             null
