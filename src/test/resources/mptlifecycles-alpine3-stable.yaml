@@ -1,0 +1,32 @@
+groovy: &java-like
+  friendlyName: Groovy
+  defaultKey: gradlew
+  gradlew:
+    fileExistsCondition: gradlew
+    fallbackKey: gradle
+    install: ./gradlew assemble
+    script: ./gradlew check
+  gradle:
+    fileExistsCondition: build.gradle
+    fallbackKey: maven
+    install: gradle assemble
+    script: gradle check
+  maven:
+    fileExistsCondition: pom.xml
+    fallbackKey: ant
+    install: mvn install -DskipTests=true
+    script: mvn test
+  ant:
+    fileExistsCondition: build.xml
+    script: ant test
+java:
+  <<: *java-like
+  friendlyName: Java
+python:
+  friendlyName: Python
+  defaultKey: none
+  none: {}
+shell:
+  friendlyName: Shell
+  defaultKey: none
+  none: {}
