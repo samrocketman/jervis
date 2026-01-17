@@ -319,6 +319,22 @@ getGeneratorFromJervis(yaml: '', folder_listing: []
             }
             // TODO verify neither os nor platform are named as keys.
         }
+        // If jenkins.platform is provided, all values MUST be known platforms
+        List user_platforms = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.platform', [[], '']).with {
+            (it in List) ? it : [it]
+        }.findAll { it instanceof String && it.trim() }
+        List unknown_platforms = user_platforms - this.known_platforms
+        if(unknown_platforms) {
+            errors << "jenkins.platform contains unknown platforms: ${unknown_platforms.inspect()}.  Known platforms: ${this.known_platforms.inspect()}"
+        }
+        // If jenkins.os is provided, all values MUST be known operating systems
+        List user_os = YamlOperator.getObjectValue(jervis_yaml, 'jenkins.os', [[], '']).with {
+            (it in List) ? it : [it]
+        }.findAll { it instanceof String && it.trim() }
+        List unknown_os = user_os - this.known_operating_systems
+        if(unknown_os) {
+            errors << "jenkins.os contains unknown operating systems: ${unknown_os.inspect()}.  Known operating systems: ${this.known_operating_systems.inspect()}"
+        }
         if(errors) {
             // TODO MultiPlatformException
             throw new Exception("Multi-platform YAML validation has failed:\n\n  - " + errors.sort().unique().join('\n  - ') + "\n\nSee one or more errors above.")

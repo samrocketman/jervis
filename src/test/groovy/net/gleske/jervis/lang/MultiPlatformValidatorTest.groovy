@@ -322,6 +322,30 @@ class MultiPlatformValidatorTest extends GroovyTestCase {
             platforms.validateJervisYaml(jervisYaml)
         }
     }
+    @Test public void test_MultiPlatformValidator_validateJervisYaml_invalid_platform_value() {
+        loadFullMultiPlatformResources()
+        Map jervisYaml = [
+            language: 'groovy',
+            jenkins: [
+                platform: ['x86_64', 'foo']  // 'foo' is not a valid platform
+            ]
+        ]
+        shouldFail(Exception) {
+            platforms.validateJervisYaml(jervisYaml)
+        }
+    }
+    @Test public void test_MultiPlatformValidator_validateJervisYaml_invalid_os_value() {
+        loadFullMultiPlatformResources()
+        Map jervisYaml = [
+            language: 'groovy',
+            jenkins: [
+                os: ['alpine3', 'foo']  // 'foo' is not a valid os
+            ]
+        ]
+        shouldFail(Exception) {
+            platforms.validateJervisYaml(jervisYaml)
+        }
+    }
     //serialization tests
     @Test public void test_MultiPlatformValidator_serialization() {
         loadFullMultiPlatformResources()
