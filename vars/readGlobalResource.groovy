@@ -43,4 +43,3 @@ String lookForGlobalLibraryResource(Run run, String resourceFile) {
 String call(String resourceFile) {
     lookForGlobalLibraryResource(currentBuild.rawBuild, resourceFile)
 }
-

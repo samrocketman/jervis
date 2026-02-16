@@ -27,9 +27,9 @@ class PipelineGeneratorTest extends GroovyTestCase {
     @Before protected void setUp() {
         super.setUp()
         generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json')
         generator.loadLifecycles(url.getFile())
-        url = this.getClass().getResource('/good_toolchains_simple.json');
+        url = this.getClass().getResource('/good_toolchains_simple.json')
         generator.loadToolchains(url.getFile())
     }
     //tear down after every test
@@ -38,14 +38,14 @@ class PipelineGeneratorTest extends GroovyTestCase {
         super.tearDown()
     }
     @Test public void test_PipelineGenerator_serialization() {
-        URL url = this.getClass().getResource('/good_platforms_simple.json');
+        URL url = this.getClass().getResource('/good_platforms_simple.json')
         generator.loadPlatformsFile(url.getFile())
         generator.loadYamlString('language: ruby')
         def pipeline = new PipelineGenerator(generator)
         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(pipeline)
     }
     @Test public void test_PipelineGenerator_getSecretPairsEnv() {
-        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048');
+        URL url = this.getClass().getResource('/rsa_keys/good_id_rsa_2048')
         URL file_url = this.getClass().getResource('/rsa_keys/rsa_secure_properties_map_test.yml')
         generator.loadYamlString(file_url.content.text)
         generator.setPrivateKey(url.content.text)
@@ -177,9 +177,9 @@ class PipelineGeneratorTest extends GroovyTestCase {
         assert pipeline_generator.getStashMap([jdk: 'jdk0']) == [hello:[includes:'world', excludes:'', use_default_excludes:true, allow_empty:false, matrix_axis:[jdk: 'openjdk6']]]
         //friendlyLabel for this matrix
         generator = new LifecycleGenerator()
-        URL url = this.getClass().getResource('/good_lifecycles_simple.json');
+        URL url = this.getClass().getResource('/good_lifecycles_simple.json')
         generator.loadLifecycles(url.getFile())
-        url = this.getClass().getResource('/good_toolchains_friendly.json');
+        url = this.getClass().getResource('/good_toolchains_friendly.json')
         generator.loadToolchains(url.getFile())
         generator.loadYamlString('language: java\njdk: [openjdk6, openjdk7]\njenkins:\n  stash:\n    - name: hello\n      includes: world\n      matrix_axis:\n        jdk: openjdk6')
         pipeline_generator = new PipelineGenerator(generator)

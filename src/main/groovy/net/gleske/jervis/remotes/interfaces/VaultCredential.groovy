@@ -50,5 +50,5 @@ interface VaultCredential extends TokenCredential {
       When implemented, this method should return a String that is the URL to
       a HashiCorp Vault instance API endpoint.
       */
-    String getVault_url();
+    String getVault_url()
 }

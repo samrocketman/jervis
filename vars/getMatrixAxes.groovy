@@ -72,8 +72,8 @@ List getMatrixAxes(Map matrix_axes) {
 }
 
 Map askMatrixQuestion(boolean userPrompt, Map matrix_axes) {
-	Map choices = [:]
-	if(userPrompt) {
+    Map choices = [:]
+    if(userPrompt) {
         stage("Choose combinations") {
             def choice = input(
                 id: 'Platform',

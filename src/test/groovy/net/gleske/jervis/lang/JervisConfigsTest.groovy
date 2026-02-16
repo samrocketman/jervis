@@ -84,7 +84,7 @@ class JervisConfigsTest extends GroovyTestCase {
       Test and validate production platforms.yaml.
      */
     @Test public void test_JervisConfigsTest_validate_platforms_config() {
-        URL url = this.getClass().getResource('/platforms.yaml');
+        URL url = this.getClass().getResource('/platforms.yaml')
         validatePlatformsString(url.content.text)
     }
 
@@ -93,13 +93,13 @@ class JervisConfigsTest extends GroovyTestCase {
       syntax errors.
      */
     @Test public void test_JervisConfigsTest_toolchains_ubuntu1604_stable_bash_syntax_check() {
-        URL url = this.getClass().getResource('/platforms.yaml');
+        URL url = this.getClass().getResource('/platforms.yaml')
         YamlOperator.loadYamlFrom(url.content.text).supported_platforms.each { platform, oses ->
             oses.collect { os, languages ->
                 def generator = new LifecycleGenerator()
-                url = this.getClass().getResource("/lifecycles-${os}-stable.yaml");
+                url = this.getClass().getResource("/lifecycles-${os}-stable.yaml")
                 generator.loadLifecyclesString(url.content.text)
-                url = this.getClass().getResource("/toolchains-${os}-stable.yaml");
+                url = this.getClass().getResource("/toolchains-${os}-stable.yaml")
                 generator.loadToolchainsString(url.content.text)
                 validateLifecycleGeneratorBashSyntax(os, generator)
             }

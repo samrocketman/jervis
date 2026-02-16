@@ -375,7 +375,7 @@ class MultiPlatformGenerator implements Serializable {
             }
             List toolValue = []
             if(tool in Map) {
-                if(!(this.toolchain_obj.toolchainType(toolchain, isUnstable) == 'advanced')) {
+                if(!(toolchain_obj.toolchainType(toolchain, isUnstable) == 'advanced')) {
                     errors << ( message + [
                         "toolchain '${toolchain}' does not support advanced matrices;",
                         'Its value must be a String or List;'

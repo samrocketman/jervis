@@ -125,11 +125,11 @@ class LifecycleValidator implements Serializable {
             Map tempLifecycles = YamlOperator.deepCopy(this.@lifecycles)
             tempLifecycles.putAll(YamlOperator.loadYamlFrom(yaml) ?: [:])
             this.unstable_lifecycles = tempLifecycles
-            this.unstable_languages = this.unstable_lifecycles.keySet() as String[];
+            this.unstable_languages = this.unstable_lifecycles.keySet() as String[]
         }
         else {
             this.lifecycles = YamlOperator.loadYamlFrom(yaml) ?: [:]
-            this.languages = lifecycles.keySet() as String[];
+            this.languages = lifecycles.keySet() as String[]
         }
     }
 

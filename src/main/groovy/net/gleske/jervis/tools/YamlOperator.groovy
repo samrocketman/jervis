@@ -68,8 +68,8 @@ class YamlOperator {
         options.setIndent(2)
         options.setPrettyFlow(true)
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
-        options.setIndicatorIndent(2);
-        options.setIndentWithIndicator(true);
+        options.setIndicatorIndent(2)
+        options.setIndentWithIndicator(true)
         def yaml = new Yaml(new SafeConstructor(new LoaderOptions()), new Representer(options), options)
         yaml.dump(yamlToSerialize)
     }

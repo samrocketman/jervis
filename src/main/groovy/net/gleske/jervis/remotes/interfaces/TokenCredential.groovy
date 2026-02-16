@@ -52,11 +52,11 @@ interface TokenCredential extends JervisCredential {
 
        @return A token used for authentication.
       */
-    String getToken();
+    String getToken()
 
     /**
        When implemented, this method should set the value of the token in a
        credential service.  Note, this method can be implemented as a no-op.
       */
-    void setToken(String token);
+    void setToken(String token)
 }

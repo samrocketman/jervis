@@ -212,4 +212,3 @@ def call(Map additional_settings, Map settings, Closure body) {
 def call(List obtain_lock, Closure body) {
     call(obtain_lock: obtain_lock, body)
 }
-
