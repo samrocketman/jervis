@@ -1184,4 +1184,26 @@ class FilterByContextTest extends GroovyTestCase {
             shouldFilter.allowBuild('invalid')
         }
     }
+    @Test public void test_FilterByContext_allowBuild_with_custom_metadata() {
+        // stage_name is custom arbitrary data example in this test
+        Map context = [
+            trigger: '',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: false,
+                cron: false,
+                manually: '',
+                pr_comment: '',
+                stage_name: 'Some stage',
+            ]
+        ]
+        Map filters = [branch: 'main', stage_name: '/Some.*/', combined: true]
+        FilterByContext shouldFilter = new FilterByContext(context, filters)
+        assert shouldFilter.allowBuild == true
+        assert shouldFilter.allowBuild(stage_name: 'Some stage2') == false
+        assert shouldFilter.allowBuild(stage_name: 'Some stage') == true
+    }
 }

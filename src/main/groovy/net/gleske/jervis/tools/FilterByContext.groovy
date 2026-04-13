@@ -148,6 +148,20 @@ class FilterByContext {
     Map context = [:]
 
     /**
+      Tracks known metadata so that users can extend filtering with custom
+      metadata.
+      */
+    private List known_metadata = [
+        'pr',
+        'branch',
+        'tag',
+        'push',
+        'cron',
+        'manually',
+        'pr_comment',
+    ]
+
+    /**
       A list of user-provided filters where a filter can be a single string or
       a filter map.
       */
@@ -300,7 +314,7 @@ class FilterByContext {
         else if((this.context.metadata[filterKey] in Boolean) || (userExpression in Boolean)) {
             return (userExpression == (context == filterKey))
         }
-        else if(context != filterKey) {
+        else if((context in known_metadata) && context != filterKey) {
             return false
         }
         // String is the only other case

@@ -16,6 +16,16 @@
 /**
   Get a build environment context map meant to be used with build trigger
   filtering by context.  This is used by the FilterByContext class typically.
+
+  If you wish to extend the metadata available to filtering builds, then define
+  a NonCPS variable named vars/adminExtendBuildContextMap.groovy which takes a
+  context HashMap as an argument and returns the enhanced context HashMap.
+
+  Example vars/adminExtendBuildContextMap.groovy
+      Map call(Map context) {
+          context.metadata.your_field = 'value'
+          return context
+      }
   */
 
 import hudson.model.Cause
@@ -91,7 +101,8 @@ Map call() {
             push: false,
             cron: false,
             manually: '',
-            pr_comment: ''
+            pr_comment: '',
+            stage_name: (env.STAGE_NAME ?: ''),
         ]
     ]
 
@@ -132,6 +143,10 @@ Map call() {
     context.metadata.branch = getBranchName(currentBuild.rawBuild.parent)
     if(context.metadata.branch) {
         context.context = 'branch'
+    }
+
+    if(hasGlobalVar('adminExtendBuildContextMap')) {
+        context = adminExtendBuildContextMap(context)
     }
 
     return context
