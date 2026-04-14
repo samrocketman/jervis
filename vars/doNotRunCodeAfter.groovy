@@ -38,34 +38,12 @@
       }
   */
 
-import java.time.Instant
-
-@NonCPS
-Boolean dateIsValid(String date) {
-    if(!(date =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) {
-        return false
-    }
-    date.tokenize('-').collect { Integer.parseInt(it) }.with { List dateItems ->
-        if(dateItems.any { it < 1 }) {
-            return false
-        }
-        // month and day
-        if(dateItems[1] > 12 || dateItems[2] > 31) {
-            return false
-        }
-        // date is valid
-        true
-    }
-}
-
 @NonCPS
 def date(String date, Closure body = null) {
-    if(!dateIsValid(date)) {
+    if(!isDate.valid(date)) {
         throw new Exception('doNotRunCodeAfter date format must be "YYYY-MM-DD"')
     }
-    // ISO 8601 date-time format is used for comparison
-    String iso8601suffix = 'T00:00:00.0Z'
-    Boolean shouldRun = Instant.now().isBefore(Instant.parse(date + iso8601suffix))
+    Boolean shouldRun = isDate(before: date)
     if(body) {
         if(shouldRun) {
             return body()
@@ -81,7 +59,7 @@ def call(String date, Closure body) {
 }
 
 def call(Map settings, Closure body) {
-    if(!dateIsValid(settings.date ?: '')) {
+    if(!isDate.valid(settings.date ?: '')) {
         error 'doNotRunCodeAfter date format must be "YYYY-MM-DD"'
     }
     if(settings.afterDate && !(settings.afterDate in Closure)) {

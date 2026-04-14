@@ -21,6 +21,7 @@ full change log see the commit log.
   then they can enhance the filtering available to users calling `isBuilding`
   step with any metadata which falls outside of triggering and context built
   into the Jervis library.
+- `isDate` step available.
 
 # jervis 2.3 - Jan 16th, 2026
 
