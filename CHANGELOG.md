@@ -3,6 +3,25 @@
 This file contains all of the notable changes from Jervis releases.  For the
 full change log see the commit log.
 
+# jervis 2.3
+
+## Enhancements
+
+#### Jervis API changes in `src/` folder
+
+- FilterByContext supports custom metadata filtering in addition to know build
+  context filtering.  This allows `isBuilding()` step to account for
+  `stage_name` and any other custom metadata.
+
+#### Jervis API changes in `vars/` folder
+
+- getBuildContextMap now includes `stage_name` as a default extra custom
+  metadata for filtering.  However, there's a new extension point where if a
+  Jenkins administrator adds their own `vars/adminExtendBuildContextMap.groovy`,
+  then they can enhance the filtering available to users calling `isBuilding`
+  step with any metadata which falls outside of triggering and context built
+  into the Jervis library.
+
 # jervis 2.3 - Jan 16th, 2026
 
 - Fixes a core but in MultiePlatformGenerator preventing its use as a

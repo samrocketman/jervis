@@ -1179,6 +1179,7 @@ class FilterByContextTest extends GroovyTestCase {
         assert shouldFilter.allowBuild('push') == false
         assert shouldFilter.allowBuild('pr_comment') == true
         assert shouldFilter.allowBuild('pr') == true
+        assert shouldFilter.allowBuild('branch') == false
         assert shouldFilter.allowBuild(pr_comment: '/some other comment/') == false
         shouldFail(FilterByContextException) {
             shouldFilter.allowBuild('invalid')
