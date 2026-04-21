@@ -353,6 +353,11 @@ class SimpleRestService {
             if(only_response_headers) {
                 return
             }
+            // RFC 7231: 204 No Content, 205 Reset Content, and 304 Not Modified must not
+            // include a message body; skip getContent() so Content-Length: -1 still works.
+            if(response_code in [204, 205, 304]) {
+                return
+            }
             if(conn.getContentLengthLong() == 0) {
                 return
             }
