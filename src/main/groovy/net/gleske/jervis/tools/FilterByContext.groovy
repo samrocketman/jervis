@@ -16,8 +16,9 @@
 
 package net.gleske.jervis.tools
 
-import static net.gleske.jervis.tools.AutoRelease.isMatched
 import net.gleske.jervis.exceptions.FilterByContextException
+import static net.gleske.jervis.tools.AutoRelease.isMatched
+import static net.gleske.jervis.tools.YamlOperator.getObjectValue
 
 /**
   Filter by context can provide a boolean result based on the conditions in
@@ -160,6 +161,61 @@ class FilterByContext {
         'manually',
         'pr_comment',
     ]
+
+    /**
+      Default behavior for complex filter types.  By default filters are not
+      combined and are not inversed.  However, you can customize the default
+      behavior of List or Map complex filters by setting
+      <tt>complexFilterDefaults</tt>.
+
+      <h2>Examples</h2>
+
+<pre><code>
+import net.gleske.jervis.tools.FilterByContext
+Map context = [
+    trigger: 'push',
+    context: 'pr',
+    metadata: [
+        push: true,
+        pr: true,
+        branch: '',
+        tag: ''
+    ]
+]
+def filters = [[branch: 'main'], 'push']
+FilterByContext filterShould = new FilterByContext(context, filters)
+
+// The filters list should be considered "combined" and a filter Map should
+// also be considered "combined".
+filterShould.complexFilterDefaults = [
+    (Map): [combined: true, inverse: false],
+    (List): [combined: true, inverse: false]
+]
+
+// returns false because not a branch push event.
+assert filterShould.allowBuild == false
+</code></pre>
+      */
+    Map complexFilterDefaults = [
+        (Map): [combined: false, inverse: false],
+        (List): [combined: false, inverse: false]
+    ]
+
+    /**
+      Sets complexFilterDefaults with some type checking before setting the
+      value.
+      */
+    void setComplexFilterDefaults(Map complexFilterDefaults) {
+        complexFilterDefaults.each { k, v ->
+            if(k in Map && v in Map) {
+                this.complexFilterDefaults[Map] = v
+            } else if(k in List && v in Map) {
+                this.complexFilterDefaults[List] = v
+            } else {
+                throw new FilterByContextException('ERROR: FilterByContext complexFilterDefaults contains invalid types.')
+            }
+        }
+    }
 
     /**
       A list of user-provided filters where a filter can be a single string or
@@ -339,8 +395,10 @@ class FilterByContext {
             return false
         }
 
-        Boolean combined = filter?.combined ?: false
-        Boolean inverse = filter?.inverse ?: false
+        Boolean combined = getObjectValue(this.complexFilterDefaults[Map], 'combined', false)
+        combined = getObjectValue(filter, 'combined', combined)
+        Boolean inverse = getObjectValue(this.complexFilterDefaults[Map], 'inverse', false)
+        inverse = getObjectValue(filter, 'inverse', inverse)
         Map results = [:]
         filter.each { k, v ->
             if(k in ['combined', 'inverse']) {
@@ -372,8 +430,11 @@ class FilterByContext {
             return false
         }
         Boolean result = false
-        Boolean inverse = ('inverse' in filters)
-        Boolean combined = ('combined' in filters)
+
+        Boolean combined = ('combined' in filters) || \
+            getObjectValue(this.complexFilterDefaults[List], 'combined', false)
+        Boolean inverse = ('inverse' in filters) || \
+            getObjectValue(this.complexFilterDefaults[List], 'inverse', false)
 
         if(combined) {
             result = filters.every {

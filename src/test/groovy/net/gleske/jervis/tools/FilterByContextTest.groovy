@@ -1207,4 +1207,83 @@ class FilterByContextTest extends GroovyTestCase {
         assert shouldFilter.allowBuild(stage_name: 'Some stage2') == false
         assert shouldFilter.allowBuild(stage_name: 'Some stage') == true
     }
+    @Test public void test_FilterByContext_allowBuild_with_complex_defaults_with_combined_specified() {
+        // stage_name is custom arbitrary data example in this test
+        Map context = [
+            trigger: '',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: false,
+                cron: false,
+                manually: '',
+                pr_comment: '',
+                stage_name: 'Some stage',
+            ]
+        ]
+        Map filters = [branch: 'main', stage_name: '/Some2.*/', combined: false]
+        FilterByContext shouldFilter = new FilterByContext(context, filters)
+        shouldFilter.complexFilterDefaults = [(Map): [combined: true, inverse: false] ]
+        assert shouldFilter.allowBuild == true
+    }
+    @Test public void test_FilterByContext_allowBuild_with_complex_defaults() {
+        // stage_name is custom arbitrary data example in this test
+        Map context = [
+            trigger: '',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: false,
+                cron: false,
+                manually: '',
+                pr_comment: '',
+                stage_name: 'Some stage',
+            ]
+        ]
+        Map filters = [branch: 'main', stage_name: '/Some2.*/']
+        FilterByContext shouldFilter = new FilterByContext(context, filters)
+        shouldFilter.complexFilterDefaults = [(Map): [combined: true, inverse: false] ]
+        assert shouldFilter.allowBuild == false
+
+        shouldFilter = new FilterByContext(context, [filters, 'branch'])
+        shouldFilter.complexFilterDefaults = [(Map): [combined: true, inverse: false] ]
+        assert shouldFilter.allowBuild == true
+        // extending complexFilterDefaults with List type
+        shouldFilter.complexFilterDefaults = [(List): [combined: true, inverse: false] ]
+        assert shouldFilter.allowBuild == false
+        // Map is inversed so overall should be true (because List is still combined: true)
+        shouldFilter.complexFilterDefaults = [(Map): [combined: true, inverse: true] ]
+        assert shouldFilter.allowBuild == true
+        // Revert the map defaults and force an overall inverse with List.
+        shouldFilter.complexFilterDefaults = [(Map): [combined: true, inverse: false] ]
+        shouldFilter.complexFilterDefaults = [(List): [combined: true, inverse: true] ]
+        // would be false but because List default inverse: true, then overall becomes true.
+        assert shouldFilter.allowBuild == true
+    }
+    @Test public void test_FilterByContext_allowBuild_with_complex_defaults_error() {
+        // stage_name is custom arbitrary data example in this test
+        Map context = [
+            trigger: '',
+            context: 'branch',
+            metadata: [
+                pr: false,
+                branch: 'main',
+                tag: '',
+                push: false,
+                cron: false,
+                manually: '',
+                pr_comment: '',
+                stage_name: 'Some stage',
+            ]
+        ]
+        Map filters = [branch: 'main', stage_name: '/Some2.*/']
+        FilterByContext shouldFilter = new FilterByContext(context, filters)
+        shouldFail(FilterByContextException) {
+            shouldFilter.complexFilterDefaults = [(Map): 23]
+        }
+    }
 }

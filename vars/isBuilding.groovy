@@ -96,13 +96,28 @@ import net.gleske.jervis.tools.FilterByContext
 */
 
 @NonCPS
-def call(def filters) {
+def call(def filters, Map = ) {
+    call(filters, complexFilterDefaults)
+}
+
+@NonCPS
+def call(def filters, Map complexFilterDefaults = [:]) {
+    /*
+      Example complexFilterDefaults Map
+        [
+            (Map): [combined: false, inverse: false],
+            (List): [combined: false, inverse: false]
+        ]
+    */
     Map context = getBuildContextMap()
     FilterByContext shouldFilter
     if(!filters) {
         shouldFilter = new FilterByContext(context)
     } else {
         shouldFilter = new FilterByContext(context, filters)
+    }
+    if(complexFilterDefaults) {
+        shouldFilter.complexFilterDefaults = complexFilterDefaults
     }
     Boolean result = shouldFilter.allowBuild
     if(result && [filters, context.metadata[filters]].every { it in String }) {

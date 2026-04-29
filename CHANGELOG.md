@@ -12,6 +12,8 @@ full change log see the commit log.
 - FilterByContext supports custom metadata filtering in addition to know build
   context filtering.  This allows `isBuilding()` step to account for
   `stage_name` and any other custom metadata.
+- FilterByContext supports complex filter defaults. e.g. Maps can be set as
+  combined by default.
 
 #### Jervis API changes in `vars/` folder
 
