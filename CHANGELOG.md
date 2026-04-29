@@ -3,7 +3,7 @@
 This file contains all of the notable changes from Jervis releases.  For the
 full change log see the commit log.
 
-# jervis 2.3
+# jervis 2.4 - Apr 28th, 2026
 
 ## Enhancements
 
@@ -24,6 +24,7 @@ full change log see the commit log.
   step with any metadata which falls outside of triggering and context built
   into the Jervis library.
 - `isDate` step available.
+- `isBuilding` supports more complex filter defaults.
 
 # jervis 2.3 - Jan 16th, 2026
 
