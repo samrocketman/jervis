@@ -1285,5 +1285,11 @@ class FilterByContextTest extends GroovyTestCase {
         shouldFail(FilterByContextException) {
             shouldFilter.complexFilterDefaults = [(Map): 23]
         }
+        shouldFail(FilterByContextException) {
+            shouldFilter.complexFilterDefaults = [(List): 23]
+        }
+        shouldFail(FilterByContextException) {
+            shouldFilter.complexFilterDefaults = [invalid_string: [foo: 'bar']]
+        }
     }
 }
