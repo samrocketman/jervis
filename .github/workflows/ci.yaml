@@ -27,18 +27,18 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        java: [ '17', '21' ]
+        java: [ '17', '21', '25' ]
         groovy:
           - ${{ vars.GROOVY_2_4 }}
           - ${{ vars.GROOVY_2_5 }}
           - ${{ vars.GROOVY_3_0 }}
           - ${{ vars.GROOVY_4_0 }}
           - ${{ vars.GROOVY_5_0 }}
-        #exclude:
-        #  - groovy: ${{ vars.GROOVY_2_4 }}
-        #    java: '21'
-        #  - groovy: ${{ vars.GROOVY_2_5 }}
-        #    java: '21'
+        exclude:
+          - groovy: ${{ vars.GROOVY_2_4 }}
+            java: '25'
+          - groovy: ${{ vars.GROOVY_2_5 }}
+            java: '25'
     name: Java ${{ matrix.java }} Groovy ${{ matrix.groovy }}
     steps:
       - uses: actions/checkout@v4
