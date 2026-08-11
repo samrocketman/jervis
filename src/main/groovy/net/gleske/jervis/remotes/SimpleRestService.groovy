@@ -365,8 +365,20 @@ class SimpleRestService {
                 ByteArrayOutputStream errorResponse = new ByteArrayOutputStream()
                 errorResponse << conn.getErrorStream()
                 response_content = errorResponse.toString()
-            } else {
+            } else if(response_headers.find { it.key?.equalsIgnoreCase('Content-Type') }) {
                 response_content = conn.getContent().getText()
+            } else {
+                // getContent() dispatches on the Content-Type header and throws
+                // UnknownServiceException('no content-type') when the response
+                // omits it, so a response with a body but no Content-Type has to
+                // be read straight off the stream instead. This is a real
+                // response shape rather than a broken server: Express
+                // `res.status(200).end()` behind compression middleware sends a
+                // bodyless 200 chunked, with neither Content-Length nor
+                // Content-Type, and that must not look like a transport failure.
+                ByteArrayOutputStream successResponse = new ByteArrayOutputStream()
+                successResponse << conn.getInputStream()
+                response_content = successResponse.toString()
             }
             response_content
         }

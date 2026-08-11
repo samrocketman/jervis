@@ -140,7 +140,14 @@ JERVIS_MOCKS_PATH=/tmp/mocks ./gradlew clean check
                 },
                 getHeaderFields: { ->
                     request_meta.data = request_meta.data?.toString() ?: ''
-                    Map header_fields = [(null): Collections.unmodifiableList(['HTTP/1.1 200 OK'])]
+                    // The recorded fixtures are JSON API responses, so the mock
+                    // declares the Content-Type a real one carries. Without it
+                    // every mocked response looks Content-Type-less, which is now
+                    // a distinct (and separately handled) read path in apiFetch.
+                    Map header_fields = [
+                        (null): Collections.unmodifiableList(['HTTP/1.1 200 OK']),
+                        'Content-Type': Collections.unmodifiableList(['application/json'])
+                    ]
                     String file = urlToMockFileName(mockedUrl, [request_meta.method, request_meta.data].join(' '), checksumMocks, checksumAlgorithm)
                     if(file in custom_responses.keySet()) {
                         //throw new Exception( custom_responses.get(file) )
