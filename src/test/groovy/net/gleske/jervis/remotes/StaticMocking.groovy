@@ -361,6 +361,9 @@ request_history
                 getDoOutput: { ->
                     request_meta.conn.getDoOutput()
                 },
+                setConnectTimeout: { Integer millis ->
+                    request_meta.conn.setConnectTimeout(millis)
+                },
                 getHeaderFields: { ->
                     request_meta.data = request_meta.data?.toString() ?: ''
                     // write output to connection request
@@ -408,7 +411,6 @@ request_history
                     }
                     if(key == 'X-HTTP-Method-Override') {
                         if(value) {
-                            request_meta.conn.@method = value
                             request_meta['method'] = value
                         }
                         return
